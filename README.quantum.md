@@ -1,22 +1,34 @@
 ------------------------------------------------ wish list for v3
 
-- Any number of dimensions, eg x and s, the spin, becomes ψ[1...N][-½, ½]
-or a 2d wave is ψ[1...N][1...N], either two 1D particles or 1 2D particle
-whats the diff?  well, the potential V with two particles, each depends on the loc of the other.
-For one particle in 2D, the potential
 
 - UI ability to set n of dimensions, and to specify angular momentum, and any energy/potential differences therein.  Two particles in the same space should have the same X coordinates; one in 2-d space should have X  and Y coords.  The V potential would be 1-dimensional or 2 dimensional, depending.
+Any number of dimensions, eg x and s, the spin, becomes ψ[1...N][-½, ½]
+or a 2d wave is ψ[1...N][1...N], either two 1D particles or 1 2D particle
+whats the diff?  well, the potential V with two particles, each depends on the loc of the other.
+For one particle in 2D, the potential is a 2d map.
 
-- Emscripten engine in C
+- Emscripten engine in C - definitely
 https://emscripten.org/docs/getting_started/downloads.html
+Multiprocessing must be done with pThreads and/or web workers, it seems.
 
-- OpenGL, if possible (maybe v4?)
+- test harness to run C++ iterator for testing
+
+- OpenGL, if possible (maybe v4?)  Must be webgl cuz emscripten doesn't do full OpenGL
+(basically OpenGL ES = WebGL anyway).
+
+- display Spiral in 3d could be easy.  Dual waves for an electron with spin.
 
 - ability to create two wave functions and superimpose them, with varying complex ratio between
 
 - ability to alter speed of animation/calculation
 
 - ability to 'stick your finger in' and measure a state variable and thereby change the state
+
+- small key image indicating phase-color correspondence
+- time display, iterations,
+- some diagnostics for me?
+
+- Fourier transforms with http://www.fftw.org to xform space domain to momentum domain
 
 ------------------------------------------------ v3 definitions
 
@@ -29,9 +41,14 @@ class Dimension {
 	Nv: number of values (=N or N+2)
 	size: number of complex values in this whole thing (product of Nv * Nv of next dimension or 1 if none)
 		or maybe x2 for number of real values
-	geometry: 'x', 'y' or 'z' - two particles will have x, x but one in 2d will have x, y.  Spin?  maybe s, or s1, s2, ...  Also could have Energy dimensions...
+	label: 'x', 'y' or 'z' - two particles will have x1, x2 but one in 2d will have x, y.
+			Spin: Sz, or Sz1, Sz2, ...  Smax = 2S+1.  Sz= ix - S.  Orbital Ang: Lz, combined: Jz
+			variable total angular mom: L combines Lz and Ltot so: state ix = 0...Lmax^2
+			Ltot = floor(sqrt(ix))   Lz = ix - L(L+1) and you have to choose a Lmax sorry
+			Also could have Energy dimensions...
 }
-Each dimension's variable is an integer, either 0...N-1 or 1...N, the latter for coordinates
+Each dimension's variable is an integer, either 0...N-1 or 1...N, the latter for coordinates.
+	Coordinates always have 1 extra point on each end, either for ∞ wall or for wraparound
 
 - a 'Space' is a list of dimensions, and a potential function of those dimension variables, known as V
 	Dimensions are listed from outer to inner as with the resulting psi array:
@@ -46,7 +63,7 @@ class Space {
 - a 'wave' is a multidimensional array of psi  values, each a complex number (two floats, either single or double)
 	- points to space
 	- iterate passes thru all psi values along all dimensions
-	- wrap ends automatically wraps continuum dimensions
+	- fixBoundaries() automatically wraps continuum dimensions
 	- can have multiple waves per space; user can superimpose them
 
 ------------------------------------------------ equations
@@ -60,5 +77,18 @@ where t=time, x=location (potentially scalar, 2-vec or 3-vec)
 h=hbar ħ plank's constant / 2π   m=particle mass
 V=potential map, function of x and t
 psi
+
+------------------------------------------------ layman descriptions
+
+
+Q: what does an electron look like?
+
+A: first you have to define what you mean by that.  Usually when we "look at" something, some photons from a light or the sun hit the thing we want to see, then they go to our eyes, which senses the photons.  (The photons really go off in all directions, but only the lucky ones are aimed at our eyes.)
+
+Imagine a boat in a lake.  We can splash some waves toward it, and the waves bounce off and come back.  By checking out the waves that get reflected, we can figure out how big the boat is, and the shape of its surface (at the water line).  This will also work with rocks or posts in the water - anything that the waves bounce off.
+
+The problem is, if our boat is a small toy boat, all we can tell is that there's something there that's reflecting waves.  It shows up as a dot, sortof.  And so that boat will look like a rock the same size, which will look like a post of the same size.  We might not even be able to see the dot if it's too small.
+
+The light that our eyes see are waves, and they have wavelengths of 400 to 700 nanometers, that's 4 x 10^-7 to 7 x 10^7.  That's very tiny.  It's great for us humans to look at large things, and even tiny things, but anything smaller than those waves, we won't be able to see much.  An atom can be as small as 10^-10 meters, that's more than 1000 times smaller.  So we can't see them with light.
 
 
