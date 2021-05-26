@@ -65,6 +65,18 @@ class Space {
 	- iterate passes thru all psi values along all dimensions
 	- fixBoundaries() automatically wraps continuum dimensions
 	- can have multiple waves per space; user can superimpose them
+	- must have at least 2 copies of wave so alg can create one from other
+	- plus boolean telling which is latest
+
+
+Also must have shared between JS and C++:
+- animation period?
+- potential energy as function of state; scalars not complex
+- elapsed time
+
+Also must have in C++; not sure if JS cares:
+- acceptable error amount
+- progress of each thread, so it can coordinate the pthreads
 
 ------------------------------------------------ equations
 

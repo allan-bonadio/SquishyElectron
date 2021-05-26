@@ -4,11 +4,9 @@ import WaveDisplay from './WaveDisplay';
 import ControlPanel from './ControlPanel';
 import ResolutionDialog from './ResolutionDialog';
 
-
-
 class App extends React.Component {
 	constructor(props) {
-		super(props)
+		super(props);
 		this.state = {
 			kickCount: 0, // remove this someday
 
@@ -57,3 +55,4 @@ class App extends React.Component {
 }
 
 export default App;
+
