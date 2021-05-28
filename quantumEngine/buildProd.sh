@@ -8,7 +8,9 @@ cd `dirname $0`
 . allCpp.sh
 
 
-emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED -O1 -flto  main.cpp $allCpp
+emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
+	-O1 -flto  \
+	main.cpp "$allCpp" EXPORTED_FUNCTIONS="$exportedFunctions"
 
 cp quantumEngine.wasm quantumEngine.js ../public
 

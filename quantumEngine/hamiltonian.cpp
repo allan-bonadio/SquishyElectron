@@ -1,5 +1,4 @@
-#include "quantumEngine.h"
-#include "cx.h"
+#include "QuantumSpace.h"
 
 
 void hamiltonian() {

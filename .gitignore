@@ -6,18 +6,8 @@ logs
 npm-debug.log*
 
 package-lock.json
-
 # old stuff I used to get the QE off the ground
 old
-
-# Runtime data
-# pids
-# *.pid
-# *.seed
-# *.pid.lock
-#
-# # Compiled binary addons (https://nodejs.org/api/addons.html)
-# build/Release
 
 # Dependency directories
 node_modules/

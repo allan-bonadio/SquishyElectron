@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../quantumEngine.h"
+#include "../QuantumSpace.h"
 #include "test.h"
 #include "../cx.h"
 

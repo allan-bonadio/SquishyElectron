@@ -3,6 +3,7 @@
 import {space, wave} from './wave';
 import draw from './draw';
 import iterate from './iterate';
+import {quantumEngineHasStarted} from './qEngine';
 // this is the state of the wave
 
 // the wave that we're displaying and animating
