@@ -8,7 +8,7 @@
 // the wave function ψ in a quantum-101 simiple potential energy well.
 // N is number of data points, including the boundaries
 
-import cx from './cx';
+import qCx from './qCx';
 import iterate from './iterate';
 //const isZero = c => (Math.abs(c.real) < 1e-10 && Math.abs(c.im) < 1e-10);
 
@@ -101,8 +101,8 @@ export class wave {
 		if (this.walls) {
 			// the points on the end are ∞ potential, but the arithmetic goes bonkers
 			// if I actually set the voltage to ∞
-			psiAr[0] = cx();
-			psiAr[N+1] = cx();
+			psiAr[0] = qCx();
+			psiAr[N+1] = qCx();
 		}
 		else {
 			// the points on the end get set to the opposite side
@@ -157,7 +157,7 @@ export class wave {
 
 		let N = this.space.N;
 		const dAngle = Math.PI / N;
-		this.map((p, ix) => cx(Math.sin(dAngle * ix * n)) );
+		this.map((p, ix) => qCx(Math.sin(dAngle * ix * n)) );
 
 		this.normalize();
 
@@ -172,7 +172,7 @@ export class wave {
 		const dAngle = 2 * Math.PI / N;
 		this.map((p, ix) => {
 			let angle = dAngle * ix * n;
-			return cx(Math.cos(angle), Math.sin(angle));
+			return qCx(Math.cos(angle), Math.sin(angle));
 		} );
 		this.normalize();
 	}
@@ -180,8 +180,8 @@ export class wave {
 	// fill the wave with a dirac delta wave function
 	setDiracDelta() {
 		this.psi = null;
-		this.map(p => cx(0));
-		this.psi[Math.floor((this.N + 1) / 2)] = cx(1);
+		this.map(p => qCx(0));
+		this.psi[Math.floor((this.N + 1) / 2)] = qCx(1);
 		this.normalize();
 	}
 
@@ -239,8 +239,8 @@ export class wave {
 //		if (this.walls) {
 //			// the points on the end are ∞ potential, but the arithmetic goes bonkers
 //			// if I actually set the voltage to ∞
-//			psiAr[0] = cx();
-//			psiAr[this.N+1] = cx();
+//			psiAr[0] = qCx();
+//			psiAr[this.N+1] = qCx();
 //		}
 //		else {
 //			// the points on the end get set to the opposite side
@@ -253,11 +253,11 @@ export class wave {
 //	// x is a naked array of complex numbers
 //	dot(x) {
 //		console.error('warning not tested')
-////		let t = cx(0);
+////		let t = qCx(0);
 ////		let psi = this.psi;
-//////		t = this.psi.map((p, ix) => cx(p).multiply(x[ix])).reduce((a, b) => a + b, 0);
+//////		t = this.psi.map((p, ix) => qCx(p).multiply(x[ix])).reduce((a, b) => a + b, 0);
 ////		for (let ix = 1; ix <= N; ix++)
-////			t.addTo(cx(psi[ix]).multiply(x[ix]));
+////			t.addTo(qCx(psi[ix]).multiply(x[ix]));
 ////		return t;
 //	}
 //
@@ -307,7 +307,7 @@ export class wave {
 //
 //		let N = this.space.N;
 //		const dAngle = Math.PI / N;
-//		this.map((p, ix) => cx(Math.sin(dAngle * ix * n)) );
+//		this.map((p, ix) => qCx(Math.sin(dAngle * ix * n)) );
 //
 //		this.normalize();
 //
@@ -322,7 +322,7 @@ export class wave {
 //		const dAngle = 2 * Math.PI / N;
 //		this.map((p, ix) => {
 //			let angle = dAngle * ix * n;
-//			return cx(Math.cos(angle), Math.sin(angle));
+//			return qCx(Math.cos(angle), Math.sin(angle));
 //		} );
 //		this.normalize();
 //	}
@@ -330,8 +330,8 @@ export class wave {
 //	// fill the well with a dirac delta wave function
 //	setDiracDelta() {
 //		this.psi = null;
-//		this.map(p => cx(0));
-//		this.psi[Math.floor((this.N + 1) / 2)] = cx(1);
+//		this.map(p => qCx(0));
+//		this.psi[Math.floor((this.N + 1) / 2)] = qCx(1);
 //		this.normalize();
 //	}
 //

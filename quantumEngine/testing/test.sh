@@ -8,7 +8,7 @@ cd ..
 
 . allCpp.sh
 
-emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED -g testing/main.test.cpp testing/cx.test.cpp $allCpp
+emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED -g testing/main.test.cpp testing/qCx.test.cpp $allCpp
 
 node quantumEngine.js
 

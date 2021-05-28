@@ -99,10 +99,10 @@ works at least for syntax:
 transform: translate(0px, 0px) scale(18.4615, -23);
 
 			<circle
-				cx={0} cy={0}
+				qCx={0} cy={0}
 				r={10} fill='#ff4' stroke='none' />
 			<circle
-				cx={innerPixelWidth} cy={innerPixelHeight}
+				qCx={innerPixelWidth} cy={innerPixelHeight}
 				r={50} fill='#4ff' stroke='none'  />
 
 	//  translate(0, ${innerPixelHeight})
@@ -119,10 +119,10 @@ txers have args separated by comma, but they themselves are separated by spaces.
 			<rect x={WELL_PIXEL_MARGIN + innerPixelWidth/2} y={WELL_PIXEL_MARGIN + innerPixelHeight/2}
 				width={innerPixelWidth/2} height={innerPixelHeight/2} stroke='orange'  fill='none' />
 			<circle
-				cx={0} cy={0}
+				qCx={0} cy={0}
 				r={50} fill='#cc4' stroke='none' />
 			<circle
-				cx={outerPixelWidth} cy={OUTER_PIXEL_HEIGHT}
+				qCx={outerPixelWidth} cy={OUTER_PIXEL_HEIGHT}
 				r={50} fill='#4cc' stroke='none'  />
 
 

@@ -9,26 +9,26 @@ EM_JS(void, qeStarted,
 	{quantumEngineHasStarted(sFLOAT, sCX, md, ml, sDim, sQS)});
 
 int main() {
-	printf("bonjour le monde! sizeof cx is %lu\n", sizeof(cx));
+	printf("bonjour le monde! sizeof qCx is %lu\n", sizeof(qCx));
 
-// 	cx zero(0, 0);
+// 	qCx zero(0, 0);
 // 	printf("bonjour zero is %lf, %lf\n", zero.re, zero.im);
 //
-// 	cx two(2, 0);
+// 	qCx two(2, 0);
 // 	printf("bonjour two is %lf, %lf\n", two.re, two.im);
 //
-// 	cx three(3);
+// 	qCx three(3);
 // 	printf("bonjour three is %lf, %lf\n", three.re, three.im);
 //
-// 	cx five = two + three;
+// 	qCx five = two + three;
 // 	printf("bonjour five is %lf, %lf\n", five.re, five.im);
 //
-// 	cx zoot = five;
-// 	zoot += cx(-7, 7);
+// 	qCx zoot = five;
+// 	zoot += qCx(-7, 7);
 // 	printf("bonjour zoot is %lf, %lf\n", zoot.re, zoot.im);
 
 
-	qeStarted(sizeof(FLOAT), sizeof(cx), MAX_DIMENSIONS, LABEL_LEN, sizeof(Dimension), sizeof(QuantumSpace));
+	qeStarted(sizeof(FLOAT), sizeof(qCx), MAX_DIMENSIONS, LABEL_LEN, sizeof(Dimension), sizeof(QuantumSpace));
 
 
 	return 0;
@@ -40,7 +40,7 @@ extern "C" {
 	// need this to set up data structures in JS
 	void getQuantumSizes(int32_t sizesArray[5]) {
 		sizesArray[0] = sizeof(FLOAT);
-		sizesArray[1] = sizeof(cx);
+		sizesArray[1] = sizeof(qCx);
 		sizesArray[2] = MAX_DIMENSIONS;
 		sizesArray[3] = sizeof(Dimension);
 		sizesArray[4] = sizeof(QuantumSpace);

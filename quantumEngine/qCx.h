@@ -11,60 +11,60 @@
 //const pi = 3.1415926535897932384626433832795029L;
 
 // my streamlined complex class
-class cx {
+class qCx {
 public:
 	FLOAT re;
 	FLOAT im;
 
 	// constructors
-	cx(FLOAT re, FLOAT im) {this->re = re; this->im = im;}
-	cx(FLOAT re) {this->re = re; this->im = 0;}
-	cx(void) {this->re = this->im = 0;}
+	qCx(FLOAT re, FLOAT im) {this->re = re; this->im = im;}
+	qCx(FLOAT re) {this->re = re; this->im = 0;}
+	qCx(void) {this->re = this->im = 0;}
 
 	// addition
-	cx operator+(cx b) {return cx(re + b.re, im + b.im);}
-	cx operator+(FLOAT b) {return cx(re + b, im);}
+	qCx operator+(qCx b) {return qCx(re + b.re, im + b.im);}
+	qCx operator+(FLOAT b) {return qCx(re + b, im);}
 
-	cx operator+=(cx b) {re += b.re; im += b.im; return *this;}
-	cx operator+=(FLOAT b) {re += b; return *this;}
+	qCx operator+=(qCx b) {re += b.re; im += b.im; return *this;}
+	qCx operator+=(FLOAT b) {re += b; return *this;}
 
 	// subtraction
-	cx operator-(cx b) {return cx(re - b.re, im - b.im);}
-	cx operator-(FLOAT b) {return cx(re - b, im);}
+	qCx operator-(qCx b) {return qCx(re - b.re, im - b.im);}
+	qCx operator-(FLOAT b) {return qCx(re - b, im);}
 
-	cx operator-=(cx b) {re -= b.re; im -= b.im; return *this;}
-	cx operator-=(FLOAT b) {re -= b; return *this;}
+	qCx operator-=(qCx b) {re -= b.re; im -= b.im; return *this;}
+	qCx operator-=(FLOAT b) {re -= b; return *this;}
 
 	// multiplication
-	cx operator*(cx b) {return cx(re * b.re - im * b.im, im * b.re + re * b.im);}
-	cx operator*(FLOAT b) {return cx(re * b, im * b);}
+	qCx operator*(qCx b) {return qCx(re * b.re - im * b.im, im * b.re + re * b.im);}
+	qCx operator*(FLOAT b) {return qCx(re * b, im * b);}
 
-	cx operator*=(cx b) {
+	qCx operator*=(qCx b) {
 		FLOAT t = re * b.re - im * b.im;
 		im = im*b.re +  + re * b.im;
 		re = t;
 		return *this;
 	}
-	cx operator*=(FLOAT b) {re *= b; im *= b; return *this;}
+	qCx operator*=(FLOAT b) {re *= b; im *= b; return *this;}
 
 	// division
-	cx operator/(cx b) {
+	qCx operator/(qCx b) {
 		FLOAT det = b.re * b.re + b.im * b.im;
-		return cx(
+		return qCx(
 			(re * b.re + im * b.im) / det,
 			(im * b.re - re * b.im) / det
 		);
 	}
-	cx operator/(FLOAT b) {re /= b; im /= b; return *this;}
+	qCx operator/(FLOAT b) {re /= b; im /= b; return *this;}
 
-	cx operator/=(cx b) {
+	qCx operator/=(qCx b) {
 		FLOAT det = b.re * b.re + b.im * b.im;
 		FLOAT t = (re * b.re + im * b.im) / det;
 		im = (im * b.re - re * b.im) / det;
 		re = t;
 		return *this;
 	}
-	cx operator/=(FLOAT b) {re -= b; return *this;}
+	qCx operator/=(FLOAT b) {re -= b; return *this;}
 
 
 	// inline so faster

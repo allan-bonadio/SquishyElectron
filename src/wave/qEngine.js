@@ -11,7 +11,7 @@
 // set up everything?
 function quantumInit() {
 	// first call them to return the sizes of different data structures.
-	// (qspace can change components; FLOAT and therefore cx can change length)
+	// (qspace can change components; FLOAT and therefore qCx can change length)
 	let sizes = new Int32Array(5);
 	//getQuantumSizes(sizes);
 	console.log(`so the quantum sizes i gt back are:`, sizes);

@@ -1,6 +1,6 @@
 import wave from './wave';
 //import complex from 'complex';
-import cx from './cx';
+import qCx from './qCx';
 
 // schrodinger's:
 //    ih ∂psi / ∂t  =  [V - (h^2/2m) (∂^2/∂x^2)] psi
@@ -48,7 +48,7 @@ export function iterate(wave, dt = DEFAULT_DT) {
 
 		// dPsi_dt_t0 = V[ix] * psi_t0[ix] - h2_2m * d2Psi_dt2_t0_t0[ix];
 		let VPsi = psi_t0[ix].multBy(V[ix]);
-		let dPsi_dt_t0 = VPsi.addTo(d2Psi_dx2_t0, -h2_2m).multBy(cx(0,-1));
+		let dPsi_dt_t0 = VPsi.addTo(d2Psi_dx2_t0, -h2_2m).multBy(qCx(0,-1));
 		check(dPsi_dt_t0);
 
 		// psi at t_1/2 given that derivative - must finish in this loop to take 2nd derivitive next loop
@@ -70,7 +70,7 @@ export function iterate(wave, dt = DEFAULT_DT) {
 
 		// now calculate dPsi_dt_tHalf, the actual derivative halfway thru
 		let VPsi_half = psi_tHalf[ix].multBy(V[ix]);
-		let dPsi_dt_tHalf = VPsi_half.addTo(d2Psi_dx2_tHalf, -h2_2m).multBy(cx(0,-1));
+		let dPsi_dt_tHalf = VPsi_half.addTo(d2Psi_dx2_tHalf, -h2_2m).multBy(qCx(0,-1));
 		check(dPsi_dt_tHalf);
 
 		// now increment psi by full step dt * derivative_Half, shbe right

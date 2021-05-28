@@ -7,7 +7,7 @@
 #include <float.h>
 #include <stdlib.h>
 
-#include "cx.h"
+#include "qCx.h"
 
 #define LABEL_LEN  16
 #define MAX_DIMENSIONS  1
@@ -55,8 +55,8 @@ public:
 	// somewhere else FLOAT *potential;
 
 	// must have at least 2 copies of wave so alg can create one from other
-// 	cx *wave0;
-// 	cx *wave1;
+// 	qCx *wave0;
+// 	qCx *wave1;
 
 	// which wave we're calculating from, 0 or 1.
 	int32_t calcFrom;

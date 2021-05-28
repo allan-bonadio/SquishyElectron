@@ -1,12 +1,12 @@
 
 #include <math.h>
-#include "cx.h"
+#include "qCx.h"
 
 
-FLOAT cx::abs() {
+FLOAT qCx::abs() {
 	return sqrt(this->norm());
 }
 
-FLOAT cx::phase() {
+FLOAT qCx::phase() {
 	return atan2(im, re) * 180 / PI;
 }

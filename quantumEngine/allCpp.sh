@@ -1,5 +1,5 @@
 # this is the list of all c++ source files
-allCpp='hamiltonian.cpp cx.cpp'
+allCpp='hamiltonian.cpp qCx.cpp'
 
 # this is the list of all exported function
 #exportedFunctions='["_getQuantumSizes"]'
