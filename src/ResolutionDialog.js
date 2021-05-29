@@ -11,23 +11,13 @@ export default class ResolutionDialog extends React.Component {
 
 	static me = this;
 
-////	open() {
-////		debugger;
-////		this.setState({visible: true});
-////	}
-////
-////	static open() {
-////		debugger;
-////		ResolutionDialog.me.open();
-////	}
-
 	close(ev) {
 		this.props.closeResolutionDialog();
 	}
 
 	OK(ev) {
 		const s = this.state;
-		recreateWave(s.resolution);
+		recreateWave(+s.resolution);
 		this.close();
 	}
 

@@ -105,7 +105,9 @@ export class qSpace {
 		this.ints = new Uint32Array(theQSpaceBuffer, offset, 8);
 		offset += 8;
 
-		this.elaps = new Float64Array(theQSpaceBuffer, offset, 8);
+
+?
+qq		this.elaps = new Float64Array(theQSpaceBuffer, offset, 8);
 		offset += 8;
 
 		if (dims.length > maxDimensions)

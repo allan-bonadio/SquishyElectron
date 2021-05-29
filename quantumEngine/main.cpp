@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "QuantumSpace.h"
+#include "qSpace.h"
 
 // call this JS callback so JS knows we're up and ready.
 // Hand it some sizes so it knows where everything is in the space buffer.  which it'll construct.
@@ -28,7 +28,7 @@ int main() {
 // 	printf("bonjour zoot is %lf, %lf\n", zoot.re, zoot.im);
 
 
-	qeStarted(sizeof(FLOAT), sizeof(qCx), MAX_DIMENSIONS, LABEL_LEN, sizeof(Dimension), sizeof(QuantumSpace));
+	qeStarted(sizeof(qReal), sizeof(qCx), MAX_DIMENSIONS, LABEL_LEN, sizeof(qDimension), sizeof(qSpace));
 
 
 	return 0;
@@ -39,11 +39,11 @@ extern "C" {
 
 	// need this to set up data structures in JS
 	void getQuantumSizes(int32_t sizesArray[5]) {
-		sizesArray[0] = sizeof(FLOAT);
+		sizesArray[0] = sizeof(qReal);
 		sizesArray[1] = sizeof(qCx);
 		sizesArray[2] = MAX_DIMENSIONS;
-		sizesArray[3] = sizeof(Dimension);
-		sizesArray[4] = sizeof(QuantumSpace);
+		sizesArray[3] = sizeof(qDimension);
+		sizesArray[4] = sizeof(qSpace);
 	}
 
 }

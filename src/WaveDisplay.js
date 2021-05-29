@@ -49,7 +49,8 @@ export class WaveDisplay extends React.Component {
 		let wellWrapper = document.getElementsByClassName('WaveWrapper');
 		//let outerPixelWidth = this.props.innerWindowWidth;
 		let outerPixelWidth = wellWrapper.length ? wellWrapper[0].offsetWidth : 700;
-		let N = theWave.space.N;
+		// theWave isn't created until after C++ is up.  This number isn't that important till then.
+		let N = theWave ? theWave.space.N : 50;
 
 		let innerPixelWidth = outerPixelWidth - 2 * WELL_PIXEL_MARGIN;
 		let innerPixelHeight = OUTER_PIXEL_HEIGHT - 2 * WELL_PIXEL_MARGIN;
@@ -99,10 +100,10 @@ works at least for syntax:
 transform: translate(0px, 0px) scale(18.4615, -23);
 
 			<circle
-				qCx={0} cy={0}
+				cx={0} cy={0}
 				r={10} fill='#ff4' stroke='none' />
 			<circle
-				qCx={innerPixelWidth} cy={innerPixelHeight}
+				cx={innerPixelWidth} cy={innerPixelHeight}
 				r={50} fill='#4ff' stroke='none'  />
 
 	//  translate(0, ${innerPixelHeight})
@@ -119,10 +120,10 @@ txers have args separated by comma, but they themselves are separated by spaces.
 			<rect x={WELL_PIXEL_MARGIN + innerPixelWidth/2} y={WELL_PIXEL_MARGIN + innerPixelHeight/2}
 				width={innerPixelWidth/2} height={innerPixelHeight/2} stroke='orange'  fill='none' />
 			<circle
-				qCx={0} cy={0}
+				cx={0} cy={0}
 				r={50} fill='#cc4' stroke='none' />
 			<circle
-				qCx={outerPixelWidth} cy={OUTER_PIXEL_HEIGHT}
+				cx={outerPixelWidth} cy={OUTER_PIXEL_HEIGHT}
 				r={50} fill='#4cc' stroke='none'  />
 
 

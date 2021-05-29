@@ -15,7 +15,7 @@
 // we use fixed size int32_t and double here just so JS can calculate sizes more easily
 
 /* one for each dimension of the wave array */
-class Dimension {
+class qDimension {
 public:
 	// possible  states, just for this  dimension.  0=end of list.
 	int32_t N;
@@ -48,11 +48,13 @@ const int contDISCRETE = 0;
 const int contWELL = 1;
 const int contCIRCULAR = 2;
 
-class QuantumSpace {
+class qSpace {
 public:
 	// potential energy as function of state; reals (not complex)
 	// otherwise same layout as wave
-	// somewhere else FLOAT *potential;
+	// somewhere else qReal *potential;
+
+	int32_t nDimensions;
 
 	// must have at least 2 copies of wave so alg can create one from other
 // 	qCx *wave0;
@@ -69,7 +71,7 @@ public:
 	// Dimensions are listed from outer to inner as with the resulting psi array:
 	// psi[outermost-dim][dim][dim][innermost-dim]
 	// always a fixed size, for simplicity.  N=0 = one past end of list.
-	Dimension dimensions[MAX_DIMENSIONS];
+	qDimension dimensions[MAX_DIMENSIONS];
 
 };
 

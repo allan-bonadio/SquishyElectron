@@ -3,10 +3,10 @@
 #include "qCx.h"
 
 
-FLOAT qCx::abs() {
+qReal qCx::abs() {
 	return sqrt(this->norm());
 }
 
-FLOAT qCx::phase() {
+qReal qCx::phase() {
 	return atan2(im, re) * 180 / PI;
 }

@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "../QuantumSpace.h"
+#include "../qSpace.h"
 #include "test.h"
-#include "../qCx.h"
+//#include "../qCx.h"
 
 int main() {
 

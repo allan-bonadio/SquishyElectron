@@ -3,14 +3,16 @@
 import {space, wave} from './wave';
 import draw from './draw';
 import iterate from './iterate';
-import {quantumEngineHasStarted} from './qEngine';
+import {qDimension, qSpace, qeStartPromise} from './qEngine';
+//import {quantumEngineHasStarted} from './qEngine';
 // this is the state of the wave
 
-// the wave that we're displaying and animating
+// the (old js) wave that we're displaying and animating
 export let theSpace;
 export let theWave;
-
 export let theDraw;
+
+export let theQSpace;
 
 let iterationSerial = 0;
 
@@ -25,13 +27,20 @@ const DEFAULT_RESOLUTION = 25;
 // call this when user changes number of datapoints.
 // Or at startup, so we have a wave to begin with.
 export function recreateWave(N) {
+	// create the old JS version
+	N = +N;
 	theSpace = new space(N);
 	theWave = new wave(theSpace);
 	theDraw = new draw(theWave);
+
+	// create the new C++ version
+	theQSpace = new qSpace([{N, continuum: qDimension.contCIRCULAR, label: 'x'}])
 }
 
 // upon startup
-recreateWave(DEFAULT_RESOLUTION);
+qeStartPromise.then(() => {
+	recreateWave(DEFAULT_RESOLUTION);
+})
 
 // completely wipe out the Psi wavefunction and replace it with one of our canned waveforms.
 // (but do not change N)

@@ -1,4 +1,4 @@
-#include "QuantumSpace.h"
+#include "qSpace.h"
 
 
 void hamiltonian() {
