@@ -20,27 +20,19 @@ let iterationSerial = 0;
 // range of vertical inside coordinates in the svg
 export const INNER_HEIGHT = 100;
 
-// this is NOT a part of the react 'state' anywhere;
-// drawing of the wave isn't done thru react
-const DEFAULT_RESOLUTION = 25;
-
 // call this when user changes number of datapoints.
 // Or at startup, so we have a wave to begin with.
-export function recreateWave(N) {
+export function recreateWave(N, continuum, callback) {
 	// create the old JS version
-	N = +N;
-	theSpace = new space(N);
+	theSpace = new space(N, continuum);
 	theWave = new wave(theSpace);
 	theDraw = new draw(theWave);
 
 	// create the new C++ version
-	theQSpace = new qSpace([{N, continuum: qDimension.contCIRCULAR, label: 'x'}])
-}
+	theQSpace = new qSpace([{N, continuum, label: 'x'}]);
 
-// upon startup
-qeStartPromise.then(() => {
-	recreateWave(DEFAULT_RESOLUTION);
-})
+	callback(theWave, theDraw);
+}
 
 // completely wipe out the Psi wavefunction and replace it with one of our canned waveforms.
 // (but do not change N)

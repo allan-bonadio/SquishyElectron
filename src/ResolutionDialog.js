@@ -1,12 +1,14 @@
 import React from 'react';
-import {recreateWave} from './wave/theWave';
+import {qDimension} from './wave/qEngine';
 
 const minResolution = 5;
 const maxResolution = 10000;
 
 export default class ResolutionDialog extends React.Component {
+	// this is the state in the dialog; doesn't become real until OK()
 	state = {
-		resolution: 5,
+		N: this.props.N,
+		continuum: this.props.continuum,
 	};
 
 	static me = this;
@@ -17,10 +19,11 @@ export default class ResolutionDialog extends React.Component {
 
 	OK(ev) {
 		const s = this.state;
-		recreateWave(+s.resolution);
-		this.close();
+		this.props.setNewResolution(s.N, s.continuum);
+		this.props.closeResolutionDialog();
 	}
 
+	// try to make the arrows on the input increment in reasonable amounts
 	calcStepSize() {
 		let resolution = this.state.resolution;
 		let digits = Math.floor(Math.log10(resolution));  // 0 ... 3
@@ -43,9 +46,10 @@ export default class ResolutionDialog extends React.Component {
 
 	render() {
 		const p = this.props;
+		const s = this.state;
 		this.calcStepSize();
 
-		return <aside className='backdrop' style={{display: p.visible ? 'flex' : 'none'}}>
+		return <aside className='backdrop' style={{display: 'flex'}}>
 			<div className='dialogSpacer' />
 			<article className='dialog'>
 
@@ -53,12 +57,23 @@ export default class ResolutionDialog extends React.Component {
 
 				<label>
 					Number of datapoints (5 - 1000) <br />
-					<input type='number' placeholder='points' size='15' value={this.value}
-						min={minResolution} max={maxResolution} step={this.calcStepSize()}
-						onChange={ev => this.setState({resolution: ev.currentTarget.value})} />
+					<input type='number' placeholder='points' size='15' value={s.N}
+						min={minResolution} max={maxResolution}
+						step={this.calcStepSize()}
+						onChange={ev => this.setState({N: ev.currentTarget.value})} />
 				</label>
-				new resolution: {this.value}<br />
-				old value: {this.oldValue}<br />
+				<label>continuum:
+					<select value={s.continuum}
+						onChange={ev => this.setState({continuum: ev.currentTarget.value})} >
+						<option  value={qDimension.contCIRCULAR}>contCIRCULAR</option>
+						<option  value={qDimension.contWELL}>contWELL</option>
+						<option  value={qDimension.contDISCRETE}>contDISCRETE</option>
+					</select >
+				</label>
+
+				new resolution: {this.state.N}<br />
+				old resolution: {this.props.N}<br />
+				old continuum: {this.props.continuum}<br />
 				stepSize: {this.stepSize}<br />
 
 				<button type='button' className='cancelButton'

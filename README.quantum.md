@@ -35,7 +35,7 @@ Multiprocessing must be done with pThreads and/or web workers, it seems.
 This is aspirational, or maybe just the description of the quantum engine.  I don't know how i'll put a UI on all  of this, but the simpler variations should be  no problem.
 
 - a 'dimension' is a description of one of the state variables input to a wave.
-class Dimension {
+class qDimension {
 	type: 'coordinate' (has N+2 values for N possibilities) or 'discrete' (has N values for N possibilities), maybe boolean?
 	N: possible  states
 	Nv: number of values (=N or N+2)
@@ -55,7 +55,7 @@ Each dimension's variable is an integer, either 0...N-1 or 1...N, the latter for
 	psi[outermost-dim][dim][dim][innermost-dim]
 	Maybe one global space for the whole app?  at least at first
 class Space {
-	Dimension dimensions[];
+	qDimension dimensions[];
 	function V(array of state variables);
 	coordinates = what names for dimensions
 }

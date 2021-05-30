@@ -1,5 +1,5 @@
 import React from 'react';
-import {theWave, theDraw} from './wave/theWave';
+import {theDraw} from './wave/theWave';
 
 /* This draws the well, without the psi wave (see draw.js).
 coordinate systems:
@@ -43,14 +43,19 @@ export class WaveDisplay extends React.Component {
 	}
 
 	render() {
+		const tWave = this.props.theWave;
+		console.log(`starting render of WaveDisplay, tWave=`, tWave);
+
+		// can't do this without a wave!  When it exists, this prop will change.
+//		if (!tWave)
+//			return null;
+
 		// after the first render, this'll give us the correct width.  We receive innerWindowWidth
 		// as a prop so that a window size change will trigger this to rerender, but we don't
 		// really use its width - there's a few pixels different.
 		let wellWrapper = document.getElementsByClassName('WaveWrapper');
 		//let outerPixelWidth = this.props.innerWindowWidth;
 		let outerPixelWidth = wellWrapper.length ? wellWrapper[0].offsetWidth : 700;
-		// theWave isn't created until after C++ is up.  This number isn't that important till then.
-		let N = theWave ? theWave.space.N : 50;
 
 		let innerPixelWidth = outerPixelWidth - 2 * WELL_PIXEL_MARGIN;
 		let innerPixelHeight = OUTER_PIXEL_HEIGHT - 2 * WELL_PIXEL_MARGIN;
@@ -60,12 +65,15 @@ export class WaveDisplay extends React.Component {
 		console.info(`WDRender: translateX:${translateX}   translateY:${translateY} `);
 
 		// we will draw N+2 bars; including overlap wraparound
+		let N = tWave ? tWave.space.N : 5;
 		let scaleX = innerPixelWidth / (N + 2);
 		let scaleY = -innerPixelHeight * this.state.verticalStretch;
-		console.info(`WDRender: scaleX:${scaleX}   scaleY:${scaleY}`);
+		console.info(`WDRender: innerPixelWidth:${innerPixelWidth} N+2:${N+2} scaleX:${scaleX}   scaleY:${scaleY}`);
 
 		let transform = `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY}) `;
 		// draw.js will draw in the <g>.  The SVG is all pixel coords inside but lower left of wave panel is at 0, 0
+
+		console.log(`about to render WaveDisplay, theWave=${tWave}`);
 		return <section className='WaveWrapper'>
 			<svg className='WaveDisplay'
 					width='100%' height={OUTER_PIXEL_HEIGHT}
@@ -86,45 +94,3 @@ export class WaveDisplay extends React.Component {
 
 export default WaveDisplay;
 
-/* this is from ant:
-			<svg className='svg-chart'
-						viewBox={viewBox}
-						width={props.graphWidth} height={props.graphHeight}
-						preserveAspectRatio='none'
-						onMouseDown={this.events ? this.events.mouseDownEvt : ()=>{}}
-						onWheel={this.mouseWheelEvt}
-						ref={svg => this.graphElement = svg}
-						style={style} >
-
-works at least for syntax:
-transform: translate(0px, 0px) scale(18.4615, -23);
-
-			<circle
-				cx={0} cy={0}
-				r={10} fill='#ff4' stroke='none' />
-			<circle
-				cx={innerPixelWidth} cy={innerPixelHeight}
-				r={50} fill='#4ff' stroke='none'  />
-
-	//  translate(0, ${innerPixelHeight})
-
-
-
-scale(18.4615, 8.84615)
-
-transform: `translate(${WELL_PIXEL_MARGIN}px, ${WELL_PIXEL_MARGIN}px) scale(${scaleX}, ${scaleY}) `,
-txers have args separated by comma, but they themselves are separated by spaces.  txlations must have px.
-
-			<rect x={WELL_PIXEL_MARGIN} y={WELL_PIXEL_MARGIN}
-				width={innerPixelWidth} height={innerPixelHeight/2} stroke='red' fill='none'/>
-			<rect x={WELL_PIXEL_MARGIN + innerPixelWidth/2} y={WELL_PIXEL_MARGIN + innerPixelHeight/2}
-				width={innerPixelWidth/2} height={innerPixelHeight/2} stroke='orange'  fill='none' />
-			<circle
-				cx={0} cy={0}
-				r={50} fill='#cc4' stroke='none' />
-			<circle
-				cx={outerPixelWidth} cy={OUTER_PIXEL_HEIGHT}
-				r={50} fill='#4cc' stroke='none'  />
-
-
-*/

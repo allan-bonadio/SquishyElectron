@@ -12,19 +12,17 @@
 #define LABEL_LEN  16
 #define MAX_DIMENSIONS  1
 
-// we use fixed size int32_t and double here just so JS can calculate sizes more easily
+// we use fixed size int32_t and double here just so JS can calculate sizes more easily.
+// Please keep these class layouts synched with qEngine.js's layout!
 
 /* one for each dimension of the wave array */
 class qDimension {
 public:
-	// possible  states, just for this  dimension.  0=end of list.
+	// possible  states, just for this  dimension.
 	int32_t N;
 
 	// number of values (=N or N+2)
 	//int32_t Nv;
-
-	// start = 0 or 1; end = N or N+1
-	//int32_t start, end;
 
 	// number of complex values in wave, from this dim to the end
 	// = product of Nv * Nv of next dimension or 1 if none
@@ -43,7 +41,7 @@ public:
 	unsigned char label[LABEL_LEN];
 };
 
-// continuum values
+// continuum values - same as in qDimension in qEngine.js; pls synchronize them
 const int contDISCRETE = 0;
 const int contWELL = 1;
 const int contCIRCULAR = 2;
@@ -54,6 +52,7 @@ public:
 	// otherwise same layout as wave
 	// somewhere else qReal *potential;
 
+	// number of  dimensions actually used, always <= MAX_DIMENSIONS
 	int32_t nDimensions;
 
 	// must have at least 2 copies of wave so alg can create one from other
@@ -70,7 +69,7 @@ public:
 
 	// Dimensions are listed from outer to inner as with the resulting psi array:
 	// psi[outermost-dim][dim][dim][innermost-dim]
-	// always a fixed size, for simplicity.  N=0 = one past end of list.
+	// always a fixed size, for simplicity.
 	qDimension dimensions[MAX_DIMENSIONS];
 
 };

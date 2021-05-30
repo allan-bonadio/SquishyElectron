@@ -14,12 +14,10 @@ let sizeofReal, sizeofComplex,
 
 let qeStartPromiseSucceed;
 
-function quantumEngineHasStarted(
+export function quantumEngineHasStarted(
 	sReal, sComplex,
 	mDimensions, mLabel,
 	sDimension, sQuantumSpace) {
-
-	debugger;
 
 	console.log(`quantumEngineHas...Started`,
 		sReal, sComplex, mDimensions, mLabel, sDimension, sQuantumSpace);
@@ -33,6 +31,7 @@ function quantumEngineHasStarted(
 
 //	headerLen = sQuantumSpace - mDimensions * sDimension;
 
+	console.log(`quantumEngineHasStarted:  resolving qeStartPromise`);
 	qeStartPromiseSucceed(sizeofSpace);
 
 };
@@ -40,7 +39,7 @@ window.quantumEngineHasStarted = quantumEngineHasStarted;
 
 export const qeStartPromise = new Promise((succeed, fail) => {
 	qeStartPromiseSucceed = succeed;
-	console.info(`nuthin to do here`, succeed, fail);
+	console.info(`qeStartPromise created:`, succeed, fail);
 });
 
 
@@ -57,7 +56,7 @@ export let theQPotentialBuffer;
 //    {N: 100, continuum: qDimension.contCIRCULAR, label: 'x'}
 export class qDimension {
 	constructor(offset, dim) {
-		debugger;
+		//debugger;
 
 		// it's some int32s, then a maxLabel-long byte string in utf8
 		let intBytes = sizeofDimension - maxLabel;
@@ -68,33 +67,34 @@ export class qDimension {
 		// simplified for now
 		this.ints[0] = this.ints[1] = dim.N;  // N and nStates
 		this.ints[2] = dim.continuum;
-		this.label = window.stringToUTF8(dim.label, this.chars, maxLabel);
+		this.label = dim.label;
+
+		// need a better way to make a C string
+		for (let ii = 0; ii < dim.label.length; ii++)
+			this.chars[ii] = dim.label.charCodeAt(ii);
+		this.chars[dim.label.length] = 0;
+		// this isn't right, dunno how to call it window.stringToUTF8(dim.label, this.chars, maxLabel);
 	}
 
 	// number of datapoints in just this dimension
 	get N() {return this.ints[0]}
-	//set N(a) {this.ints[0] = a}
 
 	// accumulated number of points in this and the following dimensions
 	get nStates() {return this.ints[1]}
-	//set nStates(a) {this.ints[1] = a}
 
 	// continuum values - continuous (like x) or discrete (like spin).  false = discrete
+	// same as in qSpace.h; pls synchronize them
 	static contDISCRETE = 0;
 	static contWELL = 1;
 	static contCIRCULAR = 2;
 	get continuum() {return this.ints[2]}
-	// you can't change this!! set continuum(a) {this.ints[2] = a}
-
-	// stored in unsigned bytes, utf8
-	get label() {return window.UTF8ToString(this.chars)}
 }
 
 // this mimics and  accesses the C++ space object; we allocate them here and construct the JS analogues
 // call like this: new qSpace([{N: 100, continuum: contCIRCULAR, label: 'x'}])
 export class qSpace {
 	constructor(dims) {
-		debugger;
+		//debugger;
 
 		// this should someday be a ArrayBuffer or Uint8Array, but for now I want  to see it in the debugger
 		//theQSpaceBuffer = new Int32Array(sizeofSpace/4);
@@ -102,10 +102,10 @@ export class qSpace {
 		theQSpaceBuffer = new ArrayBuffer(sizeofSpace);
 		let offset = 0;
 
-		this.ints = new Uint32Array(theQSpaceBuffer, offset, 8);
+		this.ints = new Uint32Array(theQSpaceBuffer, offset, 8/4);
 		offset += 8;
 
-		this.elaps = new Float64Array(theQSpaceBuffer, offset, 8);
+		this.elaps = new Float64Array(theQSpaceBuffer, offset, 8/8);
 		offset += 8;
 
 		if (dims.length > maxDimensions)
@@ -130,23 +130,4 @@ export class qSpace {
 }
 
 export default qSpace;
-
-// recreate all the buffers for the space, waves and potential
-//function recreateSpace(sDimensions = 1, sLabel = 'x') {
-//
-//	console.log(`recreateSpace`,
-//		sReal, sComplex, mDimensions, mLabel, sDimension, sQuantumSpace);
-//	//quantumInit();
-//
-//	// now we use TypedArray voodoo to construct the Space structure.
-//	theQSpaceBuffer = new ArrayBuffer(sQuantumSpace);
-//	headerLen = sQuantumSpace - sDimension * sDimension;
-//
-//	sizeofReal = sReal;
-//	sizeofComplex = sComplex;
-//	maxDimensions = mDimensions;
-//	maxLabel = mLabel;
-//	sizeofDimension = sDimension;
-//	sizeofSpace = sQuantumSpace;
-//};
 

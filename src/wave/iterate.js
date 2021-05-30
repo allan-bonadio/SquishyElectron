@@ -38,7 +38,7 @@ export function iterate(wave, dt = DEFAULT_DT) {
 	//console.info(`𝜓(t_0): `, psi_t0);
 
 	// d𝜓/dt as calculated from 2nd deriv, at time t0
-	for (let ix = 1; ix < end; ix++) {
+	for (let ix = 1; ix <= N; ix++) {
 		// second derivative at the current time t0
 		let d2Psi_dx2_t0 = psi_t0[ix+1]
 			.addTo(psi_t0[ix-1])
@@ -60,7 +60,7 @@ export function iterate(wave, dt = DEFAULT_DT) {
 	//console.info(`𝜓(t_half): `, psi_tHalf);
 
 	// given that, calc d𝜓/dt at t_1/2
-	for (let ix = 1; ix < end; ix++) {
+	for (let ix = 1; ix <= N; ix++) {
 		// second derivative at the time tHalf
 		let d2Psi_dx2_tHalf = psi_tHalf[ix+1]
 			.addTo(psi_tHalf[ix-1])

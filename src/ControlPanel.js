@@ -15,10 +15,6 @@ export class ControlPanel extends React.Component {
 		};
 	}
 
-	startResolutionDialog(ev) {
-		ResolutionDialog.open();
-	}
-
 	/* *********************************** start and stop buttons */
 
 	// toggle the running boolean, that exists in two places

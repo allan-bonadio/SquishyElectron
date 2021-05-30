@@ -9,24 +9,8 @@ EM_JS(void, qeStarted,
 	{quantumEngineHasStarted(sFLOAT, sCX, md, ml, sDim, sQS)});
 
 int main() {
-	printf("bonjour le monde! sizeof qCx is %lu\n", sizeof(qCx));
-
-// 	qCx zero(0, 0);
-// 	printf("bonjour zero is %lf, %lf\n", zero.re, zero.im);
-//
-// 	qCx two(2, 0);
-// 	printf("bonjour two is %lf, %lf\n", two.re, two.im);
-//
-// 	qCx three(3);
-// 	printf("bonjour three is %lf, %lf\n", three.re, three.im);
-//
-// 	qCx five = two + three;
-// 	printf("bonjour five is %lf, %lf\n", five.re, five.im);
-//
-// 	qCx zoot = five;
-// 	zoot += qCx(-7, 7);
-// 	printf("bonjour zoot is %lf, %lf\n", zoot.re, zoot.im);
-
+	printf("bonjour le monde! sizeof(qDimension) = %lu, sizeof(qSpace) = %lu\n",
+		sizeof(qDimension), sizeof(qSpace));
 
 	qeStarted(sizeof(qReal), sizeof(qCx), MAX_DIMENSIONS, LABEL_LEN, sizeof(qDimension), sizeof(qSpace));
 

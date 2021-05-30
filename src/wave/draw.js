@@ -60,6 +60,8 @@ class draw {
 		//console.info(barsHtml);
 
 		let gElement = document.querySelector('.waveDisplay');
+		if (!gElement)
+		    return;  // first time around, doesn't exist
 		gElement.innerHTML = barsHtml;
 	}
 }
