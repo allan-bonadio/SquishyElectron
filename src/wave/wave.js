@@ -10,7 +10,7 @@
 
 import qCx from './qCx';
 import iterate from './iterate';
-import {qDimension} from './qEngine';
+import {qSpace} from './qEngine';
 //const isZero = c => (Math.abs(c.real) < 1e-10 && Math.abs(c.im) < 1e-10);
 
 export class space {
@@ -26,10 +26,10 @@ export class space {
 		this.setZeroVoltage();
 
 		this.continuum = continuum;
-		if (qDimension.contDISCRETE == continuum)
+		if (qSpace.contDISCRETE == continuum)
 			throw `Cannot do contDISCRETE in JS`;
 
-		console.info(`space constructed: `, this)
+		console.info(`JS space constructed: `, this)
 	}
 
 	/* *************************************** voltage */
@@ -42,7 +42,7 @@ export class space {
 	setZeroVoltage() {
 		let V = this.V;
 		V.fill(0);
-		this.continuum = qDimension.contCIRCULAR;
+		this.continuum = qSpace.contCIRCULAR;
 	}
 
 	// infinite walled well at  ends
@@ -52,7 +52,7 @@ export class space {
 
 		// tried Infinity; i get NaNs and I can't do anything with them..
 		// tried 10, just doesn't cut it.
-		this.continuum = qDimension.contWELL;
+		this.continuum = qSpace.contWELL;
 		//V[1] = V[N] = 10;
 		//V[1] = V[N] = Infinity;
 	}
@@ -70,7 +70,7 @@ export class wave {
 		this.psi = new Array(N + 2);
 		this.setConstantWave(1);
 
-		console.info(`wave constructed: `, this)
+		console.info(`JS wave constructed: `, this)
 	}
 
 	dump(title = 'a wave') {
@@ -103,18 +103,18 @@ export class wave {
 	fixBoundaries(psiAr = this.psi) {
 		let {N, continuum} = this.space;
 		switch (continuum) {
-		case qDimension.contDISCRETE:
+		case qSpace.contDISCRETE:
 			// ain't no points on the end
 			break;
 
-		case qDimension.contWELL:
+		case qSpace.contWELL:
 			// the points on the end are ∞ potential, but the arithmetic goes bonkers
 			// if I actually set the voltage to ∞
 			psiAr[0] = qCx();
 			psiAr[N+1] = qCx();
 			break;
 
-		case qDimension.contCIRCULAR:
+		case qSpace.contCIRCULAR:
 			// the points on the end get set to the opposite side
 			psiAr[0] = psiAr[N];
 			psiAr[N+1] = psiAr[1];

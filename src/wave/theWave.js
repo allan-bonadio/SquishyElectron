@@ -3,9 +3,7 @@
 import {space, wave} from './wave';
 import draw from './draw';
 import iterate from './iterate';
-import {qDimension, qSpace, qeStartPromise} from './qEngine';
-//import {quantumEngineHasStarted} from './qEngine';
-// this is the state of the wave
+import {qeStartPromise, qSpace} from './qEngine';
 
 // the (old js) wave that we're displaying and animating
 export let theSpace;
