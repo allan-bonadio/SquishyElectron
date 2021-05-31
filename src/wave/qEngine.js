@@ -131,3 +131,16 @@ export class qSpace {
 
 export default qSpace;
 
+// all that stuff above is BS.
+/* ********************************************** new space */
+
+// these directly call in to the C++ functions of the same name
+const startNewSpace = cwrap('startNewSpace', 'bool', []);
+const addSpaceDimension = cwrap('addSpaceDimension', 'bool', ['number', 'number', 'string']);
+const completeNewSpace = cwrap('completeNewSpace', 'bool', []);
+
+// call like this: new qSpace([{N: 100, continuum: contCIRCULAR, label: 'x'}])
+export function constructNewSpace(dims) {
+
+
+}

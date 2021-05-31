@@ -20,14 +20,14 @@ class qDimension {
 public:
 	// possible  states, just for this  dimension.
 	int32_t N;
+	int32_t boundaries;  // 0 or 2
 
-	// number of values (=N or N+2)
-	//int32_t Nv;
-
-	// number of complex values in wave, from this dim to the end
+	// number of eigenstates, from this dim to the end
 	// = product of Nv * Nv of next dimension or 1 if none
 	int32_t nStates;
-	//	or maybe x2 for number of real values
+
+	// number of complex values in wave, from this dim to the end.  includes boundaries.
+	int32_t nPoints;
 
 	// contWELL or contCIRCULAR (has N+2 values for N possibilities)
 	// contDISCRETE = (has N values for N possibilities)
@@ -38,7 +38,7 @@ public:
 	// variable total angular mom: L combines Lz and Ltot so: state ix = 0...Lmax^2
 	// Ltot = floor(sqrt(ix))   Lz = ix - L(L+1) and you have to choose a Lmax sorry
 	// Also could have Energy dimensions...
-	unsigned char label[LABEL_LEN];
+	char label[LABEL_LEN];
 };
 
 // continuum values - same as in qDimension in qEngine.js; pls synchronize them
@@ -48,6 +48,9 @@ const int contCIRCULAR = 2;
 
 class qSpace {
 public:
+	qSpace(void) {
+	}
+
 	// potential energy as function of state; reals (not complex)
 	// otherwise same layout as wave
 	// somewhere else qReal *potential;
@@ -73,4 +76,13 @@ public:
 	qDimension dimensions[MAX_DIMENSIONS];
 
 };
+
+extern "C" {
+	int32_t startNewSpace(void);
+	int32_t addSpaceDimension(int32_t N, int32_t continuum, const char *label);
+	int32_t completeNewSpace(void);
+	qCx *getTheWave(void);
+	qReal *getThePotential(void);
+	int32_t getElapsedTime(void);
+}
 

@@ -77,3 +77,4 @@ public:
 	qReal phase();
 };
 
+typedef class qCx qCx;

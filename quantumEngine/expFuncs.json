@@ -1,0 +1,10 @@
+[
+	"_main",
+	"_addSpaceDimension",
+	"_startNewSpace",
+	"_completeNewSpace",
+	"_getTheWave",
+	"_getThePotential",
+	"_getElapsedTime"
+]
+
