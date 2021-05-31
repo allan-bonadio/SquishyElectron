@@ -1,3 +1,7 @@
+/*
+** q complex - complex and other types we use all over
+*/
+
 // what kind of floats are we using: double or float or even long double
 #define qReal  double
 
@@ -9,6 +13,9 @@
 
 // got this from ... somewhere in case I ever do long doubles
 //const pi = 3.1415926535897932384626433832795029L;
+
+// useful in cmath: isnan(qReal) isinf(qReal) NAN INFINITY  isfinite()
+// ilogb(qReal)
 
 // my streamlined complex class
 class qCx {
@@ -78,3 +85,6 @@ public:
 };
 
 typedef class qCx qCx;
+
+#define char8 unsigned char
+#define char16 char16_t
