@@ -1,5 +1,5 @@
 import React from 'react';
-import {qDimension} from './wave/qEngine';
+import {qSpace} from './wave/qEngine';
 
 const minResolution = 5;
 const maxResolution = 10000;
@@ -65,9 +65,9 @@ export default class ResolutionDialog extends React.Component {
 				<label>continuum:
 					<select value={s.continuum}
 						onChange={ev => this.setState({continuum: ev.currentTarget.value})} >
-						<option  value={qDimension.contCIRCULAR}>contCIRCULAR</option>
-						<option  value={qDimension.contWELL}>contWELL</option>
-						<option  value={qDimension.contDISCRETE}>contDISCRETE</option>
+						<option  value={qSpace.contCIRCULAR}>contCIRCULAR</option>
+						<option  value={qSpace.contWELL}>contWELL</option>
+						<option  value={qSpace.contDISCRETE}>contDISCRETE</option>
 					</select >
 				</label>
 
