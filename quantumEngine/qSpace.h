@@ -20,7 +20,9 @@ class qDimension {
 public:
 	// possible  states, just for this  dimension.
 	int32_t N;
-	int32_t boundaries;  // 0 or 2
+	int32_t extraN;  // 0 or 2
+	int32_t start;
+	int32_t end;
 
 	// number of eigenstates, from this dim to the end
 	// = product of Nv * Nv of next dimension or 1 if none
@@ -68,12 +70,27 @@ public:
 	// how much time we've iterated, from creation.  pseudo-seconds.  Since we've eliminated
 	// all the actual physical constants from the math, why not choose our own definition
 	// of what a second is?  Resets to zero every so often.
-	double elapsed;
+	double elapsedTime;
 
 	// Dimensions are listed from outer to inner as with the resulting psi array:
 	// psi[outermost-dim][dim][dim][innermost-dim]
 	// always a fixed size, for simplicity.
 	qDimension dimensions[MAX_DIMENSIONS];
+
+	void setZeroPotential(void);
+	void dumpPotential(const char *title);
+
+	void dumpWave(char *title);
+	void forEach(void callback(qCx));
+	void map(qCx callback(qCx*));
+	void fixBoundaries(void);
+	qReal innerProduct(void);
+	void normalize(void);
+	void lowPassFilter(void);
+
+	void setCircularWave(int n);
+	void setStandingWave(int n);
+	void setWavePacket(int width, qReal cycles);
 
 };
 
