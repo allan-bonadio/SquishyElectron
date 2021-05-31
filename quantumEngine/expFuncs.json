@@ -3,8 +3,12 @@
 	"_addSpaceDimension",
 	"_startNewSpace",
 	"_completeNewSpace",
+
 	"_getTheWave",
 	"_getThePotential",
-	"_getElapsedTime"
+	"_getElapsedTime",
+
+	"_qSpace_dumpPotential",
+	"_qSpace_setZeroPotential"
 ]
 
