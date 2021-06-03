@@ -50,10 +50,15 @@ let defineFuncBody = exportsSrc.map(funcDesc => {
 
 const code = `
 // this file generated ${new Date()}
+let cwrap;
 export const qe = {};
 export function defineQEngineFuncs() {
+	cwrap = window.Module.cwrap;
+
 ${defineFuncBody.join('\n')}
 }
+
+export default qe;
 `;
 
 fs.writeFile('../../src/wave/qe.js', code,
