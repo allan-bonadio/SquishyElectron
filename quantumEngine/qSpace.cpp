@@ -1,4 +1,3 @@
-#include <string.h>
 #include "qSpace.h"
 
 class qSpace *theSpace = NULL;
@@ -42,7 +41,7 @@ int32_t addSpaceDimension(int32_t N, int32_t continuum, const char *label) {
 	if (continuum) {
 		dim->extraN = 2;
 		dim->start = 1;
-		dim->end = N - 1;
+		dim->end = N + 1;
 	}
 	else {
 		dim->extraN = dim->start = 0;
@@ -77,12 +76,11 @@ int32_t completeNewSpace(void) {
 	//  allocate the buffers
 	theWave = new qCx[nPoints];
 	nextWave = new qCx[nPoints];
+	theSpace->dimensions->setCircularWave(theWave, 1);
+	//theSpace->dumpWave("freshly created");
 
 	thePotential = new qReal[nPoints];
-	theSpace->dumpPotential("freshly created");
-// 	theWave = (qCx *) malloc(sizeof(qCx) * nPoints);
-// 	nextWave = (qCx *) malloc(sizeof(qCx) * nPoints);
-// 	thePotential = (qReal *) malloc(sizeof(qReal) * nPoints);
+	//theSpace->dumpPotential("freshly created");
 
 	printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", nStates, nPoints);
 	return nPoints;
@@ -106,6 +104,14 @@ int32_t getElapsedTime(void) {
 void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
 void qSpace_setZeroPotential(void) { theSpace->setZeroPotential(); }
 
+void qSpace_dumpWave(char *title) { theSpace->dumpWave(title); }
+void qSpace_setCircularWave(qReal n) { theSpace->dimensions->setCircularWave(theWave, n); }
+void qSpace_setStandingWave(qReal n) { theSpace->dimensions->setStandingWave(theWave, n); }
+void qSpace_setWavePacket(qReal widthFactor, qReal cycles) { theSpace->dimensions->setWavePacket(theWave, widthFactor, cycles); }
+void qSpace_oneRk2Step() { theSpace->oneRk2Step(); }
+
+
+}
 
 /* ********************************************************** potential */
 
@@ -113,7 +119,7 @@ void qSpace::dumpPotential(const char *title) {
 	int ix;
 	qDimension *dim = this->dimensions;
 
-	printf("potential %s, %d...%d", title, dim->start, dim->end);
+	printf("== Potential %s, %d...%d", title, dim->start, dim->end);
 	if (dim->continuum) printf("  start [O]=%lf", thePotential[0]);
 	printf("\n");
 
@@ -134,20 +140,21 @@ void qSpace::setZeroPotential(void) {
 
 /* ********************************************************** wave arithmetic */
 
-void qSpace::dumpWave(char *title) {
+void qSpace::dumpWave(const char *title) {
 	int ix;
 	qDimension *dim = this->dimensions;
 
-	printf("Wave %s", title);
+	printf("== Wave %s iprod=%lf", title, this->dimensions->innerProduct(theWave));
 	if (dim->continuum) printf("  start [O]=(%lf,%lf)",
 		theWave[0].re, theWave[0].im);
 	printf("\n");
 
 	for (ix = dim->start; ix < dim->end; ix++) {
-		if (!(ix % 5)) printf("\n[%d] ", ix);
+		printf("\n[%d] ", ix);
+		//if (0 == ix % 5) printf("\n[%d] ", ix);
 		printf("(%lf,%lf) ", theWave[ix].re, theWave[ix].im);
 	}
-	if (dim->continuum) printf("\nend [%d]=%lf", ix, theWave[ix].re, theWave[ix].im);
+	if (dim->continuum) printf("\nend [%d]=(%lf,%lf)", ix, theWave[ix].re, theWave[ix].im);
 	printf("\n");
 }
 
@@ -159,9 +166,8 @@ void qSpace::map(qCx callback(qCx* p)) {
 
 }
 
-void qSpace::fixBoundaries(void) {
-	qDimension *dim = this->dimensions;
-	switch (dim->continuum) {
+void qDimension::fixBoundaries(qCx *wave) {
+	switch (this->continuum) {
 	case contDISCRETE:
 		// ain't no points on the end
 		break;
@@ -169,45 +175,95 @@ void qSpace::fixBoundaries(void) {
 	case contWELL:
 		// the points on the end are ∞ potential, but the arithmetic goes bonkers
 		// if I actually set the voltage to ∞
-		theWave[0] = qCx();
-		theWave[dim->end] = qCx();
+		wave[0] = qCx();
+		wave[this->end] = qCx();
 		break;
 
 	case contCIRCULAR:
 		// the points on the end get set to the opposite side
-		theWave[0] = theWave[dim->N];
-		theWave[dim->end] = theWave[1];
+		wave[0] = wave[this->N];
+		wave[this->end] = wave[1];
 		break;
 	}
 }
 
-qReal qSpace::innerProduct(void) {
+// calculate ⟨ψ | ψ⟩  'inner product' isn't the right name is it?
+qReal qDimension::innerProduct(qCx *wave) {
 	qReal sum;
-	for (ix = dim->start; ix < dim->end; ix++) {
-		sum += theWave[ix].re * theWave[ix].re + theWave[ix].im * theWave[ix].im;
-		printf("(%lf,%lf) ", theWave[ix].re, theWave[ix].im);
+
+	for (int ix = this->start; ix < this->end; ix++) {
+		sum += wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im;
+// 		printf("innerProduct point %d (%lf,%lf) %lf\n", ix, wave[ix].re, wave[ix].im,
+// 			wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im);
 	}
+	return sum;
 }
 
-void qSpace::normalize(void) {
+// enforce ⟨ψ | ψ⟩ = 1 by dividing out the current value
+void qDimension::normalize(qCx *wave) {
+	qReal mag = this->innerProduct(wave);
+	printf("normalizing.  iprod=%lf\n", mag);
+	mag = pow(mag, -0.5);
 
+	for (int ix = this->start; ix < this->end; ix++)
+		wave[ix] *= mag;
+	this->fixBoundaries(wave);
+	printf("    normalizing.  new IP=%lf\n", this->innerProduct(wave));
 }
 
-void qSpace::lowPassFilter(void) {
+// average the wave's points with the two closest neighbors to fix the divergence
+// along the x axis I always see
+void qDimension::lowPassFilter(qCx *wave) {
+	qCx avg, d2prev = wave[0];
 
+	for (int ix = this->start; ix < this->end; ix++) {
+		if ((ix && ix < this->N - 1) || this->continuum) {
+			avg = wave[ix-1] + wave[ix] * 2. + wave[ix+1];
+			wave[ix-1] = d2prev;
+			d2prev = avg;
+		}
+	}
+	this->normalize(wave);
 }
 
 
 /* ********************************************************** set wave */
 
-void qSpace::setCircularWave(int n) {
-
+// n is  number of cycles all the way across N points.
+// n 'should' be an integer to make it meet up on ends if wraparound
+// pass negative to make it go backward.
+void qDimension::setCircularWave(qCx *wave, qReal n) {
+	qReal angle, dAngle = 2. * PI / this->N;
+	for (int ix = this->start; ix < this->end; ix++) {
+		angle = dAngle * (ix - this->start) * n;
+		wave[ix] = qCx(cos(angle), sin(angle));
+	}
+	this->normalize(wave);
 }
 
-void qSpace::setStandingWave(int n) {
-
+// make a superposition of two waves in opposite directions.
+// n 'should' be an integer to make it meet up on ends if wraparound
+// pass negative to make it upside down.
+void qDimension::setStandingWave(qCx *wave, qReal n) {
+	qReal dAngle = PI / this->N;
+	for (int ix = this->start; ix < this->end; ix++) {
+		wave[ix] = qCx(sin(dAngle * (ix - this->start) * n));
+	}
+	this->normalize(wave);
 }
 
-void qSpace::setWavePacket(int width, qReal cycles) {
+// widthFactor is number of points wide it is, fraction of N.
+// Cycles is how many circles (360°) it goes thru in that width.
+void qDimension::setWavePacket(qCx *wave, qReal widthFactor, qReal cycles) {
 
+	// start with a real wave
+	this->setCircularWave(wave, cycles / widthFactor);
+
+	// modulate with a gaussian
+	int peak = lround(this->N * widthFactor) % this->N;  // ?? i dunno
+	qReal stdDev = this->N * widthFactor / 2.;  // ?? i'm making this up
+	for (int ix = this->start; ix < this->end; ix++)
+		wave[ix] *= exp(-(ix - peak) * (ix - peak) / stdDev);
+
+	this->normalize(wave);
 }

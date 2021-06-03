@@ -1,11 +1,6 @@
 /*
 ** quantum space - C++ code for optimized ODE integration for Squishy Electron
 */
-#include <emscripten.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <float.h>
-#include <stdlib.h>
 
 #include "qCx.h"
 
@@ -41,6 +36,16 @@ public:
 	// Ltot = floor(sqrt(ix))   Lz = ix - L(L+1) and you have to choose a Lmax sorry
 	// Also could have Energy dimensions...
 	char label[LABEL_LEN];
+
+	void fixBoundaries(qCx *wave);
+
+	qReal innerProduct(qCx *wave);
+	void normalize(qCx *wave);
+	void lowPassFilter(qCx *wave);
+
+	void setCircularWave(qCx *wave, qReal n);
+	void setStandingWave(qCx *wave, qReal n);
+	void setWavePacket(qCx *wave, qReal widthFactor, qReal cycles);
 };
 
 // continuum values - same as in qDimension in qEngine.js; pls synchronize them
@@ -77,23 +82,18 @@ public:
 	// always a fixed size, for simplicity.
 	qDimension dimensions[MAX_DIMENSIONS];
 
-	void setZeroPotential(void);
 	void dumpPotential(const char *title);
+	void setZeroPotential(void);
 
-	void dumpWave(char *title);
+	void dumpWave(const char *title);
 	void forEach(void callback(qCx));
 	void map(qCx callback(qCx*));
-	void fixBoundaries(void);
-	qReal innerProduct(void);
-	void normalize(void);
-	void lowPassFilter(void);
 
-	void setCircularWave(int n);
-	void setStandingWave(int n);
-	void setWavePacket(int width, qReal cycles);
+	void oneRk2Step(void);
 
 };
 
+// for JS to call
 extern "C" {
 	int32_t startNewSpace(void);
 	int32_t addSpaceDimension(int32_t N, int32_t continuum, const char *label);
@@ -103,3 +103,11 @@ extern "C" {
 	int32_t getElapsedTime(void);
 }
 
+// internal
+extern void oneRk2Step(void);
+extern qCx hamiltonian(qCx *wave, int x);
+
+extern class qSpace *theSpace;
+extern class qCx *theWave, *nextWave;
+extern qReal *thePotential;
+extern qReal elapsedTime;

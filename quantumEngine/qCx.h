@@ -2,6 +2,13 @@
 ** q complex - complex and other types we use all over
 */
 
+#include <emscripten.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <float.h>
+
 // what kind of floats are we using: double or float or even long double
 #define qReal  double
 
@@ -88,3 +95,4 @@ typedef class qCx qCx;
 
 #define char8 unsigned char
 #define char16 char16_t
+extern void qCheck(qCx aCx);
