@@ -46,9 +46,13 @@ export function iterate(wave, dt = DEFAULT_DT) {
 			//its always 1 .multBy(1 / (dx * dx));
 		check(d2Psi_dx2_t0);
 
+console.log(`js ${ix}first d2=${d2Psi_dx2_t0.real.toFixed(6)} ${d2Psi_dx2_t0.im.toFixed(6)}`);////
+
 		// dPsi_dt_t0 = V[ix] * psi_t0[ix] - h2_2m * d2Psi_dt2_t0_t0[ix];
 		let VPsi = psi_t0[ix].multBy(V[ix]);
-		let dPsi_dt_t0 = VPsi.addTo(d2Psi_dx2_t0, -h2_2m).multBy(qCx(0,-1));
+		let dPsi_dt_t0 = VPsi.addTo(d2Psi_dx2_t0, -h2_2m);
+console.log(`js ${ix}first hamiltonian=${dPsi_dt_t0.real.toFixed(6)} ${dPsi_dt_t0.im.toFixed(6)}`);////
+		dPsi_dt_t0 = dPsi_dt_t0.multBy(qCx(0,-1));
 		check(dPsi_dt_t0);
 
 		// psi at t_1/2 given that derivative - must finish in this loop to take 2nd derivitive next loop
@@ -56,8 +60,12 @@ export function iterate(wave, dt = DEFAULT_DT) {
 		check(psi_tHalf[ix]);
 	}
 	wave.fixBoundaries(psi_tHalf);
+
 //	console.info(`d𝜓/dt(t_0): `, dPsi_dt_t0);
-	//console.info(`𝜓(t_half): `, psi_tHalf);
+//console.info(`𝜓(t_half): `, psi_tHalf);
+for (let ix = 1; ix <= N; ix++)
+console.log(`iterate ${ix}\t${psi_tHalf[ix].real.toFixed(6)}\t${psi_tHalf[ix].im.toFixed(6)}`)
+
 
 	// given that, calc d𝜓/dt at t_1/2
 	for (let ix = 1; ix <= N; ix++) {
@@ -67,11 +75,14 @@ export function iterate(wave, dt = DEFAULT_DT) {
 			.addTo(psi_tHalf[ix], -2)
 			// always 1 .multBy(1 / (dx * dx));
 		check(d2Psi_dx2_tHalf);
+console.log(`js ${ix}second d2=${d2Psi_dx2_tHalf.real.toFixed(6)} ${d2Psi_dx2_tHalf.im.toFixed(6)}`);////
 
 		// now calculate dPsi_dt_tHalf, the actual derivative halfway thru
 		let VPsi_half = psi_tHalf[ix].multBy(V[ix]);
-		let dPsi_dt_tHalf = VPsi_half.addTo(d2Psi_dx2_tHalf, -h2_2m).multBy(qCx(0,-1));
+		let dPsi_dt_tHalf = VPsi_half.addTo(d2Psi_dx2_tHalf, -h2_2m);
 		check(dPsi_dt_tHalf);
+console.log(`js ${ix}second hamiltonian=${dPsi_dt_tHalf.real.toFixed(6)} ${dPsi_dt_tHalf.im.toFixed(6)}`);////
+		dPsi_dt_tHalf = dPsi_dt_tHalf.multBy(qCx(0,-1));
 
 		// now increment psi by full step dt * derivative_Half, shbe right
 		wave.psi[ix] = psi[ix].addTo(dPsi_dt_tHalf, dt);

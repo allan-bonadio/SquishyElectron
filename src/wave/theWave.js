@@ -4,6 +4,7 @@ import {space, wave} from './wave';
 import draw from './draw';
 import iterate from './iterate';
 import {qeStartPromise, qSpace} from './qEngine';
+import qe from './qe';
 
 // the (old js) wave that we're displaying and animating
 export let theSpace;
@@ -28,6 +29,20 @@ export function recreateWave(N, continuum, callback) {
 
 	// create the new C++ version
 	theQSpace = new qSpace([{N, continuum, label: 'x'}]);
+
+	/* *************** testing: now iterate both */
+//	theWave.dump('JS wave before one iteraate');
+//	qSpace_dumpWave('before qe Step');
+
+	iterate(theWave);
+	console.time('one RK2 step');
+	qe.qSpace_oneRk2Step();
+	console.timeEnd('one RK2 step');
+
+	theWave.dump('JS wave after one iteraate');
+	qe.qSpace_dumpWave('after qe Step');
+	/* *************** testing: now iterate both */
+
 
 	callback(theWave, theDraw);
 }

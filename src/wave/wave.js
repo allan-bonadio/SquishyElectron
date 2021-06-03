@@ -75,7 +75,7 @@ export class wave {
 
 	dump(title = 'a wave') {
 		console.info(`${title} ==> ⟨ψ | ψ⟩ = `, this.innerProduct());
-		this.psi.forEach((p, ix) => console.info(`   psi[${ix}]: ${p}`));
+		this.psi.forEach((p, ix) => console.info(`   psi[${ix}]: ${p.real.toFixed(6)}\t${p.im.toFixed(6)}`));
 	}
 
 	// just iterate over all.  psi must be created already
@@ -108,8 +108,8 @@ export class wave {
 			break;
 
 		case qSpace.contWELL:
-			// the points on the end are ∞ potential, but the arithmetic goes bonkers
-			// if I actually set the voltage to ∞
+			// the points on the end are ∞ potential, but the arithmetic
+			// goes bonkers if I actually set the voltage to ∞
 			psiAr[0] = qCx();
 			psiAr[N+1] = qCx();
 			break;
