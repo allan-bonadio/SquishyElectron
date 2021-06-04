@@ -5,7 +5,9 @@
 
 int main() {
 
-	runCxTests();
+	run_qCx_tests();
+
+	run_rk2_tests();
 
 
 /*

@@ -12,7 +12,7 @@ void verify(qCx actual, qCx expected, const char *msg) {
 
 #define VERIFY(actual, expected)  verify(actual, expected, #actual)
 
-void runCxTests() {
+void run_qCx_tests() {
 	/* ********************************************* constructor */
 
 	VERIFY(qCx(3, -4), qCx(3, -4));
