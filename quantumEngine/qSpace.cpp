@@ -1,7 +1,7 @@
 #include "qSpace.h"
 
 class qSpace *theSpace = NULL;
-class qCx *theWave = NULL, *nextWave = NULL;
+class qCx *theWave = NULL, *tempWave = NULL, *nextWave = NULL;
 qReal *thePotential = NULL;
 qReal elapsedTime = 0;
 
@@ -17,6 +17,7 @@ int32_t startNewSpace(void) {
 	if (theSpace) {
 		delete theSpace;
 		delete[] theWave;
+		delete[] tempWave;
 		delete[] nextWave;
 		delete[] thePotential;
 	}
@@ -75,6 +76,7 @@ int32_t completeNewSpace(void) {
 
 	//  allocate the buffers
 	theWave = new qCx[nPoints];
+	tempWave = new qCx[nPoints];
 	nextWave = new qCx[nPoints];
 	theSpace->dimensions->setCircularWave(theWave, 1);
 	//theSpace->dumpWave("freshly created");
@@ -83,6 +85,9 @@ int32_t completeNewSpace(void) {
 	//theSpace->dumpPotential("freshly created");
 
 	printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", nStates, nPoints);
+	printf("  dimension N=%d  extraN=%d  continuum=%d  start=%d  end=%d  label=%s\n",
+		theSpace->dimensions->N, theSpace->dimensions->extraN, theSpace->dimensions->continuum,
+		theSpace->dimensions->start, theSpace->dimensions->end, theSpace->dimensions->label);
 	return nPoints;
 }
 
@@ -170,6 +175,8 @@ void qDimension::fixBoundaries(qCx *wave) {
 	switch (this->continuum) {
 	case contDISCRETE:
 		// ain't no points on the end
+		printf("contDISCRETE cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", this->continuum,
+			wave[0].re, wave[0].im, wave[this->end].re, wave[this->end].im);
 		break;
 
 	case contWELL:
@@ -177,12 +184,16 @@ void qDimension::fixBoundaries(qCx *wave) {
 		// if I actually set the voltage to ∞
 		wave[0] = qCx();
 		wave[this->end] = qCx();
+		printf("contWELL cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", this->continuum,
+			wave[0].re, wave[0].im, wave[this->end].re, wave[this->end].im);
 		break;
 
 	case contCIRCULAR:
 		// the points on the end get set to the opposite side
 		wave[0] = wave[this->N];
 		wave[this->end] = wave[1];
+		printf("contCIRCULAR cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", this->continuum,
+			wave[0].re, wave[0].im, wave[this->end].re, wave[this->end].im);
 		break;
 	}
 }
@@ -232,6 +243,7 @@ void qDimension::lowPassFilter(qCx *wave) {
 // n is  number of cycles all the way across N points.
 // n 'should' be an integer to make it meet up on ends if wraparound
 // pass negative to make it go backward.
+// the first point here is like x=0 as far as the trig functions, and the last like x=-1
 void qDimension::setCircularWave(qCx *wave, qReal n) {
 	qReal angle, dAngle = 2. * PI / this->N;
 	for (int ix = this->start; ix < this->end; ix++) {
@@ -243,11 +255,19 @@ void qDimension::setCircularWave(qCx *wave, qReal n) {
 
 // make a superposition of two waves in opposite directions.
 // n 'should' be an integer to make it meet up on ends if wraparound
+// oh yeah, the walls on the sides are nodes in this case so we'll split by N+2 in that case.
 // pass negative to make it upside down.
 void qDimension::setStandingWave(qCx *wave, qReal n) {
-	qReal dAngle = PI / this->N;
-	for (int ix = this->start; ix < this->end; ix++) {
-		wave[ix] = qCx(sin(dAngle * (ix - this->start) * n));
+	int start = this->start, end = this->end, N = this->N;
+	if (this->continuum == contWELL) {
+		start--;
+		end++;
+		N += 2;
+	}
+
+	qReal dAngle = PI / N;
+	for (int ix = start; ix < end; ix++) {
+		wave[ix] = qCx(sin(dAngle * (ix - start) * n));
 	}
 	this->normalize(wave);
 }

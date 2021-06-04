@@ -108,6 +108,6 @@ extern void oneRk2Step(void);
 extern qCx hamiltonian(qCx *wave, int x);
 
 extern class qSpace *theSpace;
-extern class qCx *theWave, *nextWave;
+extern class qCx *theWave, *tempWave, *nextWave;
 extern qReal *thePotential;
 extern qReal elapsedTime;
