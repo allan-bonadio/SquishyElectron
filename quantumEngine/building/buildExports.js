@@ -48,8 +48,7 @@ let defineFuncBody = exportsSrc.map(funcDesc => {
 	'_' + name
 });
 
-const code = `
-// this file generated ${new Date()}
+const code = `// this file generated ${new Date()}
 let cwrap;
 export const qe = {};
 export function defineQEngineFuncs() {
@@ -57,6 +56,9 @@ export function defineQEngineFuncs() {
 
 ${defineFuncBody.join('\n')}
 }
+
+window.defineQEngineFuncs = defineQEngineFuncs;  // just in case
+window.qe = qe;
 
 export default qe;
 `;

@@ -38,51 +38,6 @@ export const qeStartPromise = new Promise((succeed, fail) => {
 /* ****************************************************** space buffer */
 
 
-/* ********************************************** new space */
-
-//let cwrap;
-//
-//// these directly call in to the C++ functions of the same name
-//let startNewSpace;
-//let addSpaceDimension;
-//let completeNewSpace;
-//
-//let getTheWave;
-//let getThePotential;
-//let getElapsedTime;
-//
-//let qSpace_dumpPotential;
-//let qSpace_setZeroPotential;
-//
-//export let qSpace_dumpWave;
-//let qSpace_setCircularWave;
-//let qSpace_setStandingWave;
-//let qSpace_setWavePacket;
-//export let qSpace_oneRk2Step;
-//
-//
-//export function defineQEngineFuncs() {
-//	cwrap = window.Module.cwrap;
-//	startNewSpace = cwrap('startNewSpace', 'bool', []);
-//	addSpaceDimension = cwrap('addSpaceDimension', 'bool', ['number', 'number', 'string']);
-//	completeNewSpace = cwrap('completeNewSpace', 'bool', []);
-//
-//	getTheWave = cwrap('getTheWave', 'number', []);
-//	getThePotential = cwrap('getThePotential', 'number', []);
-//	getElapsedTime = cwrap('getElapsedTime', 'number', []);
-//
-//	qSpace_dumpPotential = cwrap('qSpace_dumpPotential', null, ['string']);
-//	qSpace_setZeroPotential = cwrap('qSpace_setZeroPotential', null, []);
-//
-//	qSpace_dumpWave = cwrap('qSpace_dumpWave', null, ['string']);
-//	qSpace_setCircularWave = cwrap('qSpace_setCircularWave', null, ['number']);
-//	qSpace_setStandingWave = cwrap('qSpace_setStandingWave', null, ['number']);
-//	qSpace_setWavePacket = cwrap('qSpace_setWavePacket', null, ['number', 'number']);
-//	qSpace_oneRk2Step = cwrap('qSpace_oneRk2Step', null, []);
-//}
-
-/* ********************************************** new space */
-
 // call like this: new qSpace([{N: 100, continuum: contCIRCULAR, label: 'x'}])
 export class qSpace {
 	constructor(dims) {
