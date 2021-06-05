@@ -9,7 +9,10 @@ import qe from './qe';
 // the (old js) wave that we're displaying and animating
 export let theSpace;
 export let theWave;
+
+export let newWaveBuffer;
 export let theDraw;
+export const waveBuffers = {alt: null, next: null};
 
 export let theQSpace;
 
@@ -26,6 +29,8 @@ export function recreateWave(N, continuum, callback) {
 	theSpace = new space(N, continuum);
 	theWave = new wave(theSpace);
 	theDraw = new draw(theWave);
+	waveBuffers.alt = new Array(N + 2);
+	waveBuffers.next = new Array(N + 2);
 
 	// create the new C++ version
 	theQSpace = new qSpace([{N, continuum, label: 'x'}]);

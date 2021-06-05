@@ -4,11 +4,9 @@ import WaveDisplay from './WaveDisplay';
 import ControlPanel from './ControlPanel';
 import ResolutionDialog from './ResolutionDialog';
 import {recreateWave} from './wave/theWave';
-import {qSpace, qeStartPromise, quantumEngineHasStarted} from './wave/qEngine';
-
+import {qSpace, qeStartPromise} from './wave/qEngine';
 const DEFAULT_RESOLUTION = 5;
 const DEFAULT_CONTINUUM = qSpace.contCIRCULAR;
-
 
 class App extends React.Component {
 	constructor(props) {

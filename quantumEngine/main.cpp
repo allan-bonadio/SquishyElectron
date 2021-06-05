@@ -49,10 +49,14 @@ void forMe(void) {
 
 
 // call this JS callback so JS knows we're up and ready.
-// Hand it some sizes so it knows where everything is in the space buffer.  which it'll construct.
+// Hand it some sizes so it knows where everything is in the space buffer.
+// which it'll construct.
+// somehow there's a race condition where this isn't set soon enough... sometimes
 EM_JS(void, qeStarted,
-	(int32_t md, int32_t ml),
-	{quantumEngineHasStarted(md, ml)});
+	(int32_t mDimensions, int32_t mLabel),
+	{
+		setTimeout(() => quantumEngineHasStarted(mDimensions, mLabel), 100);
+	});
 
 int main() {
 	printf("bonjour le monde! sizeof(qDimension) = %lu, sizeof(qSpace) = %lu\n",

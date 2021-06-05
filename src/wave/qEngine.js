@@ -13,8 +13,9 @@ export let maxDimensions, maxLabel;
 
 let qeStartPromiseSucceed;
 
-export function quantumEngineHasStarted(mDimensions, mLabel) {
-
+// do NOT export this; it's global cuz quantumEngine.js, the compiled C++ proxy,
+// has to have access to it early on
+function quantumEngineHasStarted(mDimensions, mLabel) {
 	console.log(`quantumEngineHas...Started`, mDimensions, mLabel);
 	defineQEngineFuncs();
 

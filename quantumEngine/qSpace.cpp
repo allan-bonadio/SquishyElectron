@@ -1,4 +1,5 @@
 #include "qSpace.h"
+#include <cmath>
 
 class qSpace *theSpace = NULL;
 class qCx *theWave = NULL, *tempWave = NULL, *nextWave = NULL;

@@ -32,8 +32,8 @@ static void firstRK2Iteration5(void) {
 	for (int ix = 0; ix < 7; ix++) {
 		qCx actual = theWave[ix];
 		if (actual.re != expected.re || actual.im != expected.im) {
-			printf("actual=(%lf, %lf) vs exmpected=(%lf, %lf)",
-			actual.re, actual.im, exmpected.re, exmpected.im);
+			printf("actual=(%lf, %lf) vs expected=(%lf, %lf) for row %d",
+			actual.re, actual.im, exmpected.re, exmpected.im, ix);
 		}
 	}
 }
