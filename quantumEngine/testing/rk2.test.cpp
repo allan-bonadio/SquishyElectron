@@ -24,7 +24,6 @@ qCx expected[7] = {
 
 
 
-
 static void firstRK2Iteration5(void) {
 	makeNewSpace(5, contCIRCULAR, "x");
 
