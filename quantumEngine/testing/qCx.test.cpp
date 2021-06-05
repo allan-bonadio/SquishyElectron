@@ -5,9 +5,11 @@
 void verify(qCx actual, qCx expected, const char *msg) {
 	printf("testing %s\n", msg);
 	if (actual.re != expected.re)
-		printf("*** re err: %s actual.re=%f ≠ expected.re=%f\n", msg, actual.re, expected.re);
+		printf("%s*** qCx re err:%s %s actual.re=%f ≠ expected.re=%f\n",
+			redAnsiStyle, offAnsiStyle, msg, actual.re, expected.re);
 	if (actual.im != expected.im)
-		printf("*** im err: %s actual.im=%f ≠ expected.im=%f\n", msg, actual.im, expected.im);
+		printf("%s*** qCx im err:%s %s actual.im=%f ≠ expected.im=%f\n",
+			redAnsiStyle, offAnsiStyle, msg, actual.im, expected.im);
 }
 
 #define VERIFY(actual, expected)  verify(actual, expected, #actual)
@@ -72,6 +74,9 @@ void run_qCx_tests() {
 	VERIFY(qCx(-1,-1).phase(), qCx(-135));
 	VERIFY(qCx(-1,+1).phase(), qCx(135));
 
+
+	/* **********************************************/
+	printf("Done with qCx tests\n");
 }
 
 

@@ -9,9 +9,6 @@ static void makeNewSpace(int32_t N, int32_t continuum, const char *label) {
 	completeNewSpace();
 }
 
-
-char a[3] = {'a', 'b'};
-
 qCx expected[7] = {
 	qCx( 0.07809841578326204, -0.44036220853561392),
 	qCx( 0.44294308566870949, -0.06180339887498949),
@@ -30,15 +27,17 @@ static void firstRK2Iteration5(void) {
 	theSpace->oneRk2Step();
 
 	for (int ix = 0; ix < 7; ix++) {
-		qCx actual = theWave[ix];
-		if (actual.re != expected.re || actual.im != expected.im) {
-			printf("actual=(%lf, %lf) vs expected=(%lf, %lf) for row %d",
-			actual.re, actual.im, exmpected.re, exmpected.im, ix);
+		qCx act = theWave[ix];
+		qCx xpct = expected[ix];
+		if (act.re != xpct.re || act.im != xpct.im) {
+			printf("%sactual=(%lf, %lf) vs expected=(%lf, %lf) for row %d %s\n",
+			redAnsiStyle, act.re, act.im, xpct.re, xpct.im, ix, offAnsiStyle);
 		}
 	}
 }
 
 void run_rk2_tests(void) {
 	firstRK2Iteration5();
+	printf("Done with RK2 tests\n");
 }
 
