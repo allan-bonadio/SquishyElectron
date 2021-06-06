@@ -40,15 +40,6 @@ const useYarn = fs.existsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
 
 
-// compile the quantum engine
-//const emscriptenOutput =
-require('child_process').execFileSync(
-	'quantumEngine/building/buildDev.sh', {timeout: 20e3});
-//fs.writeFile('quantumEngine/buildDev.log', emscriptenOutput, () => {
-//	console.log('yes i finished*****')});
-//console.log(emscriptenOutput);
-
-
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
   process.exit(1);
