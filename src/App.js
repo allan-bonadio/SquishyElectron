@@ -39,9 +39,9 @@ class App extends React.Component {
 			// this is where it's set and not changed anywhere else
 			useQuantumEngine: true,
 
-			theJWave: null,
-			theQESpace: null,
-			theDraw: null,
+			currentJWave: null,
+			currentQESpace: null,
+			currentDraw: null,
 		};
 
 		console.log(`App constructor`);
@@ -61,8 +61,9 @@ class App extends React.Component {
 	}
 
 	setNew1DResolution(N, continuum) {
-		recreateWave(N, continuum, (theJWave, theQESpace, theDraw) => {
-			this.setState({N, continuum, theJWave, theQESpace, theDraw});
+		const s = this.state;
+		recreateWave(N, continuum, (currentJWave, currentQESpace, currentDraw) => {
+			this.setState({N, continuum, currentJWave, currentQESpace, currentDraw});
 		});
 	}
 
@@ -71,7 +72,7 @@ class App extends React.Component {
 		// upon startup, after C++ says it's ready, but remember constructor runs twice
 		qeStartPromise.then((arg) => {
 			this.setNew1DResolution(DEFAULT_RESOLUTION, DEFAULT_CONTINUUM);
-			// wont work theDraw.draw();
+			// wont work currentDraw.draw();
 		}, (ex) => {
 			console.error(`error in qeStartPromise:`, ex);
 		});
@@ -98,7 +99,8 @@ class App extends React.Component {
 
 			: null;
 
-		console.log(`about to render app, theJWave=..., qe.Wave=...`, s.theJWave, s.theJWave);
+		const N =
+		console.log(`about to render app, currentJWave=..., qe.Wave=...`, s.currentJWave, s.currentJWave);
 		return (
 			<div className="App">
 				<h2 className="App-header">
@@ -107,11 +109,11 @@ class App extends React.Component {
 					&nbsp; &nbsp;
 					Squishy Electron
 				</h2>
-				<WaveDisplay aDimension={s.theJWave || s.theQESpace && s.theQESpace.dimensions[0]}
+				<WaveDisplay N={this.state.N}
 					innerWindowWidth={s.innerWindowWidth}/>
 				<ControlPanel
 					openResolutionDialog={() => this.openResolutionDialog(true)}
-					useQuantumEngine={this.props.useQuantumEngine}
+					useQuantumEngine={this.state.useQuantumEngine}
 				/>
 				{resDialog}
 			</div>

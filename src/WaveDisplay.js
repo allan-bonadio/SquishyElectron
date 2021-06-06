@@ -1,6 +1,7 @@
 import React from 'react';
 import {theDraw} from './wave/theWave';
 import qe from './wave/qe';
+import PropTypes from 'prop-types';
 
 /* This draws the well, without the psi wave (see draw.js).
 coordinate systems:
@@ -19,6 +20,11 @@ const INITIAL_STRETCH = 2;
 // Just lay down the SVG, and the draw code will draw on its own schedule.
 
 export class WaveDisplay extends React.Component {
+	static propTypes = {
+		N: PropTypes.number,
+		innerWindowWidth: PropTypes.number,
+	};
+
 	constructor(props) {
 		super(props);
 
@@ -44,12 +50,7 @@ export class WaveDisplay extends React.Component {
 	}
 
 	render() {
-		const tWave = this.props.aDimension;
-		//console.log(`starting render of WaveDisplay, tWave=`, tWave);
-
-		// can't do this without a wave!  When it exists, this prop will change.
-//		if (!tWave)
-//			return null;
+		const N = this.props.N;
 
 		// after the first render, this'll give us the correct width.  We receive innerWindowWidth
 		// as a prop so that a window size change will trigger this to rerender, but we don't
@@ -66,7 +67,6 @@ export class WaveDisplay extends React.Component {
 		//console.info(`WDRender: translateX:${translateX}   translateY:${translateY} `);
 
 		// we will draw N+2 bars; including overlap wraparound
-		let N = tWave ? tWave.space.N : 5;
 		let scaleX = innerPixelWidth / (N + 2);
 		let scaleY = -innerPixelHeight * this.state.verticalStretch;
 		//console.info(`WDRender: innerPixelWidth:${innerPixelWidth} N+2:${N+2}`+
@@ -88,6 +88,9 @@ export class WaveDisplay extends React.Component {
 					x={translateX + scaleX} y='0'
 					width={N*scaleX} height={OUTER_PIXEL_HEIGHT}/>
 				<g className='waveDisplay' style={{transform: transform}} />
+				<text className='elapsedTime' style={{left: '20px', bottom: '1em'}}>
+					{qe.getElapsedTime && qe.getElapsedTime().toFixed(2)}
+				</text>
 			</svg>
 		</section>;
 

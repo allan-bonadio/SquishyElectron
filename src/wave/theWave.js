@@ -72,7 +72,7 @@ export function setWave(breed, freq) {
 	case 'pulse':
 		theJWave.setPulseWave();
 		// (qReal widthFactor, qReal cycles)
-		qe.qSpace_setPulse(10., 1.)
+		qe.qSpace_setPulseWave(10., 1.)
 		break;
 
 	default:

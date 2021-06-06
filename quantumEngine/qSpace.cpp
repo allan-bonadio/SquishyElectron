@@ -102,7 +102,7 @@ qReal *getThePotential(void) {
 }
 
 int32_t getElapsedTime(void) {
-	return theSpace->elapsedTime;
+	return elapsedTime;
 }
 
 
@@ -112,7 +112,7 @@ void qSpace_setZeroPotential(void) { theSpace->setZeroPotential(); }
 void qSpace_dumpWave(char *title) { theSpace->dumpWave(title); }
 void qSpace_setCircularWave(qReal n) { theSpace->dimensions->setCircularWave(theWave, n); }
 void qSpace_setStandingWave(qReal n) { theSpace->dimensions->setStandingWave(theWave, n); }
-void qSpace_setWavePacket(qReal widthFactor, qReal cycles) { theSpace->dimensions->setPulseWave(theWave, widthFactor, cycles); }
+void qSpace_setPulseWave(qReal widthFactor, qReal cycles) { theSpace->dimensions->setPulseWave(theWave, widthFactor, cycles); }
 void qSpace_oneRk2Step() { theSpace->oneRk2Step(); }
 
 

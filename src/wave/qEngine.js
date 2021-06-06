@@ -56,15 +56,12 @@ export class qeSpace {
 			return d;
 		});
 
+		// this actually does it over on the other side
 		qe.startNewSpace();
 		dims.forEach(dim => {
 			qe.addSpaceDimension(dim.N, dim.continuum, dim.label);
 		});
 		qe.completeNewSpace();
-
-		this.dimensions = dims;
-
-		//qe.qSpace_dumpPotential('done making potential');
 	}
 
 	static contDISCRETE = 0;

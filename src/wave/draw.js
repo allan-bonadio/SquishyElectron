@@ -70,7 +70,8 @@ class draw {
 		let magnitude = (psi.real * psi.real + psi.im * psi.im);
 		//console.log(`${x} magnitude: ${magnitude}`);
 
-		return `<rect x=${x} y=0 width=1 height=${magnitude.toPrecision(4)}  fill=${color} />`;
+		// little gaps appear unles you do this
+		return `<rect x=${x} y=0 width=1.05 height=${magnitude.toPrecision(4)}  fill=${color} />`;
 	}
 
 	jWellBars() {

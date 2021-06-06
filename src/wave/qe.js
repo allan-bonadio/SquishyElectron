@@ -1,4 +1,4 @@
-// this file generated Fri Jun 04 2021 23:54:04 GMT-0700 (Pacific Daylight Time)
+// this file generated Sun Jun 06 2021 12:17:16 GMT-0700 (Pacific Daylight Time)
 let cwrap;
 export const qe = {};
 export function defineQEngineFuncs() {
@@ -16,9 +16,8 @@ export function defineQEngineFuncs() {
 	qe.qSpace_dumpWave = cwrap('qSpace_dumpWave', "number", ["string"]);
 	qe.qSpace_setCircularWave = cwrap('qSpace_setCircularWave', "number", ["number"]);
 	qe.qSpace_setStandingWave = cwrap('qSpace_setStandingWave', "number", ["number"]);
-	qe.qSpace_setWavePacket = cwrap('qSpace_setWavePacket', "number", ["number","number"]);
+	qe.qSpace_setPulseWave = cwrap('qSpace_setPulseWave', "number", ["number","number"]);
 	qe.qSpace_oneRk2Step = cwrap('qSpace_oneRk2Step', "number", []);
-	qe.manyRk2Steps = cwrap('manyRk2Steps', "number", []);
 }
 
 window.defineQEngineFuncs = defineQEngineFuncs;  // just in case
