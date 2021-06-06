@@ -1,5 +1,6 @@
 import React from 'react';
 import {theDraw} from './wave/theWave';
+import qe from './wave/qe';
 
 /* This draws the well, without the psi wave (see draw.js).
 coordinate systems:
@@ -43,8 +44,8 @@ export class WaveDisplay extends React.Component {
 	}
 
 	render() {
-		const tWave = this.props.theWave;
-		console.log(`starting render of WaveDisplay, tWave=`, tWave);
+		const tWave = this.props.aDimension;
+		//console.log(`starting render of WaveDisplay, tWave=`, tWave);
 
 		// can't do this without a wave!  When it exists, this prop will change.
 //		if (!tWave)
@@ -62,18 +63,19 @@ export class WaveDisplay extends React.Component {
 
 		let translateX = WELL_PIXEL_MARGIN;
 		let translateY = OUTER_PIXEL_HEIGHT - WELL_PIXEL_MARGIN;
-		console.info(`WDRender: translateX:${translateX}   translateY:${translateY} `);
+		//console.info(`WDRender: translateX:${translateX}   translateY:${translateY} `);
 
 		// we will draw N+2 bars; including overlap wraparound
 		let N = tWave ? tWave.space.N : 5;
 		let scaleX = innerPixelWidth / (N + 2);
 		let scaleY = -innerPixelHeight * this.state.verticalStretch;
-		console.info(`WDRender: innerPixelWidth:${innerPixelWidth} N+2:${N+2} scaleX:${scaleX}   scaleY:${scaleY}`);
+		//console.info(`WDRender: innerPixelWidth:${innerPixelWidth} N+2:${N+2}`+
+		//	` scaleX:${scaleX}   scaleY:${scaleY}`);
 
 		let transform = `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY}) `;
 		// draw.js will draw in the <g>.  The SVG is all pixel coords inside but lower left of wave panel is at 0, 0
 
-		console.log(`about to render WaveDisplay, theWave=${tWave}`);
+		//console.log(`about to render WaveDisplay, theWave=${tWave}`);
 		return <section className='WaveWrapper'>
 			<svg className='WaveDisplay'
 					width='100%' height={OUTER_PIXEL_HEIGHT}

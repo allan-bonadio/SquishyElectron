@@ -9,13 +9,13 @@
 // N is number of data points, including the boundaries
 
 import qCx from './qCx';
-import iterate from './iterate';
-import {qSpace} from './qEngine';
+//import iterate from './iterate';
+import {qeSpace} from './qEngine';
 //const isZero = c => (Math.abs(c.real) < 1e-10 && Math.abs(c.im) < 1e-10);
 
-export class space {
+export class jSpace {
 	constructor(N, continuum) {
-		const boundaries = continuum ? 2 : 0;
+		//const boundaries = continuum ? 2 : 0;
 		this.N = +N;
 
 		// all the points range from 1 thru N (inclusive) so loops go ix=1, ix <= N
@@ -26,10 +26,10 @@ export class space {
 		this.setZeroVoltage();
 
 		this.continuum = continuum;
-		if (qSpace.contDISCRETE == continuum)
+		if (qeSpace.contDISCRETE == continuum)
 			throw `Cannot do contDISCRETE in JS`;
 
-		console.info(`JS space constructed: `, this)
+		//console.info(`JS jSpace constructed: `, this)
 	}
 
 	/* *************************************** voltage */
@@ -42,38 +42,38 @@ export class space {
 	setZeroVoltage() {
 		let V = this.V;
 		V.fill(0);
-		this.continuum = qSpace.contCIRCULAR;
+		this.continuum = qeSpace.contCIRCULAR;
 	}
 
 	// infinite walled well at  ends
 	setWaveVoltage() {
-		let {V, N} = this;
+		let {V} = this;
 		V.fill(0);
 
 		// tried Infinity; i get NaNs and I can't do anything with them..
 		// tried 10, just doesn't cut it.
-		this.continuum = qSpace.contWELL;
+		this.continuum = qeSpace.contWELL;
 		//V[1] = V[N] = 10;
 		//V[1] = V[N] = Infinity;
 	}
 
 }
 
-// psi itself; can have more than one per space
-export class wave {
-	// N is the resolution of the wave buffer; the array is 2 more cells
+// psi itself; can have more than one per jSpace
+export class jWave {
+	// N is the resolution of the jWave buffer; the array is 2 more cells
 	constructor(space) {
 		this.space = space;
 		let {N} = space;
 
 		// the wave function itself
 		this.psi = new Array(N + 2);
-		this.setConstantWave(1);
+		this.setCircularWave(1);
 
-		console.info(`JS wave constructed: `, this)
+		//console.info(`JS jWave constructed: `, this)
 	}
 
-	dump(title = 'a wave') {
+	dump(title = 'a jWave') {
 		console.info(`${title} ==> ⟨ψ | ψ⟩ = `, this.innerProduct());
 		this.psi.forEach((p, ix) => console.info(`   psi[${ix}]: ${p.real.toFixed(6)}\t${p.im.toFixed(6)}`));
 	}
@@ -103,18 +103,18 @@ export class wave {
 	fixBoundaries(psiAr = this.psi) {
 		let {N, continuum} = this.space;
 		switch (continuum) {
-		case qSpace.contDISCRETE:
+		case qeSpace.contDISCRETE:
 			// ain't no points on the end
 			break;
 
-		case qSpace.contWELL:
+		case qeSpace.contWELL:
 			// the points on the end are ∞ potential, but the arithmetic
 			// goes bonkers if I actually set the voltage to ∞
 			psiAr[0] = qCx();
 			psiAr[N+1] = qCx();
 			break;
 
-		case qSpace.contCIRCULAR:
+		case qeSpace.contCIRCULAR:
 			// the points on the end get set to the opposite side
 			psiAr[0] = psiAr[N];
 			psiAr[N+1] = psiAr[1];
@@ -124,7 +124,6 @@ export class wave {
 
 	// calculate ⟨ψ | ψ⟩  'inner product' isn't the right name is it?
 	innerProduct() {
-		let {N, psi} = this;
 		let tot = 0;  // always real
 		this.forEach(p => {
 			tot += p.real ** 2 + p.im ** 2;
@@ -139,7 +138,7 @@ export class wave {
 		// now adjust it so the norm comes out 1
 		let factor = Math.pow(t, -.5);
 
-		// remember: this is wave->map() not Array->map()
+		// remember: this is jWave->map() not Array->map()
 		this.map(p => {
 			if (!p) debugger;
 			return p.multBy(factor);
@@ -156,14 +155,27 @@ export class wave {
 		}
 		this.psi = newPsi;
 		this.normalize();
-		console.log(`did low pass filter`);
+		console.log(`============================== did low pass filter`);
 	}
 
-	/* *************************************** set wave */
+	/* *************************************** set jWave */
 
-	// fill the wave with an electron that's a standing wave of frequency n
+	// fill the jWave with an unrealistic electron that's constant magnitude,
+	// moving with frequency n
+	// n >= 1 and can be any positive or negative real.
+	setCircularWave(n = 1) {
+		let N = this.space.N;
+		const dAngle = 2 * Math.PI / N;
+		this.map((p, ix) => {
+			let angle = dAngle * ix * n;
+			return qCx(Math.cos(angle), Math.sin(angle));
+		} );
+		this.normalize();
+	}
+
+	// fill the jWave with an electron that's a standing wave of frequency n
 	// n >= 1 and should be integer, although you can try other values.
-	setHarmonicWave(n = 1) {
+	setStandingWave(n = 1) {
 		n = +n;
 
 		let N = this.space.N;
@@ -175,21 +187,8 @@ export class wave {
 		//this.innerProduct();
 	}
 
-	// fill the wave with an unrealistic electron that's constant magnitude,
-	// moving with frequency n
-	// n >= 1 and can be any positive or negative real.
-	setConstantWave(n = 1) {
-		let N = this.space.N;
-		const dAngle = 2 * Math.PI / N;
-		this.map((p, ix) => {
-			let angle = dAngle * ix * n;
-			return qCx(Math.cos(angle), Math.sin(angle));
-		} );
-		this.normalize();
-	}
-
-	// fill the wave with a dirac delta wave function
-	setDiracDelta() {
+	// fill the jWave with a dirac delta jWave function
+	setPulseWave() {
 		this.psi = null;
 		this.map(p => qCx(0));
 		this.psi[Math.floor((this.N + 1) / 2)] = qCx(1);
@@ -198,4 +197,4 @@ export class wave {
 
 }
 
-export default wave;
+export default jWave;

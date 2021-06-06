@@ -1,5 +1,10 @@
-import d3 from 'd3';
-import {theWave} from './theWave';
+//import d3 from 'd3';
+import {theJWave} from './theWave';
+import qe from './qe';
+//import {qeSpace} from './qEngine';
+import qCx from './qCx';
+
+const Module = window.Module;
 
 // color tables.  The component at position 3 is for real values
 const colorNodes = [
@@ -13,6 +18,24 @@ const colorNodes = [
 	[0, 255, 255],
 	[0, 0, 255],  // should not be needed
 ];
+
+// just the integer offset pointer from c++
+let cppWave;
+
+function latestWave() {
+	cppWave = qe.getTheWave();
+}
+
+// get the complex value from this one point, by index
+function getCppWave(ixPoint) {
+	const ix = cppWave + 8*2*ixPoint;
+	return qCx(
+		Module.getValue(ix, 'double'),
+		Module.getValue(ix + 8, 'double')
+	);
+
+}
+
 
 // this class draws the wavefunction, using raw DOM.
 // for each new wave, do like this: drawer = new draw(wave)
@@ -50,13 +73,31 @@ class draw {
 		return `<rect x=${x} y=0 width=1 height=${magnitude.toPrecision(4)}  fill=${color} />`;
 	}
 
-	wellBars() {
-		const bars = theWave.psi.map((psi, x) => this.oneBar(x, psi));
+	jWellBars() {
+		const bars = theJWave.psi.map((psi, x) => this.oneBar(x, psi));
 		return bars.join('\n');
 	}
 
-	draw() {
-		let barsHtml = this.wellBars();
+	qeWellBars() {
+		latestWave();
+		const N = qe.space.dimensions[0].N;
+		const bars = new Array(N);
+		const dim = qe.space.dimensions[0];
+		for (let ix = 0; ix < dim.start + dim.end; ix++) {
+			bars[ix] = this.oneBar(ix, getCppWave(ix));
+		}
+		return bars.join('\n');
+	}
+
+	draw(useQuantumEngine) {
+		let barsHtml;
+
+		if (useQuantumEngine) {
+			barsHtml = this.qeWellBars();
+		}
+		else {
+			barsHtml = this.jWellBars();
+		}
 		//console.info(barsHtml);
 
 		let gElement = document.querySelector('.waveDisplay');
@@ -64,62 +105,23 @@ class draw {
 		    return;  // first time around, doesn't exist
 		gElement.innerHTML = barsHtml;
 	}
+
+	drawFromCpp() {
+//		;
+//		var cppPot = qe.getThePotential();
+//		console.log(`cppWave=${cppWave}  cppPot=${cppPot}`);
+//		//var cppWave = cppWave >> 3;
+//
+//		debugger;
+//		// try this
+//		var a = Module.getValue(cppWave, 'double');
+//		var b = Module.getValue(cppWave+8, 'double');
+//		console.log(`a: ${a}   b: ${b}`);
+
+		for (let i = 0; i < 50; i++)
+			console.log(`re=${Module.getValue(cppWave + 8*2*i, 'double')}  im=${Module.getValue(cppWave + 8*(2*i + 1), 'double')}`)
+	}
 }
 
 export default draw;
-
-//import {extent} from 'd3-array';
-//import {scaleLinear} from 'd3-scale';
-//import {line} from 'd3-shape';
-
-/*
-******************* from ant
-//			this.xScale.domain([this.state.xMin, this.state.xMax]);
-//			this.xScale.domain([scene.xMin, scene.xMax]);
-//		this.xScale.range([this.marginLeft, this.marginRight]);
-//		this.yScale.range([this.marginBottom, this.marginTop]);
-//		this.xScale = scaleLinear();
-//		this.yScale = scaleLinear();
-//		this.setScaleRanges();
-//			[mi, mx] = extent(this.vertexSeries[f], d => d.y);
-//		this.yScale.domain([mini, maxi]);
-//
-//
-//
-//			// lineSeries is a mapper that takes an entire series and churns
-//			// out the SVG coordinate string for the d attribute.
-//			// .x() and .y() set accessors into the items.
-//			const lineSeries = line()
-//				.x(d => this.xScale(d.x))
-//				.y(d => this.yScale(d.y));
-//
-//
-//
-//			linePaths = this.vertexSeries.map((series, ix) =>
-//					<path className='series' d={lineSeries(series)} key={ix}
-//						stroke={this.funcs[ix].color} />);
-//
-//
-//
-//
-********************** from try1
-//	render() {
-//		const well = this.props.well;
-//		const N = well.N;
-//		const WIDTH=500;
-//		const pixPerPoint = WIDTH / well.N;
-//
-//		const bars = [];
-//		well.dump();
-//		for (let i = 1; i <= N; i++) {
-//			const height = well.psi[i].abs() ** 2 * 100;
-//			bars[i] = <div className='psiBar' key={i}
-//				style={{width: pixPerPoint + 'px', height: height + 'px'}} />
-//		}
-//
-//		return <div className='WellDisplay'>
-//			{bars}
-//			<br clear='both' />
-//		</div>;
-*/
 
