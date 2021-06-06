@@ -16,15 +16,13 @@ let qeStartPromiseSucceed;
 // do NOT export this; it's global cuz quantumEngine.js, the compiled C++ proxy,
 // has to have access to it early on
 function quantumEngineHasStarted(mDimensions, mLabel) {
-	console.log(`quantumEngineHas...Started`, mDimensions, mLabel);
+	//console.log(`quantumEngineHas...Started`, mDimensions, mLabel);
 	defineQEngineFuncs();
 
 	maxDimensions = mDimensions;
 	maxLabel = mLabel;
 
-//	headerLen = sQuantumSpace - mDimensions * sDimension;
-
-	console.log(`quantumEngineHasStarted:  resolving qeStartPromise`);
+	//console.log(`quantumEngineHasStarted:  resolving qeStartPromise`);
 	qeStartPromiseSucceed(mDimensions*1000 + mLabel);
 
 };
@@ -32,21 +30,41 @@ window.quantumEngineHasStarted = quantumEngineHasStarted;
 
 export const qeStartPromise = new Promise((succeed, fail) => {
 	qeStartPromiseSucceed = succeed;
-	console.info(`qeStartPromise created:`, succeed, fail);
+	//console.info(`qeStartPromise created:`, succeed, fail);
 });
 
 
 /* ****************************************************** space buffer */
 
-
-// call like this: new qSpace([{N: 100, continuum: contCIRCULAR, label: 'x'}])
-export class qSpace {
+// the JS representations of the c++ qSpace object
+// call like this: new qeSpace([{N: 100, continuum: contCIRCULAR, label: 'x'}])
+export class qeSpace {
 	constructor(dims) {
+		this.dimensions = dims.map(dim => {
+			let d = {...dim};
+			if (d.continuum) {
+				d.start = 1;
+				d.end = d.N + 1;
+			}
+			else {
+				d.start = 0;
+				d.end = d.N;
+			}
+			d.nStates = d.N;  // only if 1 dimension
+			d.nPoints = d.start + d.end;  // only if 1 dimension
+
+			return d;
+		});
+
 		qe.startNewSpace();
-		dims.forEach(dim => qe.addSpaceDimension(dim.N, dim.continuum, dim.label));
+		dims.forEach(dim => {
+			qe.addSpaceDimension(dim.N, dim.continuum, dim.label);
+		});
 		qe.completeNewSpace();
 
-		qe.qSpace_dumpPotential('done making potential');
+		this.dimensions = dims;
+
+		//qe.qSpace_dumpPotential('done making potential');
 	}
 
 	static contDISCRETE = 0;
