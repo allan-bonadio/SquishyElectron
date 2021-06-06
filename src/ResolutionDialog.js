@@ -1,8 +1,8 @@
 import React from 'react';
-import {qSpace} from './wave/qEngine';
+import {qeSpace} from './wave/qEngine';
 
 const minResolution = 5;
-const maxResolution = 10000;
+const maxResolution = 100000;
 
 export default class ResolutionDialog extends React.Component {
 	// this is the state in the dialog; doesn't become real until OK()
@@ -19,7 +19,7 @@ export default class ResolutionDialog extends React.Component {
 
 	OK(ev) {
 		const s = this.state;
-		this.props.setNewResolution(s.N, s.continuum);
+		this.props.setNew1DResolution(s.N, s.continuum);
 		this.props.closeResolutionDialog();
 	}
 
@@ -45,7 +45,6 @@ export default class ResolutionDialog extends React.Component {
 	}
 
 	render() {
-		const p = this.props;
 		const s = this.state;
 		this.calcStepSize();
 
@@ -56,7 +55,7 @@ export default class ResolutionDialog extends React.Component {
 				<h3>Universe</h3>
 
 				<label>
-					Number of datapoints (5 - 1000) <br />
+					Number of datapoints (${minResolution} - ${maxResolution}) <br />
 					<input type='number' placeholder='points' size='15' value={s.N}
 						min={minResolution} max={maxResolution}
 						step={this.calcStepSize()}
@@ -65,9 +64,9 @@ export default class ResolutionDialog extends React.Component {
 				<label>continuum:
 					<select value={s.continuum}
 						onChange={ev => this.setState({continuum: ev.currentTarget.value})} >
-						<option  value={qSpace.contCIRCULAR}>contCIRCULAR</option>
-						<option  value={qSpace.contWELL}>contWELL</option>
-						<option  value={qSpace.contDISCRETE}>contDISCRETE</option>
+						<option  value={qeSpace.contCIRCULAR}>contCIRCULAR</option>
+						<option  value={qeSpace.contWELL}>contWELL</option>
+						<option  value={qeSpace.contDISCRETE}>contDISCRETE</option>
 					</select >
 				</label>
 
