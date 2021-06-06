@@ -1,8 +1,6 @@
 import React from 'react';
 import './ControlPanel.css';
-import {theWave, setWave, setVoltage, theDraw, iterateAnimate} from './wave/theWave';
-import iterate from './wave/iterate';
-import ResolutionDialog from './ResolutionDialog';
+import {theJWave, setWave, setVoltage, iterateAnimate} from './wave/theWave';
 
 export class ControlPanel extends React.Component {
 	constructor(props) {
@@ -22,10 +20,10 @@ export class ControlPanel extends React.Component {
 		running = !!running;
 
 //		if (this.state.running)
-//			iterate(theWave);
+//			iterate(theJWave);
 //		if (running)
 //			theDraw.draw();
-		iterateAnimate(running && this.state.rate);
+		iterateAnimate(this.props.useQuantumEngine, running && this.state.rate);
 
 		ev.currentTarget.blur();
 
@@ -33,16 +31,16 @@ export class ControlPanel extends React.Component {
 		this.setState({running});
 
 		// but also a state of the animation
-		//theWave.running = running;
+		//theJWave.running = running;
 	}
 
 	// set rate, which is 1, 2, 4, 8, ...
 	// can't combine this with 'running' cuz want to remember rate even when stopped
 	setRate(rate) {
-		iterateAnimate(0);
+		iterateAnimate(this.props.useQuantumEngine, 0);
 		this.setState({rate})
 		if (this.state.running)
-			iterateAnimate(rate);
+			iterateAnimate(this.props.useQuantumEngine, rate);
 	}
 
 	goStopButtons() {
@@ -69,7 +67,7 @@ export class ControlPanel extends React.Component {
 			</select>
 
 			<button type='button' className={'filterAndNorm'}
-				onClick={ev => theWave.lowPassFilter()}>
+				onClick={ev => theJWave.lowPassFilter()}>
 					filter & norm
 			</button>
 		</div>;
@@ -81,7 +79,7 @@ export class ControlPanel extends React.Component {
 		return <div className='resetWaveButtons subPanel'>
 			<h3><big>🌊 🌊 🌊 </big> Reset Wave Function</h3>
 			<button type='button' className='harmonicWaveButton'
-				onClick={ev => setWave('harmonic', this.state.harmonicFrequency)}>
+				onClick={ev => setWave('standing', this.state.harmonicFrequency)}>
 					Harmonic Wave
 			</button>
 			&nbsp;
@@ -91,7 +89,7 @@ export class ControlPanel extends React.Component {
 
 			<br/>
 			<button type='button' className='constantWaveButton'
-				onClick={ev => setWave('constant', this.state.constantFrequency)} >
+				onClick={ev => setWave('circular', this.state.constantFrequency)} >
 					Constant Wave
 			</button>
 			&nbsp;
@@ -101,7 +99,7 @@ export class ControlPanel extends React.Component {
 
 			<br/>
 			<button type='button' className='diracDeltaButton'
-				onClick={ev => setWave('diracDelta')} >
+				onClick={ev => setWave('pulse')} >
 					Dirac Delta
 			</button>
 		</div>;

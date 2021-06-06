@@ -4,9 +4,25 @@ import WaveDisplay from './WaveDisplay';
 import ControlPanel from './ControlPanel';
 import ResolutionDialog from './ResolutionDialog';
 import {recreateWave} from './wave/theWave';
-import {qSpace, qeStartPromise} from './wave/qEngine';
-const DEFAULT_RESOLUTION = 5;
-const DEFAULT_CONTINUUM = qSpace.contCIRCULAR;
+import {qeSpace, qeStartPromise} from './wave/qEngine';
+//import qe from './wave/qe';
+
+
+const DEFAULT_RESOLUTION = 50;
+const DEFAULT_CONTINUUM = qeSpace.contCIRCULAR;
+
+// someday I need an error handling layer.  See
+// https://emscripten.org/docs/porting/Debugging.html?highlight=assertions#handling-c-exceptions-from-javascript
+
+//function getExceptionMessage(exception) {
+//  return typeof exception == 'number'
+//	? Module.getExceptionMessage(exception)
+//	: exception;
+//}
+// also see what i tried to do in main.cpp
+
+
+
 
 class App extends React.Component {
 	constructor(props) {
@@ -19,26 +35,34 @@ class App extends React.Component {
 			N: DEFAULT_RESOLUTION,
 			continuum: DEFAULT_CONTINUUM,
 
-			theWave: null,
+			// whether to use the new C++ quantum engine, or the old JS code
+			// this is where it's set and not changed anywhere else
+			useQuantumEngine: true,
+
+			theJWave: null,
+			theQESpace: null,
 			theDraw: null,
 		};
 
 		console.log(`App constructor`);
 	}
 
-	static me = this;
-	static setTheWave(theWave, theDraw) {
-		App.me.setState(theWave, theDraw);
-	}
+//	static me = this;
+//	static setTheJWave(theJWave, theDraw) {
+//		App.me.setState(theJWave, theDraw);
+//	}
+//	static setTheQESpace(theQEWave, theDraw) {
+//		App.me.setState(theQEWave, theDraw);
+//	}
 
 
 	openResolutionDialog(whetherTo) {
 		this.setState({isResolutionDialogOpen: whetherTo});
 	}
 
-	setNewResolution(N, continuum) {
-		recreateWave(N, continuum, (theWave, theDraw) => {
-			this.setState({N, continuum, theWave, theDraw});
+	setNew1DResolution(N, continuum) {
+		recreateWave(N, continuum, (theJWave, theQESpace, theDraw) => {
+			this.setState({N, continuum, theJWave, theQESpace, theDraw});
 		});
 	}
 
@@ -46,7 +70,7 @@ class App extends React.Component {
 	componentDidMount() {
 		// upon startup, after C++ says it's ready, but remember constructor runs twice
 		qeStartPromise.then((arg) => {
-			this.setNewResolution(DEFAULT_RESOLUTION, DEFAULT_CONTINUUM);
+			this.setNew1DResolution(DEFAULT_RESOLUTION, DEFAULT_CONTINUUM);
 			// wont work theDraw.draw();
 		}, (ex) => {
 			console.error(`error in qeStartPromise:`, ex);
@@ -69,12 +93,12 @@ class App extends React.Component {
 					N={this.state.N}
 					continuum={this.state.continuum}
 					closeResolutionDialog={() => this.openResolutionDialog(false)}
-					setNewResolution={(N, continuum) => this.setNewResolution(N, continuum)}
+					setNew1DResolution={(N, continuum) => this.setNew1DResolution(N, continuum)}
 			  />
 
 			: null;
 
-		console.log(`about to render app, theWave=${s.theWave}`);
+		console.log(`about to render app, theJWave=..., qe.Wave=...`, s.theJWave, s.theJWave);
 		return (
 			<div className="App">
 				<h2 className="App-header">
@@ -83,9 +107,11 @@ class App extends React.Component {
 					&nbsp; &nbsp;
 					Squishy Electron
 				</h2>
-				<WaveDisplay theWave={s.theWave} innerWindowWidth={s.innerWindowWidth}/>
+				<WaveDisplay aDimension={s.theJWave || s.theQESpace && s.theQESpace.dimensions[0]}
+					innerWindowWidth={s.innerWindowWidth}/>
 				<ControlPanel
 					openResolutionDialog={() => this.openResolutionDialog(true)}
+					useQuantumEngine={this.props.useQuantumEngine}
 				/>
 				{resDialog}
 			</div>
