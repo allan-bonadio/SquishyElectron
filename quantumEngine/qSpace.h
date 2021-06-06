@@ -13,9 +13,8 @@
 /* one for each dimension of the wave array */
 class qDimension {
 public:
-	// possible  states, just for this  dimension.
+	// possible  states, just for this  dimension.  start+end=datapoints
 	int32_t N;
-	int32_t extraN;  // 0 or 2
 	int32_t start;
 	int32_t end;
 
@@ -45,7 +44,7 @@ public:
 
 	void setCircularWave(qCx *wave, qReal n);
 	void setStandingWave(qCx *wave, qReal n);
-	void setWavePacket(qCx *wave, qReal widthFactor, qReal cycles);
+	void setPulseWave(qCx *wave, qReal widthFactor, qReal cycles);
 };
 
 // continuum values - same as in qDimension in qEngine.js; pls synchronize them
@@ -98,9 +97,12 @@ extern "C" {
 	int32_t startNewSpace(void);
 	int32_t addSpaceDimension(int32_t N, int32_t continuum, const char *label);
 	int32_t completeNewSpace(void);
+
 	qCx *getTheWave(void);
 	qReal *getThePotential(void);
 	int32_t getElapsedTime(void);
+
+	int manyRk2Steps(void);
 }
 
 // internal
@@ -111,3 +113,4 @@ extern class qSpace *theSpace;
 extern class qCx *theWave, *tempWave, *nextWave;
 extern qReal *thePotential;
 extern qReal elapsedTime;
+

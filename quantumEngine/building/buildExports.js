@@ -32,8 +32,14 @@ exportsSrc  = [
 	{name: 'qSpace_setCircularWave', retType: 'number', args: ['number']},
 	{name: 'qSpace_setStandingWave', retType: 'number', args: ['number']},
 	{name: 'qSpace_setWavePacket', retType: 'number', args: ['number', 'number']},
-	{name: 'qSpace_oneRk2Step', retType: 'number', args: []}
+	{name: 'qSpace_oneRk2Step', retType: 'number', args: []},
+
+
+
 ];
+
+// remember you don't have to export your func like this, you can do one-offs for testing with ccall():
+// https://emscripten.org/docs/api_reference/preamble.js.html#calling-compiled-c-functions-from-javascript
 
 // the exports.json file, needed by emcc
 let exportsFile = exportsSrc.map(funcDesc => '_' + funcDesc.name);

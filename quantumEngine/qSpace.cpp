@@ -13,7 +13,7 @@ extern "C" {
 
 // call this to throw away existing space and wave, and start new
 int32_t startNewSpace(void) {
-	printf("startNewSpace()\n");
+	//printf("startNewSpace()\n");
 
 	if (theSpace) {
 		delete theSpace;
@@ -26,14 +26,14 @@ int32_t startNewSpace(void) {
 
 	dimsSoFar = 0;
 	theSpace = new qSpace();
-	printf("  done startNewSpace()\n");
+	//printf("  done startNewSpace()\n");
 
 	return true;
 }
 
 // call this from JS to add one or more dimensions
 int32_t addSpaceDimension(int32_t N, int32_t continuum, const char *label) {
-	printf("addSpaceDimension(%d, %d, %s)\n", N, continuum, label);
+	//printf("addSpaceDimension(%d, %d, %s)\n", N, continuum, label);
 
 	qDimension *dim = theSpace->dimensions + dimsSoFar;
 	dim->N = N;
@@ -41,25 +41,24 @@ int32_t addSpaceDimension(int32_t N, int32_t continuum, const char *label) {
 
 	dim->continuum = continuum;
 	if (continuum) {
-		dim->extraN = 2;
 		dim->start = 1;
 		dim->end = N + 1;
 	}
 	else {
-		dim->extraN = dim->start = 0;
+		dim->start = 0;
 		dim->end = N;
 	}
 
 	strncpy(dim->label, label, LABEL_LEN-1);
 
 	dimsSoFar++;
-	printf("  done addSpaceDimension() %s\n", dim->label);
+	//printf("  done addSpaceDimension() %s\n", dim->label);
 	return true;
 }
 
 // call this from JS to finish the process
 int32_t completeNewSpace(void) {
-	printf("completeNewSpace()\n");
+	//printf("completeNewSpace()\n");
 	int32_t ix;
 	int32_t nPoints = 1, nStates = 1;
 
@@ -71,7 +70,7 @@ int32_t completeNewSpace(void) {
 
 		nStates *= dim->N;
 		dim->nStates = nStates;
-		nPoints *= dim->N + dim->extraN;
+		nPoints *= dim->start + dim->end;
 		dim->nPoints = nPoints;
 	}
 
@@ -85,10 +84,10 @@ int32_t completeNewSpace(void) {
 	thePotential = new qReal[nPoints];
 	//theSpace->dumpPotential("freshly created");
 
-	printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", nStates, nPoints);
-	printf("  dimension N=%d  extraN=%d  continuum=%d  start=%d  end=%d  label=%s\n",
-		theSpace->dimensions->N, theSpace->dimensions->extraN, theSpace->dimensions->continuum,
-		theSpace->dimensions->start, theSpace->dimensions->end, theSpace->dimensions->label);
+	//printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", nStates, nPoints);
+	//printf("  dimension N=%d  extraN=%d  continuum=%d  start=%d  end=%d  label=%s\n",
+	//	theSpace->dimensions->N, theSpace->dimensions->extraN, theSpace->dimensions->continuum,
+	//	theSpace->dimensions->start, theSpace->dimensions->end, theSpace->dimensions->label);
 	return nPoints;
 }
 
@@ -113,7 +112,7 @@ void qSpace_setZeroPotential(void) { theSpace->setZeroPotential(); }
 void qSpace_dumpWave(char *title) { theSpace->dumpWave(title); }
 void qSpace_setCircularWave(qReal n) { theSpace->dimensions->setCircularWave(theWave, n); }
 void qSpace_setStandingWave(qReal n) { theSpace->dimensions->setStandingWave(theWave, n); }
-void qSpace_setWavePacket(qReal widthFactor, qReal cycles) { theSpace->dimensions->setWavePacket(theWave, widthFactor, cycles); }
+void qSpace_setWavePacket(qReal widthFactor, qReal cycles) { theSpace->dimensions->setPulseWave(theWave, widthFactor, cycles); }
 void qSpace_oneRk2Step() { theSpace->oneRk2Step(); }
 
 
@@ -160,7 +159,8 @@ void qSpace::dumpWave(const char *title) {
 		//if (0 == ix % 5) printf("\n[%d] ", ix);
 		printf("(%lf,%lf) ", theWave[ix].re, theWave[ix].im);
 	}
-	if (dim->continuum) printf("\nend [%d]=(%lf,%lf)", ix, theWave[ix].re, theWave[ix].im);
+	if (dim->continuum) printf("\nend [%d]=(%lf,%lf)",
+		ix, theWave[ix].re, theWave[ix].im);
 	printf("\n");
 }
 
@@ -176,8 +176,8 @@ void qDimension::fixBoundaries(qCx *wave) {
 	switch (this->continuum) {
 	case contDISCRETE:
 		// ain't no points on the end
-		printf("contDISCRETE cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", this->continuum,
-			wave[0].re, wave[0].im, wave[this->end].re, wave[this->end].im);
+		//printf("contDISCRETE cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", this->continuum,
+		//	wave[0].re, wave[0].im, wave[this->end].re, wave[this->end].im);
 		break;
 
 	case contWELL:
@@ -185,16 +185,16 @@ void qDimension::fixBoundaries(qCx *wave) {
 		// if I actually set the voltage to ∞
 		wave[0] = qCx();
 		wave[this->end] = qCx();
-		printf("contWELL cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", this->continuum,
-			wave[0].re, wave[0].im, wave[this->end].re, wave[this->end].im);
+		//printf("contWELL cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", this->continuum,
+		//wave[0].re, wave[0].im, wave[this->end].re, wave[this->end].im);
 		break;
 
 	case contCIRCULAR:
 		// the points on the end get set to the opposite side
 		wave[0] = wave[this->N];
 		wave[this->end] = wave[1];
-		printf("contCIRCULAR cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", this->continuum,
-			wave[0].re, wave[0].im, wave[this->end].re, wave[this->end].im);
+		//printf("contCIRCULAR cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", this->continuum,
+		//	wave[0].re, wave[0].im, wave[this->end].re, wave[this->end].im);
 		break;
 	}
 }
@@ -214,13 +214,21 @@ qReal qDimension::innerProduct(qCx *wave) {
 // enforce ⟨ψ | ψ⟩ = 1 by dividing out the current value
 void qDimension::normalize(qCx *wave) {
 	qReal mag = this->innerProduct(wave);
-	printf("normalizing.  iprod=%lf\n", mag);
-	mag = pow(mag, -0.5);
+	//printf("normalizing.  iprod=%lf\n", mag);
+	if (mag == 0.) {
+		// ALL ZEROES!??! set them all to a constant, normalized
+		qCx each = qCx(pow(this->N, -0.5));
+		for (int ix = this->start; ix < this->end; ix++)
+			wave[ix] = each;
+	}
+	else {
+		mag = pow(mag, -0.5);
 
-	for (int ix = this->start; ix < this->end; ix++)
-		wave[ix] *= mag;
+		for (int ix = this->start; ix < this->end; ix++)
+			wave[ix] *= mag;
+	}
 	this->fixBoundaries(wave);
-	printf("    normalizing.  new IP=%lf\n", this->innerProduct(wave));
+	//printf("    normalizing.  new IP=%lf\n", this->innerProduct(wave));
 }
 
 // average the wave's points with the two closest neighbors to fix the divergence
@@ -275,7 +283,7 @@ void qDimension::setStandingWave(qCx *wave, qReal n) {
 
 // widthFactor is number of points wide it is, fraction of N.
 // Cycles is how many circles (360°) it goes thru in that width.
-void qDimension::setWavePacket(qCx *wave, qReal widthFactor, qReal cycles) {
+void qDimension::setPulseWave(qCx *wave, qReal widthFactor, qReal cycles) {
 
 	// start with a real wave
 	this->setCircularWave(wave, cycles / widthFactor);

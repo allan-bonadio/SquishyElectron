@@ -3,6 +3,8 @@
 #include "qSpace.h"
 
 #include <cmath>
+
+
 void forMe(void) {
 	// for me
 // 	qReal aReal;
@@ -55,7 +57,7 @@ void forMe(void) {
 EM_JS(void, qeStarted,
 	(int32_t mDimensions, int32_t mLabel),
 	{
-		setTimeout(() => quantumEngineHasStarted(mDimensions, mLabel), 100);
+		setTimeout(() => quantumEngineHasStarted(mDimensions, mLabel), 200);
 	});
 
 int main() {
@@ -68,6 +70,22 @@ int main() {
 
 	return 0;
 }
+
+/* ************************************************* error handling */
+
+// wasm-ld: error: /var/folders/th/9674h0fx4hx2d7y751ln3g1r0000gn/T/emscripten_temp_nx3ony_i/main_0.o: undefined symbol: _embind_register_function
+
+//#include "/dvl/emscripten/emsdk-main/upstream/emscripten/system/include/emscripten/bind.h"
+//
+//std::string getExceptionMessage(intptr_t exceptionPtr) {
+//  return std::string(reinterpret_cast<std::exception *>(exceptionPtr)->what());
+//}
+//
+//EMSCRIPTEN_BINDINGS(Bindings) {
+//  emscripten::function("getExceptionMessage", &getExceptionMessage);
+//};
+
+
 
 /*
 extern "C" {
