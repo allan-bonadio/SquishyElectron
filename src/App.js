@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import WaveDisplay from './WaveDisplay';
+import WaveView from './WaveView';
 import ControlPanel from './ControlPanel';
 import ResolutionDialog from './ResolutionDialog';
 import {recreateWave} from './wave/theWave';
@@ -96,10 +96,8 @@ class App extends React.Component {
 					closeResolutionDialog={() => this.openResolutionDialog(false)}
 					setNew1DResolution={(N, continuum) => this.setNew1DResolution(N, continuum)}
 			  />
-
 			: null;
 
-		const N =
 		console.log(`about to render app, currentJWave=..., qe.Wave=...`, s.currentJWave, s.currentJWave);
 		return (
 			<div className="App">
@@ -109,7 +107,7 @@ class App extends React.Component {
 					&nbsp; &nbsp;
 					Squishy Electron
 				</h2>
-				<WaveDisplay N={this.state.N}
+				<WaveView N={this.state.N}
 					innerWindowWidth={s.innerWindowWidth}/>
 				<ControlPanel
 					openResolutionDialog={() => this.openResolutionDialog(true)}

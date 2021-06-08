@@ -1,10 +1,8 @@
 //import d3 from 'd3';
 import {theJWave} from './theWave';
 import qe from './qe';
-//import {qeSpace} from './qEngine';
+import {qeSpace} from './qEngine';
 import qCx from './qCx';
-
-const Module = window.Module;
 
 // color tables.  The component at position 3 is for real values
 const colorNodes = [
@@ -20,22 +18,22 @@ const colorNodes = [
 ];
 
 // just the integer offset pointer from c++
-let cppWave;
-
-function latestWave() {
-	cppWave = qe.getTheWave();
-}
-
-// get the complex value from this one point, by index
-function getCppWave(ixPoint) {
-	const ix = cppWave + 8*2*ixPoint;
-	return qCx(
-		Module.getValue(ix, 'double'),
-		Module.getValue(ix + 8, 'double')
-	);
-
-}
-
+//let cppWave;
+//
+//function latestWave() {
+//	cppWave = qe.getWaveBuffer();
+//}
+//
+//// get the complex value from this one point, by index
+//function getCppWave(ixPoint) {
+//	const ix = cppWave + 8*2*ixPoint;
+//	return qCx(
+//		Module.getValue(ix, 'double'),
+//		Module.getValue(ix + 8, 'double')
+//	);
+//
+//}
+//
 
 // this class draws the wavefunction, using raw DOM.
 // for each new wave, do like this: drawer = new draw(wave)
@@ -71,7 +69,8 @@ class draw {
 		//console.log(`${x} magnitude: ${magnitude}`);
 
 		// little gaps appear unles you do this
-		return `<rect x=${x} y=0 width=1.05 height=${magnitude.toPrecision(4)}  fill=${color} />`;
+		return `<rect class=psiBar x=${x} y=0 `+
+			`width=1.05 height=${magnitude.toPrecision(4)}  fill=${color} />`;
 	}
 
 	jWellBars() {
@@ -80,12 +79,13 @@ class draw {
 	}
 
 	qeWellBars() {
-		latestWave();
+		qe.latestNumbers();
+
 		const N = qe.space.dimensions[0].N;
 		const bars = new Array(N);
 		const dim = qe.space.dimensions[0];
 		for (let ix = 0; ix < dim.start + dim.end; ix++) {
-			bars[ix] = this.oneBar(ix, getCppWave(ix));
+			bars[ix] = this.oneBar(ix, qeSpace.get1DWave(ix));
 		}
 		return bars.join('\n');
 	}
@@ -101,27 +101,27 @@ class draw {
 		}
 		//console.info(barsHtml);
 
-		let gElement = document.querySelector('.waveDisplay');
+		let gElement = document.querySelector('g.waveDisplay');
 		if (!gElement)
 		    return;  // first time around, doesn't exist
 		gElement.innerHTML = barsHtml;
 	}
 
-	drawFromCpp() {
-//		;
-//		var cppPot = qe.getThePotential();
-//		console.log(`cppWave=${cppWave}  cppPot=${cppPot}`);
-//		//var cppWave = cppWave >> 3;
+//	drawFromCpp() {
+////		;
+////		var cppPot = qe.getPotentialBuffer();
+////		console.log(`cppWave=${cppWave}  cppPot=${cppPot}`);
+////		//var cppWave = cppWave >> 3;
+////
+////		debugger;
+////		// try this
+////		var a = Module.getValue(cppWave, 'double');
+////		var b = Module.getValue(cppWave+8, 'double');
+////		console.log(`a: ${a}   b: ${b}`);
 //
-//		debugger;
-//		// try this
-//		var a = Module.getValue(cppWave, 'double');
-//		var b = Module.getValue(cppWave+8, 'double');
-//		console.log(`a: ${a}   b: ${b}`);
-
-		for (let i = 0; i < 50; i++)
-			console.log(`re=${Module.getValue(cppWave + 8*2*i, 'double')}  im=${Module.getValue(cppWave + 8*(2*i + 1), 'double')}`)
-	}
+//		for (let i = 0; i < 50; i++)
+//			console.log(`re=${Module.getValue(cppWave + 8*2*i, 'double')}  im=${Module.getValue(cppWave + 8*(2*i + 1), 'double')}`)
+//	}
 }
 
 export default draw;
