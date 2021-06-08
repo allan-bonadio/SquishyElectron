@@ -82,6 +82,7 @@ int32_t completeNewSpace(void) {
 	//theSpace->dumpWave("freshly created");
 
 	thePotential = new qReal[nPoints];
+	theSpace->setValleyPotential(1., 1., 0.);
 	//theSpace->dumpPotential("freshly created");
 
 	//printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", nStates, nPoints);
@@ -94,10 +95,10 @@ int32_t completeNewSpace(void) {
 /* ********************************************************** glue functions */
 
 // these are for JS only; they're both extern
-qCx *getTheWave(void) {
+qCx *getWaveBuffer(void) {
 	return theWave;
 }
-qReal *getThePotential(void) {
+qReal *getPotentialBuffer(void) {
 	return thePotential;
 }
 
@@ -108,6 +109,9 @@ int32_t getElapsedTime(void) {
 
 void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
 void qSpace_setZeroPotential(void) { theSpace->setZeroPotential(); }
+void qSpace_setValleyPotential(qReal power, qReal scale, qReal offset) {
+	theSpace->setValleyPotential(power, scale, offset);
+}
 
 void qSpace_dumpWave(char *title) { theSpace->dumpWave(title); }
 void qSpace_setCircularWave(qReal n) { theSpace->dimensions->setCircularWave(theWave, n); }
@@ -140,6 +144,14 @@ void qSpace::setZeroPotential(void) {
 	qDimension *dim = theSpace->dimensions;
 	for (int ix = 0; ix < dim->nPoints; ix++)
 		thePotential[ix] = 0.;
+}
+
+void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset = 0) {
+	qDimension *dim = theSpace->dimensions;
+	qReal mid = floor(dim->nPoints / 2);
+	for (int ix = 0; ix < dim->nPoints; ix++) {
+		thePotential[ix] = pow(abs(ix - mid), power) * scale + offset;
+	}
 }
 
 

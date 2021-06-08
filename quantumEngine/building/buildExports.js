@@ -19,13 +19,14 @@ exportsSrc  = [
 	{name: 'completeNewSpace', retType: 'number', args: []},
 
 	// gets
-	{name: 'getTheWave', retType: 'number', args: []},
-	{name: 'getThePotential', retType: 'number', args: []},
+	{name: 'getWaveBuffer', retType: 'number', args: []},
+	{name: 'getPotentialBuffer', retType: 'number', args: []},
 	{name: 'getElapsedTime', retType: 'number', args: []},
 
 	// the potential
 	{name: 'qSpace_dumpPotential', retType: 'number', args: ['string']},
 	{name: 'qSpace_setZeroPotential', retType: 'number', args: []},
+	{name: 'qSpace_setValleyPotential', retType: 'number', args: ['number', 'number', 'number']},
 
 	// the wave
 	{name: 'qSpace_dumpWave', retType: 'number', args: ['string']},

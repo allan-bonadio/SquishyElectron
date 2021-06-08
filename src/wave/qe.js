@@ -8,8 +8,8 @@ export function defineQEngineFuncs() {
 	qe.startNewSpace = cwrap('startNewSpace', "number", []);
 	qe.addSpaceDimension = cwrap('addSpaceDimension', "number", ["number","number","string"]);
 	qe.completeNewSpace = cwrap('completeNewSpace', "number", []);
-	qe.getTheWave = cwrap('getTheWave', "number", []);
-	qe.getThePotential = cwrap('getThePotential', "number", []);
+	qe.getWaveBuffer = cwrap('getWaveBuffer', "number", []);
+	qe.getPotentialBuffer = cwrap('getPotentialBuffer', "number", []);
 	qe.getElapsedTime = cwrap('getElapsedTime', "number", []);
 	qe.qSpace_dumpPotential = cwrap('qSpace_dumpPotential', "number", ["string"]);
 	qe.qSpace_setZeroPotential = cwrap('qSpace_setZeroPotential', "number", []);

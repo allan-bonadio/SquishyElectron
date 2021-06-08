@@ -87,6 +87,11 @@ export function setVoltage(breed, arg) {
 		qe.qSpace_setZeroPotential()
 		break;
 
+	case 'valley':
+		theJWave.setZeroVoltage();
+		qe.qSpace_setValleyPotential();
+		break;
+
 	case 'wave':
 		theJWave.setWaveVoltage();
 		break;

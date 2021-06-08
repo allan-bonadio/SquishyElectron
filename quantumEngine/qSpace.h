@@ -83,6 +83,7 @@ public:
 
 	void dumpPotential(const char *title);
 	void setZeroPotential(void);
+	void setValleyPotential(qReal power, qReal scale, qReal offset);
 
 	void dumpWave(const char *title);
 	void forEach(void callback(qCx));
@@ -98,8 +99,8 @@ extern "C" {
 	int32_t addSpaceDimension(int32_t N, int32_t continuum, const char *label);
 	int32_t completeNewSpace(void);
 
-	qCx *getTheWave(void);
-	qReal *getThePotential(void);
+	qCx *getWaveBuffer(void);
+	qReal *getPotentialBuffer(void);
 	int32_t getElapsedTime(void);
 
 	int manyRk2Steps(void);
