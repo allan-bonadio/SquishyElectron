@@ -79,13 +79,13 @@ class draw {
 	}
 
 	qeWellBars() {
-		qe.latestNumbers();
+		qe.latestWave();
 
 		const N = qe.space.dimensions[0].N;
 		const bars = new Array(N);
 		const dim = qe.space.dimensions[0];
 		for (let ix = 0; ix < dim.start + dim.end; ix++) {
-			bars[ix] = this.oneBar(ix, qeSpace.get1DWave(ix));
+			bars[ix] = this.oneBar(ix, qe.get1DWave(ix));
 		}
 		return bars.join('\n');
 	}

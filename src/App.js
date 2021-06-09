@@ -3,8 +3,8 @@ import './App.css';
 import WaveView from './WaveView';
 import ControlPanel from './ControlPanel';
 import ResolutionDialog from './ResolutionDialog';
-import {recreateWave} from './wave/theWave';
-import {qeSpace, qeStartPromise} from './wave/qEngine';
+import {recreateWave, theDraw} from './wave/theWave';
+import {qeSpace, qeStartPromise, qeDefineAccess} from './wave/qEngine';
 //import qe from './wave/qe';
 
 
@@ -61,7 +61,6 @@ class App extends React.Component {
 	}
 
 	setNew1DResolution(N, continuum) {
-		const s = this.state;
 		recreateWave(N, continuum, (currentJWave, currentQESpace, currentDraw) => {
 			this.setState({N, continuum, currentJWave, currentQESpace, currentDraw});
 		});
@@ -73,6 +72,8 @@ class App extends React.Component {
 		qeStartPromise.then((arg) => {
 			this.setNew1DResolution(DEFAULT_RESOLUTION, DEFAULT_CONTINUUM);
 			// wont work currentDraw.draw();
+			qeDefineAccess();
+			theDraw.draw(this.state.useQuantumEngine);
 		}, (ex) => {
 			console.error(`error in qeStartPromise:`, ex);
 		});
@@ -107,7 +108,7 @@ class App extends React.Component {
 					&nbsp; &nbsp;
 					Squishy Electron
 				</h2>
-				<WaveView N={this.state.N}
+				<WaveView N={this.state.N} useQuantumEngine={s.useQuantumEngine}
 					innerWindowWidth={s.innerWindowWidth}/>
 				<ControlPanel
 					openResolutionDialog={() => this.openResolutionDialog(true)}

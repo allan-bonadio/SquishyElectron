@@ -1,9 +1,8 @@
 
 import React from 'react';
-import {theDraw} from './wave/theWave';
 import qe from './wave/qe';
 import PropTypes from 'prop-types';
-import {qeSpace} from './wave/qEngine';
+import {} from './wave/qEngine';
 
 /* This draws the white potential line, and handels interaction
 	when the user moves it.
@@ -23,8 +22,6 @@ export class PotentialArea extends React.Component {
 	constructor(props) {
 		super(props);
 
-		const p = this.props;
-
 		this.state = {
 			vertPotStretch: INITIAL_POT_STRETCH
 		};  // always a power of  2
@@ -33,8 +30,11 @@ export class PotentialArea extends React.Component {
 	// make the sequence of coordinates the white line needs to draw
 	// as compressed as possible
 	makePathAttribute() {
+		if (! qe.latestPotential)
+			return `M0,0`;  // too early
+
 		const p = this.props;
-		qe.latestNumbers();
+		qe.latestPotential();
 
 		const dim = qe.space.dimensions[0];
 		const points = new Array(dim.start + dim.end);
@@ -107,6 +107,7 @@ export class PotentialArea extends React.Component {
 			<g className='PotentialArea'
 			 	style={{transform: transform}} >
 				<rect className='potentialCardNotUsed'
+					style={{display: 'none'}}
 					x='0' y={-p.height}
 					width={p.width} height={p.height}
 				/>

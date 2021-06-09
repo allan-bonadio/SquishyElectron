@@ -3,7 +3,6 @@ import React from 'react';
 import {theDraw} from './wave/theWave';
 import qe from './wave/qe';
 import PropTypes from 'prop-types';
-import {qeSpace} from './wave/qEngine';
 
 import PotentialArea from './PotentialArea';
 
@@ -33,6 +32,7 @@ export class WaveView extends React.Component {
 	static propTypes = {
 		N: PropTypes.number,
 		innerWindowWidth: PropTypes.number,
+		useQuantumEngine: PropTypes.bool,
 	};
 
 	constructor(props) {
@@ -54,11 +54,11 @@ export class WaveView extends React.Component {
 	}
 
 	componentDidMount() {
-		if (theDraw) theDraw.draw();
+		if (theDraw) theDraw.draw(this.state.useQuantumEngine);
 	}
 
 	componentDidUpdate() {
-		if (theDraw) theDraw.draw();
+		if (theDraw) theDraw.draw(this.state.useQuantumEngine);
 	}
 
 
@@ -112,7 +112,7 @@ export class WaveView extends React.Component {
 					viewBox={`0 0 ${outerPixelWidth} ${OUTER_PIXEL_HEIGHT}`}
 					xmlns="http://www.w3.org/2000/svg" >
 
-				<rect x={waveCard} y={0}
+				<rect className='waveCard' x={edgeOfPsi} y={0}
 					width={innerActiveWidth} height={OUTER_PIXEL_HEIGHT} />
 
 				<g className='waveArea' style={{transform: transform}} />
