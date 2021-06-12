@@ -6,7 +6,7 @@ import ResolutionDialog from './ResolutionDialog';
 import {recreateWave, theDraw} from './wave/theWave';
 import {qeSpace, qeStartPromise, qeDefineAccess} from './wave/qEngine';
 //import qe from './wave/qe';
-
+import SquishView from './views/SquishView';
 
 const DEFAULT_RESOLUTION = 50;
 const DEFAULT_CONTINUUM = qeSpace.contCIRCULAR;
