@@ -1,5 +1,5 @@
 
-export SQUISH_ROOT=`dirname $PWD`
+export SQUISH_ROOT=/dvl/squishyElectron/SquishyElectron
 #export SQUISH_ROOT=/dvl/squishyElectron/SquishyElectron
 
 alias qq='cd $SQUISH_ROOT'
