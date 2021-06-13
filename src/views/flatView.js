@@ -39,7 +39,7 @@ class flatView extends viewDef {
 		this.compileProgram(vertexSrc, fragmentSrc);
 	}
 
-	attachBuffer() {
+	setInputs() {
 		const {gl, canvas} = this;
 
 		const cornerAttributeLocation = gl.getAttribLocation(this.program, 'corner');

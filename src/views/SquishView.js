@@ -28,7 +28,7 @@ export class SquishView extends React.Component {
 //		this.initCanvas();
 //		this.compileProgram(flatView);
 //
-//attachBuffer()
+//setInputs()
 //
 //webglUtils.resizeCanvasToDisplaySize(gl.canvas);
 //gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -80,11 +80,16 @@ export class SquishView extends React.Component {
 
 	componentDidMount() {
 
-		const vd = new viewDef('just kidding', this.canvas);
-		//compileProgram(..., ...);
-		vd.attachBuffer();
-		vd.setGeometry();
-		vd.draw();
+		if (true) {
+			viewDef.crawlFromTheWreckage(this.canvas);
+		}
+		else {
+			const vd = new viewDef('just kidding', this.canvas);
+			//compileProgram(..., ...);
+			vd.setInputs();
+			vd.setGeometry();
+			vd.draw();
+		}
 	}
 }
 
