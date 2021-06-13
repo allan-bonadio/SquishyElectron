@@ -136,7 +136,6 @@ export class ControlPanel extends React.Component {
 					<big>|||||||</big> Change Resolution <br />
 					(will reset current wave)
 			</button>
-
 		</div>;
 	}
 }

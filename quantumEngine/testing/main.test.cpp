@@ -7,6 +7,7 @@
 const char *redAnsiStyle = "\e[1;101;30m";
 const char *offAnsiStyle = "\e[0m";
 
+// this is c++ test main(), not the main main() for running squish
 int main() {
 
 	printf("trial %sred stuff%s\n", redAnsiStyle, offAnsiStyle);
