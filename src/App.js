@@ -27,6 +27,7 @@ const DEFAULT_CONTINUUM = qeSpace.contCIRCULAR;
 class App extends React.Component {
 	constructor(props) {
 		super(props);
+
 		this.state = {
 			innerWindowWidth: window.innerWidth,
 
@@ -114,6 +115,10 @@ class App extends React.Component {
 					openResolutionDialog={() => this.openResolutionDialog(true)}
 					useQuantumEngine={this.state.useQuantumEngine}
 				/>
+
+				========= just kidding ===========
+				<SquishView />
+
 				{resDialog}
 			</div>
 		);
