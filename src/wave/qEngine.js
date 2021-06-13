@@ -40,8 +40,12 @@ export const qeStartPromise = new Promise((succeed, fail) => {
 /* ****************************************************** space buffer */
 
 // the JS representations of the c++ qSpace object
-// call like this: new qeSpace([{N: 100, continuum: contCIRCULAR, label: 'x'}])
+// call like this: new qeSpace([{N: 100, continuum: qeSpace.contCIRCULAR, label: 'x'}])
 export class qeSpace {
+	static contDISCRETE = 0;
+	static contWELL = 1;
+	static contCIRCULAR = 2;
+
 	constructor(dims) {
 		this.dimensions = dims.map(dim => {
 			let d = {...dim};
@@ -59,18 +63,27 @@ export class qeSpace {
 			return d;
 		});
 
-		// this actually does it over on the other side
+		// this actually does it over on the C++ side
 		qe.startNewSpace();
 		dims.forEach(dim => {
 			qe.addSpaceDimension(dim.N, dim.continuum, dim.label);
 		});
 		qe.completeNewSpace();
+
+		// qeDefineAccess() will set this
+		this.waveBuffer = null;
+
+		// this will be good after completeNewSpace() is called
+		this.potentialBuffer = qe.getPotentialBuffer();
 	}
 
-	static contDISCRETE = 0;
-	static contWELL = 1;
-	static contCIRCULAR = 2;
-
+	get1DWave = function get1DWave(ixPoint) {
+		const ix = 2*ixPoint;
+		return qCx(
+			this.waveBuffer[ix],
+			this.waveBuffer[ix+1]
+		);
+	}
 }
 
 
@@ -78,35 +91,36 @@ export class qeSpace {
 
 // must be called after qe is created
 export function qeDefineAccess() {
-	// tune into the most recently used wave and potential buffers
-	qe.latestWave = function latestNumbers() {
-		qe.latestWave = qe.getWaveBuffer();
+
+	// what a disaster...
+
+	// tune into the most recently used wave buffer.  The iteration algorithm can sometimes leave the
+	// results in different buffers, depending.
+	qe.updateToLatestWaveBuffer = function updateToLatestWaveBuffer() {
+		// make this thing which is the wave buffer, as a nice TypedArray of doubles (pairs making up cx numbers)
+		qe.space.waveBuffer = qe.waveBuffer = new Float64Array(window.Module.HEAPF64.buffer, qe.getWaveBuffer());
 	}
 
-	// get the complex wave value at this point
+	// get the complex wave value at this point in the wave
 	qe.get1DWave = function get1DWave(ixPoint) {
-		const ix = qe.latestWave + 8*2*ixPoint;
+		const ix = 2*ixPoint;
 		return qCx(
-			Module.getValue(ix, 'double'),
-			Module.getValue(ix + 8, 'double')
+			qe.waveBuffer[ix],
+			qe.waveBuffer[ix+1]
 		);
 	}
 
-	// tune into the most recently used wave and potential buffers
-	qe.latestPotential = function latestNumbers() {
-		qe.latestPotential = qe.getPotentialBuffer();
-	}
 
 	// get the real potential value at this point
-	qe.get1DPotential = function get1DPotential(ixPoint) {
-		const ix = qe.latestPotential + 8*ixPoint;
-		return Module.getValue(ix, 'double');
-	}
-
-	qe.set1DPotential = function set1DPotential(ixPoint, pot) {
-		const ix = qe.latestPotential + 8*ixPoint;
-		return Module.setValue(ix, 'double', pot);
-	}
+//	qe.get1DPotential = function get1DPotential(ixPoint) {
+//		const ix = qe.latestPotential + 8*ixPoint;
+//		return Module.getValue(ix, 'double');
+//	}
+//
+//	qe.set1DPotential = function set1DPotential(ixPoint, pot) {
+//		const ix = qe.latestPotential + 8*ixPoint;
+//		return Module.setValue(ix, 'double', pot);
+//	}
 
 
 }
