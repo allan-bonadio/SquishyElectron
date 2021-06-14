@@ -16,11 +16,12 @@ int32_t startNewSpace(void) {
 	//printf("startNewSpace()\n");
 
 	if (theSpace) {
-		delete theSpace;
 		delete[] theWave;
 		delete[] tempWave;
 		delete[] nextWave;
 		delete[] thePotential;
+		delete[] viewBuffer;
+		delete theSpace;
 	}
 	elapsedTime = 0;
 
@@ -73,11 +74,14 @@ int32_t completeNewSpace(void) {
 		nPoints *= dim->start + dim->end;
 		dim->nPoints = nPoints;
 	}
+	theSpace->nStates = nStates;
+	theSpace->nPoints = nPoints;
 
 	//  allocate the buffers
 	theWave = new qCx[nPoints];
 	tempWave = new qCx[nPoints];
 	nextWave = new qCx[nPoints];
+	viewBuffer = new float[nPoints * 8];  // 4 floats per row, two verts per point
 	theSpace->dimensions->setCircularWave(theWave, 1);
 	//theSpace->dumpWave("freshly created");
 

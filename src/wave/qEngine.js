@@ -57,24 +57,37 @@ export class qeSpace {
 				d.start = 0;
 				d.end = d.N;
 			}
-			d.nStates = d.N;  // only if 1 dimension
-			d.nPoints = d.start + d.end;  // only if 1 dimension
+			d.nStates = d.N;
+			d.nPoints = d.start + d.end;
 
 			return d;
 		});
 
 		// this actually does it over on the C++ side
+		let nPoints = 1, nStates = 1;
 		qe.startNewSpace();
 		dims.forEach(dim => {
 			qe.addSpaceDimension(dim.N, dim.continuum, dim.label);
+			nPoints *= dim.N + (dim.continuum ? 2 : 0);
+			nStates *= dim.N;
 		});
 		qe.completeNewSpace();
+		this.nPoints = nPoints;
+		this.nStates = nStates;
+
+		//this.viewClassName = 'viewDef';
+		this.viewClassName = 'flatView';
 
 		// qeDefineAccess() will set this
 		this.waveBuffer = null;
 
 		// this will be good after completeNewSpace() is called
 		this.potentialBuffer = qe.getPotentialBuffer();
+
+				// a nice TypedArray of floats (4 for each row; 8 for each datapoint)
+		const vb = qe.getViewBuffer()
+		this.viewBuffer = qe.viewBuffer =
+			new Float32Array(window.Module.HEAPF32.buffer, qe.getViewBuffer());
 	}
 
 	get1DWave = function get1DWave(ixPoint) {
@@ -98,7 +111,8 @@ export function qeDefineAccess() {
 	// results in different buffers, depending.
 	qe.updateToLatestWaveBuffer = function updateToLatestWaveBuffer() {
 		// make this thing which is the wave buffer, as a nice TypedArray of doubles (pairs making up cx numbers)
-		qe.space.waveBuffer = qe.waveBuffer = new Float64Array(window.Module.HEAPF64.buffer, qe.getWaveBuffer());
+		qe.space.waveBuffer = qe.waveBuffer =
+			new Float64Array(window.Module.HEAPF64.buffer, qe.getWaveBuffer());
 	}
 
 	// get the complex wave value at this point in the wave
@@ -108,6 +122,13 @@ export function qeDefineAccess() {
 			qe.waveBuffer[ix],
 			qe.waveBuffer[ix+1]
 		);
+	}
+
+	// copy  wave numbers over to view buffer
+	qe.update1DViewBuffer = function updateToLatestWaveBuffer() {
+		const highest = qe.updateViewBuffer();
+
+		return highest;
 	}
 
 

@@ -1,6 +1,6 @@
 
 // create this as many times as you have attributes as input to the vec shader
-class viewAttribute {
+export class viewAttribute {
 
 	// for a subclass of viewDef, attach a buffer that shows up as <attrName> in the v shder,...
 	constructor(view, attrName) {
@@ -44,15 +44,6 @@ void main() {
 }
 `;
 
-const proxyVertexShaderNew = `#version 300 es
-in vec2 corner;
-void main() {
-	vec4 temp;
-	temp = vec4(corner, 0., 1.);
-	gl_Position = temp;
-}
-`;
-
 const proxyFragmentShader = `#version 300 es
 precision highp float;
 out vec4 outColor;
@@ -65,14 +56,19 @@ void main() {
 // Each viewDef subclass is a definition of a kind of view; one per each kind of view.
 // (A SquishView owns an instance of the def and is a React component.)
 // This is the superclass of all view defs; with common webgl and space plumbing.
+// viewName is not the viewClassName, which is one of flatView, garlandView, ...
 export class viewDef {
-	constructor(viewName, canvas) {
-		this.viewName = viewName;
-		this.canvas = canvas;
+	constructor(viewName, canvas, currentQESpace) {
+		this.buffers = [];
 
+		if (! currentQESpace) throw  `viewDef: being created without currentQESpace`;
+		this.currentQESpace = currentQESpace;
+
+		this.viewName = viewName;
+		if (! canvas) throw `viewDef: being created without canvas`;
+		this.canvas = canvas;
 		this.initCanvas();
 
-		this.buffers = [];
 
 		// after construction, the instantiator should call compileProgram()
 	}
@@ -107,6 +103,14 @@ export class viewDef {
 		*/
 	}
 
+	// the final call to set it up does all viewClassName-specific stuff
+	completeView() {
+		this.setShaders();
+		this.setInputs();
+		this.setGeometry();
+		this.draw();
+	}
+
 	/* ************************************************** Shader Creation/Compile */
 	compileShader(type, srcString) {
 		const {gl, canvas} = this;
@@ -123,7 +127,7 @@ export class viewDef {
 		throw `Error compiling ${type} shader for ${this.viewName}: ${msg}`;
 	}
 
-	// call this with your sources after construction
+	// call this with your sources in setShaders()
 	compileProgram(vertexSrc, fragmentSrc) {
 		const {gl} = this;
 
@@ -159,14 +163,15 @@ export class viewDef {
 		throw `Error linking program for ${this.viewName}: ${msg}`;
 	}
 
+	// abstract supermethod: write your setShaders() function to compile your two GLSL sources
+	setShaders() {
+		this.compileProgram(proxyVertexShader, proxyFragmentShader);
+	}
+
 	/* ************************************************** buffers & variables */
-	// all subclasses should write their own setInputs() method.
+	// abstract supermethod: all subclasses should write their own setInputs() method.
 	setInputs() {
 //		const {gl, canvas} = this;
-
-		// you should call compileProgram yourself before setInputs, but this is a dummy
-		if (! this.program)
-			this.compileProgram(proxyVertexShader, proxyFragmentShader);
 
 		const ar = new viewAttribute(this, 'corner');
 		//const cornerAttributeLocation = gl.getAttribLocation(this.program, 'corner');
@@ -176,14 +181,12 @@ export class viewDef {
 
 		const sin = Math.sin;
 		const cos = Math.cos;
-//		const center = {x: canvas.width / 2, y: canvas.height / 2};
-//		const diameter = Math.min(canvas.width, canvas.height) / 3;
 		const corners = new Float32Array([
 			cos(2), sin(2),
 			cos(4), sin(4),
 			cos(6), sin(6),
 		]);
-		ar.attachArray(corners, 2)
+		ar.attachArray(corners, 2);
 
 //		also try gl.DYNAMIC_DRAW here
 //		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), gl.STATIC_DRAW);
@@ -202,7 +205,7 @@ export class viewDef {
 	}
 
 	/* ************************************************** Geometry and transformations */
-	// another dummy submethod... write yer  own
+	// abstract supermethod: another dummy submethod... write yer  own
 	// is this really needed?  seems like it can be omitted...
 	setGeometry() {
 
@@ -211,7 +214,7 @@ export class viewDef {
 	}
 
 	/* ************************************************** drawing */
-	// another dummy submethod... write yer  own
+	// abstract supermethod: another dummy submethod... write yer  own
 	draw() {
 		const gl = this.gl;
 

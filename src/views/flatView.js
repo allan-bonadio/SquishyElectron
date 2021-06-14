@@ -1,149 +1,119 @@
-import viewDef from './viewDef';
+import viewDef, {viewAttribute} from './viewDef';
+import {cxToColorGlsl} from './cxToColor.glsl';
+import qe from '../wave/qe';
 
+/*
+** data format of attributes:  four column table of floats
+** psi.re  psi.im   potential    ...0?...
+** uses gl_VertexID to figure out whether the y should be re^2+im^2
+** or zero
+*/
 
 const vertexSrc = `#version 300 es
+${cxToColorGlsl}
 
-// an attribute is an input (in) to a vertex shader.
-// It will receive data from a buffer
-in vec4 a_position;
+in vec4 row;
+out mediump vec4 vColor;
+uniform float nBars;
 
-// all shaders have a main function
 void main() {
+	float y;
+	if ((gl_VertexID & 1) != 0)
+		y = row.x * row.x + row.y * row.y;
+	else
+		y = 0.;
+	// i've got to figure out the vertical mag factor someday.
+	y = y - 1.;
 
-  // gl_Position is a special variable a vertex shader
-  // is responsible for setting
-  gl_Position = a_position;
+	float x;
+	x = float(gl_VertexID/2) / (nBars - 1.) * 2. - 1.;
+	gl_Position = vec4(x, y, 0., 1.);
+
+	vColor = vec4(cxToColor(vec2(row.x, row.y)), 1.);
+	//vColor = vec4(.9, .9, .1, 1.);
 }
 `;
 
 const fragmentSrc = `#version 300 es
 
-// fragment shaders don't have a default precision so we need
-// to pick one. highp is a good default. It means "high precision"
 precision highp float;
-
-// we need to declare an output for the fragment shader
 out vec4 outColor;
+in mediump vec4 vColor;
 
 void main() {
-  // Just set the output to a constant reddish-purple
-  outColor = vec4(1, 0, 0.5, 1);
+	outColor = vColor;
 }
 `;
 
 // the original
 class flatView extends viewDef {
-	constructor(canvas) {
-		super('flat', canvas);
+	constructor(viewName, canvas, currentQESpace) {
+		super(viewName, canvas, currentQESpace);
 
+	}
+
+	setShaders() {
 		this.compileProgram(vertexSrc, fragmentSrc);
+		this.gl.useProgram(this.program);
 	}
 
 	setInputs() {
-		const {gl, canvas} = this;
+		const ar = new viewAttribute(this, 'row');
 
-		const cornerAttributeLocation = gl.getAttribLocation(this.program, 'corner');
+		const highest = qe.update1DViewBuffer();
+		this.nPoints = this.currentQESpace.nPoints;
+		this.vertexCount = this.nPoints * 2;  // nbars * vertsPerBar
+		this.rowFloats = 4;
+		ar.attachArray(qe.space.viewBuffer, this.rowFloats);
 
-		const cornerBuffer = gl.createBuffer();  // actual ram in GPU chip
-		gl.bindBuffer(gl.ARRAY_BUFFER, cornerBuffer);
+		const gl = this.gl;
+		var nBarsLoc = gl.getUniformLocation(this.program, 'nBars');
+		gl.uniform1f(nBarsLoc, this.nPoints);
+	}
+
+	setInputsForTesting() {
+		const ar = new viewAttribute(this, 'row');
 
 		const sin = Math.sin;
 		const cos = Math.cos;
-//		const center = {x: canvas.width / 2, y: canvas.height / 2};
-//		const diameter = Math.min(canvas.width, canvas.height) / 3;
-		const corners = [
-			cos(2), sin(2),
-			cos(4), sin(4),
-			cos(6), sin(6),
-		];
-		// also try gl.DYNAMIC_DRAW here
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), gl.STATIC_DRAW);
+		this.nPoints = 7;
+		this.vertexCount = this.nPoints * 2;  // nbars * vertsPerBar
+		this.rowFloats = 4
+		let vertices = new Float32Array(this.vertexCount *  this.rowFloats);
+		for (let i = 0; i < 7; i++) {
+			vertices[i*8] = vertices[i*8 + 4] = cos(i);
+			vertices[i*8 + 1] = vertices[i*8 + 5] = sin(i);
+		}
+		ar.attachArray(vertices, 4);
 
-		var vao = gl.createVertexArray();
-		gl.bindVertexArray(vao);
-		this.vao = vao;
-		gl.enableVertexAttribArray(cornerAttributeLocation);
+		const gl = this.gl;
+		var nBarsLoc = gl.getUniformLocation(this.program, 'nBars');
+		gl.uniform1f(nBarsLoc, this.nPoints);
 
-		const size = 2;          // 2 components per iteration
-		const type = gl.FLOAT;   // the data is 32bit floats
-		const normalize = false; // don't normalize the data
-		const stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-		const offset = 0;        // start at the beginning of the buffer
-		gl.vertexAttribPointer(cornerAttributeLocation, size, type, normalize, stride, offset);
+// simple triangle
+//		const corners = new Float32Array([
+//			cos(2), sin(2),
+//			cos(4), sin(4),
+//			cos(6), sin(6),
+//		]);
+//		ar.attachArray(corners, 2);
 	}
 
-	// another dummy submethod
-	setGeometry() {
+	// use default
+	//setGeometry() {
+	//}
 
-		this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-	}
-
-	// another dummy submethod
 	draw() {
 		const gl = this.gl;
 
 		gl.clearColor(0, 0, 0, 0);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
-		gl.useProgram(this.program);
-		gl.bindVertexArray(this.vao);
-
-		const primitiveType = gl.TRIANGLES;
-		const offset = 0;
-		const count = 3;
-		gl.drawArrays(primitiveType, offset, count);
-
-		this.debug1();
+		//gl.useProgram(this.program);
+		//gl.bindVertexArray(this.vao);
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 	}
 
 }
 export default flatView;
-
-
-//call this as many times as you have attributes as input to the vec shader
-//class squishBuffer {
-//
-//	buffer that shows up as <attrName> in the v shder, has <float32RawArray> data input,
-//	broken into rows of <stride> floats, but we only use the <size> number of floats
-//	from each row, <offset> from the start of each row.  size=1,2,3 or 4,
-//	to make an attr that's a scalar, vec2, vec3 or vec4
-//	construct(attrName, float32RawArray, size, stride = size, offset = 0) {
-//		this.attrLocation = gl.getAttribLocation(this.program, attrName);
-//
-//		this.glBuffer = gl.createBuffer();  // actual ram in GPU chip
-//		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
-//
-//		also try gl.DYNAMIC_DRAW here?
-//		gl.bufferData(gl.ARRAY_BUFFER, float32RawArray, gl.STATIC_DRAW);
-//
-//		this.vao = gl.createVertexArray();
-//		gl.bindVertexArray(this.vao);
-//		gl.enableVertexAttribArray(this.attrLocation);
-//
-//	const size = 2;          // 2 components per iteration
-//		const type = gl.FLOAT;   // the data is 32bit floats
-//		const normalize = false; // don't normalize the data
-//	const stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-//	const offset = 0;        // start at the beginning of the buffer
-//		gl.vertexAttribPointer(this.attrLocation, size, type, normalize, stride, offset);
-//	}
-//}
-
-
-//	attachABuffer(attrName, float32Buffer) {
-//		const attrLocation = gl.getAttribLocation(this.program, attrName);
-//
-//		const glBuffer = gl.createBuffer();  // actual ram in GPU chip
-//		gl.bindBuffer(gl.ARRAY_BUFFER, glBuffer);
-//
-//		// also try gl.DYNAMIC_DRAW here?
-//		gl.bufferData(gl.ARRAY_BUFFER, float32Buffer, gl.STATIC_DRAW);
-//
-//		var vao = gl.createVertexArray();
-//		gl.bindVertexArray(vao);
-//		this.vao = vao;
-//		gl.enableVertexAttribArray(attrLocation);
-//
-//	}
-//}
 

@@ -1,28 +1,26 @@
-
-const cxToColorGlsl = `
-float sqrtOneThird = sqrt(1 / 3);  // 0.57735..
-float sqrtThree = sqrt(3);  // 1.732....
-float sqrtThreeOver2 = sqrt(3) / 2;  // .8660...
+// line numbers should correspond!  Be careful how many lines this is!
+export const cxToColorGlsl = `
+float sqrtOneThird = sqrt(1. / 3.);  // 0.57735..
+float sqrtThreeOver2 = sqrt(3.) / 2.;  // .8660...
 
 // convert a complex number into a color, whose hue is based on the complex phase of the number.  Piecewise linear.  Visualize a hexagon
-// 1+0i is on the far right, 0°, and is Red
+// 1+0i is on the far right, 0°, and is Red.  x is real part, y is imaginary part
 // 1/2 + √3/2i is Yellow at 60°; -1/2 + √3/2i is Green at 120°, and so on through the hues.
-// x is real part, y is imaginary part
 // All result colors are opaque, and are at 100% saturation, except for zero, which is black.
 // Each gun is a float 0...1.  300° == -60° as you would expect.
 vec3 cxToColor(vec2  psi) {
 	if (psi.y == 0.) {
 		// real numbers.  Get rid of y=0 cases  that screw up division by y.
 		if (psi.x == 0.) {
-			return vec3(0, 0, 0);  // black
+			return vec3(0., 0., 0.);  // black
 		}
 		else {
-			console.log('     line 14, psi.x=', psi.x);
+			//console.log('     line 14, psi.x=', psi.x);
 			if (psi.x > 0.) {
-				return vec3(1, 0, 0);  // red
+				return vec3(1., 0., 0.);  // red
 			}
 			else {
-				return vec3(0, 1, 1);  // cyan
+				return vec3(0., 1., 1.);  // cyan
 			}
 		}
 	}
@@ -32,55 +30,57 @@ vec3 cxToColor(vec2  psi) {
 	// No transcendental functions were used in this code; all linear approximations.
 	// I think each of the diagonal sides sags in the middle but whatever
 	float slope = psi.x / psi.y;
-	console.log('     line 23, slope=', slope.toFixed(4));
+	//console.log('     line 23, slope=', slope.toFixed(4));
 	if (slope > sqrtOneThird) {
 		// magenta, red, yellow... 30° 210°
-		if (psi.y > 0) {
-			console.log('     30°   red ... yellow');
+		if (psi.y > 0.) {
+			//console.log('     30°   red ... yellow');
 			float gradient = psi.y / psi.x * sqrtOneThird;
-			console.log('     line 48, gradient', gradient.toFixed(4));
-			return vec3(1, gradient, 0);  // red...yellow as gradient increases
+			//console.log('     line 48, gradient', gradient.toFixed(4));
+			return vec3(1, gradient, 0.);  // red...yellow as gradient increases
 		}
 		else {
-			console.log('     210°, cyan to blue');
+			//console.log('     210°, cyan to blue');
 			float gradient = psi.y / psi.x * sqrtOneThird;
-			console.log('     line 54, gradient', gradient.toFixed(4));
-			return vec3(0, 1-gradient, 1);  // red...magenta as gradient descends from zero
+			//console.log('     line 54, gradient', gradient.toFixed(4));
+			return vec3(0., 1.-gradient, 1.);  // red...magenta as gradient descends from zero
 		}
 	}
 
 	if (slope < -sqrtOneThird) {
 		// green, cyan, blue; psi.re < 0.  y will pass thru zero.
-		if (psi.y > 0) {
-			console.log('     150°  green ... cyan');
+		if (psi.y > 0.) {
+			//console.log('     150°  green ... cyan');
 			float gradient = psi.y / psi.x * sqrtOneThird;
-			console.log('     line 32, gradient=', gradient.toFixed(4));
-			return vec3(0, 1, 1+gradient);  // cyan...green
+			//console.log('     line 32, gradient=', gradient.toFixed(4));
+			return vec3(0., 1., 1.+gradient);  // cyan...green
 		}
 		else {
-			console.log('     330°, magenta... red');
+			//console.log('     330°, magenta... red');
 			float gradient = psi.y / psi.x * sqrtOneThird;
-			console.log('     line 38, gradient=', gradient.toFixed(4));
-			return vec3(1, 0, -gradient);
+			//console.log('     line 38, gradient=', gradient.toFixed(4));
+			return vec3(1., 0., -gradient);
 		}
 	}
 
 	// yellow to green (slope goes .57 .. -.57), or blue to magenta
 	// x can be zero but we'll avoid dividing by it
-	float gradient = (slope/sqrtOneThird + 1) / 2;  // 1...0
-	console.log('     line 45, gradient', gradient.toFixed(4));
-	if (psi.y > 0) {
-		console.log('     90°, yellow ... green as angle increases');
-		return vec3(gradient, 1, 0);
+	float gradient = (slope/sqrtOneThird + 1.) / 2.;  // 1...0
+	//console.log('     line 45, gradient', gradient.toFixed(4));
+	if (psi.y > 0.) {
+		//console.log('     90°, yellow ... green as angle increases');
+		return vec3(gradient, 1., 0.);
 	}
 	else {
-		console.log('     270°, magenta ... blue as angle decreases');
-		return vec3(1-gradient, 0, 1);
+		//console.log('     270°, magenta ... blue as angle decreases');
+		return vec3(1.-gradient, 0., 1.);
 	}
 }
 `;
+// add extra blank lines to the end of it to make it an even multiple of 10
+// so I don't go crazy debugging it
 
-//export default cxToColorGlsl;
+export default cxToColorGlsl;
 
 /* ************************************************* testing */
 
@@ -89,9 +89,9 @@ vec3 cxToColor(vec2  psi) {
 // testing in JS/node.  so hokey.  This substitutes a few things to turn GLSL  into JS
 function testCxToColorGlsl() {
 	//const glslShims = `
-	global.vec2 = function vec2(xx, yy) { return {x: xx, y: yy}}
-	global.vec3 = function vec3(xx, yy, zz) { return {x: xx, y: yy, z: zz}}
-	global.sqrt = Math.sqrt;
+	const vec2 = function vec2(xx, yy) { return {x: xx, y: yy}}
+	const vec3 = function vec3(xx, yy, zz) { return {x: xx, y: yy, z: zz}}
+	const sqrt = Math.sqrt;
 	//function vec4(a, b, c, d) { return {x: a, y: b, z: c, w: d}}
 	let jsCxToColor;
 	const notClose = (a, b) => (Math.abs(a-b) > 5e-5)
@@ -110,13 +110,13 @@ function testCxToColorGlsl() {
 				|| notClose(actual.y, expected.y)
 				|| notClose(actual.z, expected.z)) {
 			console.error(`**** error in '${shouldBe}': `+
-				`(${actual.x},${actual.x},${actual.x}) ≠ `+
-				`(${expected.x},${expected.x},${expected.x})`)
+				`(${actual.x},${actual.y},${actual.z}) ≠ `+
+				`(${expected.x},${expected.y},${expected.z})`)
 		}
 		console.log();
 	}
 
-	// conver the code to JS, brutally
+	// convert the code to JS, brutally
 	let jsCode = cxToColorGlsl.replace(/.*cxToColor.*$/m, '{');
 //	console.log(`=========== jsCode 1 ======\n${jsCode}\n=====\n`);
 	jsCode = jsCode.replace(/float/g, 'let');
@@ -164,5 +164,5 @@ function testCxToColorGlsl() {
 	test1cx(360, vec3(1, 0, 0), 'Red 1 0 0');
 }
 
-if ( 'object' == typeof module)
-	testCxToColorGlsl();
+//if ( 'object' == typeof module)
+//	testCxToColorGlsl();

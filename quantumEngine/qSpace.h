@@ -68,8 +68,12 @@ public:
 // 	qCx *wave0;
 // 	qCx *wave1;
 
-	// which wave we're calculating from, 0 or 1.
+	// which wave we're calculating from, 0 or 1. (not using yet...)
 	int32_t calcFrom;
+
+	// totals for all dimensions
+	int nStates;
+	int nPoints;
 
 	// how much time we've iterated, from creation.  pseudo-seconds.  Since we've eliminated
 	// all the actual physical constants from the math, why not choose our own definition
@@ -101,9 +105,13 @@ extern "C" {
 
 	qCx *getWaveBuffer(void);
 	qReal *getPotentialBuffer(void);
+	float *getViewBuffer();
 	int32_t getElapsedTime(void);
 
 	int manyRk2Steps(void);
+
+	// refills the view  buffer; returns highest magnitude
+	float updateViewBuffer();
 }
 
 // internal
@@ -113,5 +121,6 @@ extern qCx hamiltonian(qCx *wave, int x);
 extern class qSpace *theSpace;
 extern class qCx *theWave, *tempWave, *nextWave;
 extern qReal *thePotential;
+extern float *viewBuffer;
 extern qReal elapsedTime;
 

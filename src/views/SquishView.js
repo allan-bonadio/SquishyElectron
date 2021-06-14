@@ -1,7 +1,5 @@
 import React from 'react';
 
-import flatView from './flatView';
-
 import viewDef from './viewDef';
 
 /* **************************************** compiling & setting up */
@@ -65,12 +63,20 @@ export class SquishView extends React.Component {
 
 //	}
 
+	//  our setCanvas() calls App's setCanvas, hopefully before C++'s promise hits
+	setCanvas(canvas) {
+		if (this.canvas) return;
+
+		this.canvas = canvas;
+		this.props.setGLCanvas(this.canvas);
+	}
+
 	render() {
 		return <div>
 			<canvas className="SquishView"
-				width={400} height={300}
-				ref={element => this.canvas = element}
-				style={{width: '400px', height: '300px', border: '1px #aaa solid'}}>
+				width={800} height={400}
+				ref={element => this.setCanvas(element)}
+				style={{width: '800px', height: '400px', border: '1px #aaa solid'}}>
 			</canvas>
 		</div>;
 
@@ -79,16 +85,35 @@ export class SquishView extends React.Component {
 	}
 
 	componentDidMount() {
-
-		if (true) {
+		// turn on WebGL
+		if (false) {
 			viewDef.crawlFromTheWreckage(this.canvas);
 		}
-		else {
+		else if (false) {
 			const vd = new viewDef('just kidding', this.canvas);
 			//compileProgram(..., ...);
-			vd.setInputs();
-			vd.setGeometry();
-			vd.draw();
+			vd.completeView();
+//			vd.setShaders();
+//			vd.setInputs();
+//			vd.setGeometry();
+//			vd.draw();
+		}
+		else if (false) {
+			// I'm supposed to create an instance of this class here.
+			// unless there isn't one yet - too soon
+//			debugger;
+//			if (!this.props.viewClassName) return;
+//
+//			// the actual class (function/constructor) object
+//			const vClass = listOfViewClasses(this.props.viewClassName);
+//
+//			// seems kinda funny doing these all here - but they should work for every view class
+//			const instance = new vClass('main view', this.canvas);
+//			instance.completeView();
+//			instance.setShaders();
+//			instance.setInputs();
+//			instance.setGeometry();
+//			instance.draw();
 		}
 	}
 }
