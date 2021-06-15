@@ -60,7 +60,7 @@ class flatView extends viewDef {
 	setInputs() {
 		const ar = new viewAttribute(this, 'row');
 
-		const highest = qe.update1DViewBuffer();
+		const highest = qe.updateViewBuffer();
 		this.nPoints = this.currentQESpace.nPoints;
 		this.vertexCount = this.nPoints * 2;  // nbars * vertsPerBar
 		this.rowFloats = 4;

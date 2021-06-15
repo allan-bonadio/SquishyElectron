@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import viewDef from './viewDef';
 
@@ -10,7 +11,7 @@ import viewDef from './viewDef';
 export class SquishView extends React.Component {
 	static propTypes = {
 //		innerActiveWidth: PropTypes.number,
-//		barWidth: PropTypes.number,
+	setGLCanvas: PropTypes.func,
 	};
 
 	constructor(props) {

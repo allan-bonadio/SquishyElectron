@@ -84,10 +84,10 @@ export class qeSpace {
 		// this will be good after completeNewSpace() is called
 		this.potentialBuffer = qe.getPotentialBuffer();
 
-				// a nice TypedArray of floats (4 for each row; 8 for each datapoint)
+		// a nice TypedArray of floats (4 for each row; 8 for each datapoint)
 		const vb = qe.getViewBuffer()
 		this.viewBuffer = qe.viewBuffer =
-			new Float32Array(window.Module.HEAPF32.buffer, qe.getViewBuffer());
+			new Float32Array(window.Module.HEAPF32.buffer, qe.getViewBuffer(), nPoints*8);
 	}
 
 	get1DWave = function get1DWave(ixPoint) {
@@ -112,7 +112,7 @@ export function qeDefineAccess() {
 	qe.updateToLatestWaveBuffer = function updateToLatestWaveBuffer() {
 		// make this thing which is the wave buffer, as a nice TypedArray of doubles (pairs making up cx numbers)
 		qe.space.waveBuffer = qe.waveBuffer =
-			new Float64Array(window.Module.HEAPF64.buffer, qe.getWaveBuffer());
+			new Float64Array(window.Module.HEAPF64.buffer, qe.getWaveBuffer(), 2 * qe.space.nPoints);
 	}
 
 	// get the complex wave value at this point in the wave
@@ -125,11 +125,11 @@ export function qeDefineAccess() {
 	}
 
 	// copy  wave numbers over to view buffer
-	qe.update1DViewBuffer = function updateToLatestWaveBuffer() {
-		const highest = qe.updateViewBuffer();
-
-		return highest;
-	}
+//	qe.update1DViewBuffer = function updateToLatestWaveBuffer() {
+//		const highest = qe.updateViewBuffer();
+//
+//		return highest;
+//	}
 
 
 	// get the real potential value at this point

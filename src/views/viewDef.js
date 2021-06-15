@@ -24,13 +24,21 @@ export class viewAttribute {
 		const gl = this.view.gl;
 
 		// also try gl.DYNAMIC_DRAW here?
-		gl.bufferData(gl.ARRAY_BUFFER, float32TypedArray, gl.STATIC_DRAW);
+		this.float32TypedArray = float32TypedArray;
+		gl.bufferData(gl.ARRAY_BUFFER, float32TypedArray, gl.DYNAMIC_DRAW);
 
 		this.vao = gl.createVertexArray();
 		gl.bindVertexArray(this.vao);
 		gl.enableVertexAttribArray(this.attrLocation);
 
 		gl.vertexAttribPointer(this.attrLocation, size, gl.FLOAT, false, stride, offset);
+	}
+
+	// call this when the array's values change, to reload them into the GPU
+	reloadArray() {
+		const gl = this.view.gl;
+		gl.bufferData(gl.ARRAY_BUFFER, this.float32TypedArray, gl.STATIC_DRAW);
+
 	}
 }
 

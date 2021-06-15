@@ -6,7 +6,7 @@ import ResolutionDialog from './ResolutionDialog';
 
 import {recreateWave, theDraw} from './wave/theWave';
 import {qeSpace, qeStartPromise, qeDefineAccess} from './wave/qEngine';
-//import qe from './wave/qe';
+import qe from './wave/qe';
 
 import SquishView from './views/SquishView';
 import viewDef from './views/viewDef';
@@ -83,11 +83,12 @@ class App extends React.Component {
 	}
 
 	setNew1DResolution(N, continuum) {
+		qe.theCurrentView =  null;
 		recreateWave(N, continuum, (currentJWave, currentQESpace, currentDraw) => {
 			// we've now got a qeSpace etc all set up
 			this.setState({N, continuum, currentJWave, currentQESpace, currentDraw});
 
-			// now create the viewDef as described by the space
+			// now create the view class instance as described by the space
 			const vClass = listOfViewClasses[currentQESpace.viewClassName];
 
 			// seems kinda funny doing these all here - but they should work for every view class
@@ -95,6 +96,8 @@ class App extends React.Component {
 			currentView.completeView();
 
 			this.setState(currentView);
+			//theCurrentView = currentView;
+			qe.theCurrentView = currentView;
 		});
 	}
 
