@@ -70,6 +70,8 @@ export class ControlPanel extends React.Component {
 				onClick={ev => theJWave.lowPassFilter()}>
 					filter & norm
 			</button>
+
+			<input type="range" min='0' max='100' step='20' value='50' />
 		</div>;
 	}
 
