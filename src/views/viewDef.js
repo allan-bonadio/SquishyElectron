@@ -2,7 +2,7 @@
 // create this as many times as you have attributes as input to the vec shader
 export class viewAttribute {
 
-	// for a subclass of viewDef, attach a buffer that shows up as <attrName> in the v shder,...
+	// for a subclass of abstractViewDef, attach a buffer that shows up as <attrName> in the v shder,...
 	constructor(view, attrName) {
 		this.view = view;
 		const gl = view.gl;
@@ -61,19 +61,19 @@ void main() {
 }
 `;
 
-// Each viewDef subclass is a definition of a kind of view; one per each kind of view.
+// Each abstractViewDef subclass is a definition of a kind of view; one per each kind of view.
 // (A SquishView owns an instance of the def and is a React component.)
 // This is the superclass of all view defs; with common webgl and space plumbing.
-// viewName is not the viewClassName, which is one of flatView, garlandView, ...
-export class viewDef {
+// viewName is not the viewClassName, which is one of flatViewDef, garlandView, ...
+export class abstractViewDef {
 	constructor(viewName, canvas, currentQESpace) {
 		this.buffers = [];
 
-		if (! currentQESpace) throw  `viewDef: being created without currentQESpace`;
+		if (! currentQESpace) throw  `abstractViewDef: being created without currentQESpace`;
 		this.currentQESpace = currentQESpace;
 
 		this.viewName = viewName;
-		if (! canvas) throw `viewDef: being created without canvas`;
+		if (! canvas) throw `abstractViewDef: being created without canvas`;
 		this.canvas = canvas;
 		this.initCanvas();
 
@@ -278,7 +278,7 @@ ${fSrc}
 	// do EXACTLY THE SAME as
 	// https://webgl2fundamentals.org/webgl/lessons/webgl-fundamentals.html
 	static crawlFromTheWreckage(canvas) {
-		let vd = new viewDef('crawlFromTheWreckage', canvas);
+		let vd = new abstractViewDef('crawlFromTheWreckage', canvas);
 		vd.cftw(canvas);
 	}
 
@@ -455,6 +455,6 @@ ${fSrc}
 	}
 }
 
-export default viewDef;
+export default abstractViewDef;
 
 

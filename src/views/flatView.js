@@ -1,4 +1,4 @@
-import viewDef, {viewAttribute} from './viewDef';
+import abstractViewDef, {viewAttribute} from './abstractViewDef';
 import {cxToColorGlsl} from './cxToColor.glsl';
 import qe from '../wave/qe';
 
@@ -46,7 +46,7 @@ void main() {
 `;
 
 // the original
-class flatView extends viewDef {
+class flatViewDef extends abstractViewDef {
 	constructor(viewName, canvas, currentQESpace) {
 		super(viewName, canvas, currentQESpace);
 
@@ -115,5 +115,5 @@ class flatView extends viewDef {
 	}
 
 }
-export default flatView;
+export default flatViewDef;
 
