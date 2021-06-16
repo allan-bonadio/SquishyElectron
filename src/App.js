@@ -4,13 +4,13 @@ import './App.css';
 import ControlPanel from './ControlPanel';
 import ResolutionDialog from './ResolutionDialog';
 
-import {recreateWave, theDraw} from './wave/theWave';
+import {recreateWave} from './wave/theWave';
 import {qeSpace, qeStartPromise, qeDefineAccess} from './wave/qEngine';
 import qe from './wave/qe';
 
 import SquishView from './views/SquishView';
-import viewDef from './views/viewDef';
-import flatView from './views/flatView';
+import abstractViewDef from './views/abstractViewDef';
+import flatViewDef from './views/flatViewDef';
 
 
 const DEFAULT_RESOLUTION = 5;
@@ -18,23 +18,9 @@ const DEFAULT_CONTINUUM = qeSpace.contCIRCULAR;
 
 
 export const listOfViewClasses = {
-	flatView,  // the original one
-	viewDef,  // primitive dummy, also superclass of all these others
+	flatViewDef,  // the original one
+	abstractViewDef,  // primitive dummy, also superclass of all these others
 };
-
-
-
-// someday I need an C++ error handling layer.  See
-// https://emscripten.org/docs/porting/Debugging.html?highlight=assertions#handling-c-exceptions-from-javascript
-
-//function getExceptionMessage(exception) {
-//  return typeof exception == 'number'
-//	? Module.getExceptionMessage(exception)
-//	: exception;
-//}
-// also see what i tried to do in main.cpp
-
-
 
 
 class App extends React.Component {
@@ -65,15 +51,6 @@ class App extends React.Component {
 		console.log(`App constructor`);
 	}
 
-//	static me = this;
-//	static setTheJWave(theJWave, theDraw) {
-//		App.me.setState(theJWave, theDraw);
-//	}
-//	static setTheQESpace(theQEWave, theDraw) {
-//		App.me.setState(theQEWave, theDraw);
-//	}
-
-
 	openResolutionDialog(whetherTo) {
 		this.setState({isResolutionDialogOpen: whetherTo});
 	}
@@ -96,7 +73,6 @@ class App extends React.Component {
 			currentView.completeView();
 
 			this.setState(currentView);
-			//theCurrentView = currentView;
 			qe.theCurrentView = currentView;
 		});
 	}
@@ -107,8 +83,6 @@ class App extends React.Component {
 		qeStartPromise.then((arg) => {
 			qeDefineAccess();
 			this.setNew1DResolution(DEFAULT_RESOLUTION, DEFAULT_CONTINUUM);
-			// wont work currentDraw.draw();
-//			theDraw.draw(this.state.useQuantumEngine);
 		}, (ex) => {
 			console.error(`error in qeStartPromise:`, ex);
 		});
@@ -134,7 +108,6 @@ class App extends React.Component {
 			  />
 			: null;
 
-		console.log(`about to render app, currentJWave=..., qe.Wave=...`, s.currentJWave, s.currentJWave);
 		return (
 			<div className="App">
 				<h2 className="App-header">

@@ -76,8 +76,8 @@ export class qeSpace {
 		this.nPoints = nPoints;
 		this.nStates = nStates;
 
-		//this.viewClassName = 'viewDef';
-		this.viewClassName = 'flatView';
+		//this.viewClassName = 'abstractViewDef';
+		this.viewClassName = 'flatViewDef';
 
 		// qeDefineAccess() will set this
 		this.waveBuffer = null;
