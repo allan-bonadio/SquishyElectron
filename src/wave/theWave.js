@@ -12,14 +12,8 @@ export let theJSpace;
 export let theJWave;
 
 export let newWaveBuffer;
-export let theDraw;
-export const jWaveBuffers = {alt: null, next: null};
 
-// current description of what GL uses to display with.
-// null = in transition between spaces; animation stops
-// why is react screwing up?  export let theCurrentView;
-
-// range of vertical inside coordinates in the svg
+// range of vertical inside coordinates in the svg?
 export const INNER_HEIGHT = 100;
 
 // call this when user changes number of datapoints.
@@ -28,35 +22,13 @@ export function recreateWave(N, continuum, callback) {
 	// create the old JS version
 	theJSpace = new jSpace(N, continuum);
 	theJWave = new jWave(theJSpace);
-	theDraw = new draw(theJWave);
-	jWaveBuffers.alt = new Array(N + 2);
-	jWaveBuffers.next = new Array(N + 2);
+//	jWaveBuffers.alt = new Array(N + 2);
+//	jWaveBuffers.next = new Array(N + 2);
 
 	// create the new C++ version
 	qe.space = new qeSpace([{N, continuum, label: 'x'}]);
 
-	/* *************** testing: now iterate both */
-
-//	theJWave.dump('JS wave before one iteraate');
-//	qSpace_dumpWave('before qe Step');
-
-//	console.time('many js iterate/RK2 stepz');
-//	var i;
-//	for (i = 0; i < 100; i++)
-//		iterate(theJWave);
-//	console.timeEnd('many js iterate/RK2 stepz');
-//
-//	console.time('many C++ RK2 stepz');
-//	qe.manyRk2Steps();
-//	//qe.qSpace_oneRk2Step();
-//	console.timeEnd('many C++ RK2 stepz');
-
-	//theJWave.dump('JS wave after one iteraate');
-	//qe.qSpace_dumpWave('after qe Step');
-	/* *************** testing: now iterate both */
-
-
-	callback(theJWave, qe.space, theDraw);
+	callback(theJWave, qe.space);
 }
 
 // completely wipe out the Psi wavefunction and replace it with one of our canned waveforms.
@@ -64,24 +36,15 @@ export function recreateWave(N, continuum, callback) {
 export function setWave(breed, freq) {
 	switch (breed) {
 	case 'standing':
-		if (useQuantumEngine)
-			qe.qSpace_setStandingWave(freq);
-		else
-			theJWave.setStandingWave(freq);
+		qe.qSpace_setStandingWave(freq);
 		break;
 
 	case 'circular':
-		if (useQuantumEngine)
-			qe.qSpace_setCircularWave(freq);
-		else
-			theJWave.setCircularWave(freq);
+		qe.qSpace_setCircularWave(freq);
 		break;
 
 	case 'pulse':
-		if (useQuantumEngine)
-			qe.qSpace_setPulseWave(10., 1.)
-		else
-			theJWave.setPulseWave();
+		qe.qSpace_setPulseWave(10., 1.)
 		break;
 
 	default:
@@ -92,24 +55,12 @@ export function setWave(breed, freq) {
 export function setVoltage(breed, arg) {
 	switch (breed) {
 	case 'zero':
-		if (useQuantumEngine)
-			qe.qSpace_setZeroPotential()
-		else
-			theJWave.setZeroVoltage();
+		qe.qSpace_setZeroPotential()
 		break;
 
 	case 'valley':
-		if (useQuantumEngine)
-			qe.qSpace_setValleyPotential();
-		else
-			theJWave.setZeroVoltage();
+		qe.qSpace_setValleyPotential();
 		break;
-
-//	case 'wave':
-//		if (useQuantumEngine)
-//			theJWave.setWaveVoltage();
-//
-//		break;
 
 	default:
 		throw `setVoltage: no voltage breed '${breed}'`
@@ -140,7 +91,7 @@ export function oldIterateAnimate(useQuantumEngine, rate) {
 			else {
 				iterate(theJWave);
 			}
-			theDraw.draw(useQuantumEngine);
+			//theDraw.draw(useQuantumEngine);
 		} catch (ex) {
 			console.error(`Error during iterate/draw:`, ex)
 		}
@@ -164,11 +115,6 @@ export function iterateAnimate(isTrue, rate) {
 	isAnimating = true;
 
 	// also performance.now()
-
-	// requestAnimationFrame(): You should call this
-	// method whenever you're
-	//  ready to update your animation onscreen.
-
 
 	function animateOneFrame(now) {
 		//console.log(`time since last tic: ${now - startFrame}ms`)
@@ -208,4 +154,3 @@ function dumpViewBuffer() {
 	for (let i = 0; i < nRows; i++)
 		console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
 }
-//modernIterateAnimate();
