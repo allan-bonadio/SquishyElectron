@@ -46,16 +46,16 @@ export class jSpace {
 	}
 
 	// infinite walled well at  ends
-	setWaveVoltage() {
-		let {V} = this;
-		V.fill(0);
-
-		// tried Infinity; i get NaNs and I can't do anything with them..
-		// tried 10, just doesn't cut it.
-		this.continuum = qeSpace.contWELL;
-		//V[1] = V[N] = 10;
-		//V[1] = V[N] = Infinity;
-	}
+//	setWaveVoltage() {
+//		let {V} = this;
+//		V.fill(0);
+//
+//		// tried Infinity; i get NaNs and I can't do anything with them..
+//		// tried 10, just doesn't cut it.
+//		this.continuum = qeSpace.contWELL;
+//		//V[1] = V[N] = 10;
+//		//V[1] = V[N] = Infinity;
+//	}
 
 }
 

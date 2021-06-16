@@ -13,7 +13,7 @@ export let theJWave;
 export let newWaveBuffer;
 export let theDraw;
 export const jWaveBuffers = {alt: null, next: null};
-
+export let useQuantumEngine;
 
 // range of vertical inside coordinates in the svg
 export const INNER_HEIGHT = 100;
@@ -60,19 +60,24 @@ export function recreateWave(N, continuum, callback) {
 export function setWave(breed, freq) {
 	switch (breed) {
 	case 'standing':
-		theJWave.setStandingWave(freq);
-		qe.qSpace_setStandingWave(freq);
+		if (useQuantumEngine)
+			qe.qSpace_setStandingWave(freq);
+		else
+			theJWave.setStandingWave(freq);
 		break;
 
 	case 'circular':
-		theJWave.setCircularWave(freq);
-		qe.qSpace_setCircularWave(freq);
+		if (useQuantumEngine)
+			qe.qSpace_setCircularWave(freq);
+		else
+			theJWave.setCircularWave(freq);
 		break;
 
 	case 'pulse':
-		theJWave.setPulseWave();
-		// (qReal widthFactor, qReal cycles)
-		qe.qSpace_setPulseWave(10., 1.)
+		if (useQuantumEngine)
+			qe.qSpace_setPulseWave(10., 1.)
+		else
+			theJWave.setPulseWave();
 		break;
 
 	default:
@@ -83,18 +88,24 @@ export function setWave(breed, freq) {
 export function setVoltage(breed, arg) {
 	switch (breed) {
 	case 'zero':
-		theJWave.setZeroVoltage();
-		qe.qSpace_setZeroPotential()
+		if (useQuantumEngine)
+			qe.qSpace_setZeroPotential()
+		else
+			theJWave.setZeroVoltage();
 		break;
 
 	case 'valley':
-		theJWave.setZeroVoltage();
-		qe.qSpace_setValleyPotential();
+		if (useQuantumEngine)
+			qe.qSpace_setValleyPotential();
+		else
+			theJWave.setZeroVoltage();
 		break;
 
-	case 'wave':
-		theJWave.setWaveVoltage();
-		break;
+//	case 'wave':
+//		if (useQuantumEngine)
+//			theJWave.setWaveVoltage();
+//
+//		break;
 
 	default:
 		throw `setVoltage: no voltage breed '${breed}'`
@@ -108,7 +119,10 @@ let repeatId;
 
 // call this to start or stop animation/iteration.
 // rate = 1, 2, 4, 8, ... or zero/false to stop it
-export function iterateAnimate(useQuantumEngine, rate) {
+export function iterateAnimate(uQE, rate) {
+	// never changes during runtime
+	useQuantumEngine = uQE;
+
 	// if user cicks Go twice, we lose the previous repeatId and can never clear it
 	if (! rate || repeatId) {
 		clearInterval(repeatId);

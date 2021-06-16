@@ -101,7 +101,7 @@ class draw {
 		}
 		//console.info(barsHtml);
 
-		let gElement = document.querySelector('g.waveDisplay');
+		let gElement = document.querySelector('g.waveArea');
 		if (!gElement)
 		    return;  // first time around, doesn't exist
 		gElement.innerHTML = barsHtml;

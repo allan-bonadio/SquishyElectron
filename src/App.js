@@ -72,7 +72,7 @@ class App extends React.Component {
 		qeStartPromise.then((arg) => {
 			this.setNew1DResolution(DEFAULT_RESOLUTION, DEFAULT_CONTINUUM);
 			// wont work currentDraw.draw();
-			qeDefineAccess();
+			//qeDefineAccess();
 			theDraw.draw(this.state.useQuantumEngine);
 		}, (ex) => {
 			console.error(`error in qeStartPromise:`, ex);

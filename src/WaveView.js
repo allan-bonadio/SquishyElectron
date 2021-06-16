@@ -54,11 +54,11 @@ export class WaveView extends React.Component {
 	}
 
 	componentDidMount() {
-		if (theDraw) theDraw.draw(this.state.useQuantumEngine);
+		if (theDraw) theDraw.draw(this.props.useQuantumEngine);
 	}
 
 	componentDidUpdate() {
-		if (theDraw) theDraw.draw(this.state.useQuantumEngine);
+		if (theDraw) theDraw.draw(this.props.useQuantumEngine);
 	}
 
 
@@ -117,7 +117,9 @@ export class WaveView extends React.Component {
 
 				<g className='waveArea' style={{transform: transform}} />
 
-				<PotentialArea barWidth={barWidth} innerActiveWidth={innerActiveWidth}
+				<PotentialArea
+					barWidth={barWidth}
+					innerActiveWidth={innerActiveWidth}
 					x={edgeOfPsi} y={0}
 					width={innerActiveWidth} height={OUTER_PIXEL_HEIGHT} />
 

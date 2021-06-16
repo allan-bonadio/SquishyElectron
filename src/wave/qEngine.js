@@ -21,6 +21,7 @@ let qeStartPromiseSucceed;
 function quantumEngineHasStarted(mDimensions, mLabel) {
 	//console.log(`quantumEngineHas...Started`, mDimensions, mLabel);
 	defineQEngineFuncs();
+	qeDefineAccess();
 
 	maxDimensions = mDimensions;
 	maxLabel = mLabel;
@@ -77,35 +78,41 @@ export class qeSpace {
 /* ***************************************** data access */
 
 // must be called after qe is created
-export function qeDefineAccess() {
+function qeDefineAccess() {
 	// tune into the most recently used wave and potential buffers
-	qe.latestWave = function latestNumbers() {
-		qe.latestWave = qe.getWaveBuffer();
+	qe.latestWave = function latestWave() {
+		qe.latestWaveBuffer = qe.getWaveBuffer();
 	}
 
 	// get the complex wave value at this point
-	qe.get1DWave = function get1DWave(ixPoint) {
-		const ix = qe.latestWave + 8*2*ixPoint;
+	qe.get1DWave = function get1DWave(ix) {
+		const vPtr = qe.latestWaveBuffer + 8*2*ix;
 		return qCx(
-			Module.getValue(ix, 'double'),
-			Module.getValue(ix + 8, 'double')
+			Module.getValue(vPtr, 'double'),
+			Module.getValue(vPtr + 8, 'double')
 		);
 	}
 
+	qe.set1DWave = function set1DWave(ix, psi) {
+		const vPtr = qe.latestWaveBuffer + 8*2*ix;
+		Module.setValue(vPtr, psi, 'double');
+		Module.setValue(vPtr + 8, psi, 'double');
+	}
+
 	// tune into the most recently used wave and potential buffers
-	qe.latestPotential = function latestNumbers() {
-		qe.latestPotential = qe.getPotentialBuffer();
+	qe.latestPotential = function latestPotential() {
+		qe.latestPotentialBuffer = qe.getPotentialBuffer();
 	}
 
 	// get the real potential value at this point
-	qe.get1DPotential = function get1DPotential(ixPoint) {
-		const ix = qe.latestPotential + 8*ixPoint;
-		return Module.getValue(ix, 'double');
+	qe.get1DPotential = function get1DPotential(ix) {
+		const vPtr = qe.latestPotentialBuffer + 8*ix;
+		return Module.getValue(vPtr, 'double');
 	}
 
-	qe.set1DPotential = function set1DPotential(ixPoint, pot) {
-		const ix = qe.latestPotential + 8*ixPoint;
-		return Module.setValue(ix, 'double', pot);
+	qe.set1DPotential = function set1DPotential(ix, pot) {
+		const vPtr = qe.latestPotentialBuffer + 8*ix;
+		return Module.setValue(vPtr, pot, 'double');
 	}
 
 

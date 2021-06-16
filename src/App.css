@@ -72,22 +72,33 @@ svg.WaveView rect.waveCard {
 g.potentialArea {
 	background: #000;
 	z-index: 40;
+	/*position: relative;  / * does this have an effect? */
 }
 
 /* the line for the potential, displayed in white on top of the wave */
 g.potentialArea path.potentialLine {
-	stroke-width: 1px;
-	stroke: #fff;
+	stroke-width: 5px;
+	stroke: #fef;
 	z-index: 100;
 }
 
 /* a fat line for hit testing.  same path as the potentialLine,
 	but wider and has event handlers */
 g.potentialArea path.tactileLine {
-	stroke-width: 11px;
-	stroke: #8008;
-    cursor: n-resize;
+	stroke-width: 200px;
+	stroke: #844;
+    cursor: row-resize;
     pointer-events: stroke;
-	z-index: 90;
+	z-index: 110;
+}
+
+/* a fat line for hit testing.  same path as the potentialLine,
+	but wider and has event handlers */
+g.potentialArea text.elapsedTime {
+	fill: #ff8;
+	stroke: #f8f;
+	color: #8ff;
+	background-color: #f88;
+	z-index: 100;
 }
 
