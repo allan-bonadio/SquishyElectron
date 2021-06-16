@@ -1,7 +1,9 @@
 //import jWave from './wave';
 //import complex from 'complex';
 import qCx from './qCx';
-import {jWaveBuffers} from './theWave';
+//import {jWaveBuffers} from './theWave';
+
+let jWaveBuffers;
 
 // schrodinger's:
 //    ih ∂psi / ∂t  =  [V - (h^2/2m) (∂^2/∂x^2)] psi

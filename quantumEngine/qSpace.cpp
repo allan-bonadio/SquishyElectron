@@ -9,6 +9,11 @@ qReal elapsedTime = 0;
 
 static int dimsSoFar;
 
+
+// someday I need an C++ error handling layer.  See
+// https://emscripten.org/docs/porting/Debugging.html?highlight=assertions#handling-c-exceptions-from-javascript
+
+
 extern "C" {
 
 // call this to throw away existing space and wave, and start new
