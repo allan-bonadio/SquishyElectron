@@ -64,6 +64,11 @@ export class WaveView extends React.Component {
 
 
 	render() {
+
+
+//return '';
+
+
 		const N = this.props.N;
 
 		if (!qe.main)

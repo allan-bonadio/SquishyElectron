@@ -5,6 +5,7 @@ import draw from './draw';
 import iterate from './iterate';
 import {qeSpace} from './qEngine';
 import qe from './qe';
+import App from '../App';
 
 // the (old js) jWave that we're displaying and animating
 export let theJSpace;
@@ -13,7 +14,10 @@ export let theJWave;
 export let newWaveBuffer;
 export let theDraw;
 export const jWaveBuffers = {alt: null, next: null};
-export let useQuantumEngine;
+
+// current description of what GL uses to display with.
+// null = in transition between spaces; animation stops
+// why is react screwing up?  export let theCurrentView;
 
 // range of vertical inside coordinates in the svg
 export const INNER_HEIGHT = 100;
@@ -119,10 +123,7 @@ let repeatId;
 
 // call this to start or stop animation/iteration.
 // rate = 1, 2, 4, 8, ... or zero/false to stop it
-export function iterateAnimate(uQE, rate) {
-	// never changes during runtime
-	useQuantumEngine = uQE;
-
+export function oldIterateAnimate(useQuantumEngine, rate) {
 	// if user cicks Go twice, we lose the previous repeatId and can never clear it
 	if (! rate || repeatId) {
 		clearInterval(repeatId);
@@ -151,3 +152,60 @@ export function iterateAnimate(uQE, rate) {
 		}
 	}, 1000 / rate);
 }
+
+let isAnimating = false;
+
+export function iterateAnimate(isTrue, rate) {
+	// hmmm i'm not using the Rate here...
+	if (! rate || !qe.theCurrentView) {
+		isAnimating = false;
+		return;
+	}
+	isAnimating = true;
+
+	// also performance.now()
+
+	// requestAnimationFrame(): You should call this
+	// method whenever you're
+	//  ready to update your animation onscreen.
+
+
+	function animateOneFrame(now) {
+		//console.log(`time since last tic: ${now - startFrame}ms`)
+		let startRK = 0, startUpdate = 0, startDraw = 0, endFrame = 0;
+
+		// could be slow.  sometime in the future.
+		startRK = performance.now();
+		qe.qSpace_oneRk2Step();
+		qe.updateToLatestWaveBuffer();
+
+		startUpdate = performance.now();
+		let highest = qe.updateViewBuffer();
+		//dumpViewBuffer();
+
+		qe.theCurrentView.buffers[0].reloadArray();
+
+		startDraw = performance.now();
+		qe.theCurrentView.draw();
+
+		endFrame = performance.now();
+		//console.log(`times: RK: ${(startUpdate- startRK).toFixed(2)}ms   up: ${(startDraw- startUpdate).toFixed(2)}ms   draw: ${(endFrame- startDraw).toFixed(2)}ms   total: ${(endFrame- startRK).toFixed(2)}ms`);
+
+		if (isAnimating) {
+			requestAnimationFrame(animateOneFrame);
+		}
+	}
+
+	requestAnimationFrame(animateOneFrame);
+
+}
+
+function dumpViewBuffer() {
+	let nRows = qe.space.nPoints * 2;
+	let vb = qe.space.viewBuffer;
+	const _ = (f) => f.toFixed(3).padStart(6);
+	console.log(`dump of view buffer for ${qe.space.nPoints} points in ${nRows} rows`);
+	for (let i = 0; i < nRows; i++)
+		console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
+}
+//modernIterateAnimate();

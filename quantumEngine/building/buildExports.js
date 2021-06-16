@@ -21,6 +21,7 @@ exportsSrc  = [
 	// gets
 	{name: 'getWaveBuffer', retType: 'number', args: []},
 	{name: 'getPotentialBuffer', retType: 'number', args: []},
+	{name: 'getViewBuffer', retType: 'number', args: []},
 	{name: 'getElapsedTime', retType: 'number', args: []},
 
 	// the potential
@@ -34,6 +35,9 @@ exportsSrc  = [
 	{name: 'qSpace_setStandingWave', retType: 'number', args: ['number']},
 	{name: 'qSpace_setPulseWave', retType: 'number', args: ['number', 'number']},
 	{name: 'qSpace_oneRk2Step', retType: 'number', args: []},
+
+	// views
+	{name: 'updateViewBuffer', retType: 'number', args: []},
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():
@@ -41,7 +45,7 @@ exportsSrc  = [
 
 // the exports.json file, needed by emcc
 let exportsFile = exportsSrc.map(funcDesc => '_' + funcDesc.name);
-fs.writeFile(`${process.env.SQUISHY_ROOT}/quantumEngine/building/exports.json`,
+fs.writeFile(`${process.env.SQUISH_ROOT}/quantumEngine/building/exports.json`,
 	JSON.stringify(exportsFile),
 	ex => ex && console.error('error building exports:', ex));
 
@@ -68,7 +72,7 @@ window.qe = qe;
 export default qe;
 `;
 
-process.env.SQUISHY_ROOT
-fs.writeFile(`${process.env.SQUISHY_ROOT}/src/wave/qe.js`, code,
+process.env.SQUISH_ROOT
+fs.writeFile(`${process.env.SQUISH_ROOT}/src/wave/qe.js`, code,
 	ex => ex && console.error(ex));
 

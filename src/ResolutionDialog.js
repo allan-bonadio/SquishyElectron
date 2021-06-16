@@ -55,7 +55,7 @@ export default class ResolutionDialog extends React.Component {
 				<h3>Universe</h3>
 
 				<label>
-					Number of datapoints (${minResolution} - ${maxResolution}) <br />
+					Number of datapoints ({minResolution} - {maxResolution}) <br />
 					<input type='number' placeholder='points' size='15' value={s.N}
 						min={minResolution} max={maxResolution}
 						step={this.calcStepSize()}

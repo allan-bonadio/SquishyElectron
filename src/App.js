@@ -1,17 +1,30 @@
 import React from 'react';
 import './App.css';
-import WaveView from './WaveView';
+//import WaveView from './WaveView';
 import ControlPanel from './ControlPanel';
 import ResolutionDialog from './ResolutionDialog';
+
 import {recreateWave, theDraw} from './wave/theWave';
 import {qeSpace, qeStartPromise, qeDefineAccess} from './wave/qEngine';
-//import qe from './wave/qe';
+import qe from './wave/qe';
+
+import SquishView from './views/SquishView';
+import viewDef from './views/viewDef';
+import flatView from './views/flatView';
 
 
-const DEFAULT_RESOLUTION = 50;
+const DEFAULT_RESOLUTION = 5;
 const DEFAULT_CONTINUUM = qeSpace.contCIRCULAR;
 
-// someday I need an error handling layer.  See
+
+export const listOfViewClasses = {
+	flatView,  // the original one
+	viewDef,  // primitive dummy, also superclass of all these others
+};
+
+
+
+// someday I need an C++ error handling layer.  See
 // https://emscripten.org/docs/porting/Debugging.html?highlight=assertions#handling-c-exceptions-from-javascript
 
 //function getExceptionMessage(exception) {
@@ -27,6 +40,7 @@ const DEFAULT_CONTINUUM = qeSpace.contCIRCULAR;
 class App extends React.Component {
 	constructor(props) {
 		super(props);
+
 		this.state = {
 			innerWindowWidth: window.innerWidth,
 
@@ -42,7 +56,11 @@ class App extends React.Component {
 			currentJWave: null,
 			currentQESpace: null,
 			currentDraw: null,
+
+			currentView: null,
 		};
+
+		this.canvas = null;
 
 		console.log(`App constructor`);
 	}
@@ -60,9 +78,26 @@ class App extends React.Component {
 		this.setState({isResolutionDialogOpen: whetherTo});
 	}
 
+	setGLCanvas(canvas) {
+		this.canvas = canvas;
+	}
+
 	setNew1DResolution(N, continuum) {
+		qe.theCurrentView =  null;
 		recreateWave(N, continuum, (currentJWave, currentQESpace, currentDraw) => {
+			// we've now got a qeSpace etc all set up
 			this.setState({N, continuum, currentJWave, currentQESpace, currentDraw});
+
+			// now create the view class instance as described by the space
+			const vClass = listOfViewClasses[currentQESpace.viewClassName];
+
+			// seems kinda funny doing these all here - but they should work for every view class
+			const currentView = new vClass('main view', this.canvas, currentQESpace);
+			currentView.completeView();
+
+			this.setState(currentView);
+			//theCurrentView = currentView;
+			qe.theCurrentView = currentView;
 		});
 	}
 
@@ -70,10 +105,10 @@ class App extends React.Component {
 	componentDidMount() {
 		// upon startup, after C++ says it's ready, but remember constructor runs twice
 		qeStartPromise.then((arg) => {
+			qeDefineAccess();
 			this.setNew1DResolution(DEFAULT_RESOLUTION, DEFAULT_CONTINUUM);
 			// wont work currentDraw.draw();
-			//qeDefineAccess();
-			theDraw.draw(this.state.useQuantumEngine);
+//			theDraw.draw(this.state.useQuantumEngine);
 		}, (ex) => {
 			console.error(`error in qeStartPromise:`, ex);
 		});
@@ -108,12 +143,14 @@ class App extends React.Component {
 					&nbsp; &nbsp;
 					Squishy Electron
 				</h2>
-				<WaveView N={this.state.N} useQuantumEngine={s.useQuantumEngine}
-					innerWindowWidth={s.innerWindowWidth}/>
+				{/*}<WaveView N={this.state.N} useQuantumEngine={s.useQuantumEngine}*/}
+				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
+				<SquishView setGLCanvas={canvas => this.setGLCanvas(canvas)} />
 				<ControlPanel
 					openResolutionDialog={() => this.openResolutionDialog(true)}
 					useQuantumEngine={this.state.useQuantumEngine}
 				/>
+
 				{resDialog}
 			</div>
 		);

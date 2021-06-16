@@ -34,13 +34,14 @@ export class PotentialArea extends React.Component {
 	// make the sequence of coordinates the white line needs to draw
 	// as compressed as possible
 	makePathAttribute() {
-		if (! qe.latestPotential)
+		if (! qe.potentialBuffer)
 			return `M0,0`;  // too early
 
 		const p = this.props;
-		qe.latestPotential();
 
-		const dim = qe.space.dimensions[0];
+		const space = qe.space;
+		const dim = space.dimensions[0];
+		const potentialBuffer = space.potentialBuffer;
 		const points = new Array(dim.start + dim.end);
 		let potential = qe.get1DPotential(dim.start);
 		points[0] = `M0,${potential}L `;
@@ -86,6 +87,18 @@ export class PotentialArea extends React.Component {
 		this.dragging = true;
 		//debugger;
 
+//		}
+//		const x = Math.floor(ev.clientX / p.barWidth);
+//		this.mouseReveal('down', ev, x);
+////		console.log(`mouseDown on point (%f,%f) %f`,
+////			ev.clientX, ev.clientY,
+////			qe.get1DPotential(x), ev);
+//		if (Math.abs(qe.space.potentialBuffer[x] - ev.clientY) < 10) {
+//			// a hit!
+//			console.log(`    a hit! on point ${x}:`, ev);
+//			qe.space.potentialBuffer[x] = ev.clientY;
+//			this.dragging = true;
+//			debugger;
 //		}
 	}
 
