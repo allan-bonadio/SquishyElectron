@@ -1,24 +1,32 @@
-import abstractViewDef, {viewAttribute} from './abstractViewDef';
+import abstractViewDef from './abstractViewDef';
 import {cxToColorGlsl} from './cxToColor.glsl';
 import qe from '../wave/qe';
+import {viewUniform, viewAttribute} from './viewVariable';
 
 /*
 ** data format of attributes:  four column table of floats
 ** psi.re  psi.im   potential    ...0?...
-** uses gl_VertexID to figure out whether the y should be re^2+im^2
+** uses gl_VertexID to figure out whether the y should be re^2+im^2  NO! opengl 2 only
 ** or zero
 */
 
-const vertexSrc = `#version 300 es
+const isTesting = false;
+
+// make the line number for the start a multiple of 10
+const vertexSrc = `
 ${cxToColorGlsl}
 
-in vec4 row;
-out mediump vec4 vColor;
-uniform float nBars;
+
+#line 120
+attribute vec4 row;
+varying highp vec4 vColor;
+ int nPoints = 7;
+//uniform int nPoints;
 
 void main() {
 	float y;
-	if ((gl_VertexID & 1) != 0)
+	int vertexSerial = int(row.w);
+	if (vertexSerial / 2 * 2 > vertexSerial)
 		y = row.x * row.x + row.y * row.y;
 	else
 		y = 0.;
@@ -26,7 +34,8 @@ void main() {
 	y = y - 1.;
 
 	float x;
-	x = float(gl_VertexID/2) / (nBars - 1.) * 2. - 1.;
+	x = float(vertexSerial / 2) / float(nPoints - 1) * 2. - 1.;
+
 	gl_Position = vec4(x, y, 0., 1.);
 
 	vColor = vec4(cxToColor(vec2(row.x, row.y)), 1.);
@@ -34,22 +43,22 @@ void main() {
 }
 `;
 
-const fragmentSrc = `#version 300 es
-
+const fragmentSrc = `
 precision highp float;
-out vec4 outColor;
-in mediump vec4 vColor;
+varying highp vec4 vColor;
 
 void main() {
-	outColor = vColor;
+	gl_FragColor = vColor;
 }
 `;
 
-// the original
+// the original display that's worth watching
 class flatViewDef extends abstractViewDef {
 	constructor(viewName, canvas, currentQESpace) {
-		super(viewName, canvas, currentQESpace);
+		super(viewName, canvas);
 
+		if (! currentQESpace) throw  `flatViewDef: being created without currentQESpace`;
+		this.currentQESpace = currentQESpace;
 	}
 
 	setShaders() {
@@ -57,46 +66,50 @@ class flatViewDef extends abstractViewDef {
 		this.gl.useProgram(this.program);
 	}
 
-	setInputs() {
-		const ar = new viewAttribute(this, 'row');
 
+	setInputs() {
+		if (isTesting)
+			this.setInputsForTesting();
+		else
+			this.setInputsNormal()
+	}
+
+
+	setInputsNormal() {
 		const highest = qe.updateViewBuffer();
 		this.nPoints = this.currentQESpace.nPoints;
-		this.vertexCount = this.nPoints * 2;  // nbars * vertsPerBar
-		this.rowFloats = 4;
-		ar.attachArray(qe.space.viewBuffer, this.rowFloats);
 
-		const gl = this.gl;
-		var nBarsLoc = gl.getUniformLocation(this.program, 'nBars');
-		gl.uniform1f(nBarsLoc, this.nPoints);
+		this.rowAttr = new viewAttribute('row', this);
+		this.vertexCount = this.nPoints * 2;  // nPoints * vertsPerBar
+		this.rowFloats = 4;
+		this.rowAttr.attachArray(qe.space.viewBuffer, this.rowFloats);
+
+//		this.nPointsUniform = new viewUniform('nPoints', this,
+//			() => ({value: this.currentQESpace.nPoints, type: '1i'}));
+
+//		this.nPointsLoc = gl.getUniformLocation(this.program, 'nPoints');
+//		const gl = this.gl;
+//		gl.uniform1f(this.nPointsLoc, this.currentQESpace.nPoints);
 	}
 
 	setInputsForTesting() {
-		const ar = new viewAttribute(this, 'row');
+		const vAttr = new viewAttribute('row', this, null);
 
 		const sin = Math.sin;
 		const cos = Math.cos;
 		this.nPoints = 7;
-		this.vertexCount = this.nPoints * 2;  // nbars * vertsPerBar
+		this.vertexCount = this.nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4
 		let vertices = new Float32Array(this.vertexCount *  this.rowFloats);
 		for (let i = 0; i < 7; i++) {
 			vertices[i*8] = vertices[i*8 + 4] = cos(i);
 			vertices[i*8 + 1] = vertices[i*8 + 5] = sin(i);
 		}
-		ar.attachArray(vertices, 4);
+		vAttr.attachArray(vertices, 4);
 
-		const gl = this.gl;
-		var nBarsLoc = gl.getUniformLocation(this.program, 'nBars');
-		gl.uniform1f(nBarsLoc, this.nPoints);
-
-// simple triangle
-//		const corners = new Float32Array([
-//			cos(2), sin(2),
-//			cos(4), sin(4),
-//			cos(6), sin(6),
-//		]);
-//		ar.attachArray(corners, 2);
+//		const gl = this.gl;
+//		var nPointsLoc = gl.getUniformLocation(this.program, 'nPoints');
+//		gl.uniform1f(nPointsLoc, this.nPoints);
 	}
 
 	// use default
@@ -106,7 +119,7 @@ class flatViewDef extends abstractViewDef {
 	draw() {
 		const gl = this.gl;
 
-		gl.clearColor(0, 0, 0, 0);
+		gl.clearColor(0, 1, 0, .2);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		//gl.useProgram(this.program);

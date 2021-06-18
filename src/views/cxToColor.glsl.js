@@ -76,7 +76,9 @@ vec3 cxToColor(vec2  psi) {
 		return vec3(1.-gradient, 0., 1.);
 	}
 }
-`;
+
+
+`;  // should be exactly 80 lines long
 // add extra blank lines to the end of it to make it an even multiple of 10
 // so I don't go crazy debugging it
 
@@ -87,12 +89,8 @@ export default cxToColorGlsl;
 // you can test this in Node; just uncomment this section and run it alone.
 
 // testing in JS/node.  so hokey.  This substitutes a few things to turn GLSL  into JS
-function testCxToColorGlsl() {
-	//const glslShims = `
-	const vec2 = function vec2(xx, yy) { return {x: xx, y: yy}}
+export function testCxToColorGlsl() {
 	const vec3 = function vec3(xx, yy, zz) { return {x: xx, y: yy, z: zz}}
-	const sqrt = Math.sqrt;
-	//function vec4(a, b, c, d) { return {x: a, y: b, z: c, w: d}}
 	let jsCxToColor;
 	const notClose = (a, b) => (Math.abs(a-b) > 5e-5)
 

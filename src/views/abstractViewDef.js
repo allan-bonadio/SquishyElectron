@@ -1,76 +1,16 @@
-
-// create this as many times as you have attributes as input to the vec shader
-export class viewAttribute {
-
-	// for a subclass of abstractViewDef, attach a buffer that shows up as <attrName> in the v shder,...
-	constructor(view, attrName) {
-		this.view = view;
-		const gl = view.gl;
-		view.buffers.push(this);
-
-		// small integer indicating which attr this is
-		this.attrLocation = gl.getAttribLocation(view.program, attrName);
-
-		// actual ram in GPU chip
-		this.glBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
-	}
-
- 	// call after construction.  has <float32TypedArray> data input,
-	// broken into rows of <stride> floats, but we only use the <size> number of floats
-	// from each row, <offset> from the start of each row.  size=1,2,3 or 4,
-	// to make an attr that's a scalar, vec2, vec3 or vec4
-	attachArray(float32TypedArray, size, stride = size * 4, offset = 0) {
-		const gl = this.view.gl;
-
-		// also try gl.DYNAMIC_DRAW here?
-		this.float32TypedArray = float32TypedArray;
-		gl.bufferData(gl.ARRAY_BUFFER, float32TypedArray, gl.DYNAMIC_DRAW);
-
-		this.vao = gl.createVertexArray();
-		gl.bindVertexArray(this.vao);
-		gl.enableVertexAttribArray(this.attrLocation);
-
-		gl.vertexAttribPointer(this.attrLocation, size, gl.FLOAT, false, stride, offset);
-	}
-
-	// call this when the array's values change, to reload them into the GPU
-	reloadArray() {
-		const gl = this.view.gl;
-		gl.bufferData(gl.ARRAY_BUFFER, this.float32TypedArray, gl.STATIC_DRAW);
-
-	}
-}
+import {viewUniform, viewAttribute} from './viewVariable';
+import {curioShader, curioProgram} from './curiosity';
 
 
-/* ************************************************** construction */
-
-const proxyVertexShader = `#version 300 es
-in vec4 corner;
-void main() {
-	gl_Position = corner;
-}
-`;
-
-const proxyFragmentShader = `#version 300 es
-precision highp float;
-out vec4 outColor;
-
-void main() {
-  outColor = vec4(.5, 1, 0, 1);
-}
-`;
 
 // Each abstractViewDef subclass is a definition of a kind of view; one per each kind of view.
 // (A SquishView owns an instance of the def and is a React component.)
 // This is the superclass of all view defs; with common webgl and space plumbing.
 // viewName is not the viewClassName, which is one of flatViewDef, garlandView, ...
 export class abstractViewDef {
-	constructor(viewName, canvas, currentQESpace) {
-		this.buffers = [];
-
-		if (! currentQESpace) throw  `abstractViewDef: being created without currentQESpace`;
-		this.currentQESpace = currentQESpace;
+	/* ************************************************** construction */
+	constructor(viewName, canvas) {
+		this.viewVariables = [];
 
 		this.viewName = viewName;
 		if (! canvas) throw `abstractViewDef: being created without canvas`;
@@ -82,12 +22,12 @@ export class abstractViewDef {
 	}
 
 	initCanvas() {
-		this.gl = this.canvas.getContext("webgl2");
+		this.gl = this.canvas.getContext("webgl");
 		if (! this.gl)
-			this.gl = this.canvas.getContext("experimental-webgl2");
+			this.gl = this.canvas.getContext("experimental-webgl");
 		if (this.gl) return;
 
-		throw `Sorry this browser doesn't do WebGL2!  You might be able to turn it on ...`;
+		throw `Sorry this browser doesn't do WebGL!  You might be able to turn it on ...`;
 		/*
 		Can be enabled in Firefox by setting the about:config preference
 		webgl.enable-prototype-webgl2 to true
@@ -117,11 +57,19 @@ export class abstractViewDef {
 		this.setInputs();
 		this.setGeometry();
 		this.draw();
+
+
+		curioShader(this.gl, this.vertexShader);
+		curioShader(this.gl, this.fragmentShader);
+		curioProgram(this.gl, this.program);
+
+
+
 	}
 
 	/* ************************************************** Shader Creation/Compile */
 	compileShader(type, srcString) {
-		const {gl, canvas} = this;
+		const {gl} = this;
 
 		var shader = gl.createShader(type);
 		gl.shaderSource(shader, srcString);
@@ -139,14 +87,6 @@ export class abstractViewDef {
 	compileProgram(vertexSrc, fragmentSrc) {
 		const {gl} = this;
 
-//
-//		const vertexShader = this.compileShader(gl.VERTEX_SHADER, vertexSrc);
-//		const fragmentShader = this.compileShader(gl.FRAGMENT_SHADER, fragmentSrc);
-//		const program = gl.createProgram();
-//		gl.attachShader(program, vertexShader);
-//		gl.attachShader(program, fragmentShader);
-//
-
 		const program = gl.createProgram();
 
 		const vertexShader = this.compileShader(gl.VERTEX_SHADER, vertexSrc);
@@ -163,7 +103,7 @@ export class abstractViewDef {
 		if (success) {
 			this.program = program;
 			return
-			// after this, you'll attach your buffers with your subclassed setInputs() method.
+			// after this, you'll attach your viewVariables with your subclassed setInputs() method.
 		}
 
 		const msg = gl.getProgramInfoLog(program);
@@ -173,17 +113,37 @@ export class abstractViewDef {
 
 	// abstract supermethod: write your setShaders() function to compile your two GLSL sources
 	setShaders() {
+		const proxyVertexShader = `
+		attribute vec4 corner;
+		uniform int cornerColor;
+		void main() {
+			gl_Position = corner;
+		}
+		`;
+
+		const proxyFragmentShader = `
+		precision highp float;  // does this do anything?
+
+		void main() {
+		  gl_FragColor = vec4(.5, 1, 0, 1);
+		}
+		`;
+
 		this.compileProgram(proxyVertexShader, proxyFragmentShader);
 	}
 
 	/* ************************************************** buffers & variables */
 	// abstract supermethod: all subclasses should write their own setInputs() method.
+	// mostly, creating viewVariables that can be dynamically changed
 	setInputs() {
 //		const {gl, canvas} = this;
 
-		const ar = new viewAttribute(this, 'corner');
-		//const cornerAttributeLocation = gl.getAttribLocation(this.program, 'corner');
+		new viewUniform('cornerColor', this,
+			() => ({value: 42, type: '1i'}));
 
+		const cornerAttr = new viewAttribute('corner', this, {});
+
+		//const cornerAttributeLocation = gl.getAttribLocation(this.program, 'corner');
 //		const cornerBuffer = gl.createBuffer();  // actual ram in GPU chip
 //		gl.bindBuffer(gl.ARRAY_BUFFER, cornerBuffer);
 
@@ -194,7 +154,7 @@ export class abstractViewDef {
 			cos(4), sin(4),
 			cos(6), sin(6),
 		]);
-		ar.attachArray(corners, 2);
+		cornerAttr.attachArray(corners, 2);
 
 //		also try gl.DYNAMIC_DRAW here
 //		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), gl.STATIC_DRAW);
@@ -237,7 +197,7 @@ export class abstractViewDef {
 		const count = 3;
 		gl.drawArrays(primitiveType, offset, count);
 
-		//this.debug1();
+		this.debug1();
 	}
 
 	/* ************************************************** debugging */
@@ -298,11 +258,13 @@ ${fSrc}
 		/* ==================  shaders */
 		var vertexShaderSource, fragmentShaderSource, vertexShader, fragmentShader, program;
 		if (false) {
-			vertexShaderSource = `#version 300 es
+			vertexShaderSource = `
 
 			// an attribute is an input (in) to a vertex shader.
 			// It will receive data from a buffer
-			in vec4 corner;
+			attribute vec4 corner;
+			uniform cornerColor;
+			varying color;
 
 			// all shaders have a main function
 			void main() {
@@ -310,21 +272,19 @@ ${fSrc}
 			  // gl_Position is a special variable a vertex shader
 			  // is responsible for setting
 			  gl_Position = corner;
+			  color = cornerColor;
 			}
 			`;
 
-			fragmentShaderSource = `#version 300 es
+			fragmentShaderSource = `
 
 			// fragment shaders don't have a default precision so we need
 			// to pick one. highp is a good default. It means "high precision"
 			precision highp float;
-
-			// we need to declare an output for the fragment shader
-			out vec4 outColor;
-
+			varying vec4 color;
 			void main() {
 			  // Just set the output to a constant reddish-purple
-			  outColor = vec4(1, 0, 0.5, 1);
+			  gl_FragColor = color;
 			}
 			`;
 
@@ -364,7 +324,7 @@ ${fSrc}
 		}
 		else {
 
-			this.compileProgram(proxyVertexShader, proxyFragmentShader);
+//			this.compileProgram(proxyVertexShader, proxyFragmentShader);
 			program = this.program;
 			vertexShader = this.vertexShader;
 			fragmentShader = this.fragmentShader;
@@ -409,9 +369,9 @@ ${fSrc}
 		}
 		else {
 			this.setInputs();
-			positionAttributeLocation = this.buffers[0].attrLocation;
-			positionBuffer = this.buffers[0].glBuffer;
-			vao = this.buffers[0].vao;
+			positionAttributeLocation = this.viewVariables[0].attrLocation;
+			positionBuffer = this.viewVariables[0].glBuffer;
+			vao = this.viewVariables[0].vao;
 		}
 
 
@@ -444,9 +404,9 @@ ${fSrc}
 
 
 			var primitiveType = gl.TRIANGLES;
-			var offset = 0;
+			var off = 0;
 			var count = 3;
-			gl.drawArrays(primitiveType, offset, count);
+			gl.drawArrays(primitiveType, off, count);
 
 		}
 		else {
