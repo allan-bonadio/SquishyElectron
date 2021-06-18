@@ -1,8 +1,8 @@
 //import d3 from 'd3';
 import {theJWave} from './theWave';
 import qe from './qe';
-import {qeSpace} from './qEngine';
-import qCx from './qCx';
+//import {qeSpace} from './qEngine';
+//import qCx from './qCx';
 
 // color tables.  The component at position 3 is for real values
 const colorNodes = [

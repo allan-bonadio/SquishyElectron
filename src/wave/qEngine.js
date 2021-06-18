@@ -4,7 +4,7 @@
 import {qe, defineQEngineFuncs} from './qe';
 import qCx from './qCx';
 
-const Module = window.Module;
+//const Module = window.Module;
 
 // all of these must be attached to window to  get called by c++
 
@@ -86,9 +86,9 @@ export class qeSpace {
 		this.potentialBuffer = qe.getPotentialBuffer();
 
 		// a nice TypedArray of floats (4 for each row; 8 for each datapoint)
-		const vb = qe.getViewBuffer()
 		this.viewBuffer = qe.viewBuffer =
 			new Float32Array(window.Module.HEAPF32.buffer, qe.getViewBuffer(), nPoints*8);
+		console.log(`qeng viewBuffer:`, this.viewBuffer);
 	}
 
 	get1DWave = function get1DWave(ixPoint) {
