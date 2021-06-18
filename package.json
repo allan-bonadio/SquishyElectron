@@ -79,7 +79,15 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+        "eqeqeq": 0,
+        "no-throw-literal": 0,
+        "default-case": 0,
+        "no-self-assign": 0,
+        "no-mixed-operators": 0,
+        "no-new-func": 0
+    }
   },
   "browserslist": {
     "production": [
