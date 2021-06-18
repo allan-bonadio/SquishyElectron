@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include "qSpace.h"
 
-static const qReal dt = 0.1;
+// this is it, the all famous time variabler.  What dx will she choose?
+static const qReal dt = 0.02;
 
 // if they're really over i, they should be negative, right?
 static const qCx dtOverI = qCx(0., -dt);
