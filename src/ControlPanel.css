@@ -80,13 +80,14 @@ button.stopButton div {
 /* **************************************** Set Resolution dialog */
 
 /* button in control panel */
-.setResolutionButton {
+.setResolutionOKButton {
 	flex: 0 0 15em;
 	margin: 1em;
 	/*height: 6em;*/
 }
 
-aside.backdrop {
+.backdrop {
+	display: flex;
 	background-color: #ccc8;
 	position: fixed;
 	left: 0;
@@ -94,8 +95,11 @@ aside.backdrop {
 	width: 100%;
 	height: 100%;
 
-	text-align: center;
 	padding-top: 10%;
+}
+
+.dialogSpacer {
+	flex: 1 1;
 }
 
 .dialog {
@@ -103,26 +107,39 @@ aside.backdrop {
 	background-color: #111;
 	color: #eee;
 	flex: 0 0 30em;
-	/*height: 30em;*/
 	padding: 2em;
 	line-height: 1.5em;
-}
-
-.dialogSpacer {
-	flex: 1 1;
+	height: 30em;
 }
 
 .dialog label {
 	display: block;
-	margin: 2em;
+	margin: 0;
+}
+
+.dialog input[type=radio] {
+	margin: 0 1em 0 0;
 }
 
 .dialog input[type=number] {
 	color: #ddf;
-	margin: 2em;
+	margin: 0;
+}
+
+.dialog input[type=range] {
+	color: #8cf;
+	background-color: #888;
+	margin: 0;
 }
 
 .dialog button {
 	margin: 0 2em;
 }
 
+.dialog tr td:first {
+	text-align: right;
+}
+
+.dialog .dialogSection {
+	margin: 1em 0 0 0;
+}

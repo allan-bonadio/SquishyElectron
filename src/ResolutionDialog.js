@@ -1,13 +1,54 @@
 import React from 'react';
 import {qeSpace} from './wave/qEngine';
 
-const minResolution = 5;
-const maxResolution = 100000;
+const wassup = `${process.env.NODE_ENV}`;
+
+// these numbers represent approx 10**(n/10), so eg 60=>1M, 50=>100k,
+// 30=1000, 27=500, 23=>200, 20=>100, 7=>5
+// note 11=>12.5 so start at 12 => 16
+const MIN_SLIDER_RES = process.env.NODE_ENV == 'development' ? 0 : 12;
+const MAX_SLIDER_RES = 60;
+
+// list of settings that are more better - not that simple!
+function createGoodPowersOf10() {
+	let po10 = [];
+	for (let p = MIN_SLIDER_RES; p <= MAX_SLIDER_RES; p += 10) {
+		po10.push(<option>{p}</option>);
+//		po10.push(<option>{p + 3}</option>);
+//		po10.push(<option>{p + 7}</option>);
+	}
+	return po10;
+}
+
+const GoodPowersOf10 = createGoodPowersOf10();
+
+// convert eg 20, 21, 25, 30 into 100, 125, 300, 1000
+// indices under 12 will result in rounded results,
+// 1 2 2 2 3 3 4 5 6 8 10 13 15...
+// so not recommended for human consumption
+function indexToPower(ix) {
+	let po10 = 10 ** Math.floor(ix/10);
+	let factor = [
+		1.0, 1.25, 1.5,
+		2.0, 2.50, 3.0,
+		4.0, 5.00, 6.0,
+		8.0][ix % 10];
+	return Math.ceil(factor * po10);
+}
+
+// convert eg 100, 125, 300, 1000 into 20, 21, 25, 30
+function powerToIndex(p) {
+	return Math.round(Math.log10(p) * 10);
+}
+
+function thousands(n) {
+	return String(n).replace(/(\d\d\d)$/, ' $1').replace(/(\d\d\d) /, ' $1 ')
+}
 
 export default class ResolutionDialog extends React.Component {
 	// this is the state in the dialog; doesn't become real until OK()
 	state = {
-		N: this.props.N,
+		powerOf10: powerToIndex(this.props.N),
 		continuum: this.props.continuum,
 	};
 
@@ -19,75 +60,84 @@ export default class ResolutionDialog extends React.Component {
 
 	OK(ev) {
 		const s = this.state;
-		this.props.setNew1DResolution(s.N, s.continuum);
+		this.props.setNew1DResolution(indexToPower(s.powerOf10), s.continuum);
 		this.props.closeResolutionDialog();
 	}
 
-	// try to make the arrows on the input increment in reasonable amounts
-	calcStepSize() {
-		let resolution = this.state.resolution;
-		let digits = Math.floor(Math.log10(resolution));  // 0 ... 3
-		let digits10 = Math.max(10 ** (digits - 1), 1);  // 1, 10, 100
-		let mantissa = resolution / digits10 / 10;  // 1.000 ... 9.999
-		if (mantissa >= 5)
-			mantissa = 5;
-		else if (mantissa >= 2)
-			mantissa = 2;
-		else
-			mantissa = 1;
-		this.stepSize = mantissa * digits10;
-		let r = this.state.resolution / this.stepSize;
-		r = (this.value >= this.oldValue)
-			? Math.ceil(r)
-			: Math.floor(r);
-		this.oldValue = this.value;
-		this.value = r * this.stepSize;
+	handleChangePowersOf10(ev) {
+		this.setState({powerOf10: ev.target.valueAsNumber});
 	}
 
 	render() {
 		const s = this.state;
-		this.calcStepSize();
+		const onChange = ev => this.setState({continuum: ev.target.value});
 
-		return <aside className='backdrop' style={{display: 'flex'}}>
+		return <aside className='backdrop'>
+			<datalist id='GoodPowersOf10' >{GoodPowersOf10}</datalist>
 			<div className='dialogSpacer' />
-			<article className='dialog'>
+			<article className='dialog ResolutionDialog'>
 
 				<h3>Universe</h3>
 
-				<label>
-					Number of datapoints ({minResolution} - {maxResolution}) <br />
-					<input type='number' placeholder='points' size='15' value={s.N}
-						min={minResolution} max={maxResolution}
-						step={this.calcStepSize()}
-						onChange={ev => this.setState({N: ev.currentTarget.value})} />
-				</label>
-				<label>continuum:
-					<select value={s.continuum}
-						onChange={ev => this.setState({continuum: ev.currentTarget.value})} >
-						<option  value={qeSpace.contCIRCULAR}>contCIRCULAR</option>
-						<option  value={qeSpace.contWELL}>contWELL</option>
-						<option  value={qeSpace.contDISCRETE}>contDISCRETE</option>
-					</select >
-				</label>
+				<section className='dialogSection'>
+					Number of datapoints: {thousands(indexToPower(this.state.powerOf10))}
+					<div style={{break: 'both', fontSize: '10px'}}>
+						<div style={{float: 'left'}}>faster</div>
+						<div style={{float: 'right'}}>more accurate</div>
+					</div>
 
-				new resolution: {this.state.N}<br />
-				old resolution: {this.props.N}<br />
-				old continuum: {this.props.continuum}<br />
-				stepSize: {this.stepSize}<br />
+					<input className='powerOf10Control' type="range"
+						min={MIN_SLIDER_RES} max={MAX_SLIDER_RES}
+						value={s.powerOf10}
+						list='GoodPowersOf10'
+						style={{width: '100%'}}
+						onInput={ev => this.handleChangePowersOf10(ev)}
+					/>
 
-				<button type='button' className='cancelButton'
-					onClick={ev => this.close(ev)}>
-						Cancel
-				</button>
+				</section>
+				<section className='dialogSection'>
+					what kind of universe:
+					<label><input type='radio' name='continuum'  value={qeSpace.contCIRCULAR}
+							checked={s.continuum == qeSpace.contCIRCULAR}
+							onChange={onChange}/>
+						Endless, repeating left-right</label>
+					<label><input type='radio' name='continuum'  value={qeSpace.contWELL}
+							checked={s.continuum == qeSpace.contWELL}
+							onChange={onChange}/>
+						Well with Walls</label>
+					<label><input type='radio' name='continuum'  value={qeSpace.contDISCRETE}
+							checked={s.continuum == qeSpace.contDISCRETE}
+							onChange={onChange}/>
+						Discreet Quanta (not recommended)</label>
+				</section>
+				<table className='dialogSection'><tbody>
+					<tr><td>new resolution:</td><td>{thousands(indexToPower(this.state.powerOf10))}</td></tr>
+					<tr><td>old resolution:</td><td>{thousands(this.props.N)}</td></tr>
+					<tr><td>new continuum:</td><td>{qeSpace.contCodeToText(this.state.continuum)}</td></tr>
+					<tr><td>old continuum:</td><td>{qeSpace.contCodeToText(this.props.continuum)}</td></tr>
+					<tr><td>&nbsp;</td><td></td></tr>
 
-				<button type='button' className='setResolutionOKButton'
-					onClick={ev => this.OK()}>
-						Recreate Universe
-				</button>
-
+					<tr><td>
+						<button type='button' className='cancelButton'
+							onClick={ev => this.close(ev)}>
+								Cancel
+						</button>
+					</td><td>
+						<button type='button' className='setResolutionOKButton'
+							onClick={ev => this.OK()}>
+								Recreate Universe
+						</button>
+					</td></tr>
+				</tbody></table>
 
 			</article>
 			<div className='dialogSpacer' />
 		</aside>;
 	}
 }
+
+
+
+
+//: {
+//:</td><td>{

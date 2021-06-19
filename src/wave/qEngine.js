@@ -47,6 +47,8 @@ export class qeSpace {
 	static contWELL = 1;
 	static contCIRCULAR = 2;
 
+	static contCodeToText = code => ['discrete', 'Well', 'Endless'][code];
+
 	constructor(dims) {
 		this.dimensions = dims.map(dim => {
 			let d = {...dim};
