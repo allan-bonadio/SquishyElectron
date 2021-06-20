@@ -1,13 +1,21 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import './ControlPanel.css';
+import CPToolbar from './CPToolbar';
 import {theJWave, setWave, setVoltage, iterateAnimate} from './wave/theWave';
 
 export class ControlPanel extends React.Component {
+	static propTypes = {
+		innerActiveWidth: PropTypes.number,
+		barWidth: PropTypes.number,
+	};
+
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			running: false,
+			isRunning: false,
 			rate: 8,
 			harmonicFrequency: 1, constantFrequency: 1,
 		};
@@ -15,47 +23,53 @@ export class ControlPanel extends React.Component {
 
 	/* *********************************** start and stop buttons */
 
-	// toggle the running boolean, that exists in two places
-	setRunning(ev, running) {
-		running = !!running;
+	// toggle the isRunning boolean, that exists in two places
+	setRunning(ev, isRunning) {
+		isRunning = !!isRunning;
 
-//		if (this.state.running)
+//		if (this.state.isRunning)
 //			iterate(theJWave);
-//		if (running)
+//		if (isRunning)
 //			theDraw.draw();
-		iterateAnimate(this.props.useQuantumEngine, running && this.state.rate);
+		iterateAnimate(true, isRunning && this.state.rate);
 
 		ev.currentTarget.blur();
 
 		// it is a state of this panel, to color the buttons
-		this.setState({running});
+		this.setState({isRunning});
 
 		// but also a state of the animation
-		//theJWave.running = running;
+		//theJWave.isRunning = isRunning;
 	}
 
 	// set rate, which is 1, 2, 4, 8, ...
-	// can't combine this with 'running' cuz want to remember rate even when stopped
+	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
+	toggleRunning() {
+		this.setRunning(!this.state.running);
+	}
+
+	// set rate, which is 1, 2, 4, 8, ...
+	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
 	setRate(rate) {
-		iterateAnimate(this.props.useQuantumEngine, 0);
+		iterateAnimate(true, 0);
 		this.setState({rate})
-		if (this.state.running)
-			iterateAnimate(this.props.useQuantumEngine, rate);
+		if (this.state.isRunning)
+			iterateAnimate(true, rate);
 	}
 
 	goStopButtons() {
-		const running = this.state.running;
+		const isRunning = this.state.isRunning;
 
 		const repRates = [];
 		for (let rate = 1, i = 0; rate < 64; rate *= 2, i++)
 			repRates.push(<option key={rate} value={rate}>{rate} per sec</option>);
 
 		return <div className='goStopButtons subPanel'>
-			<button type='button' className={'goButton ' + (running && 'on')}
+			<button type='button' className={'goButton ' + (isRunning && 'on')}
 				onClick={ev => this.setRunning(ev, true)}>
 					▶
 			</button>
-			<button type='button' className={'stopButton ' + (!running && 'on')}
+			<button type='button' className={'stopButton ' + (!isRunning && 'on')}
 				onClick={ev => this.setRunning(ev, false)}>
 					◼
 			</button>
@@ -78,7 +92,7 @@ export class ControlPanel extends React.Component {
 
 	resetWaveButtons() {
 		return <div className='resetWaveButtons subPanel'>
-			<h3><big>🌊 🌊 🌊 </big> Reset Wave Function</h3>
+			<h3>Reset Wave Function</h3>
 			<button type='button' className='harmonicWaveButton'
 				onClick={ev => setWave('standing', this.state.harmonicFrequency)}>
 					Harmonic Wave
@@ -128,14 +142,20 @@ export class ControlPanel extends React.Component {
 
 	render() {
 		return <div className='ControlPanel'>
+			<CPToolbar
+				toggleRunning={ev => this.toggleRunning()}
+				oneStep={ev => this.oneStep()}
+				isRunning={this.state.isRunning}
+			/>
 			{this.goStopButtons()}
 			{this.resetWaveButtons()}
 			{this.setVoltageButtons()}
 
 			<button type='button' className='setResolutionButton'
 				onClick={ev => this.props.openResolutionDialog()}>
-					<big>|||||||</big> Change Resolution <br />
-					(will reset current wave)
+					Change Resolution
+					<div style={{fontSize: '.7em'}}>
+						(will reset current wave)</div>
 			</button>
 		</div>;
 	}
