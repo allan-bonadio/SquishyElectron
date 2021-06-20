@@ -66,6 +66,19 @@ button.stopButton div {
 }
 
 /* **************************************** Reset Wave buttons */
+.CPToolbar {
+	float: none;
+	height: 2em;
+}
+
+.CPToolbar button {
+	display: inline-block;
+	height: 2em;
+	padding: 0;
+	margin: 0 .5em;
+}
+
+/* **************************************** Reset Wave buttons */
 
 .resetWaveButtons {
 	flex: 0 0 15em;
@@ -143,3 +156,5 @@ button.stopButton div {
 .dialog .dialogSection {
 	margin: 1em 0 0 0;
 }
+
+
