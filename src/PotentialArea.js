@@ -1,5 +1,7 @@
 
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import qe from './wave/qe';
 import PropTypes from 'prop-types';
 
