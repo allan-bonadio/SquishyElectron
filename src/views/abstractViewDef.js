@@ -1,12 +1,17 @@
 import {viewUniform, viewAttribute} from './viewVariable';
 import {curioShader, curioProgram} from './curiosity';
 
+// right now this is set in constructor
+let bufferDataDrawMode;
+
+
 
 
 // Each abstractViewDef subclass is a definition of a kind of view; one per each kind of view.
 // (A SquishView owns an instance of the def and is a React component.)
 // This is the superclass of all view defs; with common webgl and space plumbing.
 // viewName is not the viewClassName, which is one of flatViewDef, garlandView, ...
+// there should be ONE of these per canvas, so each squishView should have 1.
 export class abstractViewDef {
 	/* ************************************************** construction */
 	constructor(viewName, canvas) {
@@ -18,22 +23,32 @@ export class abstractViewDef {
 		this.initCanvas();
 
 
+
+		// really a global, at least within this file, so this is how you turn this one way
+		// or another, if it makes a diff
+		bufferDataDrawMode = this.gl.DYNAMIC_DRAW;
+		//bufferDataDrawMode = this.gl.STATIC_DRAW;
+
+
+
 		// after construction, the instantiator should call compileProgram()
 	}
 
 	initCanvas() {
-		this.gl = this.canvas.getContext("webgl");
-		if (! this.gl)
-			this.gl = this.canvas.getContext("experimental-webgl");
-		if (this.gl) return;
+		let gl = this.gl = this.canvas.getContext("webgl");
+		if (! gl)
+			gl = this.gl = this.canvas.getContext("experimental-webgl");
 
-		throw `Sorry this browser doesn't do WebGL!  You might be able to turn it on ...`;
+
+		if (!gl) throw `Sorry this browser doesn't do WebGL!  You might be able to turn it on ...`;
+		this.gl = gl;
 		/*
 		Can be enabled in Firefox by setting the about:config preference
 		webgl.enable-prototype-webgl2 to true
 
 		Can be enabled in Chrome by passing the "--enable-unsafe-es3-apis"
 		flag when starting the browser through the command line
+		OR: chrome://flags/#enable-webgl-draft-extensions in Chromium based browsers (Chrome, Opera).
 
 		Safari: Can be enabled in the "Experimental Features" developer menu
 		navigator.userAgent =>
@@ -49,6 +64,11 @@ export class abstractViewDef {
 			__proto__: Array(0)
 			mobile: false
 		*/
+
+
+		this.vaoExt = gl.getExtension('OES_vertex_array_object');
+		if (! this.vaoExt) throw `Sorry this browser doesn't do OES_vertex_array_object!`+
+				`\nI guess I can't blame you, how would you know.`;
 	}
 
 	// the final call to set it up does all viewClassName-specific stuff
@@ -157,10 +177,10 @@ export class abstractViewDef {
 		cornerAttr.attachArray(corners, 2);
 
 //		also try gl.DYNAMIC_DRAW here
-//		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), gl.STATIC_DRAW);
+//		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), bufferDataDrawMode);
 //
-//		var vao = gl.createVertexArray();
-//		gl.bindVertexArray(vao);
+//		var vao = this.vaoExt.createVertexArrayOES();
+//		this.vaoExt.bindVertexArrayOES(vao);
 //		this.vao = vao;
 //		gl.enableVertexAttribArray(cornerAttributeLocation);
 //
@@ -190,7 +210,7 @@ export class abstractViewDef {
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		gl.useProgram(this.program);
-		//gl.bindVertexArray(this.vao);
+		this.vaoExt.bindVertexArrayOES(this.vao);
 
 		const primitiveType = gl.TRIANGLES;
 		const offset = 0;
@@ -201,24 +221,24 @@ export class abstractViewDef {
 	}
 
 	/* ************************************************** debugging */
-	debug1() {
-		const gl = this.gl
-
-		// prints mfg and model of GPU.  yawn.
-		const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-		const vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
-		const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-		console.log(`--- debug_renderer_info: vendor='${vendor}' renderer='${renderer}'`);
-
-		// prints src of shaders, decompiled after compilation.  Fairly interesting; not all that useful.
-		const ds = gl.getExtension('WEBGL_debug_shaders');
-		var vSrc = ds.getTranslatedShaderSource(this.vertexShader);
-		var fSrc = ds.getTranslatedShaderSource(this.fragmentShader);
-		console.log(`--- vertexShader:
-${vSrc}
---- fragmentShader:
-${fSrc}
-`);
+//	debug1() {
+//		const gl = this.gl
+//
+//		// prints mfg and model of GPU.  yawn.
+//		const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+//		const vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+//		const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+//		console.log(`--- debug_renderer_info: vendor='${vendor}' renderer='${renderer}'`);
+//
+//		// prints src of shaders, decompiled after compilation.  Fairly interesting; not all that useful.
+//		const ds = gl.getExtension('WEBGL_debug_shaders');
+//		var vSrc = ds.getTranslatedShaderSource(this.vertexShader);
+//		var fSrc = ds.getTranslatedShaderSource(this.fragmentShader);
+//		console.log(`--- vertexShader:
+//${vSrc}
+//--- fragmentShader:
+//${fSrc}
+//`);
 
 		// also try this URL in chrome...    chrome://internals/web-app
 		// after enabling it here: chrome://flags/#enable-webgl-draft-extensions
@@ -229,9 +249,9 @@ ${fSrc}
 		// enabled here in chrome:      chrome://flags/#memories-debug
 
 		// cool, list all exts:
-		const available_extensions = gl.getSupportedExtensions();
-		console.log(`--- available GL extensions:\n${available_extensions.join('\n')}`);
-	}
+//		const available_extensions = gl.getSupportedExtensions();
+//		console.log(`--- available GL extensions:\n${available_extensions.join('\n')}`);
+//	}
 
 	/* ************************************* crawling out of the wreckage */
 	// pass in the actual DOM element.
@@ -351,11 +371,10 @@ ${fSrc}
 			  0, 0.5,
 			  0.7, 0,
 			];
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), bufferDataDrawMode);
 
-			vao = gl.createVertexArray();
-
-			gl.bindVertexArray(vao);
+			vao = this.vaoExt.createVertexArrayOES();
+			this.vaoExt.bindVertexArrayOES(vao);
 
 			gl.enableVertexAttribArray(positionAttributeLocation);
 
@@ -400,7 +419,7 @@ ${fSrc}
 			gl.useProgram(program);
 
 			// Bind the attribute/buffer set we want. ... again?
-			//gl.bindVertexArray(vao);
+			//this.vaoExt.bindVertexArrayOES(vao);
 
 
 			var primitiveType = gl.TRIANGLES;
