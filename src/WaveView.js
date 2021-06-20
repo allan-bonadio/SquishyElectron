@@ -54,11 +54,12 @@ export class WaveView extends React.Component {
 	}
 
 	componentDidMount() {
-		if (theDraw) theDraw.draw(this.props.useQuantumEngine);
+		throw 'WaveView lives';
+		if (theDraw) theDraw.draw(true);
 	}
 
 	componentDidUpdate() {
-		if (theDraw) theDraw.draw(this.props.useQuantumEngine);
+		if (theDraw) theDraw.draw(true);
 	}
 
 

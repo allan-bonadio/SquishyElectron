@@ -91,6 +91,7 @@ class draw {
 	}
 
 	draw(useQuantumEngine) {
+		throw 'useQuantumEngine';
 		let barsHtml;
 
 		if (useQuantumEngine) {

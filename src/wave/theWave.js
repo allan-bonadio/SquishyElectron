@@ -9,7 +9,7 @@ import qe from './qe';
 
 // the (old js) jWave that we're displaying and animating
 export let theJSpace;
-export let theJWave;
+export let theJWave;  // deprecated, doesn't seem used much
 
 export let newWaveBuffer;
 
@@ -18,17 +18,16 @@ export const INNER_HEIGHT = 100;
 
 // call this when user changes number of datapoints.
 // Or at startup, so we have a wave to begin with.
-export function recreateWave(N, continuum, callback) {
-	// create the old JS version
-	theJSpace = new jSpace(N, continuum);
-	theJWave = new jWave(theJSpace);
-//	jWaveBuffers.alt = new Array(N + 2);
-//	jWaveBuffers.next = new Array(N + 2);
+// the callback gets called wtih the qSpace instance, when it's done being created
+export function createStateNWave(N, continuum, callback) {
+	// create the old JS version?
+//	theJSpace = new jSpace(N, continuum);
+//	theJWave = new jWave(theJSpace);
 
 	// create the new C++ version
 	qe.space = new qeSpace([{N, continuum, label: 'x'}]);
 
-	callback(theJWave, qe.space);
+	callback(qe.space);
 }
 
 // completely wipe out the Psi wavefunction and replace it with one of our canned waveforms.
@@ -75,6 +74,7 @@ let repeatId;
 // call this to start or stop animation/iteration.
 // rate = 1, 2, 4, 8, ... or zero/false to stop it
 export function oldIterateAnimate(useQuantumEngine, rate) {
+	useQuantumEngine = true;
 	// if user cicks Go twice, we lose the previous repeatId and can never clear it
 	if (! rate || repeatId) {
 		clearInterval(repeatId);
@@ -105,7 +105,11 @@ export function oldIterateAnimate(useQuantumEngine, rate) {
 }
 
 let isAnimating = false;
+
+// runtime debugging flags
 const areBenchmarking = true;
+const dumpTheViewBuffer = true;
+let prevStart  = performance.now();
 
 // the name says it all.  requestAnimationFrame() will call this probably 60x/sec
 // it will advance one 'frame' in wave time, which i dunno what that is need to tihink about it more.
@@ -120,7 +124,7 @@ function animateOneFrame(now) {
 
 	if (areBenchmarking) startUpdate = performance.now();
 	let highest = qe.updateViewBuffer();
-	dumpViewBuffer();
+	if (dumpTheViewBuffer) dumpViewBuffer();
 
 	if (areBenchmarking) startReload = performance.now();
 	qe.theCurrentView.viewVariables.forEach(v => v.reloadVariable());
@@ -130,12 +134,16 @@ function animateOneFrame(now) {
 	qe.theCurrentView.draw();
 
 	endFrame = performance.now();
-	if (areBenchmarking) console.log(`times:\n`+
-		`RK:     ${(startUpdate - startRK).toFixed(2)}ms\n`+
-		`up:     ${(startReload - startUpdate).toFixed(2)}ms\n`+
-		`reload: ${(startDraw - startReload).toFixed(2)}ms\n`+
-		`draw:   ${(endFrame - startDraw).toFixed(2)}ms\n\n`+
-		`total:  ${(endFrame - startRK).toFixed(2)}ms`);
+	if (areBenchmarking) {
+		console.log(`times:\n`+
+			`RK:     ${(startUpdate - startRK).toFixed(2)}ms\n`+
+			`up:     ${(startReload - startUpdate).toFixed(2)}ms\n`+
+			`reload: ${(startDraw - startReload).toFixed(2)}ms\n`+
+			`draw:   ${(endFrame - startDraw).toFixed(2)}ms\n`+
+			`total:  ${(endFrame - startRK).toFixed(2)}ms\n\n` +
+			`period:  ${(startRK - prevStart).toFixed(2)}ms\n`);
+		prevStart = startRK;
+	}
 
 	if (isAnimating) {
 		requestAnimationFrame(animateOneFrame);

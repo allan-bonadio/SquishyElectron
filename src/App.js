@@ -1,14 +1,15 @@
 import React from 'react';
 import './App.css';
 //import WaveView from './WaveView';
-import ControlPanel from './ControlPanel';
+import SquishPanel from './SquishPanel';
+//import ControlPanel from './ControlPanel';
 import ResolutionDialog from './ResolutionDialog';
 
-import {recreateWave} from './wave/theWave';
+import {createStateNWave} from './wave/theWave';
 import {qeSpace, qeStartPromise, qeDefineAccess} from './wave/qEngine';
 import qe from './wave/qe';
 
-import SquishView from './views/SquishView';
+//import SquishView from './views/SquishView';
 import abstractViewDef from './views/abstractViewDef';
 import flatViewDef from './views/flatViewDef';
 
@@ -32,12 +33,9 @@ class App extends React.Component {
 
 			isResolutionDialogOpen: false,
 
+			// THE N and continuum for THE space we're currently doing
 			N: DEFAULT_RESOLUTION,
 			continuum: DEFAULT_CONTINUUM,
-
-			// whether to use the new C++ quantum engine, or the old JS code
-			// this is where it's set and not changed anywhere else
-			useQuantumEngine: true,
 
 			currentJWave: null,
 			currentQESpace: null,
@@ -61,9 +59,9 @@ class App extends React.Component {
 
 	setNew1DResolution(N, continuum) {
 		qe.theCurrentView =  null;
-		recreateWave(N, continuum, (currentJWave, currentQESpace, currentDraw) => {
+		createStateNWave(N, continuum, currentQESpace => {
 			// we've now got a qeSpace etc all set up
-			this.setState({N, continuum, currentJWave, currentQESpace, currentDraw});
+			this.setState({N, continuum, currentQESpace});
 
 			// now create the view class instance as described by the space
 			const vClass = listOfViewClasses[currentQESpace.viewClassName];
@@ -108,6 +106,7 @@ class App extends React.Component {
 			  />
 			: null;
 
+		debugger;
 		return (
 			<div className="App">
 				<h2 className="App-header">
@@ -118,11 +117,8 @@ class App extends React.Component {
 				</h2>
 				{/*}<WaveView N={this.state.N} useQuantumEngine={s.useQuantumEngine}*/}
 				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
-				<SquishView setGLCanvas={canvas => this.setGLCanvas(canvas)} />
-				<ControlPanel
-					openResolutionDialog={() => this.openResolutionDialog(true)}
-					useQuantumEngine={this.state.useQuantumEngine}
-				/>
+				<SquishPanel
+					openResolutionDialog={() => this.openResolutionDialog(true)} />
 
 				{resDialog}
 			</div>
@@ -133,3 +129,8 @@ class App extends React.Component {
 
 export default App;
 
+
+//				<SquishView setGLCanvas={canvas => this.setGLCanvas(canvas)} />
+//				<ControlPanel
+//					openResolutionDialog={() => this.openResolutionDialog(true)}
+//				/>
