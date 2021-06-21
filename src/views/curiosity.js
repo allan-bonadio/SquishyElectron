@@ -1,18 +1,26 @@
-const URL_PREFIX = 'https://developer.mozilla.org';
+//const URL_PREFIX = 'https://developer.mozilla.org';
 
 function raceThruAll(gl, funcName, arg, kList) {
 	const wgl2 = !(gl.VERSION == 7938);  // for now
 
 	kList.forEach(k => {
 		if ('WebGL2' != k.only || wgl2) {
-			let desc = k.desc.trim() || '';
+			let desc = (k.desc || '').trim();
 			if (k.desc2) desc += ' '+ k.desc2.trim();
 			if (k.desc3) desc += ' '+ k.desc3.trim();
 			if (k.type) desc += k.type.trim();
 			if (k.url) desc += k.url.trim();
 
+			let result = null;
+			try {
+				result = gl[funcName](arg, gl[k.code]);
+			} catch (ex) {
+				result = 'error '+ ex.toString();
+			}
+
 			console.log(`gl.${funcName}(${k.code}) = `+
-				gl[funcName](arg, gl[k.code]) + '\n  🤷🏽‍♀️ ' + desc);
+				result + '\n %c 🤷🏽‍♀️ %c' + desc,
+				'font-size: 2em; backgroundColor: white; padding: 2px;', '');
 		}
 	});
 }
@@ -20,8 +28,8 @@ function raceThruAll(gl, funcName, arg, kList) {
 export function curioShader(gl, shader) {
 
 	const shaderLabel = gl.getShaderParameter(shader, gl.SHADER_TYPE) > 35632
-		? 'vertex shader i think 35633'
-		: 'frag shader i think 35632';
+		? 'vertex shader 35633'
+		: 'frag shader 35632';
 
 	const keywords = [
 	{code: 'DELETE_STATUS',
@@ -190,9 +198,8 @@ const keywords = [
 		url: '/en-US/docs/Web/API/WebGL_API/Types', type: 'GLint',},
 	{code: 'RENDERBUFFER_BINDING',
 		url: '/en-US/docs/Web/API/WebGLRenderbuffer',
-		desc: 'WebGLRenderbuffer',
-		desc: 'See /en-US/docs/Web/API/WebGLRenderingContext/bindRenderbuffer',
-		type: 'bindRenderbuffer .'},
+		type: 'WebGLRenderbuffer bindRenderbuffer',
+		desc: 'See /en-US/docs/Web/API/WebGLRenderingContext/bindRenderbuffer',},
 	{code: 'RENDERER',
 		url: '/en-US/docs/Web/API/DOMString', type: 'DOMString',},
 	{code: 'SAMPLE_BUFFERS',
@@ -424,23 +431,25 @@ const keywords = [
 }
 
 export function curioAUB(gl, vShader, fShader, program, ) {
+	throw 'not implemented yet';
 
-const keywords = [
-{code: 'UNIFORM_BLOCK_BINDING',
-	desc: "Returns a GLuint indicating the uniform buffer binding point."},
-{code: 'UNIFORM_BLOCK_DATA_SIZE',
-	desc: "Returns a GLuint indicating the minimum total buffer object size."},
-{code: 'UNIFORM_BLOCK_ACTIVE_UNIFORMS',
-	desc: "Returns a GLuint indicating the number of active uniforms in the uniform block."},
-{code: 'UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES',
-	desc: "Returns a Uint32Array indicating the list of active uniforms in the uniform block."},
-{code: 'UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER',
-	desc: "Returns a GLboolean indicating whether the uniform block is referenced by the vertex shader."},
-{code: 'UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER',
-	desc: "Returns a GLboolean indicating whether the uniform block is referenced by the fragment shader."},
-];
-
-
+//	const keywords = [
+//	{code: 'UNIFORM_BLOCK_BINDING',
+//		desc: "Returns a GLuint indicating the uniform buffer binding point."},
+//	{code: 'UNIFORM_BLOCK_DATA_SIZE',
+//		desc: "Returns a GLuint indicating the minimum total buffer object size."},
+//	{code: 'UNIFORM_BLOCK_ACTIVE_UNIFORMS',
+//		desc: "Returns a GLuint indicating the number of active uniforms in the uniform block."},
+//	{code: 'UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES',
+//		desc: "Returns a Uint32Array indicating the list of active uniforms in the uniform block."},
+//	{code: 'UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER',
+//		desc: "Returns a GLboolean indicating whether the uniform block is referenced by the vertex shader."},
+//	{code: 'UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER',
+//		desc: "Returns a GLboolean indicating whether the uniform block is referenced by the fragment shader."},
+//	];
+//
+//	console.log(`======================= getParameter`);
+//	raceThruAll(gl, 'getAUBParameter', null, keywords);
 }
 
 
@@ -882,3 +891,10 @@ VERTEX_SHADER: 35633,
 VIEWPORT: 2978,
 ZERO: 0,
 }
+
+export function shuddupESLint() {
+
+	// not really
+	console.log(WebGLConstants)
+}
+

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import abstractViewDef from './abstractViewDef';
+import SquishPanel, {listOfViewClasses} from '../SquishPanel';
 
 /* **************************************** compiling & setting up */
 

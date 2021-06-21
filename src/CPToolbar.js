@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {isItAnimating} from './wave/theWave';
 //import ControlPanel from './ControlPanel';
 //import './ControlPanel.css';
 
-import {iterateAnimate} from './wave/theWave';
+//import {iterateAnimate} from './wave/theWave';
 
 function setPT() {
 	CPToolbar.propTypes = {
 		toggleRunning: PropTypes.func.isRequired,
 		oneStep: PropTypes.func.isRequired,
-		isRunning: PropTypes.bool.isRequired,
 	}
 };
 
@@ -27,18 +27,18 @@ function CPToolbar(props) {
 
 	// toggle the isRunning boolean, that exists in two places
 //	function toggleRunning(ev) {
-//		let newRunning = !props.isRunning;
+//		let newRunning = !isItAnimating;
 //
 ////		if (this.state.isRunning)
 ////			iterate(theJWave);
 ////		if (isRunning)
 ////			theDraw.draw();
-//		iterateAnimate(true, isRunning && props.rate);
+//		iterateAnimate(isRunning && props.rate);
 //
 //		ev.currentTarget.blur();
 //
 //		// it is a state of this panel, to color the buttons
-//		this.props.setRunning(isRunning);
+//		props.setRunning(isRunning);
 
 		// but also a state of the animation
 		//theJWave.isRunning = isRunning;
@@ -46,18 +46,21 @@ function CPToolbar(props) {
 //
 //
 //	render() {
-	const isRunning = props.isRunning;
+	const isRunningClass = isItAnimating() ? 'isRunning' : 'notRunning';
 
 	return <div className='CPToolbar'>
-		<button type='button' className={'startStopToggleButton on '+
-			(isRunning ? 'isRunning' : 'notRunning')}
+		<button type='button' className={`startStopToggleButton toolbarButton on ${isRunningClass}`}
 			onClick={ev => props.toggleRunning(ev)}>
-			▶️ </button>
-		<button type='button' className={'stepButton ' + (isRunning && 'on')}
-			onClick={ev => this.props.oneStep(ev)}>
+			{ isItAnimating()
+				? ' ▶️ ️'
+				: ' ⏸ ' }
+				</button>
+		<button type='button' className={`stepButton toolbarButton on `}
+			onClick={ev => props.oneStep(ev)}>
 			⏯
 		</button>
-		<button type='button' className={'stopButton ' + (!isRunning && 'on')}
+		<button type='button' className={'stopButtonXXX '}
+			style={{display: 'none'}}
 			onClick={ev =>props.toggleRunning(ev, false)}>
 			don\'t click ⏸   ▶️   ⏸   ⏯   ⏹   ⏺    ⏭    ⏮    ⏩  ⏪           
 		</button>

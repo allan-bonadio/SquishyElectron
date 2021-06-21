@@ -2,6 +2,7 @@ import abstractViewDef from './abstractViewDef';
 import {cxToColorGlsl} from './cxToColor.glsl';
 import qe from '../wave/qe';
 import {viewUniform, viewAttribute} from './viewVariable';
+import SquishPanel from '../SquishPanel';
 
 /*
 ** data format of attributes:  four column table of floats
@@ -54,6 +55,9 @@ void main() {
 
 // the original display that's worth watching
 class flatViewDef extends abstractViewDef {
+	static viewName: 'flat';
+	static viewClassName: 'flatViewDef';
+
 	constructor(viewName, canvas, currentQESpace) {
 		super(viewName, canvas);
 
@@ -128,5 +132,11 @@ class flatViewDef extends abstractViewDef {
 	}
 
 }
+
+setTimeout(() => {
+	if (SquishPanel) SquishPanel.addMeToYourList(flatViewDef);
+else debugger;
+}, 1000);
+
 export default flatViewDef;
 

@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {qeSpace} from './wave/qEngine';
+import SquishPanel, {listOfViewClasses} from './SquishPanel';
 
-const wassup = `${process.env.NODE_ENV}`;
 
 // these numbers represent approx 10**(n/10), but
 // rounded off to convenient increments, so eg 60=>1M, 50=>100k,
@@ -49,10 +49,21 @@ function thousands(n) {
 }
 
 export default class ResolutionDialog extends React.Component {
-	// this is the state in the dialog; doesn't become real until OK()
+	static propTypes = {
+		stateParams: PropTypes.shape({
+			N: PropTypes.number.isRequired,
+			continuum: PropTypes.number.isRequired,
+			viewClassName: PropTypes.string.isRequired,
+		}),
+		closeResolutionDialog: PropTypes.func,
+	};
+
+	// this is the state in the dialog; doesn't become real until OK().
+	// Therefore, initial values set from props.
 	state = {
-		powerOf10: powerToIndex(this.props.N),
-		continuum: this.props.continuum,
+		N: powerToIndex(this.props.stateParams.N),
+		continuum: this.props.stateParams.continuum,
+		viewClassName: this.props.stateParams.viewClassName,
 	};
 
 	static me = this;
@@ -63,12 +74,51 @@ export default class ResolutionDialog extends React.Component {
 
 	OK(ev) {
 		const s = this.state;
-		this.props.setNew1DResolution(indexToPower(s.powerOf10), s.continuum);
+		this.props.setNew1DResolution(
+			indexToPower(s.powerOf10), s.continuum, s.viewClassName);
 		this.props.closeResolutionDialog();
 	}
 
 	handleChangePowersOf10(ev) {
 		this.setState({powerOf10: ev.target.valueAsNumber});
+	}
+
+	renderViewRadios() {
+		const s = this.state;
+		const onChange = ev => this.setState({continuum: ev.target.value});
+
+//		const radioz = SquishPanel
+//			.getListOfViews()
+		const radioz = listOfViewClasses
+			.map((vu, ix) => (
+				<label key={ix} serial={ix} >
+					<input type='radio' key={ix} name='viewClassName'
+						value={vu.viewClassName}
+						checked={s.continuum == qeSpace.contCIRCULAR}
+						onChange={onChange}/>
+					{vu.viewName} - {vu.viewClassName}</label>
+			));
+
+		return radioz;
+
+		return <>
+		<label><input type='radio' name='viewClassName'  value='flatViewDef' key='flat'}
+				checked={s.continuum == qeSpace.contCIRCULAR}
+				onChange={onChange}/>
+			Regular</label>
+		<label><input type='radio' name='viewClassName'  value='abstractViewDef' key='abstract'}
+				checked={s.continuum == qeSpace.contWELL}
+				onChange={onChange}/>
+			Testing Dummy abstract</label>
+		<label><input type='radio' name='viewClassName'  value='manualViewDef' key='manual'}
+				checked={s.continuum == qeSpace.contWELL}
+				onChange={onChange}/>
+			Testing Dummy manual</label>
+		<label><input type='radio' name='viewClassName'  value='viewVariableViewDef' key='viewVariable'}
+				checked={s.continuum == qeSpace.contWELL}
+				onChange={onChange}/>
+			Testing Dummy</label>
+		</>
 	}
 
 	render() {
@@ -83,7 +133,7 @@ export default class ResolutionDialog extends React.Component {
 				<h3>Reconfigure the Universe</h3>
 
 				<p>
-					The actual universe is essntially infinite.
+					The actual universe is essentially infinite.
 					Nobody's computer has that much ram or power.
 					Squishy Electron's universe runs on a finite web page.
 					The universe where all this happens is very simplified.
@@ -104,8 +154,8 @@ export default class ResolutionDialog extends React.Component {
 						style={{width: '100%'}}
 						onInput={ev => this.handleChangePowersOf10(ev)}
 					/>
-
 				</section>
+
 				<section className='dialogSection'>
 					what kind of universe:
 					<label><input type='radio' name='continuum'  value={qeSpace.contCIRCULAR}
@@ -121,12 +171,23 @@ export default class ResolutionDialog extends React.Component {
 							onChange={onChange}/>
 						Discreet Quanta (not recommended)</label>
 				</section>
+
+				<section className='dialogSection'>
+					view:
+					{this.renderViewRadios()}
+				</section>
+
 				<table className='dialogSection'><tbody>
-					<tr><td>new resolution:</td><td>{thousands(indexToPower(this.state.powerOf10))}</td></tr>
-					<tr><td>old resolution:</td><td>{thousands(this.props.N)}</td></tr>
-					<tr><td>new continuum:</td><td>{qeSpace.contCodeToText(this.state.continuum)}</td></tr>
-					<tr><td>old continuum:</td><td>{qeSpace.contCodeToText(this.props.continuum)}</td></tr>
-					<tr><td>&nbsp;</td><td></td></tr>
+					<tr><td>new resolution:</td>
+						<td>{thousands(indexToPower(this.state.powerOf10))}</td></tr>
+					<tr><td>old resolution:</td>
+						<td>{thousands(this.props.stateParams.N)}</td></tr>
+					<tr><td>new continuum:</td>
+						<td>{qeSpace.contCodeToText(this.state.continuum)}</td></tr>
+					<tr><td>old continuum:</td>
+						<td>{qeSpace.contCodeToText(this.props.stateParams.continuum)}</td></tr>
+					<tr><td>&nbsp;</td>
+						<td></td></tr>
 
 					<tr><td>
 						<button type='button' className='cancelButton'

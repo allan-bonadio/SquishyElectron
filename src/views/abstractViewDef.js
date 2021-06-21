@@ -1,10 +1,11 @@
 import {viewUniform, viewAttribute} from './viewVariable';
-import {curioShader, curioProgram} from './curiosity';
+import {curioShader, curioProgram, curioParameter} from './curiosity';
+import SquishPanel from '../SquishPanel';
 
 // right now this is set in constructor
 let bufferDataDrawMode;
 
-
+let sp = SquishPanel;  // tell optimizer to gimme Squish Panel
 
 
 // Each abstractViewDef subclass is a definition of a kind of view; one per each kind of view.
@@ -13,6 +14,9 @@ let bufferDataDrawMode;
 // viewName is not the viewClassName, which is one of flatViewDef, garlandView, ...
 // there should be ONE of these per canvas, so each squishView should have 1.
 export class abstractViewDef {
+	static viewName: 'abstract';
+	static viewClassName: 'abstractViewDef';
+
 	/* ************************************************** construction */
 	constructor(viewName, canvas) {
 		this.viewVariables = [];
@@ -34,6 +38,7 @@ export class abstractViewDef {
 		// after construction, the instantiator should call compileProgram()
 	}
 
+	// preliminary construction, called in constructor
 	initCanvas() {
 		let gl = this.gl = this.canvas.getContext("webgl");
 		if (! gl)
@@ -78,13 +83,11 @@ export class abstractViewDef {
 		this.setGeometry();
 		this.draw();
 
-
-		curioShader(this.gl, this.vertexShader);
-		curioShader(this.gl, this.fragmentShader);
-		curioProgram(this.gl, this.program);
-
-
-
+		// just for curiosity's sake
+		//curioShader(this.gl, this.vertexShader);
+		//curioShader(this.gl, this.fragmentShader);
+		//curioProgram(this.gl, this.program);
+		//curioParameter(this.gl);
 	}
 
 	/* ************************************************** Shader Creation/Compile */
@@ -216,8 +219,6 @@ export class abstractViewDef {
 		const offset = 0;
 		const count = 3;
 		gl.drawArrays(primitiveType, offset, count);
-
-		this.debug1();
 	}
 
 	/* ************************************************** debugging */
@@ -262,6 +263,7 @@ export class abstractViewDef {
 		vd.cftw(canvas);
 	}
 
+//CFTW
 	cftw(canvas) {
 		var gl;
 		if (false) {
@@ -296,6 +298,8 @@ export class abstractViewDef {
 			}
 			`;
 
+
+//CFTW
 			fragmentShaderSource = `
 
 			// fragment shaders don't have a default precision so we need
@@ -340,6 +344,8 @@ export class abstractViewDef {
 			  gl.deleteProgram(program);
 			}
 
+
+//CFTW
 			program = createProgram(gl, vertexShader, fragmentShader);
 		}
 		else {
@@ -356,6 +362,8 @@ export class abstractViewDef {
 
 
 		/* ==================  attrs */
+
+//CFTW
 		var positionAttributeLocation, positionBuffer, positions, vao;
 		if (false) {
 
@@ -393,6 +401,8 @@ export class abstractViewDef {
 			vao = this.viewVariables[0].vao;
 		}
 
+
+//CFTW
 
 
 
@@ -432,8 +442,136 @@ export class abstractViewDef {
 			this.draw()
 		}
 	}
+
+//CFTW end
 }
 
+if (SquishPanel) SquishPanel.addMeToYourList(abstractViewDef);
 export default abstractViewDef;
 
 
+
+/* ********************************************************************** manualViewDef */
+
+// even simpler without the viewVariables
+export class manualViewDef extends abstractViewDef {
+	static viewName: 'manual';
+	static viewClassName: 'manualViewDef';
+
+	// same constructor and everything else
+
+	setShaders() {
+		const proxyVertexShader = `
+		attribute vec4 corner;
+		void main() {
+			gl_Position = corner;
+		}
+		`;
+
+		const proxyFragmentShader = `
+		precision highp float;  // does this do anything?
+
+		void main() {
+			// chartreuce triangle
+			gl_FragColor = vec4(.5, 1, 0, 1);
+		}
+		`;
+
+		this.compileProgram(proxyVertexShader, proxyFragmentShader);
+	}
+
+	// all to do this one differently
+	setInputs() {
+		const gl = this.gl;
+
+		const sin = Math.sin;
+		const cos = Math.cos;
+		const corners = new Float32Array([
+			cos(2), sin(2),
+			cos(4), sin(4),
+			cos(6), sin(6),
+		]);
+
+		let cornerAttributeLocation = gl.getAttribLocation(this.program, "corner");
+		if (cornerAttributeLocation < 0) throw `cornerAttributeLocation bad: ${cornerAttributeLocation}`;
+
+		const cornerBuffer = gl.createBuffer();  // actual ram in GPU chip
+		gl.bindBuffer(gl.ARRAY_BUFFER, cornerBuffer);
+
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), bufferDataDrawMode);
+
+		var vao = this.vaoExt.createVertexArrayOES();
+		this.vaoExt.bindVertexArrayOES(vao);
+		this.vao = vao;
+		gl.enableVertexAttribArray(cornerAttributeLocation);
+
+		const size = 2;          // 2 components per iteration
+		const type = gl.FLOAT;   // the data is 32bit floats
+		const normalize = false; // don't normalize the data
+		const stride = 0;        // 0 = move forward number of bytes to get the next position
+								// size * sizeof(type) each iteration
+		const offset = 0;        // start at the beginning of the buffer
+		gl.vertexAttribPointer(cornerAttributeLocation, size, type, normalize, stride, offset);
+	}
+}
+if (SquishPanel) SquishPanel.addMeToYourList(manualViewDef);
+
+/* ********************************************************************** viewVariableViewDef */
+
+
+// even simpler with the viewVariables
+export class viewVariableViewDef extends abstractViewDef {
+	static viewName: 'uses viewVariables';
+	static viewClassName: 'viewVariableViewDef';
+
+	// same constructor and everything else
+
+	// all to do this one differently
+	setInputs() {
+		const gl = this.gl;
+
+		new viewUniform('cornerColor', this,
+			() => ({value: 42, type: '1i'}));
+
+		const cornerAttr = new viewAttribute('corner', this, {});
+		//cornerAttributeLocation = cornerAttr.attributeLoc;
+
+		//const cornerAttributeLocation = gl.getAttribLocation(this.program, 'corner');
+		const cornerBuffer = gl.createBuffer();  // actual ram in GPU chip
+		gl.bindBuffer(gl.ARRAY_BUFFER, cornerBuffer);
+
+		const sin = Math.sin;
+		const cos = Math.cos;
+		const corners = new Float32Array([
+			cos(2), sin(2),
+			cos(4), sin(4),
+			cos(6), sin(6),
+		]);
+		cornerAttr.attachArray(corners, 2);
+
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), bufferDataDrawMode);
+
+		var vao = this.vaoExt.createVertexArrayOES();
+		this.vaoExt.bindVertexArrayOES(vao);
+		this.vao = vao;
+		gl.enableVertexAttribArray(cornerAttr.attributeLoc);
+
+		const size = 2;          // 2 components per iteration
+		const type = gl.FLOAT;   // the data is 32bit floats
+		const normalize = false; // don't normalize the data
+		const stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+		const offset = 0;        // start at the beginning of the buffer
+		gl.vertexAttribPointer(cornerAttr.attributeLoc, size, type, normalize, stride, offset);
+	}
+}
+
+if (SquishPanel) SquishPanel.addMeToYourList(viewVariableViewDef);
+
+setTimeout(() => {
+	if (SquishPanel) {
+		SquishPanel.addMeToYourList(abstractViewDef);
+		SquishPanel.addMeToYourList(manualViewDef);
+		SquishPanel.addMeToYourList(viewVariableViewDef);
+	}
+	else debugger;
+}, 1000);
