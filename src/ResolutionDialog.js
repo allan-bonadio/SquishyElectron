@@ -102,19 +102,19 @@ export default class ResolutionDialog extends React.Component {
 		return radioz;
 
 		return <>
-		<label><input type='radio' name='viewClassName'  value='flatViewDef' key='flat'}
+		<label><input type='radio' name='viewClassName'  value='flatViewDef' key='flat'
 				checked={s.continuum == qeSpace.contCIRCULAR}
 				onChange={onChange}/>
 			Regular</label>
-		<label><input type='radio' name='viewClassName'  value='abstractViewDef' key='abstract'}
+		<label><input type='radio' name='viewClassName'  value='abstractViewDef' key='abstract'
 				checked={s.continuum == qeSpace.contWELL}
 				onChange={onChange}/>
 			Testing Dummy abstract</label>
-		<label><input type='radio' name='viewClassName'  value='manualViewDef' key='manual'}
+		<label><input type='radio' name='viewClassName'  value='manualViewDef' key='manual'
 				checked={s.continuum == qeSpace.contWELL}
 				onChange={onChange}/>
 			Testing Dummy manual</label>
-		<label><input type='radio' name='viewClassName'  value='viewVariableViewDef' key='viewVariable'}
+		<label><input type='radio' name='viewClassName'  value='viewVariableViewDef' key='viewVariable'
 				checked={s.continuum == qeSpace.contWELL}
 				onChange={onChange}/>
 			Testing Dummy</label>
