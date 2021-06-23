@@ -94,6 +94,7 @@ public:
 	void map(qCx callback(qCx*));
 
 	void oneRk2Step(void);
+	void oneRk4Step(void);
 
 };
 
@@ -116,11 +117,13 @@ extern "C" {
 
 // internal
 extern void oneRk2Step(void);
+extern void oneRk4Step(void);
 extern qCx hamiltonian(qCx *wave, int x);
 
 extern class qSpace *theSpace;
-extern class qCx *theWave, *tempWave, *nextWave;
+extern class qCx *theWave, *quartWave, *sumWave;
 extern qReal *thePotential;
 extern float *viewBuffer;
 extern qReal elapsedTime;
 
+// sumWave  quartWave

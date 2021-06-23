@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "qSpace.h"
 
-// this is it, the all famous time variabler.  What dx will she choose?
+// dx is always 1.  dt is below.
 static const qReal dt = 0.02;
 
 // if they're really over i, they should be negative, right?
@@ -9,30 +9,30 @@ static const qCx dtOverI = qCx(0., -dt);
 static const qCx halfDtOverI = qCx(0., -dt / 2.);
 
 
-// iterate along x to find the next version of theWave, after dt, and store it there.
+// crawl along x to find the next version of theWave, after dt, and store it there.
 void qSpace::oneRk2Step(void) {
 	qDimension *dim = theSpace->dimensions;
 	dim->fixBoundaries(theWave);
 
-	// use nextWave for all the first-try psi values
+	// use quartWave for all the first-try psi values
 	for (int ix = dim->start; ix < dim->end; ix++) {
-		tempWave[ix] = theWave[ix] + hamiltonian(theWave, ix) * halfDtOverI;
-		qCheck(nextWave[ix]);
+		quartWave[ix] = theWave[ix] + hamiltonian(theWave, ix) * halfDtOverI;
+		qCheck(sumWave[ix]);
 	}
-	dim->fixBoundaries(tempWave);
+	dim->fixBoundaries(quartWave);
 
 	//for (int ix = 0; ix <= dim->end; ix++)
-	//printf("INRK2 %d\t%lf\t%lf\n", ix, tempWave[ix].re, tempWave[ix].im);
+	//printf("INRK2 %d\t%lf\t%lf\n", ix, quartWave[ix].re, quartWave[ix].im);
 
-	// then use nextWave as the input to a better rate and a better inc
+	// then use quartWave as the input to a better rate and a better inc at sumWave.
 	for (int ix = dim->start; ix < dim->end; ix++) {
-		nextWave[ix] = theWave[ix] + hamiltonian(tempWave, ix) * dtOverI;
-		qCheck(nextWave[ix]);
+		sumWave[ix] = theWave[ix] + hamiltonian(quartWave, ix) * dtOverI;
+		qCheck(sumWave[ix]);
 	}
 
 	// now flip them around
-	qCx *t = nextWave;
-	nextWave = theWave;
+	qCx *t = sumWave;
+	sumWave = theWave;
 	theWave = t;
 
 	dim->fixBoundaries(theWave);

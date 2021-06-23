@@ -2,7 +2,7 @@
 #include <cmath>
 
 class qSpace *theSpace = NULL;
-class qCx *theWave = NULL, *tempWave = NULL, *nextWave = NULL;
+class qCx *theWave = NULL, *quartWave = NULL, *sumWave = NULL;
 qReal *thePotential = NULL;
 qReal elapsedTime = 0;
 
@@ -22,8 +22,8 @@ int32_t startNewSpace(void) {
 
 	if (theSpace) {
 		delete[] theWave;
-		delete[] tempWave;
-		delete[] nextWave;
+		delete[] quartWave;
+		delete[] sumWave;
 		delete[] thePotential;
 		delete[] viewBuffer;
 		delete theSpace;
@@ -84,8 +84,8 @@ int32_t completeNewSpace(void) {
 
 	//  allocate the buffers
 	theWave = new qCx[nPoints];
-	tempWave = new qCx[nPoints];
-	nextWave = new qCx[nPoints];
+	quartWave = new qCx[nPoints];
+	sumWave = new qCx[nPoints];
 	viewBuffer = new float[nPoints * 8];  // 4 floats per row, two verts per point
 	theSpace->dimensions->setCircularWave(theWave, 1);
 	//theSpace->dumpWave("freshly created");
@@ -127,6 +127,7 @@ void qSpace_setCircularWave(qReal n) { theSpace->dimensions->setCircularWave(the
 void qSpace_setStandingWave(qReal n) { theSpace->dimensions->setStandingWave(theWave, n); }
 void qSpace_setPulseWave(qReal widthFactor, qReal cycles) { theSpace->dimensions->setPulseWave(theWave, widthFactor, cycles); }
 void qSpace_oneRk2Step() { theSpace->oneRk2Step(); }
+void qSpace_oneRk4Step() { theSpace->oneRk4Step(); }
 
 
 }
