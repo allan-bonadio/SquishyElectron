@@ -18,10 +18,10 @@ const DEFAULT_RESOLUTION = 5;
 const DEFAULT_CONTINUUM = qeSpace.contCIRCULAR;
 
 
-export const listOfViewClasses = {
-	flatViewDef,  // the original one
-	abstractViewDef,  // primitive dummy, also superclass of all these others
-};
+//export const listOfViewClassNames = {
+//	flatViewDef,  // the original one
+//	abstractViewDef,  // primitive dummy, also superclass of all these others
+//};
 
 
 class App extends React.Component {
@@ -64,7 +64,7 @@ class App extends React.Component {
 			this.setState({N, continuum, currentQESpace});
 
 			// now create the view class instance as described by the space
-			const vClass = listOfViewClasses[currentQESpace.viewClassName];
+			const vClass = listOfViewClassNames[currentQESpace.viewClassName];
 
 			// seems kinda funny doing these all here - but they should work for every view class
 			const currentView = new vClass('main view', this.canvas, currentQESpace);

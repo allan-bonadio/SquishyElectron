@@ -41,7 +41,11 @@ export const qeStartPromise = new Promise((succeed, fail) => {
 /* ****************************************************** space buffer */
 
 // the JS representations of the c++ qSpace object
-// call like this: new qeSpace([{N: 100, continuum: qeSpace.contCIRCULAR, label: 'x'}])
+// call like this:
+// new qeSpace([{N: 100, continuum: qeSpace.contCIRCULAR, label: 'x', coord: 'x'}])
+// labels must be unique.
+// Coords are the same if two dims are parallel, eg two particles with x coords.
+// Not the same if one particle with x and y coords; eg you could have an endless canal.
 export class qeSpace {
 	static contDISCRETE = 0;
 	static contWELL = 1;

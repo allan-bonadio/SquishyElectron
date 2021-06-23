@@ -2,7 +2,8 @@
 
 qReal DEFAULT_DT = 0.1;
 
-// this is only for continuum dimension
+// this is only for continuum dimension.  Ultimately, these should be per-dimension,
+// and each dimension should have a function that does the honors.
 qCx hamiltonian(qCx *wave, int x) {
 	// so at location x, if dx = 1,
 	// the derivative would be (psi[x+1] - psi[x])
@@ -16,7 +17,6 @@ qCx hamiltonian(qCx *wave, int x) {
 	qCx pot = wave[x] * thePotential[x];
 	qCheck(pot);
 	qCx rate = pot - d2;
-	// shouldnt this be right!??! qCx rate = pot - d2;
 
 	//printf("c++ hamiltonian= %lf %lf\n", rate.re, rate.im);
 

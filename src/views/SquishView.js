@@ -106,7 +106,7 @@ export class SquishView extends React.Component {
 //			if (!this.props.viewClassName) return;
 //
 //			// the actual class (function/constructor) object
-//			const vClass = listOfViewClasses(this.props.viewClassName);
+//			const vClass = listOfViewClassNames(this.props.viewClassName);
 //
 //			// seems kinda funny doing these all here - but they should work for every view class
 //			const instance = new vClass('main view', this.canvas);
