@@ -1,6 +1,7 @@
 import {viewUniform, viewAttribute} from './viewVariable';
 import {curioShader, curioProgram, curioParameter} from './curiosity';
 import SquishPanel from '../SquishPanel';
+import {qeStartPromise} from '../wave/qEngine';
 
 // right now this is set in constructor
 let bufferDataDrawMode;
@@ -567,11 +568,11 @@ export class viewVariableViewDef extends abstractViewDef {
 
 if (SquishPanel) SquishPanel.addMeToYourList(viewVariableViewDef);
 
-setTimeout(() => {
+
+qeStartPromise.then((arg) => {
 	if (SquishPanel) {
 		SquishPanel.addMeToYourList(abstractViewDef);
 		SquishPanel.addMeToYourList(manualViewDef);
 		SquishPanel.addMeToYourList(viewVariableViewDef);
 	}
-	else debugger;
-}, 1000);
+});

@@ -116,7 +116,7 @@ button.stopButton div {
 
 .backdrop {
 	display: flex;
-	background-color: #ccc8;
+	background-color: #8888;
 	position: fixed;
 	left: 0;
 	top: 0;
@@ -131,7 +131,7 @@ button.stopButton div {
 }
 
 .dialog {
-	flex: 0 0 30em;
+	flex: 0 0 50em;
 	padding: 2em;
 	line-height: 1.5em;
 	height: 30em;

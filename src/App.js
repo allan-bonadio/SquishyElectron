@@ -4,8 +4,8 @@ import './App.css';
 //import ControlPanel from './ControlPanel';
 import ResolutionDialog from './ResolutionDialog';
 
-// kindof superfluous
-import SquishPanel, {listOfViewClasses} from './SquishPanel';
+import SquishPanel from './SquishPanel';
+import SquishDialog from './SquishDialog';
 
 //import {createSpaceNWave} from './wave/theWave';
 //import {qeSpace, qeStartPromise, qeDefineAccess} from './wave/qEngine';
@@ -33,7 +33,7 @@ class App extends React.Component {
 		this.state = {
 			innerWindowWidth: window.innerWidth,
 
-			isResolutionDialogOpen: false,
+			isDialogShowing: false,
 			stateParams: {
 //N: DEFAULT_RESOLUTION,
 //continuum: DEFAULT_CONTINUUM,
@@ -49,26 +49,41 @@ class App extends React.Component {
 
 		};
 
-		this.canvas = null;
+		//this.canvas = null;
+
+		App.me = this;
 
 		console.log(`App constructor`);
 	}
 
+	/* ************************************************ dialog */
+
+	// deprecated
 	// stateParams is {N, continuum, viewClassName}
 	// this is kindof what you need to start up a dialog: the input arguments.
 	// I guess we use a default if its null?  No, this function not meant for anybody but
 	// SquishPanel, just pass it the arguments and walk away
-	showResolutionDialog(stateParams) {
+	showResolutionDialog(stateParams, callback) {
+		this.dialogCallback = callback;
+		debugger;
 
-		// reallyt we have no business messing around with the SquishyPanel's business
+		// really we have no business messing around with the SquishyPanel's business
 		// state params = the input arguments to dialog; otherwise
 		// a general dialog system would just pass in some object
-		this.setState({isResolutionDialogOpen: true, stateParams});
+		this.setState({isDialogShowing: true, stateParams});
 		this.stateParams = stateParams;
 	}
-	closeResolutionDialog() {
-		this.setState({isResolutionDialogOpen: false, stateParams: null});
-		this.stateParams = null;
+
+	// this is called before the ResolutionDialog has been instantiated
+	static showDialog(dialogCloseCallback) {
+		App.dialogCloseCallback = dialogCloseCallback;
+		App.me.setState({isDialogShowing: true});
+	}
+
+	static hideDialog() {
+		App.me.setState({isDialogShowing: false});
+		App.dialogCloseCallback(0);
+		App.dialogCloseCallback = null;
 	}
 
 //	setGLCanvas(canvas) {
@@ -94,6 +109,8 @@ class App extends React.Component {
 //	}
 //					setNew1DResolution={(N, continuum) => this.setNew1DResolution(N, continuum)}
 
+	/* ************************************************ App */
+
 	// constructor runs twice, so do this once here
 	componentDidMount() {
 		// keep track of any window width changes, to reset the svg
@@ -108,12 +125,12 @@ class App extends React.Component {
 	render() {
 		const s = this.state;
 		const stateParams = this.stateParams || this.state.stateParams;
-		const resDialog = (this.state.isResolutionDialogOpen && stateParams)
-			? <ResolutionDialog
-					stateParams={stateParams}
-					closeResolutionDialog={() => this.closeResolutionDialog()}
+		const sqDialog = (this.state.isDialogShowing && stateParams)
+			? <SquishDialog
 			  />
 			: null;
+			//stateParams={stateParams}
+			//closeResolutionDialog={() => this.closeResolutionDialog()}
 
 		return (
 			<div className="App">
@@ -129,7 +146,7 @@ class App extends React.Component {
 					showResolutionDialog={stateParams => this.showResolutionDialog(stateParams)}
 					stateParams={this.stateParams} />
 
-				{resDialog}
+				{sqDialog}
 			</div>
 		);
 

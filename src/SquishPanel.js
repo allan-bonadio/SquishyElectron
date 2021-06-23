@@ -11,6 +11,7 @@ import SquishView from './views/SquishView';
 
 import {abstractViewDef, manualViewDef, viewVariableViewDef} from './views/abstractViewDef';
 import flatViewDef from './views/flatViewDef';
+import ResolutionDialog from './ResolutionDialog';
 
 
 // flatViewDef  abstractViewDef      manualViewDef     viewVariableViewDef
@@ -103,8 +104,11 @@ export class SquishPanel extends React.Component {
 	openResolutionDialog() {
 		const s = this.state;
 		// pass our state upward to load into the dialog
-		this.props.showResolutionDialog(
-			{N: s.N, continuum: s.continuum, viewClassName: s.viewClassName}
+		ResolutionDialog.openDialog(
+			{N: s.N, continuum: s.continuum, viewClassName: s.viewClassName},
+			stateParams => this.setNew1DResolution(
+				stateParams.N, stateParams.continuum, stateParams.viewClassName),
+			() => {debugger}
 		)
 	}
 

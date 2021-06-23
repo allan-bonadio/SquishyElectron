@@ -3,6 +3,7 @@ import {cxToColorGlsl} from './cxToColor.glsl';
 import qe from '../wave/qe';
 import {viewUniform, viewAttribute} from './viewVariable';
 import SquishPanel from '../SquishPanel';
+import {qeStartPromise} from '../wave/qEngine';
 
 /*
 ** data format of attributes:  four column table of floats
@@ -133,10 +134,12 @@ class flatViewDef extends abstractViewDef {
 
 }
 
-setTimeout(() => {
-	if (SquishPanel) SquishPanel.addMeToYourList(flatViewDef);
-else debugger;
-}, 1000);
+qeStartPromise.then((arg) => {
+	if (SquishPanel)
+		SquishPanel.addMeToYourList(flatViewDef);
+	else
+		debugger;
+});
 
 export default flatViewDef;
 
