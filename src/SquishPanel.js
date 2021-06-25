@@ -3,34 +3,57 @@ import PropTypes from 'prop-types';
 
 import ControlPanel from './ControlPanel';
 
-import {createStateNWave} from './wave/theWave';
+import {createSpaceNWave} from './wave/theWave';
 import {qeSpace, qeStartPromise, qeDefineAccess} from './wave/qEngine';
 import qe from './wave/qe';
 
 import SquishView from './views/SquishView';
-import abstractViewDef from './views/abstractViewDef';
-import flatViewDef from './views/flatViewDef';
 
+import {abstractViewDef, manualViewDef, viewVariableViewDef} from './views/abstractViewDef';
+import flatViewDef from './views/flatViewDef';
+import ResolutionDialog from './ResolutionDialog';
+
+
+// flatViewDef  abstractViewDef      manualViewDef     viewVariableViewDef
+const DEFAULT_VIEW_CLASS_NAME =
+//'flatViewDef';
+//'abstractViewDef';
+'viewVariableViewDef';
+//'manualViewDef';
 
 const DEFAULT_RESOLUTION = 5;
 const DEFAULT_CONTINUUM = qeSpace.contCIRCULAR;
 
 
+// this will appear in the resolution dialog
 export const listOfViewClassNames = {
-	flatViewDef,  // the original one
-	abstractViewDef,  // primitive dummy, also superclass of all these others
+//	abstractViewDef, manualViewDef, viewVariableViewDef,
+//	flatViewDef,
 };
 
 
-class SquishPanel extends React.Component {
+export class SquishPanel extends React.Component {
+	static propTypes = {
+		////showResolutionDialog: PropTypes.func.isRequired,
+	};
+
+	// if you subclass abstractViewDef, call this to join the 'in' crowd
+	static addMeToYourList(aViewClass) {
+		listOfViewClassNames[aViewClass.name] = aViewClass;
+	}
+
+	static getListOfViews() {
+		return listOfViewClassNames;
+	}
+
 	constructor(props) {
 		super(props);
 
-		debugger;
 		this.state = {
 			// THE N and continuum for THE space we're currently doing
 			N: DEFAULT_RESOLUTION,
 			continuum: DEFAULT_CONTINUUM,
+			viewClassName: DEFAULT_VIEW_CLASS_NAME,
 
 			currentQESpace: null,
 			currentView: null,
@@ -43,50 +66,74 @@ class SquishPanel extends React.Component {
 
 	// the canvas per panel, one panel per canvas
 	setGLCanvas(canvas) {
-		debugger;
 		this.canvas = canvas;
 		canvas.squishPanel = this;
 	}
 
-	setNew1DResolution(N, continuum) {
-		debugger;
+	// init or re-init the space and the panel
+	setNew1DResolution(N, continuum, viewClassName) {
 		qe.theCurrentView =  null;
-		createStateNWave(N, continuum, currentQESpace => {
+		createSpaceNWave(N, continuum, currentQESpace => {
 			// we've now got a qeSpace etc all set up
 			this.setState({N, continuum, currentQESpace});
 
 			// now create the view class instance as described by the space
-			const vClass = listOfViewClassNames[currentQESpace.viewClassName];
+			const vClass = listOfViewClassNames[viewClassName];
 
-			const currentView = new vClass('main view', this.canvas, currentQESpace);
-			currentView.completeView();
 
-			this.setState(currentView);
+			if (! vClass)
+				alert(`no vClass! see for yerself! ${JSON.stringify(listOfViewClassNames)}`);
+			else {
 
-			// kinda paranoid?
-			qe.theCurrentView = currentView;
+				const currentView = new vClass('main view', this.canvas, currentQESpace);
+				currentView.completeView();
+
+				this.setState(currentView);
+
+				// kinda paranoid?
+				qe.theCurrentView = currentView;
+			}
 		});
+	}
+
+	// puts up the resolution dialog, starting with the values from this.state
+	openResolutionDialog() {
+		const s = this.state;
+		// pass our state upward to load into the dialog
+		ResolutionDialog.openDialog(
+			{N: s.N, continuum: s.continuum, viewClassName: s.viewClassName},
+			stateParams => this.setNew1DResolution(
+				stateParams.N, stateParams.continuum, stateParams.viewClassName),
+			() => {debugger}
+		)
 	}
 
 	// constructor runs twice, so do this once here
 	componentDidMount() {
+		// upon startup, after C++ says it's ready, but remember constructor runs twice
+		qeStartPromise.then((arg) => {
+			qeDefineAccess();
+			setTimeout(() => {
+				this.setNew1DResolution(
+					DEFAULT_RESOLUTION, DEFAULT_CONTINUUM, DEFAULT_VIEW_CLASS_NAME);
+			}, 2000);
+		}).catch(ex => {
+			console.error(`error in SquishPanel.didMount.then:`, ex);
+			debugger;
+		});
+
 	}
 
 	render() {
-		const s = this.state;
-		let resDialog = null;  // what's this supposed to be?
+//		const s = this.state;
 
-
-		debugger;
 		return (
 			<div className="SquishPanel">
 				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
 				<SquishView setGLCanvas={canvas => this.setGLCanvas(canvas)} />
 				<ControlPanel
-
+					openResolutionDialog={() => this.openResolutionDialog()}
 				/>
-
-				{resDialog}
 			</div>
 		);
 
@@ -95,3 +142,6 @@ class SquishPanel extends React.Component {
 
 export default SquishPanel;
 
+// do these work?  becha not.
+//SquishPanel.addMeToYourList(abstractViewDef);
+//SquishPanel.addMeToYourList(flatViewDef);

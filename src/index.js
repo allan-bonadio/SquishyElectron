@@ -7,9 +7,12 @@ import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
 	<React.StrictMode>
-	<ErrorBoundary>
-		<App />
-	</ErrorBoundary>
+		<ErrorBoundary howToRecover={errorMsg => {
+			// just reload the page, dude
+			window.location = window.location;  // ??
+		}}>
+			<App />
+		</ErrorBoundary>
 	</React.StrictMode>,
 	document.getElementById('root')
 );

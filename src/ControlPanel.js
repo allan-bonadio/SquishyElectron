@@ -3,19 +3,19 @@ import PropTypes from 'prop-types';
 
 import './ControlPanel.css';
 import CPToolbar from './CPToolbar';
-import {theJWave, setWave, setVoltage, iterateAnimate} from './wave/theWave';
+import {theJWave, setWave, setVoltage, iterateAnimate, isItAnimating} from './wave/theWave';
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
-		innerActiveWidth: PropTypes.number,
-		barWidth: PropTypes.number,
+		//innerActiveWidth: PropTypes.number,
+		openResolutionDialog: PropTypes.func.isRequired,
 	};
 
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			isRunning: false,
+			//isRunning: false,
 			rate: 8,
 			harmonicFrequency: 1, constantFrequency: 1,
 		};
@@ -31,12 +31,12 @@ export class ControlPanel extends React.Component {
 //			iterate(theJWave);
 //		if (isRunning)
 //			theDraw.draw();
-		iterateAnimate(true, isRunning && this.state.rate);
+		iterateAnimate(isRunning && this.state.rate);
 
-		ev.currentTarget.blur();
+		if (ev && ev.currentTarget) ev.currentTarget.blur();
 
 		// it is a state of this panel, to color the buttons
-		this.setState({isRunning});
+		//this.setState({isRunning});
 
 		// but also a state of the animation
 		//theJWave.isRunning = isRunning;
@@ -44,20 +44,33 @@ export class ControlPanel extends React.Component {
 
 	// set rate, which is 1, 2, 4, 8, ...
 	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
-	toggleRunning() {
-		this.setRunning(!this.state.running);
+	toggleRunning(ev) {
+		//this.setState({isRunning: false});
+
+		iterateAnimate(!isItAnimating(), this.state.rate);
+
+		if (ev && ev.currentTarget) ev.currentTarget.blur();
+
+	}
+
+	oneStep(ev) {
+		//this.setState({isRunning: false});
+
+		iterateAnimate(false, 'one');
+
+		if (ev && ev.currentTarget) ev.currentTarget.blur();
 	}
 
 	// set rate, which is 1, 2, 4, 8, ...
 	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
 	setRate(rate) {
-		iterateAnimate(true, 0);
-		this.setState({rate})
-		if (this.state.isRunning)
-			iterateAnimate(true, rate);
+		iterateAnimate(isItAnimating(), rate);
+		this.setState({rate});  // rate is stored in two places, na na na
+//		if (this.state.isRunning)
+//			iterateAnimate(rate);
 	}
 
-	goStopButtons() {
+	renderGoStopButtons() {
 		const isRunning = this.state.isRunning;
 
 		const repRates = [];
@@ -90,7 +103,7 @@ export class ControlPanel extends React.Component {
 
 	/* ********************************************** resetWave */
 
-	resetWaveButtons() {
+	renderResetWaveButtons() {
 		return <div className='resetWaveButtons subPanel'>
 			<h3>Reset Wave Function</h3>
 			<button type='button' className='harmonicWaveButton'
@@ -122,7 +135,7 @@ export class ControlPanel extends React.Component {
 
 	/* ********************************************** set voltage */
 
-	setVoltageButtons() {
+	renderSetVoltageButtons() {
 		return <div className='setVoltageButtons subPanel'>
 			<h3><big>⚡️</big> Reset Voltage Profile <br /> (potential energy function)</h3>
 			<button type='button' className='zeroVoltageButton'
@@ -143,20 +156,22 @@ export class ControlPanel extends React.Component {
 	render() {
 		return <div className='ControlPanel'>
 			<CPToolbar
-				toggleRunning={ev => this.toggleRunning()}
-				oneStep={ev => this.oneStep()}
+				toggleRunning={ev => this.toggleRunning(ev)}
+				oneStep={ev => this.oneStep(ev)}
 				isRunning={this.state.isRunning}
 			/>
-			{this.goStopButtons()}
-			{this.resetWaveButtons()}
-			{this.setVoltageButtons()}
+			<div className='cpSecondRow'>
+				{this.renderGoStopButtons()}
+				{this.renderResetWaveButtons()}
+				{this.renderSetVoltageButtons()}
 
-			<button type='button' className='setResolutionButton'
-				onClick={ev => this.props.openResolutionDialog()}>
-					Change Resolution
-					<div style={{fontSize: '.7em'}}>
-						(will reset current wave)</div>
-			</button>
+				<button type='button' className='setResolutionButton'
+					onClick={ev => this.props.openResolutionDialog()}>
+						Change Resolution
+						<div style={{fontSize: '.7em'}}>
+							(will reset current wave)</div>
+				</button>
+			</div>
 		</div>;
 	}
 }

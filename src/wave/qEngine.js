@@ -82,9 +82,6 @@ export class qeSpace {
 		this.nPoints = nPoints;
 		this.nStates = nStates;
 
-		//this.viewClassName = 'abstractViewDef';
-		this.viewClassName = 'flatViewDef';
-
 		// qeDefineAccess() will set this
 		this.waveBuffer = null;
 
@@ -94,7 +91,7 @@ export class qeSpace {
 		// a nice TypedArray of floats (4 for each row; 8 for each datapoint)
 		this.viewBuffer = qe.viewBuffer =
 			new Float32Array(window.Module.HEAPF32.buffer, qe.getViewBuffer(), nPoints*8);
-		console.log(`qeng viewBuffer:`, this.viewBuffer);
+		//console.log(`qeSpace viewBuffer:`, this.viewBuffer);
 	}
 
 	get1DWave = function get1DWave(ixPoint) {

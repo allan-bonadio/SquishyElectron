@@ -1,6 +1,6 @@
 // wave.js and theJWave, draw and iterate are all about the internals of the wave.
 // all of this is svg and d3, no react.
-import {jSpace, jWave} from './wave';
+//import {jSpace, jWave} from './wave';
 //import draw from './draw';
 import iterate from './iterate';
 import {qeSpace} from './qEngine';
@@ -19,7 +19,7 @@ export const INNER_HEIGHT = 100;
 // call this when user changes number of datapoints.
 // Or at startup, so we have a wave to begin with.
 // the callback gets called wtih the qSpace instance, when it's done being created
-export function createStateNWave(N, continuum, callback) {
+export function createSpaceNWave(N, continuum, callback) {
 	// create the old JS version?
 //	theJSpace = new jSpace(N, continuum);
 //	theJWave = new jWave(theJSpace);
@@ -150,10 +150,14 @@ function animateOneFrame(now) {
 	}
 }
 
-
-export function iterateAnimate(isTrue, rate) {
+// start/stop or single step the animation
+// shouldAnimate falsy = stop it if running
+// true = start it or continue it if running
+// rate is how fast it goes, or 'one' to single step.
+// I guess it's irrelevant now with requestAnimationFrame()
+export function iterateAnimate(shouldAnimate, rate) {
 	// hmmm i'm not using the Rate here...
-	if (! rate || !qe.theCurrentView) {
+	if (! shouldAnimate || ! rate || !qe.theCurrentView) {
 		isAnimating = false;
 		return;
 	}
@@ -164,11 +168,12 @@ export function iterateAnimate(isTrue, rate) {
 	}
 	isAnimating = true;
 
-	// also performance.now()
-
-
-	requestAnimationFrame(animateOneFrame);
+	animateOneFrame(performance.now());
+//	requestAnimationFrame(animateOneFrame);
 }
+
+// return true if animation in motion; false otherwise
+export const isItAnimating = () => isAnimating;
 
 function dumpViewBuffer() {
 	let nRows = qe.space.nPoints * 2;

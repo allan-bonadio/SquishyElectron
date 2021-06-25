@@ -2,6 +2,8 @@ import abstractViewDef from './abstractViewDef';
 import {cxToColorGlsl} from './cxToColor.glsl';
 import qe from '../wave/qe';
 import {viewUniform, viewAttribute} from './viewVariable';
+import SquishPanel from '../SquishPanel';
+import {qeStartPromise} from '../wave/qEngine';
 
 /*
 ** data format of attributes:  four column table of floats
@@ -54,6 +56,9 @@ void main() {
 
 // the original display that's worth watching
 class flatViewDef extends abstractViewDef {
+	static viewName: 'flat';
+	static viewClassName: 'flatViewDef';
+
 	constructor(viewName, canvas, currentQESpace) {
 		super(viewName, canvas);
 
@@ -62,8 +67,10 @@ class flatViewDef extends abstractViewDef {
 	}
 
 	setShaders() {
-		this.compileProgram(vertexSrc, fragmentSrc);
-		this.gl.useProgram(this.program);
+		this.vertexShaderSrc = vertexSrc;
+		this.fragmentShaderSrc = fragmentSrc;
+		this.compileProgram();
+		this.gl.useProgram(this.view.program);
 	}
 
 
@@ -122,11 +129,19 @@ class flatViewDef extends abstractViewDef {
 		gl.clearColor(0, 1, 0, .2);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
-		//gl.useProgram(this.program);
+		//gl.useProgram(this.view.program);
 		//gl.bindVertexArray(this.vao);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 	}
 
 }
+
+qeStartPromise.then((arg) => {
+	if (SquishPanel)
+		SquishPanel.addMeToYourList(flatViewDef);
+	else
+		debugger;
+});
+
 export default flatViewDef;
 
