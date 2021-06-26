@@ -94,6 +94,8 @@ int32_t completeNewSpace(void) {
 	theSpace->setValleyPotential(1., 1., 0.);
 	//theSpace->dumpPotential("freshly created");
 
+	theSpace->iterationCount = 0;
+
 	//printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", nStates, nPoints);
 	//printf("  dimension N=%d  extraN=%d  continuum=%d  start=%d  end=%d  label=%s\n",
 	//	theSpace->dimensions->N, theSpace->dimensions->extraN, theSpace->dimensions->continuum,
@@ -114,7 +116,6 @@ qReal *getPotentialBuffer(void) {
 int32_t getElapsedTime(void) {
 	return elapsedTime;
 }
-
 
 void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
 void qSpace_setZeroPotential(void) { theSpace->setZeroPotential(); }

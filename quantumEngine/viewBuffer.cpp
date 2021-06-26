@@ -35,10 +35,10 @@ float updateViewBuffer() {
 			highest = height;
 	}
 
-	printf("viewBuffer.cpp, latest:\n");
-	for (int i = 0; i < nPoints*2; i++)
-		printf("%6.3f  %6.3f  %6.3f  %6.3f\n",
-			viewBuffer[i*4], viewBuffer[i*4+1], viewBuffer[i*4+2], viewBuffer[i*4+3]);
+	//printf("viewBuffer.cpp, latest:\n");
+	//for (int i = 0; i < nPoints*2; i++)
+	//	printf("%6.3f  %6.3f  %6.3f  %6.3f\n",
+	//		viewBuffer[i*4], viewBuffer[i*4+1], viewBuffer[i*4+2], viewBuffer[i*4+3]);
 
 	return highest;
 }

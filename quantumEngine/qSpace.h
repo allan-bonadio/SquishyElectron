@@ -45,6 +45,8 @@ public:
 	void setCircularWave(qCx *wave, qReal n);
 	void setStandingWave(qCx *wave, qReal n);
 	void setPulseWave(qCx *wave, qReal widthFactor, qReal cycles);
+
+	int iterationCount = 0;
 };
 
 // continuum values - same as in qDimension in qEngine.js; pls synchronize them
@@ -80,6 +82,8 @@ public:
 	// of what a second is?  Resets to zero every so often.
 	double elapsedTime;
 
+	int iterationCount;
+
 	// Dimensions are listed from outer to inner as with the resulting psi array:
 	// psi[outermost-dim][dim][dim][innermost-dim]
 	// always a fixed size, for simplicity.
@@ -95,7 +99,6 @@ public:
 
 	void oneRk2Step(void);
 	void oneRk4Step(void);
-
 };
 
 // for JS to call

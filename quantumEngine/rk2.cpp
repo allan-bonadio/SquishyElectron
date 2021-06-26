@@ -42,6 +42,12 @@ void qSpace::oneRk2Step(void) {
 	//printf("qCx(%20.17lf, %20.17lf)\n", theWave[ix].re, theWave[ix].im);
 
 	theSpace->elapsedTime += dt;
+
+	this->iterationCount++;
+	if (this->iterationCount > -1) {  // theSpace->nPoints/2
+		this->iterationCount = 0;
+		dim->lowPassFilter(theWave);
+	}
 }
 
 /* ************************************************** benchmarking */
