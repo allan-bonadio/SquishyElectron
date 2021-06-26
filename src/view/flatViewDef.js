@@ -12,11 +12,12 @@ import {qeStartPromise} from '../wave/qEngine';
 ** or zero
 */
 
-const isTesting = false;
+let alsoDrawPoints = false, alsoDrawLines = false;
+//alsoDrawLines =0;
 
 // make the line number for the start a multiple of 10
-const vertexSrc = `
-${cxToColorGlsl}
+let ps = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
+const vertexSrc = `${cxToColorGlsl}
 #line 120
 varying highp vec4 vColor;
 attribute vec4 row;
@@ -27,12 +28,10 @@ void main() {
 	float y;
 	int vertexSerial = int(row.w);
 	if (vertexSerial / 2 * 2 < vertexSerial) {
-		y = 1.2;
-		//y = row.x * row.x + row.y * row.y;
+		y = row.x * row.x + row.y * row.y;
 	}
 	else {
-		y = -0.2;
-		//y = 0.;
+		y = 0.;
 	}
 	//y=row.w / 10.;
 	//y=0.5;
@@ -43,7 +42,7 @@ void main() {
 	// figure out x, basically the point index
 	float x;
 	x = float(int(vertexSerial) / 2) / float(nPoints - 1) * 2. - 1.;
-	x = row.w / 6. - 1.;
+	//x = row.w / 6. - 1.;
 
 	// and here we are
 	gl_Position = vec4(x, y, 0., 1.);
@@ -52,8 +51,8 @@ void main() {
 	vColor = vec4(cxToColor(vec2(row.x, row.y)), 1.);
 	//vColor = vec4(.9, .9, .1, 1.);
 
-	// dot size, in pixels not clip units.  actually a crude square.
-	gl_PointSize = (row.w+1.) * 5.;//10.;
+	// dot size, in pixels not clip units.  actually a square.
+	${ps}
 }
 `;
 
@@ -87,11 +86,6 @@ class flatViewDef extends abstractViewDef {
 
 
 	setInputs() {
-		if (isTesting) {
-			this.setInputsForTesting();
-			return;
-		}
-
 		const highest = qe.updateViewBuffer();
 		let nPointsUniform = this.nPointsUniform = new viewUniform('nPoints', this);
 
@@ -110,30 +104,6 @@ class flatViewDef extends abstractViewDef {
 //		gl.uniform1f(this.nPointsLoc, this.currentQESpace.nPoints);
 	}
 
-	// hasn't worked for a while
-	setInputsForTesting() {
-		const vAttr = new viewAttribute('row', this, null);
-
-		const sin = Math.sin;
-		const cos = Math.cos;
-		this.nPoints = 7;
-		this.vertexCount = this.nPoints * 2;  // nPoints * vertsPerBar
-		this.rowFloats = 4
-		let vertices = new Float32Array(this.vertexCount *  this.rowFloats);
-		for (let i = 0; i < 7; i++) {
-			vertices[i*8] = vertices[i*8 + 4] = cos(i);
-			vertices[i*8 + 1] = vertices[i*8 + 5] = sin(i);
-		}
-		vAttr.attachArray(vertices, 4);
-
-//		const gl = this.gl;
-//		var nPointsLoc = gl.getUniformLocation(this.program, 'nPoints');
-//		gl.uniform1f(nPointsLoc, this.nPoints);
-	}
-
-	// use default
-	//setGeometry() {
-	//}
 
 	draw() {
 		const gl = this.gl;
@@ -144,14 +114,18 @@ class flatViewDef extends abstractViewDef {
 		gl.useProgram(this.program);
 		//this.rowAttr.reloadVariable()
 
-		gl.lineWidth(10.0);  // it's the only option anyway
-
 		//gl.bindVertexArray(this.vao);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 
-		gl.drawArrays(gl.LINES, 0, this.vertexCount);
-		//gl.drawArrays(gl.LINE_STRIP, 0, this.vertexCount);
-		gl.drawArrays(gl.POINTS, 0, this.vertexCount);
+		if (alsoDrawLines) {
+			gl.lineWidth(1);  // it's the only option anyway
+
+			gl.drawArrays(gl.LINES, 0, this.vertexCount);
+			//gl.drawArrays(gl.LINE_STRIP, 0, this.vertexCount);
+		}
+
+		if (alsoDrawPoints)
+			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 	}
 
 }
