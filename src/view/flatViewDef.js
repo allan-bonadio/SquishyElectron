@@ -15,13 +15,14 @@ import {qeStartPromise} from '../wave/qEngine';
 let alsoDrawPoints = false, alsoDrawLines = false;
 //alsoDrawLines =0;
 
-// make the line number for the start a multiple of 10
 let ps = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
+
+// make the line number for the start a multiple of 10
 const vertexSrc = `${cxToColorGlsl}
-#line 120
+#line 122
 varying highp vec4 vColor;
 attribute vec4 row;
-uniform int nPoints;
+uniform float barWidth;
 
 void main() {
 	// figure out y
@@ -41,7 +42,7 @@ void main() {
 
 	// figure out x, basically the point index
 	float x;
-	x = float(int(vertexSerial) / 2) / float(nPoints - 1) * 2. - 1.;
+	x = float(int(vertexSerial) / 2) * barWidth * 2. - 1.;
 	//x = row.w / 6. - 1.;
 
 	// and here we are
@@ -87,21 +88,16 @@ class flatViewDef extends abstractViewDef {
 
 	setInputs() {
 		const highest = qe.updateViewBuffer();
-		let nPointsUniform = this.nPointsUniform = new viewUniform('nPoints', this);
+		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
 
 		let nPoints = this.nPoints = this.currentQESpace.nPoints;
-		nPointsUniform.setValue(nPoints, '1i');
-			//() => ({value: this.currentQESpace.nPoints, type: '1i'});
-
+		let barWidth = 1 / (nPoints - 1);
+		barWidthUniform.setValue(barWidth, '1f');
 
 		const rowAttr = this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
 		this.rowAttr.attachArray(qe.space.viewBuffer, this.rowFloats);
-
-//		this.nPointsLoc = gl.getUniformLocation(this.program, 'nPoints');
-//		const gl = this.gl;
-//		gl.uniform1f(this.nPointsLoc, this.currentQESpace.nPoints);
 	}
 
 
