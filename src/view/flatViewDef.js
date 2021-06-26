@@ -23,13 +23,14 @@ const vertexSrc = `${cxToColorGlsl}
 varying highp vec4 vColor;
 attribute vec4 row;
 uniform float barWidth;
+uniform float unitHeight;
 
 void main() {
 	// figure out y
 	float y;
 	int vertexSerial = int(row.w);
 	if (vertexSerial / 2 * 2 < vertexSerial) {
-		y = row.x * row.x + row.y * row.y;
+		y = (row.x * row.x + row.y * row.y) * unitHeight;
 	}
 	else {
 		y = 0.;
@@ -37,8 +38,7 @@ void main() {
 	//y=row.w / 10.;
 	//y=0.5;
 
-	// i've got to figure out the vertical mag factor someday.
-	//y = y - 1.;
+	y = 1. - 2. * y;
 
 	// figure out x, basically the point index
 	float x;
@@ -88,11 +88,15 @@ class flatViewDef extends abstractViewDef {
 
 	setInputs() {
 		const highest = qe.updateViewBuffer();
-		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
 
+		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
 		let nPoints = this.nPoints = this.currentQESpace.nPoints;
 		let barWidth = 1 / (nPoints - 1);
 		barWidthUniform.setValue(barWidth, '1f');
+
+		let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
+		let unitHeight = 1;
+		unitHeightUniform.setValue(unitHeight, '1f');
 
 		const rowAttr = this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
@@ -104,7 +108,7 @@ class flatViewDef extends abstractViewDef {
 	draw() {
 		const gl = this.gl;
 
-		gl.clearColor(0, 0, .3, 1);
+		gl.clearColor(0, 0, 0, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		gl.useProgram(this.program);
