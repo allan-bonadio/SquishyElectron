@@ -26,10 +26,7 @@ const DEFAULT_CONTINUUM = qeSpace.contCIRCULAR;
 
 
 // this will appear in the resolution dialog
-export const listOfViewClassNames = {
-//	abstractViewDef, manualViewDef, viewVariableViewDef,
-//	flatViewDef,
-};
+export const listOfViewClassNames = {};
 
 
 export class SquishPanel extends React.Component {
@@ -38,6 +35,7 @@ export class SquishPanel extends React.Component {
 	};
 
 	// if you subclass abstractViewDef, call this to join the 'in' crowd
+	// and be listed
 	static addMeToYourList(aViewClass) {
 		listOfViewClassNames[aViewClass.name] = aViewClass;
 	}

@@ -23,47 +23,6 @@ export class SquishView extends React.Component {
 		};
 	}
 
-//
-//	setup() {
-//		this.initCanvas();
-//		this.compileProgram(flatViewDef);
-//
-//setInputs()
-//
-//webglUtils.resizeCanvasToDisplaySize(gl.canvas);
-//gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-//
-//// Clear the canvas
-//gl.clearColor(0, 0, 0, 0);
-//gl.clear(gl.COLOR_BUFFER_BIT);
-//gl.useProgram(program);
-//
-//
-//// Bind the attribute/buffer set we want.
-//gl.bindVertexArray(vao);
-//
-//
-//var primitiveType = gl.TRIANGLES;
-//var offset = 0;
-//var count = 3;
-//gl.drawArrays(primitiveType, offset, count);
-
-//
-//abstractViewDef
-//export default const abstractViewDef = {
-//var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
-//this.gl
-//	initCanvas()
-//			gl.deleteProgram(program);
-//
-//gl.getProgramInfoLog(program)
-//abstractViewDef
-//export default const abstractViewDef = {
-//
-//this.gl
-//	initCanvas()
-
-//	}
 
 	//  our setCanvas() calls App's setCanvas, hopefully before C++'s promise hits
 	setCanvas(canvas) {

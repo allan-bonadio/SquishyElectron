@@ -141,7 +141,7 @@ export class abstractViewDef {
 	setShaders() {
 		this.vertexShaderSrc = `
 		attribute vec4 corner;
-		uniform int cornerColor;
+
 		void main() {
 			gl_Position = corner;
 		}
@@ -149,9 +149,10 @@ export class abstractViewDef {
 
 		this.fragmentShaderSrc = `
 		precision highp float;  // does this do anything?
+		uniform int cornerColor;
 
 		void main() {
-		  gl_FragColor = vec4(.5, 1, 0, 1);
+		  gl_FragColor = vec4(.5, 1, float(cornerColor)/100., 1);
 		}
 		`;
 
@@ -218,7 +219,7 @@ export class abstractViewDef {
 		gl.useProgram(this.program);
 
 		//this.vaoExt.bindVertexArrayOES(this.vao);
-		this.cornerAttr.reloadVariable()
+		//this.cornerAttr.reloadVariable()
 
 		const primitiveType = gl.TRIANGLES;
 		const offset = 0;
@@ -475,10 +476,11 @@ export class manualViewDef extends abstractViewDef {
 
 		this.fragmentShaderSrc = `
 		precision highp float;  // does this do anything?
+		uniform int cornerColor;
 
 		void main() {
 			// chartreuce triangle
-			gl_FragColor = vec4(.5, 1, 0, 1);
+			gl_FragColor = vec4(.5, 1, cornerColor, 1);
 		}
 		`;
 
@@ -525,7 +527,7 @@ export class manualViewDef extends abstractViewDef {
 
 // this makes a light green color if false, a little on the yellow side.
 // if true, you should see something brighter and less yellow
-let includeUniform = true;
+let includeUniform = false;
 
 // slightly more complicated with the viewVariables
 export class viewVariableViewDef extends abstractViewDef {
@@ -538,18 +540,20 @@ export class viewVariableViewDef extends abstractViewDef {
 		attribute vec4 corner;
 		void main() {
 			gl_Position = corner;
+
+			gl_PointSize = 10.;  // dot size, actually a crude square
 		}
 		`;
 
-		const decl = includeUniform ? `uniform vec4 julianne;` : '';
-		const julianne = includeUniform ? `julianne` : 'vec4(0.,.5,1.,1.)';
+		const decl = includeUniform ? `uniform vec4 cornerColorUni;` : '';
+		const cornerColorUni = includeUniform ? `cornerColorUni` : 'vec4(0.,.5,1.,1.)';
 		this.fragmentShaderSrc = `
 		precision highp float;  // does this do anything?
 		${decl}
 
 		void main() {
 			// colored triangle, depends on the uniform?
-			gl_FragColor = ${julianne};
+			gl_FragColor = ${cornerColorUni};
 		}
 		`;
 
@@ -561,9 +565,9 @@ export class viewVariableViewDef extends abstractViewDef {
 	setInputs() {
 		const gl = this.gl;
 
-		let ccUni;
+		let cornerColorUni;
 		if (includeUniform)
-			ccUni = this.cornerColorUni = new viewUniform('julianne', this,
+			cornerColorUni = this.cornerColorUni = new viewUniform('cornerColorUni', this,
 				() => ({value: [0, 1, .5, 1], type: '4fv'}));
 
 //		const cornerAttributeLocation = gl.getAttribLocation(this.program, 'corner');
@@ -573,32 +577,48 @@ export class viewVariableViewDef extends abstractViewDef {
 		const sin = Math.sin;
 		const cos = Math.cos;
 		const corners = new Float32Array([
+			cos(1), sin(1),
+			cos(3), sin(3),
+			cos(5), sin(5),
+			cos(7), sin(7),
+			cos(9), sin(9),
+			cos(11), sin(11),
+			cos(0), sin(0),
 			cos(2), sin(2),
 			cos(4), sin(4),
 			cos(6), sin(6),
+			cos(8), sin(8),
+			cos(10), sin(10),
 		]);
 		const cornerAttr = this.cornerAttr = new viewAttribute('corner', this);
 		cornerAttr.attachArray(corners, 2);
 
-		//cornerAttributeLocation = cornerAttr.attributeLoc;
+	}
+
+	draw() {
+		const gl = this.gl;
+
+		// is this a good place to do this?
+		gl.lineWidth(1.0);  // it's the only option anyway
+
+		gl.clearColor(0, 0, .3, 0);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+
+		if (includeUniform) {
+			this.cornerColorUni.setNewFunction()
+		}
+
+		gl.useProgram(this.program);
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 12);
 
 
-		//cornerAttr.attachArray(float32TypedArray, 2);
-		//attachArray(float32TypedArray, size, stride = size * 4, offset
+		gl.drawArrays(gl.LINE_STRIP, 0, 12);
+		gl.drawArrays(gl.POINTS, 0, 12);
 
-//		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), bufferDataDrawMode);
-
-//		var vao = this.vaoExt.createVertexArrayOES();
-//		this.vaoExt.bindVertexArrayOES(vao);
-//		this.vao = vao;
-//		gl.enableVertexAttribArray(cornerAttr.attributeLoc);
-
-//		const size = 2;          // 2 components per iteration
-//		const type = gl.FLOAT;   // the data is 32bit floats
-//		const normalize = false; // don't normalize the data
-//		const stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-//		const offset = 0;        // start at the beginning of the buffer
-//		gl.vertexAttribPointer(cornerAttr.attributeLoc, size, type, normalize, stride, offset);
+		//gl.POINTS,     // most useful and foolproof but set width in vertex shader
+		//gl.LINES,      // tend to scribble all over
+		//gl.LINE_STRIP, // tend to scribble all over
+		//gl.TRIANGLES,  // more sparse triangles
 	}
 }
 

@@ -20,12 +20,13 @@ ${cxToColorGlsl}
 
 
 #line 120
-attribute vec4 row;
 varying highp vec4 vColor;
- int nPoints = 7;
-//uniform int nPoints;
+attribute vec4 row;
+//int nPoints = 7;
+uniform int nPoints;
 
 void main() {
+	// figure out y
 	float y;
 	int vertexSerial = int(row.w);
 	if (vertexSerial / 2 * 2 > vertexSerial)
@@ -35,13 +36,16 @@ void main() {
 	// i've got to figure out the vertical mag factor someday.
 	y = y - 1.;
 
+	// figure out x, basically the point index
 	float x;
-	x = float(vertexSerial / 2) / float(nPoints - 1) * 2. - 1.;
+	x = float(int(vertexSerial) / 2) / float(nPoints - 1) * 2. - 1.;
 
+	// and here we are
 	gl_Position = vec4(x, y, 0., 1.);
 
-	vColor = vec4(cxToColor(vec2(row.x, row.y)), 1.);
-	//vColor = vec4(.9, .9, .1, 1.);
+	//  for the color, convert the complex values via this algorithm
+	//vColor = vec4(cxToColor(vec2(row.x, row.y)), 1.);
+	vColor = vec4(.9, .9, .1, 1.);
 }
 `;
 
@@ -70,7 +74,7 @@ class flatViewDef extends abstractViewDef {
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
 		this.compileProgram();
-		this.gl.useProgram(this.view.program);
+		this.gl.useProgram(this.program);
 	}
 
 
@@ -84,15 +88,15 @@ class flatViewDef extends abstractViewDef {
 
 	setInputsNormal() {
 		const highest = qe.updateViewBuffer();
-		this.nPoints = this.currentQESpace.nPoints;
+		this.nPointsUniform = new viewUniform('nPoints', this,
+			() => ({value: this.currentQESpace.nPoints, type: '1i'}));
 
-		this.rowAttr = new viewAttribute('row', this);
+
+		const rowAttr = this.rowAttr = new viewAttribute('row', this);
+		this.nPoints = this.currentQESpace.nPoints;
 		this.vertexCount = this.nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
 		this.rowAttr.attachArray(qe.space.viewBuffer, this.rowFloats);
-
-//		this.nPointsUniform = new viewUniform('nPoints', this,
-//			() => ({value: this.currentQESpace.nPoints, type: '1i'}));
 
 //		this.nPointsLoc = gl.getUniformLocation(this.program, 'nPoints');
 //		const gl = this.gl;
@@ -126,10 +130,12 @@ class flatViewDef extends abstractViewDef {
 	draw() {
 		const gl = this.gl;
 
-		gl.clearColor(0, 1, 0, .2);
+		gl.clearColor(0, 0, .3, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
-		//gl.useProgram(this.view.program);
+		gl.useProgram(this.program);
+		//this.rowAttr.reloadVariable()
+
 		//gl.bindVertexArray(this.vao);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 	}

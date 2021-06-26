@@ -54,29 +54,6 @@ class App extends React.Component {
 		App.dialogCloseCallback = null;
 	}
 
-//	setGLCanvas(canvas) {
-//		this.canvas = canvas;
-//	}
-
-//	setNew1DResolution(N, continuum) {
-//		qe.theCurrentView =  null;
-//		createSpaceNWave(N, continuum, currentQESpace => {
-//			// we've now got a qeSpace etc all set up
-//			this.setState({N, continuum, currentQESpace});
-//
-//			// now create the view class instance as described by the space
-//			const vClass = listOfViewClasses[currentQESpace.viewClassName];
-//
-//			// seems kinda funny doing these all here - but they should work for every view class
-//			const currentView = new vClass('main view', this.canvas, currentQESpace);
-//			currentView.completeView();
-//
-//			this.setState(currentView);
-//			qe.theCurrentView = currentView;
-//		});
-//	}
-//					setNew1DResolution={(N, continuum) => this.setNew1DResolution(N, continuum)}
-
 	/* ************************************************ App */
 
 	// constructor runs twice, so do this once here

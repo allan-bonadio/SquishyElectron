@@ -104,8 +104,6 @@ export default class ResolutionDialog extends React.Component {
 	OK(ev) {
 		debugger;
 		const s = //this.state;
-//		this.props.setNew1DResolution(
-//			indexToPower(s.powerOf10), s.continuum, s.viewClassName);
 		ResolutionDialog.okCallback(this.state);
 		SquishDialog.closeDialog();
 	}
