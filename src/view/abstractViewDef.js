@@ -527,7 +527,7 @@ export class manualViewDef extends abstractViewDef {
 
 // this makes a light green color if false, a little on the yellow side.
 // if true, you should see something brighter and less yellow
-let includeUniform = false;
+let includeUniform = true;
 
 // slightly more complicated with the viewVariables
 export class viewVariableViewDef extends abstractViewDef {
@@ -567,8 +567,10 @@ export class viewVariableViewDef extends abstractViewDef {
 
 		let cornerColorUni;
 		if (includeUniform)
-			cornerColorUni = this.cornerColorUni = new viewUniform('cornerColorUni', this,
-				() => ({value: [0, 1, .5, 1], type: '4fv'}));
+			cornerColorUni = this.cornerColorUni =
+				new viewUniform('cornerColorUni', this);
+			cornerColorUni.setValue([0, 1, .5, 1], '4fv');
+			//() => ({value: [0, 1, .5, 1], type: '4fv'});
 
 //		const cornerAttributeLocation = gl.getAttribLocation(this.program, 'corner');
 //		const cornerBuffer = gl.createBuffer();  // actual ram in GPU chip
@@ -605,7 +607,7 @@ export class viewVariableViewDef extends abstractViewDef {
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		if (includeUniform) {
-			this.cornerColorUni.setNewFunction()
+			this.cornerColorUni.reloadVariable();
 		}
 
 		gl.useProgram(this.program);

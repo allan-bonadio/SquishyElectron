@@ -79,22 +79,21 @@ class flatViewDef extends abstractViewDef {
 
 
 	setInputs() {
-		if (isTesting)
+		if (isTesting) {
 			this.setInputsForTesting();
-		else
-			this.setInputsNormal()
-	}
+			return;
+		}
 
-
-	setInputsNormal() {
 		const highest = qe.updateViewBuffer();
-		this.nPointsUniform = new viewUniform('nPoints', this,
-			() => ({value: this.currentQESpace.nPoints, type: '1i'}));
+		let nPointsUniform = this.nPointsUniform = new viewUniform('nPoints', this);
+
+		let nPoints = this.nPoints = this.currentQESpace.nPoints;
+		nPointsUniform.setValue(nPoints, '1i');
+			//() => ({value: this.currentQESpace.nPoints, type: '1i'});
 
 
 		const rowAttr = this.rowAttr = new viewAttribute('row', this);
-		this.nPoints = this.currentQESpace.nPoints;
-		this.vertexCount = this.nPoints * 2;  // nPoints * vertsPerBar
+		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
 		this.rowAttr.attachArray(qe.space.viewBuffer, this.rowFloats);
 
