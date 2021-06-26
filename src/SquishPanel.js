@@ -1,3 +1,7 @@
+/*
+** squish panel -- like a self-contained quantum system, including space,
+** 				waves, and drawings and interactivity.
+*/
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -7,10 +11,10 @@ import {createSpaceNWave} from './wave/theWave';
 import {qeSpace, qeStartPromise, qeDefineAccess} from './wave/qEngine';
 import qe from './wave/qe';
 
-import SquishView from './views/SquishView';
+import SquishView from './view/SquishView';
 
-import {abstractViewDef, manualViewDef, viewVariableViewDef} from './views/abstractViewDef';
-import flatViewDef from './views/flatViewDef';
+import {abstractViewDef, manualViewDef, viewVariableViewDef} from './view/abstractViewDef';
+import flatViewDef from './view/flatViewDef';
 import ResolutionDialog from './ResolutionDialog';
 
 

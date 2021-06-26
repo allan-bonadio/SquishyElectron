@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {qeSpace} from './wave/qEngine';
-import SquishPanel, {listOfViewClasses} from './SquishPanel';
+import SquishPanel from './SquishPanel';
 import SquishDialog from './SquishDialog';
 
 // had this been a real webiste, I would not have to copy/paste these here
@@ -103,7 +103,7 @@ export default class ResolutionDialog extends React.Component {
 
 	OK(ev) {
 		debugger;
-		const s = //this.state;
+		//const s = //this.state;
 		ResolutionDialog.okCallback(this.state);
 		SquishDialog.closeDialog();
 	}
@@ -216,7 +216,7 @@ export default class ResolutionDialog extends React.Component {
 	}
 
 	render() {
-		const s = this.state;
+		//const s = this.state;
 
 		return
 			<article className='dialog ResolutionDialog' style={{fontSize: '80%'}}>
