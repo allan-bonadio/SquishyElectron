@@ -13,17 +13,21 @@ import qe from './wave/qe';
 
 import SquishView from './view/SquishView';
 
-import {abstractViewDef, manualViewDef, viewVariableViewDef} from './view/abstractViewDef';
+import abstractViewDef from './view/abstractViewDef';
+import manualViewDef from './view/manualViewDef';
+import viewVariableViewDef from './view/viewVariableViewDef';
 import flatViewDef from './view/flatViewDef';
+
 import ResolutionDialog from './ResolutionDialog';
 
 
-// flatViewDef  abstractViewDef      manualViewDef     viewVariableViewDef
+const makeSureTheyreAllImported = {flatViewDef,  abstractViewDef,      manualViewDef,     viewVariableViewDef};
 const DEFAULT_VIEW_CLASS_NAME =
-//'flatViewDef';
-//'abstractViewDef';
-'viewVariableViewDef';
 //'manualViewDef';
+//'abstractViewDef';
+//'viewVariableViewDef';
+'flatViewDef';
+makeSureTheyreAllImported[0] = 'use me';
 
 const DEFAULT_RESOLUTION = 5;
 const DEFAULT_CONTINUUM = qeSpace.contCIRCULAR;
@@ -35,6 +39,7 @@ export const listOfViewClassNames = {};
 
 export class SquishPanel extends React.Component {
 	static propTypes = {
+		token: PropTypes.number,
 		////showResolutionDialog: PropTypes.func.isRequired,
 	};
 
@@ -115,10 +120,9 @@ export class SquishPanel extends React.Component {
 		// upon startup, after C++ says it's ready, but remember constructor runs twice
 		qeStartPromise.then((arg) => {
 			qeDefineAccess();
-			setTimeout(() => {
-				this.setNew1DResolution(
-					DEFAULT_RESOLUTION, DEFAULT_CONTINUUM, DEFAULT_VIEW_CLASS_NAME);
-			}, 2000);
+
+			this.setNew1DResolution(
+				DEFAULT_RESOLUTION, DEFAULT_CONTINUUM, DEFAULT_VIEW_CLASS_NAME);
 		}).catch(ex => {
 			console.error(`error in SquishPanel.didMount.then:`, ex);
 			debugger;

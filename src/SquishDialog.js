@@ -6,6 +6,7 @@ import App from './App';
 export default class SquishDialog extends React.Component {
 
 	static propTypes = {
+		token: PropTypes.number,
 //		stateParams: PropTypes.shape({
 //			N: PropTypes.number.isRequired,
 //			continuum: PropTypes.number.isRequired,
@@ -32,12 +33,13 @@ export default class SquishDialog extends React.Component {
 	}
 
 	render() {
-		return
+		return (
 			<aside className='backdrop'>
 				<div className='dialogSpacer' />
 				{SquishDialog.centralComponent}
 				<div className='dialogSpacer' />
-			</aside>;
+			</aside>
+		);
 	}
 
 }

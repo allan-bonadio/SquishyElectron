@@ -17,35 +17,43 @@ const isTesting = false;
 // make the line number for the start a multiple of 10
 const vertexSrc = `
 ${cxToColorGlsl}
-
-
 #line 120
 varying highp vec4 vColor;
 attribute vec4 row;
-//int nPoints = 7;
 uniform int nPoints;
 
 void main() {
 	// figure out y
 	float y;
 	int vertexSerial = int(row.w);
-	if (vertexSerial / 2 * 2 > vertexSerial)
-		y = row.x * row.x + row.y * row.y;
-	else
-		y = 0.;
+	if (vertexSerial / 2 * 2 < vertexSerial) {
+		y = 1.2;
+		//y = row.x * row.x + row.y * row.y;
+	}
+	else {
+		y = -0.2;
+		//y = 0.;
+	}
+	//y=row.w / 10.;
+	//y=0.5;
+
 	// i've got to figure out the vertical mag factor someday.
-	y = y - 1.;
+	//y = y - 1.;
 
 	// figure out x, basically the point index
 	float x;
 	x = float(int(vertexSerial) / 2) / float(nPoints - 1) * 2. - 1.;
+	x = row.w / 6. - 1.;
 
 	// and here we are
 	gl_Position = vec4(x, y, 0., 1.);
 
 	//  for the color, convert the complex values via this algorithm
-	//vColor = vec4(cxToColor(vec2(row.x, row.y)), 1.);
-	vColor = vec4(.9, .9, .1, 1.);
+	vColor = vec4(cxToColor(vec2(row.x, row.y)), 1.);
+	//vColor = vec4(.9, .9, .1, 1.);
+
+	// dot size, in pixels not clip units.  actually a crude square.
+	gl_PointSize = (row.w+1.) * 5.;//10.;
 }
 `;
 
@@ -102,6 +110,7 @@ class flatViewDef extends abstractViewDef {
 //		gl.uniform1f(this.nPointsLoc, this.currentQESpace.nPoints);
 	}
 
+	// hasn't worked for a while
 	setInputsForTesting() {
 		const vAttr = new viewAttribute('row', this, null);
 
@@ -135,17 +144,20 @@ class flatViewDef extends abstractViewDef {
 		gl.useProgram(this.program);
 		//this.rowAttr.reloadVariable()
 
+		gl.lineWidth(10.0);  // it's the only option anyway
+
 		//gl.bindVertexArray(this.vao);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
+
+		gl.drawArrays(gl.LINES, 0, this.vertexCount);
+		//gl.drawArrays(gl.LINE_STRIP, 0, this.vertexCount);
+		gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 	}
 
 }
 
 qeStartPromise.then((arg) => {
-	if (SquishPanel)
-		SquishPanel.addMeToYourList(flatViewDef);
-	else
-		debugger;
+	SquishPanel.addMeToYourList(flatViewDef);
 });
 
 export default flatViewDef;
