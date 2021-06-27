@@ -113,7 +113,10 @@ let prevStart  = performance.now();
 
 // the name says it all.  requestAnimationFrame() will call this probably 60x/sec
 // it will advance one 'frame' in wave time, which i dunno what that is need to tihink about it more.
+// deprecated; see SquishPanel
 function animateOneFrame(now) {
+	debugger;
+	throw "animateOneFrame is deprecated";
 	//console.log(`time since last tic: ${now - startFrame}ms`)
 	let startRK = 0, startUpdate = 0, startReload = 0, startDraw = 0, endFrame = 0;
 
@@ -156,6 +159,9 @@ function animateOneFrame(now) {
 // rate is how fast it goes, or 'one' to single step.
 // I guess it's irrelevant now with requestAnimationFrame()
 export function iterateAnimate(shouldAnimate, rate) {
+	debugger;
+	throw "animateOneFrame is deprecated";
+
 	// hmmm i'm not using the Rate here...
 	if (! shouldAnimate || ! rate || !qe.theCurrentView) {
 		isAnimating = false;

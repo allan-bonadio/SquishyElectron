@@ -3,12 +3,18 @@ import PropTypes from 'prop-types';
 
 import './ControlPanel.css';
 import CPToolbar from './CPToolbar';
-import {theJWave, setWave, setVoltage, iterateAnimate, isItAnimating} from './wave/theWave';
+import {theJWave, setWave, setVoltage, isItAnimating} from './wave/theWave';
+//import {theJWave, setWave, setVoltage, iterateAnimate, isItAnimating} from './wave/theWave';
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
 		//innerActiveWidth: PropTypes.number,
 		openResolutionDialog: PropTypes.func.isRequired,
+		//iterateAnimate: PropTypes.func.isRequired,
+		startIterating: PropTypes.func.isRequired,
+		stopIterating: PropTypes.func.isRequired,
+		singleStep: PropTypes.func.isRequired,
+		isTimeAdvancing: PropTypes.bool,
 	};
 
 	constructor(props) {
@@ -24,66 +30,66 @@ export class ControlPanel extends React.Component {
 	/* *********************************** start and stop buttons */
 
 	// toggle the isRunning boolean, that exists in two places
-	setRunning(ev, isRunning) {
-		isRunning = !!isRunning;
-
-//		if (this.state.isRunning)
-//			iterate(theJWave);
-//		if (isRunning)
-//			theDraw.draw();
-		iterateAnimate(isRunning && this.state.rate);
-
-		if (ev && ev.currentTarget) ev.currentTarget.blur();
-
-		// it is a state of this panel, to color the buttons
-		//this.setState({isRunning});
-
-		// but also a state of the animation
-		//theJWave.isRunning = isRunning;
-	}
-
-	// set rate, which is 1, 2, 4, 8, ...
-	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
-	toggleRunning(ev) {
-		//this.setState({isRunning: false});
-
-		iterateAnimate(!isItAnimating(), this.state.rate);
-
-		if (ev && ev.currentTarget) ev.currentTarget.blur();
-
-	}
-
-	oneStep(ev) {
-		//this.setState({isRunning: false});
-
-		iterateAnimate(false, 'one');
-
-		if (ev && ev.currentTarget) ev.currentTarget.blur();
-	}
+//	setRunning(ev, isRunning) {
+//		isRunning = !!isRunning;
+//
+////		if (this.state.isRunning)
+////			iterate(theJWave);
+////		if (isRunning)
+////			theDraw.draw();
+//		this.props.iterateAnimate(isRunning && this.state.rate);
+//
+//		if (ev && ev.currentTarget) ev.currentTarget.blur();
+//
+//		// it is a state of this panel, to color the buttons
+//		//this.setState({isRunning});
+//
+//		// but also a state of the animation
+//		//theJWave.isRunning = isRunning;
+//	}
+//
+//	// set rate, which is 1, 2, 4, 8, ...
+//	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
+//	toggleRunning(ev) {
+//		//this.setState({isRunning: false});
+//
+//		this.props.iterateAnimate(!isItAnimating(), this.state.rate);
+//
+//		if (ev && ev.currentTarget) ev.currentTarget.blur();
+//
+//	}
+//
+//	oneStep(ev) {
+//		//this.setState({isRunning: false});
+//
+//		this.props.iterateAnimate(false, 'one');
+//
+//		if (ev && ev.currentTarget) ev.currentTarget.blur();
+//	}
 
 	// set rate, which is 1, 2, 4, 8, ...
 	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
 	setRate(rate) {
-		iterateAnimate(isItAnimating(), rate);
+
+		this.props.iterateAnimate(isItAnimating(), rate);
 		this.setState({rate});  // rate is stored in two places, na na na
 //		if (this.state.isRunning)
-//			iterateAnimate(rate);
+//			this.props.iterateAnimate(rate);
 	}
 
 	renderGoStopButtons() {
-		const isRunning = this.state.isRunning;
-
+		let isRunning = this.props.isTimeAdvancing;
 		const repRates = [];
 		for (let rate = 1, i = 0; rate < 64; rate *= 2, i++)
 			repRates.push(<option key={rate} value={rate}>{rate} per sec</option>);
 
 		return <div className='goStopButtons subPanel'>
 			<button type='button' className={'goButton ' + (isRunning && 'on')}
-				onClick={ev => this.setRunning(ev, true)}>
+				onClick={ev => this.startIterating()}>
 					▶
 			</button>
 			<button type='button' className={'stopButton ' + (!isRunning && 'on')}
-				onClick={ev => this.setRunning(ev, false)}>
+				onClick={ev => this.stopIterating()}>
 					◼
 			</button>
 
@@ -92,12 +98,6 @@ export class ControlPanel extends React.Component {
 					onChange={ev => this.setRate(ev.currentTarget.value)}>
 				{repRates}
 			</select>
-
-			<button type='button' className={'filterAndNorm'}
-				onClick={ev => theJWave.lowPassFilter()}>
-					filter & norm
-			</button>
-
 		</div>;
 	}
 
@@ -156,9 +156,10 @@ export class ControlPanel extends React.Component {
 	render() {
 		return <div className='ControlPanel'>
 			<CPToolbar
-				toggleRunning={ev => this.toggleRunning(ev)}
-				oneStep={ev => this.oneStep(ev)}
-				isRunning={this.state.isRunning}
+				startIterating={this.props.startIterating}
+				stopIterating={this.props.stopIterating}
+				singleStep={this.props.singleStep}
+				isTimeAdvancing={this.props.isTimeAdvancing}
 			/>
 			<div className='cpSecondRow'>
 				{this.renderGoStopButtons()}

@@ -18,19 +18,29 @@
 
 .CPToolbar button.toolbarButton {
 	display: inline-block;
-	font-size: 4em;
-	padding: 0 2em;
-	margin: 0 .5em;
+	font-size: 6em;
+	padding: .2em .5em;
+	margin: .1em;
+	cursor: pointer;
+	background-color: linear-gradient(#aaa, #444);
+	border-radius: .5em;
+	width: 3em;
 }
 
 .CPToolbar .isRunning {
+/*
 	background-color: #080;
+ */
 }
 .CPToolbar .notRunning {
+/*
 	background-color: #800;
+ */
 }
 .CPToolbar .stepButton {
+/*
 	background-color: #008;
+ */
 }
 
 

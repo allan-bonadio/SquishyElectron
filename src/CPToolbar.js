@@ -8,61 +8,31 @@ import {isItAnimating} from './wave/theWave';
 
 function setPT() {
 	CPToolbar.propTypes = {
-		toggleRunning: PropTypes.func.isRequired,
-		oneStep: PropTypes.func.isRequired,
-	}
-};
+		startIterating: PropTypes.func.isRequired,
+		stopIterating: PropTypes.func.isRequired,
+		singleStep: PropTypes.func.isRequired,
+		isTimeAdvancing: PropTypes.bool,
+	};
+}
 
 function CPToolbar(props) {
-//	constructor(props) {
-//		super(props);
-//
-//		this.state = {
-//			isRunning: false,
-//			rate: 8,
-//			harmonicFrequency: 1, constantFrequency: 1,
-//		};
-//	}
-
-
-	// toggle the isRunning boolean, that exists in two places
-//	function toggleRunning(ev) {
-//		let newRunning = !isItAnimating;
-//
-////		if (this.state.isRunning)
-////			iterate(theJWave);
-////		if (isRunning)
-////			theDraw.draw();
-//		iterateAnimate(isRunning && props.rate);
-//
-//		ev.currentTarget.blur();
-//
-//		// it is a state of this panel, to color the buttons
-//		props.setRunning(isRunning);
-
-		// but also a state of the animation
-		//theJWave.isRunning = isRunning;
-//	}
-//
-//
-//	render() {
 	const isRunningClass = isItAnimating() ? 'isRunning' : 'notRunning';
 
 	return <div className='CPToolbar'>
-		<button type='button' className={`startStopToggleButton toolbarButton on ${isRunningClass}`}
-			onClick={ev => props.toggleRunning(ev)}>
-			{ isItAnimating()
-				? ' ▶️ ️'
-				: ' ⏸ ' }
+		<button type='button' className={`startStopToggleButton toolbarButton`}
+			onClick={ev => {
+				if (props.isTimeAdvancing)
+					props.stopIterating();
+				else
+					props.startIterating();
+			}}>
+			{ props.isTimeAdvancing
+				? ' | | '
+				: ' ► ' }
 				</button>
 		<button type='button' className={`stepButton toolbarButton on `}
-			onClick={ev => props.oneStep(ev)}>
-			⏯
-		</button>
-		<button type='button' className={'stopButtonXXX '}
-			style={{display: 'none'}}
-			onClick={ev =>props.toggleRunning(ev, false)}>
-			don\'t click ⏸   ▶️   ⏸   ⏯   ⏹   ⏺    ⏭    ⏮    ⏩  ⏪           
+			onClick={ev => props.singleStep()}>
+			⇥
 		</button>
 
 
