@@ -13,6 +13,7 @@ export class viewVariableViewDef extends abstractViewDef {
 	static viewClassName: 'viewVariableViewDef';
 
 	// same constructor and everything else, mostly
+
 	setShaders() {
 		this.vertexShaderSrc = `
 		attribute vec4 corner;
@@ -104,6 +105,4 @@ export class viewVariableViewDef extends abstractViewDef {
 
 export default viewVariableViewDef;
 
-qeStartPromise.then((arg) => {
-	SquishPanel.addMeToYourList(viewVariableViewDef);
-});
+viewVariableViewDef.viewClassName = 'viewVariableViewDef';

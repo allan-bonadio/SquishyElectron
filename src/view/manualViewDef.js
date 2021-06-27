@@ -70,6 +70,4 @@ export class manualViewDef extends abstractViewDef {
 export default manualViewDef;
 
 
-qeStartPromise.then((arg) => {
-	SquishPanel.addMeToYourList(manualViewDef);
-});
+manualViewDef.viewClassName = 'manualViewDef';

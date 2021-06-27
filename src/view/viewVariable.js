@@ -1,26 +1,28 @@
 
+// attr arrays and uniforms that can change on every frame.
 
-
-let ddraw = true;
-
-// attr arrays and uniforms can change on every frame.
-// These help.
-
-// superclass for both of these
+// superclass for all of these.
 export class viewVariable {
-	constructor(varName, view) {
-		this.view = view;
-		this.gl = view.gl;
-		this.varName = varName;
-		if (! varName || ! view) throw `bad name${!varName} or view${!view} used to create a view var`;
-		view.viewVariables.push(this);
+	// the owner is the view or the drawing it's used in.  Must have a:
+	// gl, vaoExt, viewVariables array, bufferDataDrawMode enum
+	// program,
+	constructor(varName, owner) {
+		this.owner = owner;
+		this.gl = owner.gl;
+		this.vaoExt = owner.vaoExt;
 
-		// i need a gl to get these numbers
-		if (ddraw)
-			this.bufferDataDrawMode = this.gl.DYNAMIC_DRAW;
-		else
-			this.bufferDataDrawMode = this.gl.STATIC_DRAW;
-		//bufferDataDrawMode = this.gl.STATIC_DRAW;
+		this.varName = varName;
+		if (! varName || ! owner) throw `bad name${!varName} or owner${!owner} used to create a view var`;
+
+		// both views and drawings often have this array, so 'owner' might not be a view
+		let vv = owner.viewVariables;
+		if (vv.includes(this)) {
+			console.error(`duplicate variable ${varName}!!`);
+			return null;  // thisis a duplicate, why?
+		}
+		vv.push(this);
+
+		this.bufferDataDrawMode = owner.bufferDataDrawMode;
 	}
 }
 
@@ -29,8 +31,8 @@ export class viewVariable {
 
 // create this as many times as you have uniforms as input to either or both shaders
 export class viewUniform extends viewVariable {
-	constructor(varName, view) {
-		super(varName, view);
+	constructor(varName, owner) {
+		super(varName, owner);
 
 		//function that will get value
 		//from wherever and return it.
@@ -38,7 +40,7 @@ export class viewUniform extends viewVariable {
 		//this.valueVar = getFunc;
 
 		// this turns out to be an internal magic object
-		this.uniformLoc = this.gl.getUniformLocation(this.view.program, varName);
+		this.uniformLoc = this.gl.getUniformLocation(this.owner.program, varName);
 		if (!this.uniformLoc) throw `Cannot find uniform loc for uniform variable ${varName}`;
 	}
 
@@ -79,7 +81,7 @@ export class viewUniform extends viewVariable {
 		if ((! value && value !== 0) || ! type)
 			throw `uniform variable has no value(${value}) or no type(${type})`;
 		const gl = this.gl;
-		const pgm = this.view.program;
+		const pgm = this.owner.program;
 
 		gl.useProgram(pgm);  // a Gain?
 
@@ -108,12 +110,12 @@ export class viewUniform extends viewVariable {
 /* *********************************************** attributes for arrays */
 // create this as many times as you have buffers as input to either shader
 export class viewAttribute extends viewVariable {
-	constructor(varName, view) {
-		super(varName, view);
+	constructor(varName, owner) {
+		super(varName, owner);
 		const gl = this.gl;
 
 		// small integer indicating which attr this is
-		const atLo = this.attrLocation = gl.getAttribLocation(view.program, varName);
+		const atLo = this.attrLocation = gl.getAttribLocation(owner.program, varName);
 
 		if (atLo < 0)
 			throw `viewAttribute:attr loc for '${varName}' is bad: `+ atLo;
@@ -125,7 +127,7 @@ export class viewAttribute extends viewVariable {
 	// <offset> from the start of each row.  size=1,2,3 or 4,
 	// to make an attr that's a scalar, vec2, vec3 or vec4
 	attachArray(float32TypedArray, size, stride = size * 4, offset = 0) {
-		const gl = this.view.gl;
+		const gl = this.gl;
 
 		// allocate actual ram in GPU chip
 		const gBuf = this.glBuffer = gl.createBuffer();
@@ -133,7 +135,7 @@ export class viewAttribute extends viewVariable {
 		// magical vao which is apparently a list of cpu-side buffers.
 		// Each is named with some integer in opengl, but I don't think we see these in webgl 1.
 		// you have to dispose of it ultimately
-		const vaoExt = this.view.vaoExt;
+		const vaoExt = this.vaoExt;
 		let vao = this.vao = vaoExt.createVertexArrayOES();
 		vaoExt.bindVertexArrayOES(vao);
 		// now do calls to bindBuffer() or vertexAttribPointer()
@@ -143,7 +145,7 @@ export class viewAttribute extends viewVariable {
 		gl.bindBuffer(gl.ARRAY_BUFFER, gBuf);
 
 		// now attach some data to it, with CPU-side arrays
-		this.float32TypedArray = float32TypedArray;
+		this.float32TypedArray = this.owner.float32TypedArray = float32TypedArray;
 		gl.bufferData(gl.ARRAY_BUFFER, float32TypedArray, this.bufferDataDrawMode);
 
 		gl.enableVertexAttribArray(this.attrLocation);
@@ -169,7 +171,7 @@ export class viewAttribute extends viewVariable {
 
 	// call this when the array's values change, to reload them into the GPU
 	reloadVariable() {
-		const gl = this.view.gl;
+		const gl = this.gl;
 		//console.log(`reload Array variable ${this.varName} : `, this.float32TypedArray);
 		// not sure we have to do this again...
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);

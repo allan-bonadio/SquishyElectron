@@ -116,7 +116,7 @@ let prevStart  = performance.now();
 // deprecated; see SquishPanel
 function animateOneFrame(now) {
 	debugger;
-	throw "animateOneFrame is deprecated";
+	//throw "animateOneFrame is deprecated";
 	//console.log(`time since last tic: ${now - startFrame}ms`)
 	let startRK = 0, startUpdate = 0, startReload = 0, startDraw = 0, endFrame = 0;
 
@@ -160,7 +160,7 @@ function animateOneFrame(now) {
 // I guess it's irrelevant now with requestAnimationFrame()
 export function iterateAnimate(shouldAnimate, rate) {
 	debugger;
-	throw "animateOneFrame is deprecated";
+	//throw "animateOneFrame is deprecated";
 
 	// hmmm i'm not using the Rate here...
 	if (! shouldAnimate || ! rate || !qe.theCurrentView) {

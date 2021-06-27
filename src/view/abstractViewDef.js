@@ -3,12 +3,6 @@ import {viewUniform, viewAttribute} from './viewVariable';
 import SquishPanel from '../SquishPanel';
 import {qeStartPromise} from '../wave/qEngine';
 
-// right now this is set in constructor
-let bufferDataDrawMode;
-
-//let sp = SquishPanel;  // tell optimizer to gimme Squish Panel
-
-
 // Each abstractViewDef subclass is a definition of a kind of view; one per each kind of view.
 // (A SquishView owns an instance of the def and is a React component.)
 // This is the superclass of all view defs; with common webgl and space plumbing.
@@ -19,7 +13,7 @@ export class abstractViewDef {
 	static viewClassName: 'abstractViewDef';
 
 	/* ************************************************** construction */
-	constructor(viewName, canvas) {
+	constructor(viewName, canvas, space) {
 		this.viewVariables = [];
 
 		this.viewName = viewName;
@@ -27,23 +21,21 @@ export class abstractViewDef {
 		this.canvas = canvas;
 		this.initCanvas();
 
+		this.space = space;  // optional
 
-
-		// really a global, at least within this file, so this is how you turn this one way
+		// really a global, for this file and all descenden tviews and drawings
+		// and variables, so this is how you turn this one way
 		// or another, if it makes a diff
-		bufferDataDrawMode = this.bufferDataDrawMode = this.gl.DYNAMIC_DRAW;
+		this.bufferDataDrawMode = this.gl.DYNAMIC_DRAW;
 		//bufferDataDrawMode = this.gl.STATIC_DRAW;
 
-
-
-		// after construction, the instantiator should call compileProgram()
 	}
 
 	// preliminary construction, called in constructor
 	initCanvas() {
 		let gl = this.gl = this.canvas.getContext("webgl");
 		if (! gl)
-			gl = this.gl = this.canvas.getContext("experimental-webgl");
+			gl = this.gl = this.canvas.getContext("experimental-webgl");  // really old
 
 
 		if (!gl) throw `Sorry this browser doesn't do WebGL!  You might be able to turn it on ...`;
@@ -82,8 +74,12 @@ export class abstractViewDef {
 	completeView() {
 		this.setShaders();
 		this.setInputs();
+
 		this.setGeometry();
+
+		// kick it off by drawing it once
 		this.draw();
+
 
 		// just for curiosity's sake
 		//curioShader(this.gl, this.vertexShader);
@@ -184,7 +180,7 @@ export class abstractViewDef {
 		cornerAttr.attachArray(corners, 2);
 
 //		also try gl.DYNAMIC_DRAW here
-//		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), bufferDataDrawMode);
+//		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), this.bufferDataDrawMode);
 //
 //		var vao = this.vaoExt.createVertexArrayOES();
 //		this.vaoExt.bindVertexArrayOES(vao);
@@ -385,7 +381,7 @@ export class abstractViewDef {
 			  0, 0.5,
 			  0.7, 0,
 			];
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), bufferDataDrawMode);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), this.bufferDataDrawMode);
 
 			vao = this.vaoExt.createVertexArrayOES();
 			this.vaoExt.bindVertexArrayOES(vao);
@@ -455,11 +451,4 @@ export class abstractViewDef {
 
 export default abstractViewDef;
 
-
-// this is the way to do it
-qeStartPromise.then((arg) => {
-	if (SquishPanel) {
-		//debugger;//  hey does this owrk?
-		SquishPanel.addMeToYourList(abstractViewDef);
-	}
-});
+abstractViewDef.viewClassName = 'abstractViewDef';

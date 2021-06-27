@@ -1,9 +1,9 @@
-import abstractViewDef from './abstractViewDef';
+import abstractDrawing from './abstractDrawing';
 import {cxToColorGlsl} from './cxToColor.glsl';
 import qe from '../wave/qe';
 import {viewUniform, viewAttribute} from './viewVariable';
-import SquishPanel from '../SquishPanel';
-import {qeStartPromise} from '../wave/qEngine';
+//import SquishPanel from '../SquishPanel';
+//import {qeStartPromise} from '../wave/qEngine';
 
 /*
 ** data format of attributes:  four column table of floats
@@ -67,16 +67,16 @@ void main() {
 `;
 
 // the original display that's worth watching
-class flatViewDef extends abstractViewDef {
-	static viewName: 'flatViewDef';
-	static viewClassName: 'flatViewDef';
+class flatDrawing extends abstractDrawing {
 
-	constructor(viewName, canvas, space) {
-		super(viewName, canvas, space);
-
-		if (! space) throw  `flatViewDef: being created without space`;
-//		this.space = space;
+	constructor(view, space) {
+		super(view, space);
+		//view.drawings.push(this);
+		//this.view = view;
 	}
+
+	static drawingClassName: 'flatDrawing';
+	drawingClassName: 'flatDrawing';
 
 	setShaders() {
 		this.vertexShaderSrc = vertexSrc;
@@ -90,15 +90,15 @@ class flatViewDef extends abstractViewDef {
 		const highest = qe.updateViewBuffer();
 
 		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
-		let nPoints = this.nPoints = this.space.nPoints;
+		let nPoints = this.nPoints = this.space ? this.space.nPoints : 10;
 		let barWidth = 1 / (nPoints - 1);
 		barWidthUniform.setValue(barWidth, '1f');
 
 		let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
-		let unitHeight = 1;
-		unitHeightUniform.setValue(unitHeight, '1f');
+		this.unitHeight = 1;
+		unitHeightUniform.setValue(this.unitHeight, '1f');
 
-		const rowAttr = this.rowAttr = new viewAttribute('row', this);
+		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
 		this.rowAttr.attachArray(qe.space.viewBuffer, this.rowFloats);
@@ -108,10 +108,7 @@ class flatViewDef extends abstractViewDef {
 	draw() {
 		const gl = this.gl;
 
-		gl.clearColor(0, 0, 0, 1);
-		gl.clear(gl.COLOR_BUFFER_BIT);
-
-		gl.useProgram(this.program);
+		//gl.useProgram(this.program);
 		//this.rowAttr.reloadVariable()
 
 		//gl.bindVertexArray(this.vao);
@@ -130,7 +127,5 @@ class flatViewDef extends abstractViewDef {
 
 }
 
-flatViewDef.viewClassName = 'flatViewDef';
-
-export default flatViewDef;
+export default flatDrawing;
 

@@ -19,23 +19,31 @@ import abstractViewDef from './view/abstractViewDef';
 import manualViewDef from './view/manualViewDef';
 import viewVariableViewDef from './view/viewVariableViewDef';
 import flatViewDef from './view/flatViewDef';
+import flatDrawingViewDef from './view/flatDrawingViewDef';
+import drawingViewDef from './view/drawingViewDef';
 
 
+// unfortunately, we hafe to have a list of all the view types.  here.
+// this will appear in the resolution dialog
+export const listOfViewClassNames = {
+	manualViewDef, abstractViewDef, viewVariableViewDef,
+	flatViewDef,
 
-const makeSureTheyreAllImported = {flatViewDef,  abstractViewDef,      manualViewDef,     viewVariableViewDef};
+	drawingViewDef,
+	flatDrawingViewDef, };
+
+
 const DEFAULT_VIEW_CLASS_NAME =
 //'manualViewDef';
 //'abstractViewDef';
 //'viewVariableViewDef';
-'flatViewDef';
-makeSureTheyreAllImported[0] = 'use me';
+//'flatViewDef';
+//'flatViewDef';
+'flatDrawingViewDef';
 
 const DEFAULT_RESOLUTION = 5;
 const DEFAULT_CONTINUUM = qeSpace.contCIRCULAR;
 
-
-// this will appear in the resolution dialog
-export const listOfViewClassNames = {};
 
 
 export class SquishPanel extends React.Component {
@@ -47,7 +55,7 @@ export class SquishPanel extends React.Component {
 	// if you subclass abstractViewDef, call this to join the 'in' crowd
 	// and be listed
 	static addMeToYourList(aViewClass) {
-		listOfViewClassNames[aViewClass.name] = aViewClass;
+		listOfViewClassNames[aViewClass.viewClassName] = aViewClass;
 	}
 
 	static getListOfViews() {
@@ -72,11 +80,6 @@ export class SquishPanel extends React.Component {
 			// but more the control panel
 			isTimeAdvancing: false,
 		};
-
-		// although these are, in a sense, 'state', changes don't cause a re-rendering
-		// (ie react) of the canvas; just a redrawing of its contents (ie webgl)
-		this.curUnitHeight = 1;  // always what's displayed
-		this.targetUnitHeight = 1;  // always a power of 2; only changes cuz highest
 
 		// never changes once set
 		this.canvas = null;
@@ -133,14 +136,14 @@ export class SquishPanel extends React.Component {
 		ResolutionDialog.openResolutionDialog(
 			{N: s.N, continuum: s.continuum, viewClassName: s.viewClassName},
 
-			// success callback
+			// OK callback
 			finalParams => {
 				this.setNew1DResolution(
 					finalParams.N, finalParams.continuum, finalParams.viewClassName);
 				this.setState({isTimeAdvancing: timeWasAdvancing});
 			},
 
-			// failure callback
+			// cancel callback
 			() => {
 				this.setState({isTimeAdvancing: timeWasAdvancing});
 			}
@@ -153,6 +156,7 @@ export class SquishPanel extends React.Component {
 	// it will advance one 'frame' in wave time, which i dunno what that is need to tihink about it more.
 	animateOneFrame(now) {
 		const s = this.state;
+		let needsRepaint = false;
 
 		//console.log(`time since last tic: ${now - startFrame}ms`)
 		let startRK = 0, startUpdate = 0, startReload = 0, startDraw = 0, endFrame = 0;
@@ -166,24 +170,30 @@ export class SquishPanel extends React.Component {
 
 			if (areBenchmarking) startUpdate = performance.now();
 			let highest = qe.updateViewBuffer();
-			if (this.dumpingTheViewBuffer) this.dumpViewBuffer();
+			let cView = s.currentView;
+			if (cView.reportHighest)
+				needsRepaint = needsRepaint || cView.ifNeedsPaint(highest);
+
+			if (this.dumpingTheViewBuffer)
+				this.dumpViewBuffer();
 
 			// adjust our unit height?
-			const highestHeight = highest * this.targetUnitHeight;
-			if (highestHeight > 1.)
-				this.targetUnitHeight /= 2;
-			else if (highestHeight < .25)
-				this.targetUnitHeight *= 2;
+			//const highestHeight = highest * this.targetUnitHeight;
+			//if (highestHeight > 1.)
+			//	this.targetUnitHeight /= 2;
+			//else if (highestHeight < .25)
+			//	this.targetUnitHeight *= 2;
 		}
 
-		// if we need to repaint...
-		if (s.isTimeAdvancing || this.curUnitHeight != this.targetUnitHeight || this.onceMore) {
+		// if we need to repaint... if we're iterating, if the view says we have to,
+		// or if this is a one shot step
+		if (s.isTimeAdvancing || needsRepaint || this.onceMore) {
 			if (areBenchmarking) startReload = performance.now();
 			qe.theCurrentView.viewVariables.forEach(v => v.reloadVariable());
 			//qe.theCurrentView.viewVariables[0].reloadVariable();
 
 			if (areBenchmarking) startDraw = performance.now();
-			qe.theCurrentView.draw(this.curUnitHeight);
+			qe.theCurrentView.draw();
 
 			endFrame = performance.now();
 			if (areBenchmarking) {
@@ -201,15 +211,15 @@ export class SquishPanel extends React.Component {
 				this.setState({isTimeAdvancing: false});
 			this.onceMore = false;
 
-			if (this.curUnitHeight != this.targetUnitHeight) {
-				// exponential relaxation
-				this.curUnitHeight = (15 * this.curUnitHeight + this.targetUnitHeight) / 16;
-				if (Math.abs((this.curUnitHeight - this.targetUnitHeight) / this.targetUnitHeight) < .01) {
-					//ok we're done.  close enough.
-					this.curUnitHeight = this.targetUnitHeight;
-					//this.onceMore = true;  // just to make sure it paints
-				}
-			}
+			//if (this.curUnitHeight != this.targetUnitHeight) {
+			//	// exponential relaxation
+			//	this.curUnitHeight = (15 * this.curUnitHeight + this.targetUnitHeight) / 16;
+			//	if (Math.abs((this.curUnitHeight - this.targetUnitHeight) / this.targetUnitHeight) < .01) {
+			//		//ok we're done.  close enough.
+			//		this.curUnitHeight = this.targetUnitHeight;
+			//		//this.onceMore = true;  // just to make sure it paints
+			//	}
+			//}
 		}
 
 		// harmless if this just falls thru, right?
@@ -273,7 +283,7 @@ export class SquishPanel extends React.Component {
 	}
 
 	singleStep() {
-		this.onceMore = true;
+		this.onceMore = true;  // will stop iterating after next frame
 		this.setState({isTimeAdvancing: true});
 	}
 
