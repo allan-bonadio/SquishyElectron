@@ -94,8 +94,8 @@ export class viewUniform extends viewVariable {
 			args.push(false);
 		args.push(value);
 
-		console.log(`reload Uniform variable ${this.varName} with `+
-			` method gl.${method}() with these args:`, args);
+		//console.log(`reload Uniform variable ${this.varName} with `+
+		//	` method gl.${method}() with these args:`, args);
 
 		gl.useProgram(pgm);  // a Gain?
 
@@ -170,7 +170,7 @@ export class viewAttribute extends viewVariable {
 	// call this when the array's values change, to reload them into the GPU
 	reloadVariable() {
 		const gl = this.view.gl;
-		console.log(`reload Array variable ${this.varName} : `, this.float32TypedArray);
+		//console.log(`reload Array variable ${this.varName} : `, this.float32TypedArray);
 		// not sure we have to do this again...
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
 
