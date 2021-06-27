@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import './ControlPanel.css';
 import CPToolbar from './CPToolbar';
-import {theJWave, setWave, setVoltage, isItAnimating} from './wave/theWave';
+import {setWave, setVoltage, isItAnimating} from './wave/theWave';
 //import {theJWave, setWave, setVoltage, iterateAnimate, isItAnimating} from './wave/theWave';
 
 export class ControlPanel extends React.Component {

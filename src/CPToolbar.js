@@ -1,10 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {isItAnimating} from './wave/theWave';
-//import ControlPanel from './ControlPanel';
-//import './ControlPanel.css';
-
-//import {iterateAnimate} from './wave/theWave';
 
 function setPT() {
 	CPToolbar.propTypes = {
@@ -16,7 +11,7 @@ function setPT() {
 }
 
 function CPToolbar(props) {
-	const isRunningClass = isItAnimating() ? 'isRunning' : 'notRunning';
+//	const isRunningClass = isItAnimating() ? 'isRunning' : 'notRunning';
 
 	return <div className='CPToolbar'>
 		<button type='button' className={`startStopToggleButton toolbarButton`}
