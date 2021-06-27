@@ -59,20 +59,22 @@ export default class ResolutionDialog extends React.Component {
 		N: PropTypes.number.isRequired,
 		continuum: PropTypes.number.isRequired,
 		viewClassName: PropTypes.string.isRequired,
-//		closeResolutionDialog: PropTypes.func.isRequired,
 	};
 
 	// this is the state in the dialog; doesn't become real until OK().
 	// Therefore, initial values set from props.
 	state = {
-		N: powerToIndex(this.props.N),
+		N: this.props.N,
 		powerOf10: powerToIndex(this.props.N),
 		continuum: this.props.continuum,
 		viewClassName: this.props.viewClassName,
 	};
 
 	handleChangePowersOf10(ev) {
-		this.setState({powerOf10: ev.target.valueAsNumber});
+		this.setState({
+			powerOf10: ev.target.valueAsNumber,
+			N: indexToPower(ev.target.valueAsNumber),
+		});
 	}
 
 	/* ******************************************************************* open/close */
@@ -80,39 +82,43 @@ export default class ResolutionDialog extends React.Component {
 	static initialParams;
 	static me = this;
 
-	static openDialog(initialParams, okCallback, cancelCallback) {
+	// open the Resolution dialog specifically
+	static openResolutionDialog(initialParams, okCallback, cancelCallback) {
 		ResolutionDialog.initialParams = initialParams;
 		ResolutionDialog.okCallback = okCallback;
 		ResolutionDialog.cancelCallback = cancelCallback;
 
+		// open the general dialog with resolutionDialog as the main component
 		SquishDialog.openDialog(
 			<ResolutionDialog
 				N={initialParams.N}
 				continuum={initialParams.continuum}
-				viewClassName={initialParams.viewClassName}/>,
-			ResolutionDialog.closeDialog
+				viewClassName={initialParams.viewClassName}
+			/>,
+
+			// close function
+			ResolutionDialog.closeDialog,
 		);
 	}
 
-	// called by App when the dialog closes/hides
+	// NEVER called by App when the dialog closes/hides, whether by OK or cancel
+	// deprecated
 	static closeDialog() {
 		debugger;
 
 	}
 
-
+	// called when user clicks OK, before dialog is hidden in App
 	OK(ev) {
-		debugger;
 		//const s = //this.state;
 		ResolutionDialog.okCallback(this.state);
-		SquishDialog.closeDialog();
+		SquishDialog.startClosingDialog();
 	}
 
+	// called when user clicks Cancel, before dialog is hidden in App
 	cancel(ev) {
-		debugger;
-
 		ResolutionDialog.cancelCallback();
-		SquishDialog.closeDialog();
+		SquishDialog.startClosingDialog();
 	}
 
 
@@ -253,7 +259,7 @@ export default class ResolutionDialog extends React.Component {
 							Cancel
 					</button>
 					<button type='button' className='setResolutionOKButton'
-						onClick={ev => this.OK()}>
+						onClick={ev => this.OK(ev)}>
 							Recreate Universe
 					</button>
 				</section>

@@ -19,17 +19,19 @@ export default class SquishDialog extends React.Component {
 
 	static me = this;
 
-	static openDialog(centralComponent, dialogCloseCallback) {
+	static openDialog(centralComponent) {
 		SquishDialog.centralComponent = centralComponent;
-		SquishDialog.dialogCloseCallback = dialogCloseCallback;
-		App.showDialog(SquishDialog.closeDialog);
+		App.showDialog();
 	}
 
-	static closeDialog() {
-		SquishDialog.dialogCloseCallback();
-		SquishDialog.dialogCloseCallback = null;
-		SquishDialog.centralComponent = null;
+	// called by client sw (whoever called us) after user clicks OK or Cancel
+	static startClosingDialog() {
 		App.hideDialog();
+	}
+
+	// called when App finishes closing it
+	static finishClosingDialog() {
+		SquishDialog.centralComponent = null;
 	}
 
 	render() {

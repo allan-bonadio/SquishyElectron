@@ -43,15 +43,13 @@ class App extends React.Component {
 
 
 	// this is called before the ResolutionDialog has been instantiated
-	static showDialog(dialogCloseCallback) {
-		App.dialogCloseCallback = dialogCloseCallback;
+	static showDialog() {
 		App.me.setState({isDialogShowing: true});
 	}
 
 	static hideDialog() {
 		App.me.setState({isDialogShowing: false});
-		App.dialogCloseCallback(0);
-		App.dialogCloseCallback = null;
+		SquishDialog.finishClosingDialog();
 	}
 
 	/* ************************************************ App */
