@@ -1,7 +1,9 @@
-import abstractViewDef from './abstractViewDef';
-import {cxToColorGlsl} from './cxToColor.glsl';
+
+import abstractDrawing from './abstractDrawing';
 import qe from '../wave/qe';
 import {viewUniform, viewAttribute} from './viewVariable';
+//import SquishPanel from '../SquishPanel';
+//import {qeStartPromise} from '../wave/qEngine';
 
 /*
 ** data format of attributes:  four column table of floats
@@ -16,39 +18,32 @@ let alsoDrawPoints = false, alsoDrawLines = false;
 let ps = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
 
 // make the line number for the start a multiple of 10
-const vertexSrc = `${cxToColorGlsl}
+const vertexSrc = `
 #line 122
-varying highp vec4 vColor;
 attribute vec4 row;
 uniform float barWidth;
 uniform float unitHeight;
 
 void main() {
 	// figure out y
-	float y;
+	float y = row.z * unitHeight;
+	float thickness = unitHeight * .03;
 	int vertexSerial = int(row.w);
 	if (vertexSerial / 2 * 2 < vertexSerial) {
-		y = (row.x * row.x + row.y * row.y) * unitHeight;
+		y += thickness; // odd
 	}
 	else {
-		y = 0.;
+		y -= thickness;  // even
 	}
-	//y=row.w / 10.;
-	//y=0.5;
 
-	y = 1. - 2. * y;
+	y = 2. * y - 1.;
 
 	// figure out x, basically the point index
 	float x;
 	x = float(int(vertexSerial) / 2) * barWidth * 2. - 1.;
-	//x = row.w / 6. - 1.;
 
 	// and here we are
 	gl_Position = vec4(x, y, 0., 1.);
-
-	//  for the color, convert the complex values via this algorithm
-	vColor = vec4(cxToColor(vec2(row.x, row.y)), 1.);
-	//vColor = vec4(.9, .9, .1, 1.);
 
 	// dot size, in pixels not clip units.  actually a square.
 	${ps}
@@ -57,24 +52,23 @@ void main() {
 
 const fragmentSrc = `
 precision highp float;
-varying highp vec4 vColor;
 
 void main() {
-	gl_FragColor = vColor;
+	gl_FragColor = vec4(1., 1., 1., .7);
 }
 `;
 
 // the original display that's worth watching
-class flatViewDef extends abstractViewDef {
-	static viewName: 'flatViewDef';
-	static viewClassName: 'flatViewDef';
+class potentialDrawing extends abstractDrawing {
 
-	constructor(viewName, canvas, space) {
-		super(viewName, canvas, space);
-
-		if (! space) throw  `flatViewDef: being created without space`;
-//		this.space = space;
+	constructor(view, space) {
+		super(view, space);
+		//view.drawings.push(this);
+		//this.view = view;
 	}
+
+	static drawingClassName: 'potentialDrawing';
+	drawingClassName: 'potentialDrawing';
 
 	setShaders() {
 		this.vertexShaderSrc = vertexSrc;
@@ -92,11 +86,13 @@ class flatViewDef extends abstractViewDef {
 		let barWidth = 1 / (nPoints - 1);
 		barWidthUniform.setValue(barWidth, '1f');
 
+		// note unit height for potential is different from unit potential for wave!
 		let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
-		let unitHeight = 1;
-		unitHeightUniform.setValue(unitHeight, '1f');
+		this.unitHeight = .125;
+		unitHeightUniform.setValue(this.unitHeight, '1f');
 
-		const rowAttr = this.rowAttr = new viewAttribute('row', this);
+		// this shares the view buf with wave, [re, im, potential, serial]
+		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
 		this.rowAttr.attachArray(qe.space.viewBuffer, this.rowFloats);
@@ -106,13 +102,7 @@ class flatViewDef extends abstractViewDef {
 	draw() {
 		const gl = this.gl;
 
-		gl.clearColor(0, 0, 0, 1);
-		gl.clear(gl.COLOR_BUFFER_BIT);
-
 		gl.useProgram(this.program);
-		//this.rowAttr.reloadVariable()
-
-		//gl.bindVertexArray(this.vao);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 
 		if (alsoDrawLines) {
@@ -126,9 +116,42 @@ class flatViewDef extends abstractViewDef {
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 	}
 
+	/* ************************************************************************  interactive */
+
+	mouseCoords(ev) {
+		console.log(`mouse: `, ev.clientX, ev.clientY, ev.buttons.toString(16));
+	}
+
+	mouseDown(ev) {
+
+	}
+
+	mouseMove(ev) {
+		this.mouseCoords(ev);
+	}
+
+	mouseUp(ev) {
+
+	}
+
+	mouseEnter(ev) {
+
+	}
+
+	mouseLeave(ev) {
+
+	}
+
+	domSetup(canvas) {
+		// we dont use react event handlers here - this has nothing to do with React.
+		canvas.addEventListener('mousedown', ev => this.mouseDown(ev), false);
+		window.addEventListener('mousemove', ev => this.mouseMove(ev), false);
+		window.addEventListener('mouseup', ev => this.mouseUp(ev), false);
+		window.addEventListener('mouseEnter', ev => this.mouseEnter(ev), false);
+		window.addEventListener('mouseLeave', ev => this.mouseLeave(ev), false);
+
+	}
 }
 
-flatViewDef.viewClassName = 'flatViewDef';
-
-export default flatViewDef;
+export default potentialDrawing;
 

@@ -1,7 +1,5 @@
 import {viewUniform, viewAttribute} from './viewVariable';
 //import {curioShader, curioProgram, curioParameter} from './curiosity';
-import SquishPanel from '../SquishPanel';
-import {qeStartPromise} from '../wave/qEngine';
 
 // Each abstractViewDef subclass is a definition of a kind of view; one per each kind of view.
 // (A SquishView owns an instance of the def and is a React component.)
@@ -79,6 +77,9 @@ export class abstractViewDef {
 
 		// kick it off by drawing it once
 		this.draw();
+
+		// and set up interactivity
+		this.domSetup(this.canvas);
 
 
 		// just for curiosity's sake
@@ -222,6 +223,13 @@ export class abstractViewDef {
 		const count = 3;
 		gl.drawArrays(primitiveType, offset, count);
 	}
+
+	/* ************************************************** dom interactivity */
+
+	domSetup(canvas) {
+		console.log(`abstract viewdef does an abstract domSetup.`)
+	}
+
 
 	/* ************************************************** debugging */
 //	debug1() {

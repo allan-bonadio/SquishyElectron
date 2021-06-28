@@ -108,7 +108,7 @@ class flatDrawing extends abstractDrawing {
 	draw() {
 		const gl = this.gl;
 
-		//gl.useProgram(this.program);
+		gl.useProgram(this.program);
 		//this.rowAttr.reloadVariable()
 
 		//gl.bindVertexArray(this.vao);

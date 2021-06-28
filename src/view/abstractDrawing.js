@@ -123,6 +123,12 @@ export class abstractDrawing {
 		// one purple dot
 		gl.drawArrays(gl.POINTS, 0, 1);
 	}
+
+
+	/* ************************************************** interactivity */
+	// abstract supermethod: another dummy submethod... write yer  own
+	domSetup() {
+	}
 }
 
 export default abstractDrawing;

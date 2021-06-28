@@ -1,10 +1,6 @@
 import drawingViewDef from './drawingViewDef';
-import {cxToColorGlsl} from './cxToColor.glsl';
-import qe from '../wave/qe';
-import {viewUniform, viewAttribute} from './viewVariable';
-import SquishPanel from '../SquishPanel';
-import {qeStartPromise} from '../wave/qEngine';
 import flatDrawing from './flatDrawing';
+import potentialDrawing from './potentialDrawing';
 
 
 class flatDrawingViewDef extends drawingViewDef {
@@ -18,6 +14,7 @@ class flatDrawingViewDef extends drawingViewDef {
 
 		// create relevant drawings
 		new flatDrawing(this, space);
+		new potentialDrawing(this, space);
 
 
 		// these changing should trigger a redrawing of its contents (ie webgl)
@@ -57,10 +54,6 @@ class flatDrawingViewDef extends drawingViewDef {
 
 		return onceMore;
 	}
-
-
-
-
 }
 
 flatDrawingViewDef.viewClassName = 'flatDrawingViewDef';

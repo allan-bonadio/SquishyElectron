@@ -1,8 +1,4 @@
 import {abstractViewDef} from './abstractViewDef';
-import {qeStartPromise} from '../wave/qEngine';
-import SquishPanel from '../SquishPanel';
-
-
 
 // even simpler without the viewVariables
 export class manualViewDef extends abstractViewDef {

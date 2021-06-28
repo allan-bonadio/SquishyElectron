@@ -1,6 +1,4 @@
 import abstractViewDef from './abstractViewDef';
-import SquishPanel from '../SquishPanel';
-import {qeStartPromise} from '../wave/qEngine';
 
 // a view that does nothing but house its drawings
 class drawingViewDef extends abstractViewDef {
@@ -62,6 +60,14 @@ class drawingViewDef extends abstractViewDef {
 		this.drawings.forEach(drawing => {
 			drawing.draw();
 		});
+	}
+
+
+	domSetup(canvas) {
+		this.drawings.forEach(drawing => {
+			drawing.domSetup(canvas);
+		});
+
 	}
 }
 

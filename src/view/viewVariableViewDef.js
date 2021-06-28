@@ -1,6 +1,4 @@
 import {abstractViewDef} from './abstractViewDef';
-import {qeStartPromise} from '../wave/qEngine';
-import SquishPanel from '../SquishPanel';
 import {viewUniform, viewAttribute} from './viewVariable';
 
 // this makes a light green color if false, a little on the yellow side.

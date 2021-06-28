@@ -54,9 +54,9 @@ export class SquishPanel extends React.Component {
 
 	// if you subclass abstractViewDef, call this to join the 'in' crowd
 	// and be listed
-	static addMeToYourList(aViewClass) {
-		listOfViewClassNames[aViewClass.viewClassName] = aViewClass;
-	}
+	//static addMeToYourList(aViewClass) {
+	//listOfViewClassNames[aViewClass.viewClassName] = aViewClass;
+	//}
 
 	static getListOfViews() {
 		return listOfViewClassNames;
@@ -109,8 +109,6 @@ export class SquishPanel extends React.Component {
 
 			// now create the view class instance as described by the space
 			const vClass = listOfViewClassNames[viewClassName];
-
-
 			if (! vClass)
 				throw `no vClass! see for yerself! ${JSON.stringify(listOfViewClassNames)}`;
 
@@ -118,6 +116,7 @@ export class SquishPanel extends React.Component {
 			currentView.completeView();
 
 			this.setState(currentView);
+			this.currentView = currentView;  // sometimes this gets set sooner
 
 			// kinda paranoid?
 			qe.theCurrentView = currentView;
@@ -300,6 +299,11 @@ export class SquishPanel extends React.Component {
 			// this should be the only place animateOneFrame() should be called
 			// except for inside the function itself
 			this.animateOneFrame(performance.now());
+
+			// use this.currentView rather than state.currentView - we just set it
+			// and it takes a while.
+			// Make sure you call the new view's domSetup method.
+			this.currentView.domSetup(this.canvas);
 		}).catch(ex => {
 			console.error(`error in SquishPanel.didMount.then:`, ex);
 			debugger;
