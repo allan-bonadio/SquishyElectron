@@ -105,7 +105,8 @@ int32_t completeNewSpace(void) {
 
 /* ********************************************************** glue functions */
 
-// these are for JS only; they're both extern
+// these are for JS only; they're all extern "C"
+
 qCx *getWaveBuffer(void) {
 	return theWave;
 }
@@ -198,9 +199,6 @@ void qSpace::map(qCx callback(qCx* p)) {
 void qDimension::fixBoundaries(qCx *wave) {
 	switch (this->continuum) {
 	case contDISCRETE:
-		// ain't no points on the end
-		//printf("contDISCRETE cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", this->continuum,
-		//	wave[0].re, wave[0].im, wave[this->end].re, wave[this->end].im);
 		break;
 
 	case contWELL:
@@ -219,6 +217,23 @@ void qDimension::fixBoundaries(qCx *wave) {
 		//printf("contCIRCULAR cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", this->continuum,
 		//	wave[0].re, wave[0].im, wave[this->end].re, wave[this->end].im);
 		break;
+	}
+}
+
+qReal cleanOneNumber(qReal u, int ix) {
+	if (!isfinite(u)) {
+		// just enough to be nonzero without affecting the balance
+		qReal faker = (ix & 1) ? 1e-9 :  -1e-9;
+		return faker;
+	}
+	return u;
+}
+
+// look for NaNs and other foul numbers, and replace them with something .. better.
+void qDimension::prune(qCx *wave) {
+	for (int ix = this->start; ix < this->end; ix++) {
+		wave[ix].re = cleanOneNumber(wave[ix].re, ix);
+		wave[ix].im = cleanOneNumber(wave[ix].im, ix);
 	}
 }
 
@@ -255,9 +270,12 @@ void qDimension::normalize(qCx *wave) {
 }
 
 // average the wave's points with the two closest neighbors to fix the divergence
-// along the x axis I always see
+// along the x axis I always see.  Since the thickness of our mesh is finite,
+// you can't expect noise at or near the frequency of the mesh to be meaningful.
 void qDimension::lowPassFilter(qCx *wave) {
 	qCx avg, d2prev = wave[0];
+
+	this->prune(wave);
 
 	for (int ix = this->start; ix < this->end; ix++) {
 		if ((ix && ix < this->N - 1) || this->continuum) {

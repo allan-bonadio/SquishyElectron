@@ -43,11 +43,8 @@ void qSpace::oneRk2Step(void) {
 
 	theSpace->elapsedTime += dt;
 
-	this->iterationCount++;
-	if (this->iterationCount > -1) {  // theSpace->nPoints/2
-		this->iterationCount = 0;
-		dim->lowPassFilter(theWave);
-	}
+	dim->lowPassFilter(theWave);
+	dim->normalize(theWave);
 }
 
 /* ************************************************** benchmarking */

@@ -22,7 +22,8 @@ public:
 	// = product of Nv * Nv of next dimension or 1 if none
 	int32_t nStates;
 
-	// accumulated number of complex values in wave, from this dim to the end.  includes boundaries.
+	// accumulated number of complex values in wave, from this dim to the end.
+	// includes boundaries.
 	int32_t nPoints;
 
 	// contWELL or contCIRCULAR (has N+2 values for N possibilities)
@@ -38,6 +39,7 @@ public:
 
 	void fixBoundaries(qCx *wave);
 
+	void prune(qCx *wave);
 	qReal innerProduct(qCx *wave);
 	void normalize(qCx *wave);
 	void lowPassFilter(qCx *wave);
@@ -120,6 +122,9 @@ extern "C" {
 
 // internal
 extern void oneRk2Step(void);
+
+
+
 extern void oneRk4Step(void);
 extern qCx hamiltonian(qCx *wave, int x);
 
