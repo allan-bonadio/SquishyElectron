@@ -14,19 +14,19 @@ void qSpace::oneRk2Step(void) {
 	qDimension *dim = theSpace->dimensions;
 	dim->fixBoundaries(theWave);
 
-	// use quartWave for all the first-try psi values
+	// use laosWave for all the first-try psi values
 	for (int ix = dim->start; ix < dim->end; ix++) {
-		quartWave[ix] = theWave[ix] + hamiltonian(theWave, ix) * halfDtOverI;
+		laosWave[ix] = theWave[ix] + hamiltonian(theWave, ix) * halfDtOverI;
 		qCheck(sumWave[ix]);
 	}
-	dim->fixBoundaries(quartWave);
+	dim->fixBoundaries(laosWave);
 
 	//for (int ix = 0; ix <= dim->end; ix++)
-	//printf("INRK2 %d\t%lf\t%lf\n", ix, quartWave[ix].re, quartWave[ix].im);
+	//printf("INRK2 %d\t%lf\t%lf\n", ix, laosWave[ix].re, laosWave[ix].im);
 
-	// then use quartWave as the input to a better rate and a better inc at sumWave.
+	// then use laosWave as the input to a better rate and a better inc at sumWave.
 	for (int ix = dim->start; ix < dim->end; ix++) {
-		sumWave[ix] = theWave[ix] + hamiltonian(quartWave, ix) * dtOverI;
+		sumWave[ix] = theWave[ix] + hamiltonian(laosWave, ix) * dtOverI;
 		qCheck(sumWave[ix]);
 	}
 

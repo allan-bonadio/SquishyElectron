@@ -121,9 +121,8 @@ extern void oneRk4Step(void);
 extern qCx hamiltonian(qCx *wave, int x);
 
 extern class qSpace *theSpace;
-extern class qCx *theWave, *quartWave, *sumWave;
+extern class qCx *theWave, *egyptWave, *laosWave, *sumWave;
 extern qReal *thePotential;
 extern float *viewBuffer;
 extern qReal elapsedTime;
 
-// sumWave  quartWave

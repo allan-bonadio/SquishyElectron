@@ -2,7 +2,7 @@
 #include <cmath>
 
 class qSpace *theSpace = NULL;
-class qCx *theWave = NULL, *quartWave = NULL, *sumWave = NULL;
+class qCx *theWave = NULL, *egyptWave = NULL, *laosWave = NULL, *sumWave = NULL;
 qReal *thePotential = NULL;
 qReal elapsedTime = 0;
 
@@ -22,7 +22,8 @@ int32_t startNewSpace(void) {
 
 	if (theSpace) {
 		delete[] theWave;
-		delete[] quartWave;
+		delete[] egyptWave;
+		delete[] laosWave;
 		delete[] sumWave;
 		delete[] thePotential;
 		delete[] viewBuffer;
@@ -84,7 +85,8 @@ int32_t completeNewSpace(void) {
 
 	//  allocate the buffers
 	theWave = new qCx[nPoints];
-	quartWave = new qCx[nPoints];
+	egyptWave = new qCx[nPoints];
+	laosWave = new qCx[nPoints];
 	sumWave = new qCx[nPoints];
 	viewBuffer = new float[nPoints * 8];  // 4 floats per row, two verts per point
 	theSpace->dimensions->setCircularWave(theWave, 1);
