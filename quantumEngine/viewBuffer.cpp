@@ -1,6 +1,7 @@
 #include "qSpace.h"
 
-// prep wave & potential  data for GL.  For rows of floats in a big Float32Array will be fed directly into gl.
+// prep wave & potential  data for GL.  For rows of floats in a big Float32Array,
+// will be fed directly into gl.
 float *viewBuffer;
 
 float *getViewBuffer(void) {
@@ -23,10 +24,14 @@ float updateViewBuffer() {
 		qReal re = wavePtr->re;
 		qReal im = wavePtr->im;
 
-		twoRowPtr[0] = twoRowPtr[4] = re;
-		twoRowPtr[1] = twoRowPtr[5] = im;
-		twoRowPtr[2] = twoRowPtr[6] = potPtr[0];
+		twoRowPtr[0] = 0;
+		twoRowPtr[1] = 0;
+		twoRowPtr[2] = potPtr[0];  // this isn't going to be used
 		twoRowPtr[3] = pointNum * 2.;  // vertexSerial: at zero
+
+		twoRowPtr[4] = re;
+		twoRowPtr[5] = im;
+		twoRowPtr[6] = potPtr[0];
 		twoRowPtr[7] = pointNum * 2. + 1.;  // at magnitude, top
 
 		// while we're here, collect the highest point
@@ -35,11 +40,32 @@ float updateViewBuffer() {
 			highest = height;
 	}
 
-	printf("viewBuffer.cpp, latest:\n");
+	printf("viewBuffer.cpp, as written to view buffer:\n");
 	for (int i = 0; i < nPoints*2; i++)
 		printf("%6.3f  %6.3f  %6.3f  %6.3f\n",
 			viewBuffer[i*4], viewBuffer[i*4+1], viewBuffer[i*4+2], viewBuffer[i*4+3]);
 
+	printf("viewBuffer.cpp, resulting cx number:\n");
+	for (int i = 0; i < nPoints*2; i++) {
+		float re = viewBuffer[i*4];
+		float im = viewBuffer[i*4+1];
+		float prob = re * re + im * im;
+		if (i & 1) {
+			if (.199 > prob || prob > .201) {
+				printf("bad inner prod in position %i: %6.3f + %6.3f => %6.3f\n",
+					i, viewBuffer[i*4], viewBuffer[i*4+1], prob);
+			}
+		}
+		else {
+			if (-.000001 > prob || prob > .00001) {
+				printf("bad zero inner prod in position %i: %6.3f + %6.3f => %6.3f\n",
+					i, viewBuffer[i*4], viewBuffer[i*4+1], prob);
+			}
+		}
+		if (i != viewBuffer[i*4+3]) {
+			printf("bad serial in position %i: %f\n", i, viewBuffer[i*4+3]);
+		}
+	}
 	return highest;
 }
 
