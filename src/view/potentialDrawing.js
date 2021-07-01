@@ -5,6 +5,8 @@ import {viewUniform, viewAttribute} from './viewVariable';
 //import SquishPanel from '../SquishPanel';
 //import {qeStartPromise} from '../wave/qEngine';
 
+/* ******************************************************* unit height management */
+
 /*
 ** data format of attributes:  four column table of floats
 ** psi.re  psi.im   potential    ...0?...
@@ -27,13 +29,13 @@ uniform float unitHeight;
 void main() {
 	// figure out y
 	float y = row.z * unitHeight;
-	float thickness = unitHeight * .03;
+	float hThickness = unitHeight * .03;
 	int vertexSerial = int(row.w);
 	if (vertexSerial / 2 * 2 < vertexSerial) {
-		y += thickness; // odd
+		y += hThickness; // odd
 	}
 	else {
-		y -= thickness;  // even
+		y -= hThickness;  // even
 	}
 
 	y = 2. * y - 1.;
@@ -119,11 +121,14 @@ class potentialDrawing extends abstractDrawing {
 	/* ************************************************************************  interactive */
 
 	mouseCoords(ev) {
-		console.log(`mouse: `, ev.clientX, ev.clientY, ev.buttons.toString(16));
+//		console.log(`mouse: `, ev.clientX, ev.clientY, ev.buttons.toString(16));
 	}
 
 	mouseDown(ev) {
-
+		console.log(`from the canvas to the top:`)
+		for (let here = ev.target; here; here = here.parentNode) {
+			console.log(` ¬ element <${here.localName} id=${here.id} class=${here.className}`,
+				here.offsetLeft, here.offsetTop, '>');}
 	}
 
 	mouseMove(ev) {

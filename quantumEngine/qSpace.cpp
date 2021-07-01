@@ -173,10 +173,10 @@ void qSpace::dumpWave(const char *title) {
 	int ix;
 	qDimension *dim = this->dimensions;
 
-	printf("== Wave %s iprod=%lf", title, this->dimensions->innerProduct(theWave));
-	if (dim->continuum) printf("  start [O]=(%lf,%lf)",
+	printf("\n== Wave %s", title);
+	if (dim->continuum) printf(" [O]=(%lf,%lf)",
 		theWave[0].re, theWave[0].im);
-	printf("\n");
+	//printf("\n");
 
 	for (ix = dim->start; ix < dim->end; ix++) {
 		printf("\n[%d] ", ix);
@@ -220,10 +220,11 @@ void qDimension::fixBoundaries(qCx *wave) {
 	}
 }
 
-qReal cleanOneNumber(qReal u, int ix) {
+qReal cleanOneNumber(qReal u, int ix, int sense) {
 	if (!isfinite(u)) {
 		// just enough to be nonzero without affecting the balance
-		qReal faker = (ix & 1) ? 1e-9 :  -1e-9;
+		printf("had to prune [%d]= %f\n", ix, u);
+		qReal faker = sense ? 1e-9 :  -1e-9;
 		return faker;
 	}
 	return u;
@@ -232,8 +233,8 @@ qReal cleanOneNumber(qReal u, int ix) {
 // look for NaNs and other foul numbers, and replace them with something .. better.
 void qDimension::prune(qCx *wave) {
 	for (int ix = this->start; ix < this->end; ix++) {
-		wave[ix].re = cleanOneNumber(wave[ix].re, ix);
-		wave[ix].im = cleanOneNumber(wave[ix].im, ix);
+		wave[ix].re = cleanOneNumber(wave[ix].re, ix, ix & 1);
+		wave[ix].im = cleanOneNumber(wave[ix].im, ix, ix & 2);
 	}
 }
 
@@ -252,12 +253,21 @@ qReal qDimension::innerProduct(qCx *wave) {
 // enforce ⟨ψ | ψ⟩ = 1 by dividing out the current value
 void qDimension::normalize(qCx *wave) {
 	qReal mag = this->innerProduct(wave);
-	//printf("normalizing.  iprod=%lf\n", mag);
+	printf("normalizing.  iprod=%lf\n", mag);
+	theSpace->dumpWave("The wave,before normalize");
 	if (mag == 0.) {
 		// ALL ZEROES!??! set them all to a constant, normalized
-		qCx each = qCx(pow(this->N, -0.5));
+		printf("ALL ZEROES ! ? ? ! set them all to a constant, normalized\n");
+		const qReal f = 1e-9;
 		for (int ix = this->start; ix < this->end; ix++)
-			wave[ix] = each;
+			wave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
+	}
+	else if (! isfinite(mag)) {
+		//
+		printf("not finite ! ? ? ! set them all to a constant, normalized\n");
+		const qReal f = 1e-9;
+		for (int ix = this->start; ix < this->end; ix++)
+			wave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
 	}
 	else {
 		mag = pow(mag, -0.5);

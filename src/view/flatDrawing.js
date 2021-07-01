@@ -5,6 +5,38 @@ import {viewUniform, viewAttribute} from './viewVariable';
 //import SquishPanel from '../SquishPanel';
 //import {qeStartPromise} from '../wave/qEngine';
 
+
+/* ******************************************************* unit height management */
+
+// wait, do I need this?  what if I try without any scaling, just fixed.
+
+// adjust the target unitHeight.  The currentUnitHeight will relax to the target value.
+export function adjustUnitHeight(highest) {
+	const highestHeight = highest * this.targetUnitHeight;
+	if (highestHeight > 1.)
+		this.targetUnitHeight /= 2;
+	else if (highestHeight < .25)
+		this.targetUnitHeight *= 2;
+}
+
+export function coastUnitHeight() {
+	if (this.curUnitHeight != this.targetUnitHeight) {
+		if (Math.abs((this.curUnitHeight - this.targetUnitHeight) / this.targetUnitHeight) < .01) {
+			//ok we're done.  close enough.
+			this.curUnitHeight = this.targetUnitHeight;
+			//this.onceMore = true;  // just to make sure it paints
+			return;
+		}
+
+		// exponential relaxation towards the target
+		this.curUnitHeight = (15 * this.curUnitHeight + this.targetUnitHeight) / 16;
+	}
+}
+
+
+
+/* ******************************************************* flat drawing */
+
 /*
 ** data format of attributes:  four column table of floats
 ** psi.re  psi.im   potential    ...0?...
@@ -125,6 +157,9 @@ class flatDrawing extends abstractDrawing {
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 	}
 
+
+	adjustUnitHeight = adjustUnitHeight;
+	coastUnitHeight = coastUnitHeight;
 }
 
 export default flatDrawing;

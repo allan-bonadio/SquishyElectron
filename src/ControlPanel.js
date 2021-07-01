@@ -37,7 +37,7 @@ export class ControlPanel extends React.Component {
 ////			iterate(theJWave);
 ////		if (isRunning)
 ////			theDraw.draw();
-//		this.props.iterateAnimate(isRunning && this.state.rate);
+//		p.iterateAnimate(isRunning && this.state.rate);
 //
 //		if (ev && ev.currentTarget) ev.currentTarget.blur();
 //
@@ -53,7 +53,7 @@ export class ControlPanel extends React.Component {
 //	toggleRunning(ev) {
 //		//this.setState({isRunning: false});
 //
-//		this.props.iterateAnimate(!isItAnimating(), this.state.rate);
+//		p.iterateAnimate(this.props.isTimeAdvancing, this.state.rate);
 //
 //		if (ev && ev.currentTarget) ev.currentTarget.blur();
 //
@@ -62,7 +62,7 @@ export class ControlPanel extends React.Component {
 //	oneStep(ev) {
 //		//this.setState({isRunning: false});
 //
-//		this.props.iterateAnimate(false, 'one');
+//		p.iterateAnimate(false, 'one');
 //
 //		if (ev && ev.currentTarget) ev.currentTarget.blur();
 //	}
@@ -71,25 +71,26 @@ export class ControlPanel extends React.Component {
 	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
 	setRate(rate) {
 
-		this.props.iterateAnimate(isItAnimating(), rate);
+		this.props.iterateAnimate(this.props.isTimeAdvancing, rate);
 		this.setState({rate});  // rate is stored in two places, na na na
 //		if (this.state.isRunning)
 //			this.props.iterateAnimate(rate);
 	}
 
 	renderGoStopButtons() {
-		let isRunning = this.props.isTimeAdvancing;
+		const p = this.props;
+		let isRunning = p.isTimeAdvancing;
 		const repRates = [];
 		for (let rate = 1, i = 0; rate < 64; rate *= 2, i++)
 			repRates.push(<option key={rate} value={rate}>{rate} per sec</option>);
 
 		return <div className='goStopButtons subPanel'>
 			<button type='button' className={'goButton ' + (isRunning && 'on')}
-				onClick={ev => this.startIterating()}>
+				onClick={ev => p.startIterating()}>
 					▶
 			</button>
 			<button type='button' className={'stopButton ' + (!isRunning && 'on')}
-				onClick={ev => this.stopIterating()}>
+				onClick={ev => p.stopIterating()}>
 					◼
 			</button>
 
@@ -154,12 +155,13 @@ export class ControlPanel extends React.Component {
 	/* ********************************************** render */
 
 	render() {
+		const p = this.props;
 		return <div className='ControlPanel'>
 			<CPToolbar
-				startIterating={this.props.startIterating}
-				stopIterating={this.props.stopIterating}
-				singleStep={this.props.singleStep}
-				isTimeAdvancing={this.props.isTimeAdvancing}
+				startIterating={p.startIterating}
+				stopIterating={p.stopIterating}
+				singleStep={p.singleStep}
+				isTimeAdvancing={p.isTimeAdvancing}
 			/>
 			<div className='cpSecondRow'>
 				{this.renderGoStopButtons()}
@@ -167,7 +169,7 @@ export class ControlPanel extends React.Component {
 				{this.renderSetVoltageButtons()}
 
 				<button type='button' className='setResolutionButton'
-					onClick={ev => this.props.openResolutionDialog()}>
+					onClick={ev => p.openResolutionDialog()}>
 						Change Resolution
 						<div style={{fontSize: '.7em'}}>
 							(will reset current wave)</div>

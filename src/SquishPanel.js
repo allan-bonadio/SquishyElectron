@@ -41,7 +41,7 @@ const DEFAULT_VIEW_CLASS_NAME =
 //'flatViewDef';
 'flatDrawingViewDef';
 
-const DEFAULT_RESOLUTION = 5;
+const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 5;
 const DEFAULT_CONTINUUM = qeSpace.contCIRCULAR;
 
 
@@ -94,6 +94,12 @@ export class SquishPanel extends React.Component {
 		console.log(`SquishPanel constructor done`);
 	}
 
+	// this is kinda cheating, but the currentView in the state takes some time to
+	// get set; but we need it immediately.  So we also set it as a variable on this.
+	get curView() {
+		return this.currentView || this.state.currentView;
+	}
+
 	// the canvas per panel, one panel per canvas
 	setGLCanvas(canvas) {
 		this.canvas = canvas;
@@ -116,9 +122,9 @@ export class SquishPanel extends React.Component {
 			currentView.completeView();
 
 			this.setState(currentView);
-			this.currentView = currentView;  // sometimes this gets set sooner
+			this.currentView = currentView;  // this gets set sooner
 
-			// kinda paranoid?
+			// kinda paranoid?  this should be deprecated.
 			qe.theCurrentView = currentView;
 		});
 	}
@@ -151,59 +157,75 @@ export class SquishPanel extends React.Component {
 
 	/* ******************************************************* iteration & animation */
 
+
+	crunchOneFrame() {
+		qe.qSpace_oneRk2Step();
+		qe.updateToLatestWaveBuffer();
+
+		this.startUpdate = performance.now();
+		let highest = qe.updateViewBuffer();
+		let cView = this.curView;
+		//if (cView.reportHighest)
+		//	needsRepaint = needsRepaint || cView.ifNeedsPaint(highest);
+
+		if (this.dumpingTheViewBuffer)
+			this.dumpViewBuffer();
+
+		// adjust our unit height?
+		//const highestHeight = highest * this.targetUnitHeight;
+		//if (highestHeight > 1.)
+		//	this.targetUnitHeight /= 2;
+		//else if (highestHeight < .25)
+		//	this.targetUnitHeight *= 2;
+
+	}
+
+	oneFramePerTick: 60;
+	howManyTics:0
+
 	// the name says it all.  requestAnimationFrame() will call this probably 60x/sec
-	// it will advance one 'frame' in wave time, which i dunno what that is need to tihink about it more.
+	// it will advance one 'frame' in wave time, which i dunno what that
+	// is need to tihink about it more.
 	animateOneFrame(now) {
 		const s = this.state;
 		let needsRepaint = false;
 
 		//console.log(`time since last tic: ${now - startFrame}ms`)
-		let startRK = 0, startUpdate = 0, startReload = 0, startDraw = 0, endFrame = 0;
+		this.startRK = this.startUpdate = this.startReload = this.startDraw = this.endFrame = 0;
 		const areBenchmarking = this.areBenchmarking;
 
 		// could be slow.  sometime in the future.
-		if (areBenchmarking) startRK = performance.now();
+		this.startRK = performance.now();
 		if (s.isTimeAdvancing) {
-			qe.qSpace_oneRk2Step();
-			qe.updateToLatestWaveBuffer();
-
-			if (areBenchmarking) startUpdate = performance.now();
-			let highest = qe.updateViewBuffer();
-			let cView = s.currentView;
-			if (cView.reportHighest)
-				needsRepaint = needsRepaint || cView.ifNeedsPaint(highest);
-
-			if (this.dumpingTheViewBuffer)
-				this.dumpViewBuffer();
-
-			// adjust our unit height?
-			//const highestHeight = highest * this.targetUnitHeight;
-			//if (highestHeight > 1.)
-			//	this.targetUnitHeight /= 2;
-			//else if (highestHeight < .25)
-			//	this.targetUnitHeight *= 2;
+			this.crunchOneFrame();
 		}
 
 		// if we need to repaint... if we're iterating, if the view says we have to,
 		// or if this is a one shot step
 		if (s.isTimeAdvancing || needsRepaint || this.onceMore) {
-			if (areBenchmarking) startReload = performance.now();
-			qe.theCurrentView.viewVariables.forEach(v => v.reloadVariable());
-			//qe.theCurrentView.viewVariables[0].reloadVariable();
+			// reload all variables
+			this.startReload = performance.now();
+			let cView = this.curView;
+			cView.viewVariables.forEach(v => v.reloadVariable());
+			cView.drawings.forEach(dr => {
+				dr.viewVariables.forEach(v => v.reloadVariable());
+			});
 
-			if (areBenchmarking) startDraw = performance.now();
+			// draw
+			this.startDraw = performance.now();
 			qe.theCurrentView.draw();
 
-			endFrame = performance.now();
+			// print out benchmarks
+			this.endFrame = performance.now();
 			if (areBenchmarking) {
 				console.log(`times:\n`+
-					`RK:     ${(startUpdate - startRK).toFixed(2)}ms\n`+
-					`up:     ${(startReload - startUpdate).toFixed(2)}ms\n`+
-					`reload: ${(startDraw - startReload).toFixed(2)}ms\n`+
-					`draw:   ${(endFrame - startDraw).toFixed(2)}ms\n`+
-					`total:  ${(endFrame - startRK).toFixed(2)}ms\n\n` +
-					`period:  ${(startRK - this.prevStart).toFixed(2)}ms\n`);
-				this.prevStart = startRK;
+					`RK:     ${(this.startUpdate - this.startRK).toFixed(2)}ms\n`+
+					`up:     ${(this.startReload - this.startUpdate).toFixed(2)}ms\n`+
+					`reload: ${(this.startDraw - this.startReload).toFixed(2)}ms\n`+
+					`draw:   ${(this.endFrame - this.startDraw).toFixed(2)}ms\n`+
+					`total:  ${(this.endFrame - this.startRK).toFixed(2)}ms\n\n` +
+					`period:  ${(this.startRK - this.prevStart).toFixed(2)}ms\n`);
+				this.prevStart = this.startRK;
 			}
 
 			if (this.onceMore)
