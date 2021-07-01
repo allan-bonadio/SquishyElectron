@@ -13,5 +13,5 @@ qReal qCx::phase() {
 
 void qCheck(qCx aCx) {
 	if (isnan(aCx.re) || isnan(aCx.im))
-		printf("complex number became NaN: (%lf,%lf)", aCx.re, aCx.im);
+		printf("complex number became NaN: (%lf,%lf)\n", aCx.re, aCx.im);
 }

@@ -96,6 +96,8 @@ int32_t completeNewSpace(void) {
 	theSpace->setValleyPotential(1., 1., 0.);
 	//theSpace->dumpPotential("freshly created");
 
+	theSpace->iterationCount = 0;
+
 	//printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", nStates, nPoints);
 	//printf("  dimension N=%d  extraN=%d  continuum=%d  start=%d  end=%d  label=%s\n",
 	//	theSpace->dimensions->N, theSpace->dimensions->extraN, theSpace->dimensions->continuum,
@@ -105,7 +107,8 @@ int32_t completeNewSpace(void) {
 
 /* ********************************************************** glue functions */
 
-// these are for JS only; they're both extern
+// these are for JS only; they're all extern "C"
+
 qCx *getWaveBuffer(void) {
 	return theWave;
 }
@@ -116,7 +119,6 @@ qReal *getPotentialBuffer(void) {
 int32_t getElapsedTime(void) {
 	return elapsedTime;
 }
-
 
 void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
 void qSpace_setZeroPotential(void) { theSpace->setZeroPotential(); }
@@ -173,10 +175,10 @@ void qSpace::dumpWave(const char *title) {
 	int ix;
 	qDimension *dim = this->dimensions;
 
-	printf("== Wave %s iprod=%lf", title, this->dimensions->innerProduct(theWave));
-	if (dim->continuum) printf("  start [O]=(%lf,%lf)",
+	printf("\n== Wave %s", title);
+	if (dim->continuum) printf(" [O]=(%lf,%lf)",
 		theWave[0].re, theWave[0].im);
-	printf("\n");
+	//printf("\n");
 
 	for (ix = dim->start; ix < dim->end; ix++) {
 		printf("\n[%d] ", ix);
@@ -199,9 +201,6 @@ void qSpace::map(qCx callback(qCx* p)) {
 void qDimension::fixBoundaries(qCx *wave) {
 	switch (this->continuum) {
 	case contDISCRETE:
-		// ain't no points on the end
-		//printf("contDISCRETE cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", this->continuum,
-		//	wave[0].re, wave[0].im, wave[this->end].re, wave[this->end].im);
 		break;
 
 	case contWELL:
@@ -223,6 +222,24 @@ void qDimension::fixBoundaries(qCx *wave) {
 	}
 }
 
+qReal cleanOneNumber(qReal u, int ix, int sense) {
+	if (!isfinite(u)) {
+		// just enough to be nonzero without affecting the balance
+		printf("had to prune [%d]= %f\n", ix, u);
+		qReal faker = sense ? 1e-9 :  -1e-9;
+		return faker;
+	}
+	return u;
+}
+
+// look for NaNs and other foul numbers, and replace them with something .. better.
+void qDimension::prune(qCx *wave) {
+	for (int ix = this->start; ix < this->end; ix++) {
+		wave[ix].re = cleanOneNumber(wave[ix].re, ix, ix & 1);
+		wave[ix].im = cleanOneNumber(wave[ix].im, ix, ix & 2);
+	}
+}
+
 // calculate ⟨ψ | ψ⟩  'inner product' isn't the right name is it?
 qReal qDimension::innerProduct(qCx *wave) {
 	qReal sum;
@@ -238,12 +255,21 @@ qReal qDimension::innerProduct(qCx *wave) {
 // enforce ⟨ψ | ψ⟩ = 1 by dividing out the current value
 void qDimension::normalize(qCx *wave) {
 	qReal mag = this->innerProduct(wave);
-	//printf("normalizing.  iprod=%lf\n", mag);
+	printf("normalizing.  iprod=%lf\n", mag);
+	theSpace->dumpWave("The wave,before normalize");
 	if (mag == 0.) {
 		// ALL ZEROES!??! set them all to a constant, normalized
-		qCx each = qCx(pow(this->N, -0.5));
+		printf("ALL ZEROES ! ? ? ! set them all to a constant, normalized\n");
+		const qReal f = 1e-9;
 		for (int ix = this->start; ix < this->end; ix++)
-			wave[ix] = each;
+			wave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
+	}
+	else if (! isfinite(mag)) {
+		//
+		printf("not finite ! ? ? ! set them all to a constant, normalized\n");
+		const qReal f = 1e-9;
+		for (int ix = this->start; ix < this->end; ix++)
+			wave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
 	}
 	else {
 		mag = pow(mag, -0.5);
@@ -256,9 +282,12 @@ void qDimension::normalize(qCx *wave) {
 }
 
 // average the wave's points with the two closest neighbors to fix the divergence
-// along the x axis I always see
+// along the x axis I always see.  Since the thickness of our mesh is finite,
+// you can't expect noise at or near the frequency of the mesh to be meaningful.
 void qDimension::lowPassFilter(qCx *wave) {
 	qCx avg, d2prev = wave[0];
+
+	this->prune(wave);
 
 	for (int ix = this->start; ix < this->end; ix++) {
 		if ((ix && ix < this->N - 1) || this->continuum) {

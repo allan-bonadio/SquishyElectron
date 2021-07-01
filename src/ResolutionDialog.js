@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {qeSpace} from './wave/qEngine';
-import SquishPanel, {listOfViewClasses} from './SquishPanel';
+import SquishPanel from './SquishPanel';
 import SquishDialog from './SquishDialog';
 
 // had this been a real webiste, I would not have to copy/paste these here
@@ -59,20 +59,22 @@ export default class ResolutionDialog extends React.Component {
 		N: PropTypes.number.isRequired,
 		continuum: PropTypes.number.isRequired,
 		viewClassName: PropTypes.string.isRequired,
-//		closeResolutionDialog: PropTypes.func.isRequired,
 	};
 
 	// this is the state in the dialog; doesn't become real until OK().
 	// Therefore, initial values set from props.
 	state = {
-		N: powerToIndex(this.props.N),
+		N: this.props.N,
 		powerOf10: powerToIndex(this.props.N),
 		continuum: this.props.continuum,
 		viewClassName: this.props.viewClassName,
 	};
 
 	handleChangePowersOf10(ev) {
-		this.setState({powerOf10: ev.target.valueAsNumber});
+		this.setState({
+			powerOf10: ev.target.valueAsNumber,
+			N: indexToPower(ev.target.valueAsNumber),
+		});
 	}
 
 	/* ******************************************************************* open/close */
@@ -80,39 +82,43 @@ export default class ResolutionDialog extends React.Component {
 	static initialParams;
 	static me = this;
 
-	static openDialog(initialParams, okCallback, cancelCallback) {
+	// open the Resolution dialog specifically
+	static openResolutionDialog(initialParams, okCallback, cancelCallback) {
 		ResolutionDialog.initialParams = initialParams;
 		ResolutionDialog.okCallback = okCallback;
 		ResolutionDialog.cancelCallback = cancelCallback;
 
+		// open the general dialog with resolutionDialog as the main component
 		SquishDialog.openDialog(
 			<ResolutionDialog
 				N={initialParams.N}
 				continuum={initialParams.continuum}
-				viewClassName={initialParams.viewClassName}/>,
-			ResolutionDialog.closeDialog
+				viewClassName={initialParams.viewClassName}
+			/>,
+
+			// close function
+			ResolutionDialog.closeDialog,
 		);
 	}
 
-	// called by App when the dialog closes/hides
+	// NEVER called by App when the dialog closes/hides, whether by OK or cancel
+	// deprecated
 	static closeDialog() {
 		debugger;
 
 	}
 
-
+	// called when user clicks OK, before dialog is hidden in App
 	OK(ev) {
-		debugger;
-		const s = //this.state;
+		//const s = //this.state;
 		ResolutionDialog.okCallback(this.state);
-		SquishDialog.closeDialog();
+		SquishDialog.startClosingDialog();
 	}
 
+	// called when user clicks Cancel, before dialog is hidden in App
 	cancel(ev) {
-		debugger;
-
 		ResolutionDialog.cancelCallback();
-		SquishDialog.closeDialog();
+		SquishDialog.startClosingDialog();
 	}
 
 
@@ -173,52 +179,58 @@ export default class ResolutionDialog extends React.Component {
 	renderViewRadios() {
 		const s = this.state;
 		const onChange = ev => this.setState({viewClassName: ev.target.value});
+		if (true) {
+			// the one that theoreticallyt should work
+			const viewz = SquishPanel.getListOfViews()
+			const radioz = [];
+			for (let vuName in viewz) {
+				const vu = viewz[vuName];
+				console.log(`doin this vu:`, vu.viewClassName);
+				console.dir(vu);
+				console.log(`   typeof:`, typeof vuName, typeof vu);
+				console.log(`   names:`, vu.viewClassName, vu.viewClassName, vu.name);
+				radioz.push(<label key={vu.viewClassName}>
+					<input type='radio' key={vu.viewClassName} name='viewClassName'
+						value={vu.viewClassName}
+						checked={vu.viewClassName == this.state.viewClassName}
+						onChange={onChange}/>
+					{vu.viewClassName}</label>);
+			}
 
-//		const radioz = SquishPanel
-//			.getListOfViews()
+			return radioz;
+			}
+		else {
+			return (<>
+				view:
+				<label><input type='radio' name='viewClassName'  value='flatViewDef' key='flatViewDef'
+						checked={s.viewClassName == 'flatViewDef'}
+						onChange={onChange}/>
+					flatViewDef</label>
+				<label><input type='radio' name='viewClassName'  value='flatDrawingViewDef' key='flatDrawingViewDef'
+						checked={s.viewClassName == 'flatDrawingViewDef'}
+						onChange={onChange}/>
+					viewVariableViewDef</label>
+				<label><input type='radio' name='viewClassName'  value='abstractViewDef' key='abstractViewDef'
+						checked={s.viewClassName == 'abstractViewDef'}
+						onChange={onChange}/>
+					abstractViewDef</label>
+				<label><input type='radio' name='viewClassName'  value='manualViewDef' key='manualViewDef'
+						checked={s.viewClassName == 'manualViewDef'}
+						onChange={onChange}/>
+					manualViewDef</label>
+				<label><input type='radio' name='viewClassName'  value='viewVariableViewDef' key='viewVariable'
+						checked={s.viewClassName == 'viewVariableViewDef'}
+						onChange={onChange}/>
+					viewVariableViewDef</label>
+			</>);
+		}
 
-//		const radioz = [];
-//		for (let vuName in listOfViewClasses) {
-//			const vu = listOfViewClasses[vuName];
-//			console.log(`doin this vu:`, vuName, vu);
-//			console.dir(vu);
-//			console.log(`   typeof:`, typeof vuName, typeof vu);
-//			console.log(`   names:`, vu.viewName, vu.viewClassName, vu.name);
-//			radioz.push(<label key={vu.viewName}>
-//				<input type='radio' key={vu.viewName} name='viewClassName'
-//					value={vu.viewClassName}
-//					checked={vu.viewClassName == this.props.viewClassName}
-//					onChange={onChange}/>
-//				{vu.viewName} - {vu.viewClassName}</label>);
-//		}
-//
-//		return radioz;
-
-		return <>
-			view:
-			<label><input type='radio' name='viewClassName'  value='flatViewDef' key='flat'
-					checked={s.viewClassName == 'flatViewDef'}
-					onChange={onChange}/>
-				flatViewDef</label>
-			<label><input type='radio' name='viewClassName'  value='abstractViewDef' key='abstract'
-					checked={s.viewClassName == 'abstractViewDef'}
-					onChange={onChange}/>
-				abstractViewDef</label>
-			<label><input type='radio' name='viewClassName'  value='manualViewDef' key='manual'
-					checked={s.viewClassName == 'manualViewDef'}
-					onChange={onChange}/>
-				manualViewDef</label>
-			<label><input type='radio' name='viewClassName'  value='viewVariableViewDef' key='viewVariable'
-					checked={s.viewClassName == 'viewVariableViewDef'}
-					onChange={onChange}/>
-				viewVariableViewDef</label>
-		</>
 	}
 
 	render() {
-		const s = this.state;
+		//const s = this.state;
 
-		return
+		return (
 			<article className='dialog ResolutionDialog' style={{fontSize: '80%'}}>
 				<datalist id='GoodPowersOf10' >{GoodPowersOf10}</datalist>
 
@@ -249,16 +261,17 @@ export default class ResolutionDialog extends React.Component {
 				<section className='dialogSection'
 					style={{padding: '1em', margin: '1em', textAlign: 'right'}}>
 					<button type='button' className='cancelButton'
-						onClick={ev => this.close(ev)}>
+						onClick={ev => this.cancel(ev)}>
 							Cancel
 					</button>
 					<button type='button' className='setResolutionOKButton'
-						onClick={ev => this.OK()}>
+						onClick={ev => this.OK(ev)}>
 							Recreate Universe
 					</button>
 				</section>
 
 			</article>
+		);
 	}
 }
 

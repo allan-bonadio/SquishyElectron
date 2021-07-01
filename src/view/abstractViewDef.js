@@ -1,13 +1,5 @@
 import {viewUniform, viewAttribute} from './viewVariable';
-import {curioShader, curioProgram, curioParameter} from './curiosity';
-import SquishPanel from '../SquishPanel';
-import {qeStartPromise} from '../wave/qEngine';
-
-// right now this is set in constructor
-let bufferDataDrawMode;
-
-//let sp = SquishPanel;  // tell optimizer to gimme Squish Panel
-
+//import {curioShader, curioProgram, curioParameter} from './curiosity';
 
 // Each abstractViewDef subclass is a definition of a kind of view; one per each kind of view.
 // (A SquishView owns an instance of the def and is a React component.)
@@ -19,7 +11,7 @@ export class abstractViewDef {
 	static viewClassName: 'abstractViewDef';
 
 	/* ************************************************** construction */
-	constructor(viewName, canvas) {
+	constructor(viewName, canvas, space) {
 		this.viewVariables = [];
 
 		this.viewName = viewName;
@@ -27,23 +19,21 @@ export class abstractViewDef {
 		this.canvas = canvas;
 		this.initCanvas();
 
+		this.space = space;  // optional
 
-
-		// really a global, at least within this file, so this is how you turn this one way
+		// really a global, for this file and all descenden tviews and drawings
+		// and variables, so this is how you turn this one way
 		// or another, if it makes a diff
-		bufferDataDrawMode = this.gl.DYNAMIC_DRAW;
+		this.bufferDataDrawMode = this.gl.DYNAMIC_DRAW;
 		//bufferDataDrawMode = this.gl.STATIC_DRAW;
 
-
-
-		// after construction, the instantiator should call compileProgram()
 	}
 
 	// preliminary construction, called in constructor
 	initCanvas() {
 		let gl = this.gl = this.canvas.getContext("webgl");
 		if (! gl)
-			gl = this.gl = this.canvas.getContext("experimental-webgl");
+			gl = this.gl = this.canvas.getContext("experimental-webgl");  // really old
 
 
 		if (!gl) throw `Sorry this browser doesn't do WebGL!  You might be able to turn it on ...`;
@@ -82,8 +72,15 @@ export class abstractViewDef {
 	completeView() {
 		this.setShaders();
 		this.setInputs();
+
 		this.setGeometry();
+
+		// kick it off by drawing it once
 		this.draw();
+
+		// and set up interactivity
+		this.domSetup(this.canvas);
+
 
 		// just for curiosity's sake
 		//curioShader(this.gl, this.vertexShader);
@@ -184,7 +181,7 @@ export class abstractViewDef {
 		cornerAttr.attachArray(corners, 2);
 
 //		also try gl.DYNAMIC_DRAW here
-//		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), bufferDataDrawMode);
+//		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), this.bufferDataDrawMode);
 //
 //		var vao = this.vaoExt.createVertexArrayOES();
 //		this.vaoExt.bindVertexArrayOES(vao);
@@ -226,6 +223,13 @@ export class abstractViewDef {
 		const count = 3;
 		gl.drawArrays(primitiveType, offset, count);
 	}
+
+	/* ************************************************** dom interactivity */
+
+	domSetup(canvas) {
+		console.log(`abstract viewdef does an abstract domSetup.`)
+	}
+
 
 	/* ************************************************** debugging */
 //	debug1() {
@@ -385,7 +389,7 @@ export class abstractViewDef {
 			  0, 0.5,
 			  0.7, 0,
 			];
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), bufferDataDrawMode);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), this.bufferDataDrawMode);
 
 			vao = this.vaoExt.createVertexArrayOES();
 			this.vaoExt.bindVertexArrayOES(vao);
@@ -451,185 +455,8 @@ export class abstractViewDef {
 
 //CFTW end
 }
+/* *********************************************************** end of CFTW */
 
-//if (SquishPanel) SquishPanel.addMeToYourList(abstractViewDef);
 export default abstractViewDef;
 
-
-
-/* *********************************************************** manualViewDef */
-
-// even simpler without the viewVariables
-export class manualViewDef extends abstractViewDef {
-	static viewName: 'manual';
-	static viewClassName: 'manualViewDef';
-
-	// same constructor and everything else
-
-	setShaders() {
-		this.vertexShaderSrc = `
-		attribute vec4 corner;
-		void main() {
-			gl_Position = corner;
-		}
-		`;
-
-		this.fragmentShaderSrc = `
-		precision highp float;  // does this do anything?
-		uniform int cornerColor;
-
-		void main() {
-			// chartreuce triangle
-			gl_FragColor = vec4(.5, 1, cornerColor, 1);
-		}
-		`;
-
-		this.compileProgram();
-	}
-
-	// all to do this one differently
-	setInputs() {
-		const gl = this.gl;
-
-		const sin = Math.sin;
-		const cos = Math.cos;
-		const corners = new Float32Array([
-			cos(2), sin(2),
-			cos(4), sin(4),
-			cos(6), sin(6),
-		]);
-
-		let cornerAttributeLocation = gl.getAttribLocation(this.program, "corner");
-		if (cornerAttributeLocation < 0) throw `cornerAttributeLocation bad: ${cornerAttributeLocation}`;
-
-		const cornerBuffer = gl.createBuffer();  // actual ram in GPU chip
-		gl.bindBuffer(gl.ARRAY_BUFFER, cornerBuffer);
-
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), bufferDataDrawMode);
-
-		var vao = this.vaoExt.createVertexArrayOES();
-		this.vaoExt.bindVertexArrayOES(vao);
-		this.vao = vao;
-		gl.enableVertexAttribArray(cornerAttributeLocation);
-
-		const size = 2;          // 2 components per iteration
-		const type = gl.FLOAT;   // the data is 32bit floats
-		const normalize = false; // don't normalize the data
-		const stride = 0;        // 0 = move forward number of bytes to get the next position
-								// size * sizeof(type) each iteration
-		const offset = 0;        // start at the beginning of the buffer
-		gl.vertexAttribPointer(cornerAttributeLocation, size, type, normalize, stride, offset);
-	}
-}
-//if (SquishPanel) SquishPanel.addMeToYourList(manualViewDef);
-
-/* ****************************************************** viewVariableViewDef */
-
-// this makes a light green color if false, a little on the yellow side.
-// if true, you should see something brighter and less yellow
-let includeUniform = false;
-
-// slightly more complicated with the viewVariables
-export class viewVariableViewDef extends abstractViewDef {
-	static viewName: 'viewVariable';
-	static viewClassName: 'viewVariableViewDef';
-
-	// same constructor and everything else, mostly
-	setShaders() {
-		this.vertexShaderSrc = `
-		attribute vec4 corner;
-		void main() {
-			gl_Position = corner;
-
-			gl_PointSize = 10.;  // dot size, actually a crude square
-		}
-		`;
-
-		const decl = includeUniform ? `uniform vec4 cornerColorUni;` : '';
-		const cornerColorUni = includeUniform ? `cornerColorUni` : 'vec4(0.,.5,1.,1.)';
-		this.fragmentShaderSrc = `
-		precision highp float;  // does this do anything?
-		${decl}
-
-		void main() {
-			// colored triangle, depends on the uniform?
-			gl_FragColor = ${cornerColorUni};
-		}
-		`;
-
-		this.compileProgram();
-	}
-
-
-	// all to do this one differently
-	setInputs() {
-		const gl = this.gl;
-
-		let cornerColorUni;
-		if (includeUniform)
-			cornerColorUni = this.cornerColorUni = new viewUniform('cornerColorUni', this,
-				() => ({value: [0, 1, .5, 1], type: '4fv'}));
-
-//		const cornerAttributeLocation = gl.getAttribLocation(this.program, 'corner');
-//		const cornerBuffer = gl.createBuffer();  // actual ram in GPU chip
-//		gl.bindBuffer(gl.ARRAY_BUFFER, cornerBuffer);
-
-		const sin = Math.sin;
-		const cos = Math.cos;
-		const corners = new Float32Array([
-			cos(1), sin(1),
-			cos(3), sin(3),
-			cos(5), sin(5),
-			cos(7), sin(7),
-			cos(9), sin(9),
-			cos(11), sin(11),
-			cos(0), sin(0),
-			cos(2), sin(2),
-			cos(4), sin(4),
-			cos(6), sin(6),
-			cos(8), sin(8),
-			cos(10), sin(10),
-		]);
-		const cornerAttr = this.cornerAttr = new viewAttribute('corner', this);
-		cornerAttr.attachArray(corners, 2);
-
-	}
-
-	draw() {
-		const gl = this.gl;
-
-		// is this a good place to do this?
-		gl.lineWidth(1.0);  // it's the only option anyway
-
-		gl.clearColor(0, 0, .3, 0);
-		gl.clear(gl.COLOR_BUFFER_BIT);
-
-		if (includeUniform) {
-			this.cornerColorUni.setNewFunction()
-		}
-
-		gl.useProgram(this.program);
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 12);
-
-
-		gl.drawArrays(gl.LINE_STRIP, 0, 12);
-		gl.drawArrays(gl.POINTS, 0, 12);
-
-		//gl.POINTS,     // most useful and foolproof but set width in vertex shader
-		//gl.LINES,      // tend to scribble all over
-		//gl.LINE_STRIP, // tend to scribble all over
-		//gl.TRIANGLES,  // more sparse triangles
-	}
-}
-
-//if (SquishPanel) SquishPanel.addMeToYourList(viewVariableViewDef);
-
-// this is the way to do it
-qeStartPromise.then((arg) => {
-	if (SquishPanel) {
-		//debugger;//  hey does this owrk?
-		SquishPanel.addMeToYourList(abstractViewDef);
-		SquishPanel.addMeToYourList(manualViewDef);
-		SquishPanel.addMeToYourList(viewVariableViewDef);
-	}
-});
+abstractViewDef.viewClassName = 'abstractViewDef';

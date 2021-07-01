@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import abstractViewDef from './abstractViewDef';
+//import abstractViewDef from './abstractViewDef';
 //import SquishPanel, {listOfViewClasses} from '../SquishPanel';
 
 /* **************************************** compiling & setting up */
@@ -33,15 +33,15 @@ export class SquishView extends React.Component {
 	}
 
 	render() {
-		return <div>
+		return (<div>
 			<canvas className="SquishView"
 				width={800} height={400}
 				ref={element => this.setCanvas(element)}
-				style={{width: '800px', height: '400px', border: '1px #aaa solid'}}>
+				style={{width: '800px', height: '400px', border: '1px #666 inset'}}>
 			</canvas>
-		</div>;
+		</div>);
 
-
+		// , border: '1px #aaa solid'
 
 	}
 

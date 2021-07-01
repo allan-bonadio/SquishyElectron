@@ -19,8 +19,12 @@
 .CPToolbar button.toolbarButton {
 	display: inline-block;
 	font-size: 4em;
-	padding: 0 2em;
-	margin: 0 .5em;
+	padding: .2em .5em;
+	margin: .1em;
+	cursor: pointer;
+	background-color: linear-gradient(#aaa, #444);
+	border-radius: .5em;
+	width: 3em;
 }
 
 .CPToolbar .isRunning {
@@ -163,7 +167,7 @@ button.stopButton div {
 }
 
 .dialog button {
-	margin: 0 2em;
+	margin: 2em;
 }
 
 .dialog tr td:first {
