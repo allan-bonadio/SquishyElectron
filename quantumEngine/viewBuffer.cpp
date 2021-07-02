@@ -48,13 +48,15 @@ float updateViewBuffer() {
 		}
 	}
 
-	printf("viewBuffer.cpp, resulting cx number:\n");
-	for (int i = 0; i < nPoints*2; i++) {
+	if (true) {
+		printf("viewBuffer.cpp, resulting cx number:\n");
+		qReal avgProb = 1. / theSpace->nStates;
+		for (int i = 0; i < nPoints*2; i++) {
 		float re = viewBuffer[i*4];
 		float im = viewBuffer[i*4+1];
 		float prob = re * re + im * im;
 		if (i & 1) {
-			if (.199 > prob || prob > .201) {
+			if (avgProb/2. > prob || prob > avgProb*2.) {
 				printf("bad inner prod in position %i: %6.3f + %6.3f => %6.3f\n",
 					i, viewBuffer[i*4], viewBuffer[i*4+1], prob);
 			}
