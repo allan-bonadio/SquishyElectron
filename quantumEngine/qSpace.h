@@ -10,8 +10,8 @@
 // we use fixed size int32_t and double here just so JS can calculate sizes more easily.
 // Please keep these class layouts synched with qEngine.js's layout!
 
-/* one for each dimension of the wave array */
-class qDimension {
+/* *************************************** one for each DIMENSION of the wave array */
+struct qDimension {
 public:
 	// possible  states, just for this  dimension.  start+end=datapoints
 	int32_t N;
@@ -26,7 +26,7 @@ public:
 	// includes boundaries.
 	int32_t nPoints;
 
-	// contWELL or contCIRCULAR (has N+2 values for N possibilities)
+	// contWELL or contENDLESS (has N+2 values for N possibilities)
 	// contDISCRETE = (has N values for N possibilities)
 	int32_t continuum;
 
@@ -44,9 +44,9 @@ public:
 	void normalize(qCx *wave);
 	void lowPassFilter(qCx *wave);
 
-	void setCircularWave(qCx *wave, qReal n);
-	void setStandingWave(qCx *wave, qReal n);
-	void setPulseWave(qCx *wave, qReal widthFactor, qReal cycles);
+	void setCircularWave(qReal n);
+	void setStandingWave(qReal n);
+	void setPulseWave(qReal widthFactor, qReal cycles);
 
 	int iterationCount = 0;
 };
@@ -54,11 +54,16 @@ public:
 // continuum values - same as in qDimension in qEngine.js; pls synchronize them
 const int contDISCRETE = 0;
 const int contWELL = 1;
-const int contCIRCULAR = 2;
+const int contENDLESS = 2;
 
-class qSpace {
+/* ************************************************************ the space */
+
+struct qSpace {
 public:
-	qSpace(void) {
+	qSpace(int nDims) {
+		this->nDimensions = nDims;
+		this->iterationCount = 0;
+		this->elapsedTime = 0.;
 	}
 
 	// potential energy as function of state; reals (not complex)
@@ -72,9 +77,6 @@ public:
 // 	qCx *wave0;
 // 	qCx *wave1;
 
-	// which wave we're calculating from, 0 or 1. (not using yet...)
-	int32_t calcFrom;
-
 	// totals for all dimensions
 	int nStates;
 	int nPoints;
@@ -84,6 +86,7 @@ public:
 	// of what a second is?  Resets to zero every so often.
 	double elapsedTime;
 
+	// total number of times thru the number cruncher.
 	int iterationCount;
 
 	// Dimensions are listed from outer to inner as with the resulting psi array:
@@ -102,6 +105,36 @@ public:
 	void oneRk2Step(void);
 	void oneRk4Step(void);
 };
+
+/* ************************************************************ a wave buffer */
+
+struct qWave {
+
+	// create a qWave
+	qWave(qSpace *space);
+	~qWave();
+
+	qSpace *space;
+
+	// the actual data, hopefully in the right size allocated block
+	qCx *buffer;
+
+	void dumpWave(const char *title);
+	void fixBoundaries(void);
+	void prune(void);
+	qReal innerProduct(void);
+	void normalize(void);
+	void lowPassFilter(void);
+
+	void setCircularWave(qReal n);
+	void setStandingWave(qReal n);
+	void setPulseWave(qReal widthFactor, qReal cycles);
+
+	void forEachPoint(void (*callback)(qCx, int));
+	void forEachState(void (*callback)(qCx, int));
+};
+
+/* ************************************************************ the space */
 
 // for JS to call
 extern "C" {
@@ -134,3 +167,4 @@ extern qReal *thePotential;
 extern float *viewBuffer;
 extern qReal elapsedTime;
 
+extern void qeStarted(void);
