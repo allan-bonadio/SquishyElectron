@@ -42,7 +42,7 @@ const DEFAULT_VIEW_CLASS_NAME =
 'flatDrawingViewDef';
 
 const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 5;
-const DEFAULT_CONTINUUM = qeSpace.contCIRCULAR;
+const DEFAULT_CONTINUUM = qeSpace.contENDLESS;
 
 
 
@@ -158,6 +158,7 @@ export class SquishPanel extends React.Component {
 	/* ******************************************************* iteration & animation */
 
 
+	// take one RK integration step
 	crunchOneFrame() {
 		qe.qSpace_oneRk2Step();
 		qe.updateToLatestWaveBuffer();

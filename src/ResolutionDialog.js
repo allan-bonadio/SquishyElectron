@@ -149,11 +149,11 @@ export default class ResolutionDialog extends React.Component {
 		const onChange = ev => this.setState({continuum: ev.target.value});
 		return <>
 			what kind of universe:
-			<label><input type='radio' name='continuum'  value={qeSpace.contCIRCULAR}
-					checked={s.continuum == qeSpace.contCIRCULAR}
+			<label><input type='radio' name='continuum'  value={qeSpace.contENDLESS}
+					checked={s.continuum == qeSpace.contENDLESS}
 					onChange={onChange}
 					style={{fontWeight:
-						(this.props.continuum == qeSpace.contCIRCULAR)
+						(this.props.continuum == qeSpace.contENDLESS)
 						? 'bold'
 						: 'normal'}}/>
 				Endless, repeating left-right</label>

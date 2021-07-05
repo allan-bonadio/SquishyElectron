@@ -42,7 +42,7 @@ export class jSpace {
 	setZeroVoltage() {
 		let V = this.V;
 		V.fill(0);
-		this.continuum = qeSpace.contCIRCULAR;
+		this.continuum = qeSpace.contENDLESS;
 	}
 
 	// infinite walled well at  ends
@@ -114,7 +114,7 @@ export class jWave {
 			psiAr[N+1] = qCx();
 			break;
 
-		case qeSpace.contCIRCULAR:
+		case qeSpace.contENDLESS:
 			// the points on the end get set to the opposite side
 			psiAr[0] = psiAr[N];
 			psiAr[N+1] = psiAr[1];
