@@ -19,7 +19,7 @@ void run_qCx_tests(void) {
 
 	VERIFY(qCx(3, -4), qCx(3, -4));
 	VERIFY(qCx(-3), qCx(-3, 0));
-	VERIFY(qCx(), qCx(0, 0));
+	VERIFY(qCx(0), qCx(0));
 
 
 	/* ********************************************* addition */

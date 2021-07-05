@@ -30,7 +30,7 @@ public:
 	qReal re;
 	qReal im;
 
-	// constructors
+	// informal constructors
 	qCx(qReal re, qReal im) {this->re = re; this->im = im;}
 	qCx(qReal re) {this->re = re; this->im = 0;}
 	qCx(void) {this->re = this->im = 0;}
@@ -53,12 +53,15 @@ public:
 	qCx operator*(qCx b) {return qCx(re * b.re - im * b.im, im * b.re + re * b.im);}
 	qCx operator*(qReal b) {return qCx(re * b, im * b);}
 
+	//    over complex
 	qCx operator*=(qCx b) {
 		qReal t = re * b.re - im * b.im;
 		im = im*b.re +  + re * b.im;
 		re = t;
 		return *this;
 	}
+
+	//    over reals
 	qCx operator*=(qReal b) {re *= b; im *= b; return *this;}
 
 	// division
@@ -69,16 +72,18 @@ public:
 			(im * b.re - re * b.im) / det
 		);
 	}
+
+	// over reals
 	qCx operator/(qReal b) {re /= b; im /= b; return *this;}
 
 	qCx operator/=(qCx b) {
 		qReal det = b.re * b.re + b.im * b.im;
 		qReal t = (re * b.re + im * b.im) / det;
-		im = (im * b.re - re * b.im) / det;
-		re = t;
+		this->im = (im * b.re - re * b.im) / det;
+		this->re = t;
 		return *this;
 	}
-	qCx operator/=(qReal b) {re -= b; return *this;}
+	qCx operator/=(qReal b) {re /= b; return *this;}
 
 
 	// inline so faster
