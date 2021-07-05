@@ -5,7 +5,7 @@
 // construct our space & stuff
 static void makeNewSpace(int32_t N, int32_t continuum, const char *label) {
 	startNewSpace();
-	addSpaceDimension(5, contCIRCULAR, "x");
+	addSpaceDimension(5, contENDLESS, "x");
 	completeNewSpace();
 }
 
@@ -22,7 +22,7 @@ qCx expected[7] = {
 
 
 static void firstRK2Iteration5(void) {
-	makeNewSpace(5, contCIRCULAR, "x");
+	makeNewSpace(5, contENDLESS, "x");
 
 	theSpace->oneRk2Step();
 

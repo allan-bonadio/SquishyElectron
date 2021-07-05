@@ -8,6 +8,9 @@ static const qReal dt = 0.02;
 static const qCx dtOverI = qCx(0., -dt);
 static const qCx halfDtOverI = qCx(0., -dt / 2.);
 
+void dumpMyPoint(qCx val, int ix) {
+	printf("appoint a point %6d  %8.4f %8.4f ", val.re, val.im, ix);
+}
 
 // crawl along x to find the next version of theWave, after dt, and store it there.
 void qSpace::oneRk2Step(void) {
@@ -45,6 +48,9 @@ void qSpace::oneRk2Step(void) {
 
 	dim->lowPassFilter(theWave);
 	dim->normalize(theWave);
+
+
+	this->forEachPoint(theWave, dumpMyPoint);
 }
 
 /* ************************************************** benchmarking */
