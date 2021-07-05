@@ -14,6 +14,8 @@ static const qCx halfDtOverI = qCx(0., -dt / 2.);
 void qSpace::oneRk2Step(void) {
 	qDimension *dim = theSpace->dimensions;
 	dim->fixBoundaries(theWave);
+	this->dumpWave("starting theWave", theWave);
+	//qCx *laosWave = theWave;
 
 	// use laosWave for all the first-try psi values
 	for (int ix = dim->start; ix < dim->end; ix++) {
@@ -21,6 +23,7 @@ void qSpace::oneRk2Step(void) {
 		qCheck(sumWave[ix]);
 	}
 	dim->fixBoundaries(laosWave);
+	this->dumpWave("laosWave", laosWave);
 
 	//for (int ix = 0; ix <= dim->end; ix++)
 	//printf("INRK2 %d\t%lf\t%lf\n", ix, laosWave[ix].re, laosWave[ix].im);
@@ -30,6 +33,7 @@ void qSpace::oneRk2Step(void) {
 		sumWave[ix] = theWave[ix] + hamiltonian(laosWave, ix) * dtOverI;
 		qCheck(sumWave[ix]);
 	}
+	this->dumpWave("sumWave", sumWave);
 
 	// now flip them around
 	qCx *t = sumWave;
@@ -37,6 +41,7 @@ void qSpace::oneRk2Step(void) {
 	theWave = t;
 
 	dim->fixBoundaries(theWave);
+	this->dumpWave("almost done theWave", theWave);
 
 	//printf("done with rk2: \n");
 	//for (int ix = 0; ix <= dim->end; ix++)
@@ -45,7 +50,7 @@ void qSpace::oneRk2Step(void) {
 	theSpace->elapsedTime += dt;
 
 	dim->lowPassFilter(theWave);
-	dim->normalize(theWave);
+	this->dumpWave("after low pass theWave", theWave);
 }
 
 /* ************************************************** benchmarking */
