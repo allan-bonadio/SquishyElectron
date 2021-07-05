@@ -1,5 +1,6 @@
 qCx.cpp
 qSpace.cpp
 rk2.cpp
+rk4.cpp
 hamiltonian.cpp
 viewBuffer.cpp
