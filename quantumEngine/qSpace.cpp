@@ -2,7 +2,9 @@
 #include <cmath>
 
 class qSpace *theSpace = NULL;
-class qCx *theWave = NULL, *egyptWave = NULL, *laosWave = NULL, *sumWave = NULL;
+class qCx *theWave = NULL, *sumWave = NULL,
+	*k1Wave = NULL, *k2Wave = NULL, *k3Wave = NULL, *k4Wave = NULL,
+	*egyptWave = NULL, *laosWave = NULL;
 qReal *thePotential = NULL;
 qReal elapsedTime = 0;
 
@@ -22,9 +24,13 @@ int32_t startNewSpace(void) {
 
 	if (theSpace) {
 		delete[] theWave;
+		delete[] sumWave;
+		delete[] k1Wave;
+		delete[] k2Wave;
+		delete[] k3Wave;
+		delete[] k4Wave;
 		delete[] egyptWave;
 		delete[] laosWave;
-		delete[] sumWave;
 		delete[] thePotential;
 		delete[] viewBuffer;
 		delete theSpace;
@@ -85,15 +91,22 @@ int32_t completeNewSpace(void) {
 
 	//  allocate the buffers
 	theWave = new qCx[nPoints];
+	sumWave = new qCx[nPoints];
+	k1Wave = new qCx[nPoints];
+	k2Wave = new qCx[nPoints];
+	k3Wave = new qCx[nPoints];
+	k4Wave = new qCx[nPoints];
 	egyptWave = new qCx[nPoints];
 	laosWave = new qCx[nPoints];
-	sumWave = new qCx[nPoints];
-	viewBuffer = new float[nPoints * 8];  // 4 floats per row, two verts per point
+
+	viewBuffer = new float[nPoints * 8];  // 4 floats per vertex, two verts per point
+
+	// a default
 	theSpace->dimensions->setCircularWave(theWave, 1);
 	//theSpace->dumpWave("freshly created");
 
 	thePotential = new qReal[nPoints];
-	theSpace->setValleyPotential(1., 1., 0.);
+	theSpace->setValleyPotential(1., 1., 0.); // another default
 	//theSpace->dumpPotential("freshly created");
 
 	theSpace->iterationCount = 0;
@@ -171,11 +184,10 @@ void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset =
 
 /* ********************************************************** wave arithmetic */
 
-void qSpace::dumpWave(const char *title) {
+void qSpace::dumpThatWave(qCx *wave) {
 	int ix;
 	qDimension *dim = this->dimensions;
 
-	printf("\n== Wave %s", title);
 	if (dim->continuum) printf(" [O]=(%lf,%lf)",
 		theWave[0].re, theWave[0].im);
 	//printf("\n");
@@ -188,6 +200,28 @@ void qSpace::dumpWave(const char *title) {
 	if (dim->continuum) printf("\nend [%d]=(%lf,%lf)",
 		ix, theWave[ix].re, theWave[ix].im);
 	printf("\n");
+}
+
+void qSpace::dumpWave(const char *title, qCx *aWave) {
+	int ix;
+	qDimension *dim = this->dimensions;
+
+	printf("\n== Wave %s", title);
+
+	this->dumpThatWave(aWave);
+
+// 	if (dim->continuum) printf(" [O]=(%lf,%lf)",
+// 		aWave[0].re, aWave[0].im);
+// 	//printf("\n");
+//
+// 	for (ix = dim->start; ix < dim->end; ix++) {
+// 		printf("\n[%d] ", ix);
+// 		//if (0 == ix % 5) printf("\n[%d] ", ix);
+// 		printf("(%lf,%lf) ", aWave[ix].re, aWave[ix].im);
+// 	}
+// 	if (dim->continuum) printf("\nend [%d]=(%lf,%lf)",
+// 		ix, aWave[ix].re, aWave[ix].im);
+// 	printf("\n");
 }
 
 void qSpace::forEach(void callback(qCx a)) {
@@ -206,8 +240,8 @@ void qDimension::fixBoundaries(qCx *wave) {
 	case contWELL:
 		// the points on the end are ∞ potential, but the arithmetic goes bonkers
 		// if I actually set the voltage to ∞
-		wave[0] = qCx();
-		wave[this->end] = qCx();
+		wave[0] = qCx(0);
+		wave[this->end] = qCx(0);
 		//printf("contWELL cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", this->continuum,
 		//wave[0].re, wave[0].im, wave[this->end].re, wave[this->end].im);
 		break;
