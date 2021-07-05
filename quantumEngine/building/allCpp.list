@@ -1,5 +1,8 @@
+hamiltonian.cpp
 qCx.cpp
 qSpace.cpp
+qStepper.cpp
+qWave.cpp
 rk2.cpp
-hamiltonian.cpp
+rk4.cpp
 viewBuffer.cpp
