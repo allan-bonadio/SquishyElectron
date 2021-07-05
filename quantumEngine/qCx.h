@@ -9,6 +9,9 @@
 #include <string.h>
 #include <float.h>
 
+#define byte unsigned char
+#define char16 char16_t
+
 // what kind of floats are we using: double or float or even long double
 #define qReal  double
 
@@ -69,7 +72,7 @@ public:
 			(im * b.re - re * b.im) / det
 		);
 	}
-	qCx operator/(qReal b) {re /= b; im /= b; return *this;}
+	qCx operator/(qReal b) { return qCx(re / b; im / b); }
 
 	qCx operator/=(qCx b) {
 		qReal det = b.re * b.re + b.im * b.im;
@@ -93,6 +96,4 @@ public:
 
 typedef class qCx qCx;
 
-#define char8 unsigned char
-#define char16 char16_t
 extern void qCheck(qCx aCx);
