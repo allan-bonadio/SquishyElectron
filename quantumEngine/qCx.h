@@ -31,25 +31,27 @@ public:
 	qReal im;
 
 	// informal constructors
-	qCx(qReal re, qReal im) {this->re = re; this->im = im;}
-	qCx(qReal re) {this->re = re; this->im = 0;}
-	qCx(void) {this->re = this->im = 0;}
+	qCx(qReal real, qReal imag) {re = real; im = imag;}
+	qCx(qReal real) {re = real; im = 0;}
+	qCx(void) {re = im = 0;}
 
-	// addition
+	// // // // // // // // // // // // // addition
 	qCx operator+(qCx b) {return qCx(re + b.re, im + b.im);}
 	qCx operator+(qReal b) {return qCx(re + b, im);}
 
 	qCx operator+=(qCx b) {re += b.re; im += b.im; return *this;}
 	qCx operator+=(qReal b) {re += b; return *this;}
 
-	// subtraction
+	// // // // // // // // // // // // // subtraction
 	qCx operator-(qCx b) {return qCx(re - b.re, im - b.im);}
 	qCx operator-(qReal b) {return qCx(re - b, im);}
+	qCx operator-(void) {return qCx(-re, -im);}
 
 	qCx operator-=(qCx b) {re -= b.re; im -= b.im; return *this;}
 	qCx operator-=(qReal b) {re -= b; return *this;}
 
-	// multiplication
+
+	// // // // // // // // // // // // // multiplication
 	qCx operator*(qCx b) {return qCx(re * b.re - im * b.im, im * b.re + re * b.im);}
 	qCx operator*(qReal b) {return qCx(re * b, im * b);}
 
@@ -64,26 +66,15 @@ public:
 	//    over reals
 	qCx operator*=(qReal b) {re *= b; im *= b; return *this;}
 
-	// division
-	qCx operator/(qCx b) {
-		qReal det = b.re * b.re + b.im * b.im;
-		return qCx(
-			(re * b.re + im * b.im) / det,
-			(im * b.re - re * b.im) / det
-		);
-	}
+
+	// // // // // // // // // // // // // division
+	qCx operator/(qCx b);
 
 	// over reals
-	qCx operator/(qReal b) {re /= b; im /= b; return *this;}
+	qCx operator/(qReal b) {return qCx(re / b, im / b);}
 
-	qCx operator/=(qCx b) {
-		qReal det = b.re * b.re + b.im * b.im;
-		qReal t = (re * b.re + im * b.im) / det;
-		this->im = (im * b.re - re * b.im) / det;
-		this->re = t;
-		return *this;
-	}
-	qCx operator/=(qReal b) {re /= b; return *this;}
+	qCx operator/=(qCx b);
+	qCx operator/=(qReal b) {re /= b; im /= b; return *this;}
 
 
 	// inline so faster
@@ -92,12 +83,13 @@ public:
 	// oh i don't want to do abs
 	qReal abs();
 
-	// the angle, ±180 degrees.  Kindof retro but really i'm just using it for display colors.
+	// the angle, ±180 degrees.  Kindof retro but really i'm just using it
+	// for display colors.  not even that.
 	qReal phase();
 };
 
 typedef class qCx qCx;
 
-#define char8 unsigned char
-#define char16 char16_t
+// #define char8 unsigned char
+// #define char16 char16_t
 extern void qCheck(qCx aCx);
