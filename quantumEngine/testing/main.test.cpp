@@ -17,5 +17,7 @@ int main() {
 
 	run_rk2_tests();
 
+	run_wave_tests();
+
 	return 0;
 }
