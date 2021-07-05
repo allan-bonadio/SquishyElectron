@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "qSpace.h"
+#include <ctime>
 
 // dx is always 1.  dt is below.
 static const qReal dt = 0.02;
@@ -48,7 +49,6 @@ void qSpace::oneRk2Step(void) {
 }
 
 /* ************************************************** benchmarking */
-#include <ctime>
 
 int manyRk2Steps(void) {
 	const int many = 100;

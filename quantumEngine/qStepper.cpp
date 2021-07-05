@@ -1,4 +1,5 @@
 // this manages the engine's stepping through time, subdividing
+// note: not tested or called anywhere (?)
 int qStepper(void) {
 	const int many = 100;
 
