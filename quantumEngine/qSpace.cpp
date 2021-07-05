@@ -276,7 +276,7 @@ void qDimension::prune(qCx *wave) {
 
 // calculate ⟨ψ | ψ⟩  'inner product' isn't the right name is it?
 qReal qDimension::innerProduct(qCx *wave) {
-	qReal sum;
+	qReal sum = 0.;
 
 	for (int ix = this->start; ix < this->end; ix++) {
 		sum += wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im;
