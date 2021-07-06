@@ -2,9 +2,16 @@
 #include <cmath>
 
 class qSpace *theSpace = NULL;
+
+// a transitional kind of thing from raw wave arrays to the new qWave buffer obj
+class qWave *theQWave = NULL, *sumQWave = NULL,
+	*k1QWave = NULL, *k2QWave = NULL, *k3QWave = NULL, *k4QWave = NULL,
+	*egyptQWave = NULL, *laosQWave = NULL;
 class qCx *theWave = NULL, *sumWave = NULL,
 	*k1Wave = NULL, *k2Wave = NULL, *k3Wave = NULL, *k4Wave = NULL,
 	*egyptWave = NULL, *laosWave = NULL;
+
+
 qReal *thePotential = NULL;
 qReal elapsedTime = 0;
 
@@ -23,14 +30,15 @@ int32_t startNewSpace(void) {
 	//printf("startNewSpace()\n");
 
 	if (theSpace) {
-		delete[] theWave;
-		delete[] sumWave;
-		delete[] k1Wave;
-		delete[] k2Wave;
-		delete[] k3Wave;
-		delete[] k4Wave;
-		delete[] egyptWave;
-		delete[] laosWave;
+		delete theQWave;
+		delete sumQWave;
+		delete k1QWave;
+		delete k2QWave;
+		delete k3QWave;
+		delete k4QWave;
+		delete egyptQWave;
+		delete laosQWave;
+
 		delete[] thePotential;
 		delete[] viewBuffer;
 		delete theSpace;
@@ -41,7 +49,7 @@ int32_t startNewSpace(void) {
 	theSpace = new qSpace(1);
 	//printf("  done startNewSpace()\n");
 
-	return true;
+	return 1;
 }
 
 // call this from JS to add one or more dimensions
@@ -66,7 +74,7 @@ int32_t addSpaceDimension(int32_t N, int32_t continuum, const char *label) {
 
 	dimsSoFar++;
 	//printf("  done addSpaceDimension() %s\n", dim->label);
-	return true;
+	return 1;
 }
 
 // call this from JS to finish the process
@@ -90,19 +98,30 @@ int32_t completeNewSpace(void) {
 	theSpace->nPoints = nPoints;
 
 	//  allocate the buffers
-	theWave = new qCx[nPoints];
-	sumWave = new qCx[nPoints];
-	k1Wave = new qCx[nPoints];
-	k2Wave = new qCx[nPoints];
-	k3Wave = new qCx[nPoints];
-	k4Wave = new qCx[nPoints];
-	egyptWave = new qCx[nPoints];
-	laosWave = new qCx[nPoints];
+	theQWave = new qWave(theSpace);
+	sumQWave = new qWave(theSpace);
+	k1QWave = new qWave(theSpace);
+	k2QWave = new qWave(theSpace);
+	k3QWave = new qWave(theSpace);
+	k4QWave = new qWave(theSpace);
+	egyptQWave = new qWave(theSpace);
+	laosQWave = new qWave(theSpace);
+
+	theWave = theQWave->buffer;
+	sumWave = sumQWave->buffer;
+	k1Wave = k1QWave->buffer;
+	k2Wave = k2QWave->buffer;
+	k3Wave = k3QWave->buffer;
+	k4Wave = k4QWave->buffer;
+	egyptWave = egyptQWave->buffer;
+	laosWave = laosQWave->buffer;
 
 	viewBuffer = new float[nPoints * 8];  // 4 floats per vertex, two verts per point
 
 	// a default
-	theSpace->dimensions->setCircularWave(theWave, 1);
+	theQWave->setCircularWave(1);
+	theQWave->dumpWave("freshly created");
+	//theSpace->dimensions->setCircularWave(theWave, 1);
 	//theSpace->dumpWave("freshly created");
 
 	thePotential = new qReal[nPoints];
@@ -118,7 +137,7 @@ int32_t completeNewSpace(void) {
 	return nPoints;
 }
 
-/* ********************************************************** glue functions */
+/* ********************************************************** glue functions for js */
 
 // these are for JS only; they're all extern "C"
 
@@ -139,10 +158,10 @@ void qSpace_setValleyPotential(qReal power, qReal scale, qReal offset) {
 	theSpace->setValleyPotential(power, scale, offset);
 }
 
-void qSpace_dumpWave(char *title) { theSpace->dumpWave(title); }
-void qSpace_setCircularWave(qReal n) { theSpace->dimensions->setCircularWave(n); }
-void qSpace_setStandingWave(qReal n) { theSpace->dimensions->setStandingWave(n); }
-void qSpace_setPulseWave(qReal widthFactor, qReal cycles) { theSpace->dimensions->setPulseWave(widthFactor, cycles);
+void qSpace_dumpWave(char *title) { theQWave->dumpWave(title); }
+void qSpace_setCircularWave(qReal n) { theQWave->setCircularWave(n); }
+void qSpace_setStandingWave(qReal n) { theQWave->setStandingWave(n); }
+void qSpace_setPulseWave(qReal widthFactor, qReal cycles) { theQWave->setPulseWave(widthFactor, cycles);
 }
 void qSpace_oneRk2Step() { theSpace->oneRk2Step(); }
 void qSpace_oneRk4Step() { theSpace->oneRk4Step(); }

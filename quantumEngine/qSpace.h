@@ -13,6 +13,11 @@
 extern class qSpace *theSpace;
 extern class qCx *theWave, *sumWave, *egyptWave, *laosWave;
 extern class qCx *k1Wave, *k2Wave, *k3Wave, *k4Wave;
+
+extern class qWave *theQWave, *sumQWave,
+	*k1QWave, *k2QWave, *k3QWave, *k4QWave,
+	*egyptQWave, *laosQWave;
+
 extern qReal *thePotential;
 extern float *viewBuffer;
 extern qReal elapsedTime;
@@ -44,16 +49,17 @@ public:
 	// Also could have Energy dimensions...
 	char label[LABEL_LEN];
 
-	void fixBoundaries(qCx *wave);
+	//void fixBoundaries(qCx *wave);
 
-	void prune(qCx *wave);
-	qReal innerProduct(qCx *wave);
-	void normalize(qCx *wave);
-	void lowPassFilter(qCx *wave);
+	//void prune(qCx *wave);
+	//qReal innerProduct(qCx *wave);
+	//void normalize(qCx *wave);
+	//void lowPassFilter(qCx *wave);
 
-	void setCircularWave(qReal n);
-	void setStandingWave(qReal n);
-	void setPulseWave(qReal widthFactor, qReal cycles);
+	// see qWave for these
+	//void setCircularWave(qReal n);
+	//void setStandingWave(qReal n);
+	//void setPulseWave(qReal widthFactor, qReal cycles);
 
 	int iterationCount = 0;
 };
@@ -105,10 +111,10 @@ public:
 	void setZeroPotential(void);
 	void setValleyPotential(qReal power, qReal scale, qReal offset);
 
-	void dumpThatWave(qCx *wave);
-	void dumpWave(const char *title, qCx *aWave = theWave);
-	void forEach(void callback(qCx));
-	void map(qCx callback(qCx*));
+//	void dumpThatWave(qCx *wave);
+//	void dumpWave(const char *title, qCx *aWave = theWave);
+//	void forEach(void callback(qCx));
+//	void map(qCx callback(qCx*));
 
 	void oneRk2Step(void);
 	void oneRk4Step(void);

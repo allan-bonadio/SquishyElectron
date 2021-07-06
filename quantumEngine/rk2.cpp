@@ -10,14 +10,14 @@ static const qCx dtOverI = qCx(0., -dt);
 static const qCx halfDtOverI = qCx(0., -dt / 2.);
 
 void dumpMyPoint(qCx val, int ix) {
-	printf("appoint a point %6d  %8.4f %8.4f ", val.re, val.im, ix);
+	printf("appoint a point %6d  %8.4f %8.4f ", ix, val.re, val.im);
 }
 
 // crawl along x to find the next version of theWave, after dt, and store it there.
 void qSpace::oneRk2Step(void) {
 	qDimension *dim = theSpace->dimensions;
-	dim->fixBoundaries(theWave);
-	this->dumpWave("starting theWave", theWave);
+	theQWave->fixBoundaries();
+	theQWave->dumpWave("starting theWave");
 	//qCx *laosWave = theWave;
 
 	// use laosWave for all the first-try psi values
@@ -25,8 +25,8 @@ void qSpace::oneRk2Step(void) {
 		laosWave[ix] = theWave[ix] + hamiltonian(theWave, ix) * halfDtOverI;
 		qCheck(sumWave[ix]);
 	}
-	dim->fixBoundaries(laosWave);
-	this->dumpWave("laosWave", laosWave);
+	theQWave->fixBoundaries();
+	laosQWave->dumpWave("laos Q Wave");
 
 	//for (int ix = 0; ix <= dim->end; ix++)
 	//printf("INRK2 %d\t%lf\t%lf\n", ix, laosWave[ix].re, laosWave[ix].im);
@@ -36,15 +36,17 @@ void qSpace::oneRk2Step(void) {
 		sumWave[ix] = theWave[ix] + hamiltonian(laosWave, ix) * dtOverI;
 		qCheck(sumWave[ix]);
 	}
-	this->dumpWave("sumWave", sumWave);
+	sumQWave->dumpWave("sumWave");
 
-	// now flip them around
+	// now flip them around.  This type of surgery; not sure about it...
 	qCx *t = sumWave;
 	sumWave = theWave;
+	sumQWave->buffer = theWave;
 	theWave = t;
+	theQWave->buffer = t;
 
-	dim->fixBoundaries(theWave);
-	this->dumpWave("almost done theWave", theWave);
+	theQWave->fixBoundaries();
+	theQWave->dumpWave("almost done theWave");
 
 	//printf("done with rk2: \n");
 	//for (int ix = 0; ix <= dim->end; ix++)
@@ -52,11 +54,11 @@ void qSpace::oneRk2Step(void) {
 
 	theSpace->elapsedTime += dt;
 
-	dim->lowPassFilter(theWave);
+	theQWave->lowPassFilter();
 
 	// which one i better?  who cares, forEachPoint works!
-	this->forEachPoint(theWave, dumpMyPoint);
-	this->dumpWave("after low pass theWave", theWave);
+	theQWave->forEachPoint(dumpMyPoint);
+	theQWave->dumpWave("after low pass theWave");
 }
 
 /* ************************************************** benchmarking */

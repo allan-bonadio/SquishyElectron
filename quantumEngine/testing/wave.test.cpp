@@ -28,6 +28,8 @@ void run_wave_tests(void) {
 
 	// normalize
 
+	// low pass
+
 	// populate
 
 	// destroying

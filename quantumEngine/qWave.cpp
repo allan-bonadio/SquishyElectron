@@ -1,6 +1,7 @@
 #include "qSpace.h"
 #include <cmath>
 
+/* ************************************************************ birth & death & basics */
 
 // buffer is initialized to zero bytes therefore 0.0 everywhere
 qWave::qWave(qSpace *space) {
@@ -13,8 +14,6 @@ qWave::~qWave() {
 	free(this->buffer);
 	this->buffer = NULL;
 }
-
-
 
 void qWave::forEachPoint(void (*callback)(qCx, int) ) {
 	qDimension *dim = this->space->dimensions;
@@ -34,30 +33,31 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 
 }
 
-
-
-
-
-
-void qWave::dumpWave(const char *title) {
+// NOT a member function; this is wave and space independent
+void dumpThatWave(qDimension *dim, qCx *wave) {
 	int ix;
-	qDimension *dim = this->space->dimensions;
-	qCx *buf = this->buffer;
 
-	printf("\n== Wave %s", title);
-	if (dim->continuum) printf(" [O]=(%lf,%lf)",
-		buf[0].re, buf[0].im);
+	if (dim->continuum) printf(" [O]=(%lf, %lf)",
+		wave[0].re, wave[0].im);
 	//printf("\n");
 
 	for (ix = dim->start; ix < dim->end; ix++) {
 		printf("\n[%d] ", ix);
 		//if (0 == ix % 5) printf("\n[%d] ", ix);
-		printf("(%lf,%lf) ", buf[ix].re, buf[ix].im);
+		printf("(%lf,%lf) ", wave[ix].re, wave[ix].im);
 	}
-	if (dim->continuum) printf("\nend [%d]=(%lf,%lf)",
-		ix, buf[ix].re, buf[ix].im);
+	if (dim->continuum) printf("\nend [%d]=(%lf, %lf)",
+		ix, wave[ix].re, wave[ix].im);
 	printf("\n");
 }
+
+// this is the member function that uses its own wave and space
+void qWave::dumpWave(const char *title) {
+	printf("\n== Wave %s", title);
+	dumpThatWave(this->space->dimensions, this->buffer);
+}
+
+/* ************************************************************ arithmetic */
 
 // refresh the wraparound points on the ends of continuum dimensions from their counterpoints
 void qWave::fixBoundaries(void) {
@@ -124,9 +124,9 @@ qReal qWave::innerProduct(void) {
 void qWave::normalize(void) {
 	qCx *wave = this->buffer;
 	qDimension *dims = this->space->dimensions;
-	qReal mag = dims->innerProduct(wave);
+	qReal mag = this->innerProduct();
 	printf("normalizing.  iprod=%lf\n", mag);
-	theSpace->dumpWave("The wave,before normalize");
+	this->dumpWave("The wave,before normalize");
 
 	if (mag == 0.) {
 		// ALL ZEROES!??! set them all to a constant, normalized
@@ -148,7 +148,7 @@ void qWave::normalize(void) {
 		for (int ix = dims->start; ix < dims->end; ix++)
 			wave[ix] *= mag;
 	}
-	dims->fixBoundaries(wave);
+	this->fixBoundaries();
 	//printf("    normalizing.  new IP=%lf\n", this->space->innerProduct(wave));
 }
 
@@ -160,7 +160,7 @@ void qWave::lowPassFilter() {
 	qCx avg, d2prev = wave[0];
 	qDimension *dims = this->space->dimensions;
 
-	dims->prune(wave);
+	this->prune();
 
 	// average each point with the neighbors; ¼ for each neightbor, ½ for the point itself
 	// drag your feet on setting the new value in so it doesn't interfere
@@ -171,7 +171,7 @@ void qWave::lowPassFilter() {
 			d2prev = avg;
 		}
 	}
-	dims->normalize(wave);
+	this->normalize();
 }
 
 
@@ -192,7 +192,7 @@ void qWave::setCircularWave(qReal n) {
 		angle = dAngle * (ix - start);
 		wave[ix] = qCx(cos(angle), sin(angle));
 	}
-	dims->normalize(wave);
+	this->normalize();
 }
 
 // make a superposition of two waves in opposite directions.
@@ -214,7 +214,7 @@ void qWave::setStandingWave(qReal n) {
 	for (int ix = start; ix < end; ix++) {
 		wave[ix] = qCx(sin(dAngle * (ix - start)));
 	}
-	dims->normalize(wave);
+	this->normalize();
 }
 
 // widthFactor is number of points wide it is, fraction of N.
@@ -224,7 +224,7 @@ void qWave::setPulseWave(qReal widthFactor, qReal cycles) {
 	qDimension *dims = this->space->dimensions;
 
 	// start with a real wave
-	dims->setCircularWave(cycles / widthFactor);
+	this->setCircularWave(cycles / widthFactor);
 
 	// modulate with a gaussian
 	int peak = lround(dims->N * widthFactor) % dims->N;  // ?? i dunno
@@ -232,7 +232,7 @@ void qWave::setPulseWave(qReal widthFactor, qReal cycles) {
 	for (int ix = dims->start; ix < dims->end; ix++)
 		wave[ix] *= exp(-(ix - peak) * (ix - peak) / stdDev);
 
-	this->space->dimensions->normalize(wave);
+	this->normalize();
 }
 
 

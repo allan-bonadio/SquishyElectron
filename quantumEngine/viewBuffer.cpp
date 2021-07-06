@@ -16,6 +16,7 @@ float *getViewBuffer(void) {
 float updateViewBuffer() {
 	int nPoints = theSpace->nPoints;
 	qReal highest = 0;
+	qReal tiny = 1e-8;
 
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
 		float *twoRowPtr = viewBuffer + pointNum * 8;
@@ -24,8 +25,8 @@ float updateViewBuffer() {
 		qReal re = wavePtr->re;
 		qReal im = wavePtr->im;
 
-		twoRowPtr[0] = 0;
-		twoRowPtr[1] = 0;
+		twoRowPtr[0] = re * tiny;
+		twoRowPtr[1] = im * tiny;
 		twoRowPtr[2] = potPtr[0];  // this isn't going to be used
 		twoRowPtr[3] = pointNum * 2.;  // vertexSerial: at zero
 
@@ -40,11 +41,11 @@ float updateViewBuffer() {
 			highest = height;
 	}
 
-	if (false) {
+	if (true) {
 		printf("viewBuffer.cpp, as written to view buffer:\n");
 		for (int i = 0; i < nPoints*2; i++) {
-			printf("%6.3f  %6.3f  %6.3f  %6.3f\n",
-				viewBuffer[i*4], viewBuffer[i*4+1], viewBuffer[i*4+2], viewBuffer[i*4+3]);
+			printf("%6d   %6.3f  %6.3f  %6.3f  %6.3f\n",
+				i, viewBuffer[i*4], viewBuffer[i*4+1], viewBuffer[i*4+2], viewBuffer[i*4+3]);
 		}
 	}
 
@@ -56,12 +57,13 @@ float updateViewBuffer() {
 			float im = viewBuffer[i*4+1];
 			float prob = re * re + im * im;
 			if (i & 1) {
-				if (avgProb/2. > prob || prob > avgProb*2.) {
-					printf("bad inner prod in position %i: %6.3f + %6.3f => %6.3f\n",
+				if (avgProb/8. > prob || prob > avgProb*8.) {
+					printf("bad prob in position %i: %6.3f + %6.3f => %6.3f\n",
 						i, viewBuffer[i*4], viewBuffer[i*4+1], prob);
 				}
 			}
 			else {
+				// should be about zero
 				if (-.000001 > prob || prob > .00001) {
 					printf("bad zero inner prod in position %i: %6.3f + %6.3f => %6.3f\n",
 						i, viewBuffer[i*4], viewBuffer[i*4+1], prob);
