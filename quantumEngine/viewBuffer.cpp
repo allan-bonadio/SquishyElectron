@@ -52,23 +52,24 @@ float updateViewBuffer() {
 		printf("viewBuffer.cpp, resulting cx number:\n");
 		qReal avgProb = 1. / theSpace->nStates;
 		for (int i = 0; i < nPoints*2; i++) {
-		float re = viewBuffer[i*4];
-		float im = viewBuffer[i*4+1];
-		float prob = re * re + im * im;
-		if (i & 1) {
-			if (avgProb/2. > prob || prob > avgProb*2.) {
-				printf("bad inner prod in position %i: %6.3f + %6.3f => %6.3f\n",
-					i, viewBuffer[i*4], viewBuffer[i*4+1], prob);
+			float re = viewBuffer[i*4];
+			float im = viewBuffer[i*4+1];
+			float prob = re * re + im * im;
+			if (i & 1) {
+				if (avgProb/2. > prob || prob > avgProb*2.) {
+					printf("bad inner prod in position %i: %6.3f + %6.3f => %6.3f\n",
+						i, viewBuffer[i*4], viewBuffer[i*4+1], prob);
+				}
 			}
-		}
-		else {
-			if (-.000001 > prob || prob > .00001) {
-				printf("bad zero inner prod in position %i: %6.3f + %6.3f => %6.3f\n",
-					i, viewBuffer[i*4], viewBuffer[i*4+1], prob);
+			else {
+				if (-.000001 > prob || prob > .00001) {
+					printf("bad zero inner prod in position %i: %6.3f + %6.3f => %6.3f\n",
+						i, viewBuffer[i*4], viewBuffer[i*4+1], prob);
+				}
 			}
-		}
-		if (i != viewBuffer[i*4+3]) {
-			printf("bad serial in position %i: %f\n", i, viewBuffer[i*4+3]);
+			if (i != viewBuffer[i*4+3]) {
+				printf("bad serial in position %i: %f\n", i, viewBuffer[i*4+3]);
+			}
 		}
 	}
 	return highest;

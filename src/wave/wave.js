@@ -110,8 +110,8 @@ export class jWave {
 		case qeSpace.contWELL:
 			// the points on the end are ∞ potential, but the arithmetic
 			// goes bonkers if I actually set the voltage to ∞
-			psiAr[0] = qCx();
-			psiAr[N+1] = qCx();
+			psiAr[0] = qCx(0);
+			psiAr[N+1] = qCx(0);
 			break;
 
 		case qeSpace.contENDLESS:

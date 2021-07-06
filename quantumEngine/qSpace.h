@@ -8,7 +8,14 @@
 #define MAX_DIMENSIONS  1
 
 // we use fixed size int32_t and double here just so JS can calculate sizes more easily.
-// Please keep these class layouts synched with qEngine.js's layout!
+// Please keep these class layouts synched with qEngine.js's estimate!
+
+extern class qSpace *theSpace;
+extern class qCx *theWave, *sumWave, *egyptWave, *laosWave;
+extern class qCx *k1Wave, *k2Wave, *k3Wave, *k4Wave;
+extern qReal *thePotential;
+extern float *viewBuffer;
+extern qReal elapsedTime;
 
 /* *************************************** one for each DIMENSION of the wave array */
 struct qDimension {
@@ -98,7 +105,8 @@ public:
 	void setZeroPotential(void);
 	void setValleyPotential(qReal power, qReal scale, qReal offset);
 
-	void dumpWave(const char *title);
+	void dumpThatWave(qCx *wave);
+	void dumpWave(const char *title, qCx *aWave = theWave);
 	void forEach(void callback(qCx));
 	void map(qCx callback(qCx*));
 
@@ -158,7 +166,7 @@ extern void oneRk2Step(void);
 
 
 
-extern void oneRk4Step(void);
+//extern void oneRk4Step(void);
 extern qCx hamiltonian(qCx *wave, int x);
 
 extern class qSpace *theSpace;

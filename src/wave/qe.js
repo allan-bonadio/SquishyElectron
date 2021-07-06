@@ -1,4 +1,4 @@
-// this file generated Mon Jun 14 2021 06:12:22 GMT-0700 (Pacific Daylight Time)
+// this file generated Sun Jul 04 2021 18:38:21 GMT-0700 (Pacific Daylight Time)
 let cwrap;
 export const qe = {};
 export function defineQEngineFuncs() {
@@ -20,6 +20,7 @@ export function defineQEngineFuncs() {
 	qe.qSpace_setStandingWave = cwrap('qSpace_setStandingWave', "number", ["number"]);
 	qe.qSpace_setPulseWave = cwrap('qSpace_setPulseWave', "number", ["number","number"]);
 	qe.qSpace_oneRk2Step = cwrap('qSpace_oneRk2Step', "number", []);
+	qe.qSpace_oneRk4Step = cwrap('qSpace_oneRk4Step', "number", []);
 	qe.updateViewBuffer = cwrap('updateViewBuffer', "number", []);
 }
 

@@ -35,6 +35,7 @@ exportsSrc  = [
 	{name: 'qSpace_setStandingWave', retType: 'number', args: ['number']},
 	{name: 'qSpace_setPulseWave', retType: 'number', args: ['number', 'number']},
 	{name: 'qSpace_oneRk2Step', retType: 'number', args: []},
+	{name: 'qSpace_oneRk4Step', retType: 'number', args: []},
 
 	// views
 	{name: 'updateViewBuffer', retType: 'number', args: []},
@@ -46,7 +47,7 @@ exportsSrc  = [
 // the exports.json file, needed by emcc
 let exportsFile = exportsSrc.map(funcDesc => '_' + funcDesc.name);
 fs.writeFile(`${process.env.SQUISH_ROOT}/quantumEngine/building/exports.json`,
-	JSON.stringify(exportsFile),
+	JSON.stringify(exportsFile) + '\n',
 	ex => ex && console.error('error building exports:', ex));
 
 // the JS file

@@ -33,55 +33,51 @@ public:
 	qReal re;
 	qReal im;
 
-	// constructors
-	qCx(qReal re, qReal im) {this->re = re; this->im = im;}
-	qCx(qReal re) {this->re = re; this->im = 0;}
-	qCx(void) {this->re = this->im = 0;}
+	// informal constructors
+	qCx(qReal real, qReal imag) {re = real; im = imag;}
+	qCx(qReal real) {re = real; im = 0;}
+	qCx(void) {re = im = 0;}
 
-	// addition
+	// // // // // // // // // // // // // addition
 	qCx operator+(qCx b) {return qCx(re + b.re, im + b.im);}
 	qCx operator+(qReal b) {return qCx(re + b, im);}
 
 	qCx operator+=(qCx b) {re += b.re; im += b.im; return *this;}
 	qCx operator+=(qReal b) {re += b; return *this;}
 
-	// subtraction
+	// // // // // // // // // // // // // subtraction
 	qCx operator-(qCx b) {return qCx(re - b.re, im - b.im);}
 	qCx operator-(qReal b) {return qCx(re - b, im);}
+	qCx operator-(void) {return qCx(-re, -im);}
 
 	qCx operator-=(qCx b) {re -= b.re; im -= b.im; return *this;}
 	qCx operator-=(qReal b) {re -= b; return *this;}
 
-	// multiplication
+
+	// // // // // // // // // // // // // multiplication
 	qCx operator*(qCx b) {return qCx(re * b.re - im * b.im, im * b.re + re * b.im);}
 	qCx operator*(qReal b) {return qCx(re * b, im * b);}
 
+	//    over complex
 	qCx operator*=(qCx b) {
 		qReal t = re * b.re - im * b.im;
 		im = im*b.re +  + re * b.im;
 		re = t;
 		return *this;
 	}
+
+	//    over reals
 	qCx operator*=(qReal b) {re *= b; im *= b; return *this;}
 
-	// division
-	qCx operator/(qCx b) {
-		qReal det = b.re * b.re + b.im * b.im;
-		return qCx(
-			(re * b.re + im * b.im) / det,
-			(im * b.re - re * b.im) / det
-		);
-	}
-	qCx operator/(qReal b) { return qCx(re / b; im / b); }
 
-	qCx operator/=(qCx b) {
-		qReal det = b.re * b.re + b.im * b.im;
-		qReal t = (re * b.re + im * b.im) / det;
-		im = (im * b.re - re * b.im) / det;
-		re = t;
-		return *this;
-	}
-	qCx operator/=(qReal b) {re -= b; return *this;}
+	// // // // // // // // // // // // // division
+	qCx operator/(qCx b);
+
+	// over reals
+	qCx operator/(qReal b) {return qCx(re / b, im / b);}
+
+	qCx operator/=(qCx b);
+	qCx operator/=(qReal b) {re /= b; im /= b; return *this;}
 
 
 	// inline so faster
@@ -90,7 +86,8 @@ public:
 	// oh i don't want to do abs
 	qReal abs();
 
-	// the angle, ±180 degrees.  Kindof retro but really i'm just using it for display colors.
+	// the angle, ±180 degrees.  Kindof retro but really i'm just using it
+	// for display colors.  not even that.
 	qReal phase();
 };
 

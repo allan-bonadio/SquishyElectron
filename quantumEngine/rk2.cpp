@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "qSpace.h"
+#include <ctime>
 
 // dx is always 1.  dt is below.
 static const qReal dt = 0.02;
@@ -16,6 +17,8 @@ void dumpMyPoint(qCx val, int ix) {
 void qSpace::oneRk2Step(void) {
 	qDimension *dim = theSpace->dimensions;
 	dim->fixBoundaries(theWave);
+	this->dumpWave("starting theWave", theWave);
+	//qCx *laosWave = theWave;
 
 	// use laosWave for all the first-try psi values
 	for (int ix = dim->start; ix < dim->end; ix++) {
@@ -23,6 +26,7 @@ void qSpace::oneRk2Step(void) {
 		qCheck(sumWave[ix]);
 	}
 	dim->fixBoundaries(laosWave);
+	this->dumpWave("laosWave", laosWave);
 
 	//for (int ix = 0; ix <= dim->end; ix++)
 	//printf("INRK2 %d\t%lf\t%lf\n", ix, laosWave[ix].re, laosWave[ix].im);
@@ -32,6 +36,7 @@ void qSpace::oneRk2Step(void) {
 		sumWave[ix] = theWave[ix] + hamiltonian(laosWave, ix) * dtOverI;
 		qCheck(sumWave[ix]);
 	}
+	this->dumpWave("sumWave", sumWave);
 
 	// now flip them around
 	qCx *t = sumWave;
@@ -39,6 +44,7 @@ void qSpace::oneRk2Step(void) {
 	theWave = t;
 
 	dim->fixBoundaries(theWave);
+	this->dumpWave("almost done theWave", theWave);
 
 	//printf("done with rk2: \n");
 	//for (int ix = 0; ix <= dim->end; ix++)
@@ -47,14 +53,13 @@ void qSpace::oneRk2Step(void) {
 	theSpace->elapsedTime += dt;
 
 	dim->lowPassFilter(theWave);
-	dim->normalize(theWave);
 
-
+	// which one i better?  who cares, forEachPoint works!
 	this->forEachPoint(theWave, dumpMyPoint);
+	this->dumpWave("after low pass theWave", theWave);
 }
 
 /* ************************************************** benchmarking */
-#include <ctime>
 
 int manyRk2Steps(void) {
 	const int many = 100;

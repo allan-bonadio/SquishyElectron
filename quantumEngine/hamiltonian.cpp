@@ -1,9 +1,12 @@
 #include "qSpace.h"
 
-qReal DEFAULT_DT = 0.1;
+
+// this is the slope, not the increment, so dt is irrelevant
+//qReal DEFAULT_DT = 0.1;
 
 // this is only for continuum dimension.  Ultimately, these should be per-dimension,
 // and each dimension should have a function that does the honors.
+// or, per-view or per-space.
 qCx hamiltonian(qCx *wave, int x) {
 	// so at location x, if dx = 1,
 	// the derivative would be (psi[x+1] - psi[x])
