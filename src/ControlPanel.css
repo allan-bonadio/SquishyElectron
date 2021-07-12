@@ -16,26 +16,39 @@
 	float: none;
 }
 
-.CPToolbar button.toolbarButton {
+
+.CPToolbar .toolbarGradient {
+	background: linear-gradient(#889, #dcd 20%, #ccd 25%, #cdd 30%, #223);
 	display: inline-block;
-	font-size: 4em;
-	padding: .2em .5em;
-	margin: .1em;
-	cursor: pointer;
-	background-color: linear-gradient(#aaa, #444);
-	border-radius: .5em;
-	width: 3em;
+	font-size: 3em;
+	padding: .1em .5em .2em;
+	margin: .1em 0;
+	line-height: 1.3em;
+	border: none;
 }
 
-.CPToolbar .isRunning {
-	background-color: #080;
+.CPToolbar button.toolbarButton {
+	cursor: pointer;
+	color: #fff;
 }
-.CPToolbar .notRunning {
-	background-color: #800;
+
+.CPToolbar button.toolbarButton:active {
+	color: #000;
 }
+
+.CPToolbar .toolbarSpacer {
+	width: .1em;
+}
+
+.CPToolbar .startStopToggle {
+	width: 8em;
+}
+
 .CPToolbar .stepButton {
-	background-color: #008;
+	width: 4em;
 }
+
+
 
 
 

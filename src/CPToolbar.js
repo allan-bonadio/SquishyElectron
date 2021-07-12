@@ -6,7 +6,10 @@ function setPT() {
 		startIterating: PropTypes.func.isRequired,
 		stopIterating: PropTypes.func.isRequired,
 		singleStep: PropTypes.func.isRequired,
-		isTimeAdvancing: PropTypes.bool,
+
+		isTimeAdvancing: PropTypes.bool.isRequired,
+		timeClock: PropTypes.number.isRequired,
+		iterateSerial: PropTypes.number.isRequired,
 	};
 }
 
@@ -14,7 +17,9 @@ function CPToolbar(props) {
 //	const isRunningClass = isItAnimating() ? 'isRunning' : 'notRunning';
 
 	return <div className='CPToolbar'>
-		<button type='button' className={`startStopToggleButton toolbarButton`}
+		<div className='toolbarGradient toolbarSpacer'>&nbsp;</div>
+
+		<button type='button' className={`startStopToggle toolbarButton toolbarGradient`}
 			onClick={ev => {
 				if (props.isTimeAdvancing)
 					props.stopIterating();
@@ -22,15 +27,20 @@ function CPToolbar(props) {
 					props.startIterating();
 			}}>
 			{ props.isTimeAdvancing
-				? ' | | '
-				: ' ► ' }
+				? '▐▐ '
+				: <big>►</big> }
 				</button>
-		<button type='button' className={`stepButton toolbarButton on `}
+
+		<div className='toolbarGradient toolbarSpacer'>&nbsp;</div>
+
+		<button type='button' className={`stepButton toolbarButton toolbarGradient `}
 			onClick={ev => props.singleStep()}>
-			⇥
+			<big>►</big> ▌
 		</button>
 
+		<div className='toolbarGradient toolbarSpacer'>&nbsp;</div>
 
+		<span >frame {props.iterateSerial}  at time {props.timeClock.toFixed(2)}</span>
 	</div>;
 }
 
