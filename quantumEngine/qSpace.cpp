@@ -123,7 +123,7 @@ int32_t completeNewSpace(void) {
 	//theQWave->dumpWave("freshly created");
 
 	thePotential = new qReal[nPoints];
-	theSpace->setValleyPotential(1., 1., 0.); // another default
+	//theSpace->setValleyPotential(1., 1., 0.); // another default
 
 	theSpace->iterationCount = 0;
 
