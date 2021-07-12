@@ -1,4 +1,4 @@
-// this file generated Sun Jul 04 2021 18:38:21 GMT-0700 (Pacific Daylight Time)
+// this file generated Sat Jul 10 2021 17:39:37 GMT-0700 (Pacific Daylight Time)
 let cwrap;
 export const qe = {};
 export function defineQEngineFuncs() {
@@ -15,10 +15,10 @@ export function defineQEngineFuncs() {
 	qe.qSpace_dumpPotential = cwrap('qSpace_dumpPotential', "number", ["string"]);
 	qe.qSpace_setZeroPotential = cwrap('qSpace_setZeroPotential', "number", []);
 	qe.qSpace_setValleyPotential = cwrap('qSpace_setValleyPotential', "number", ["number","number","number"]);
-	qe.qSpace_dumpWave = cwrap('qSpace_dumpWave', "number", ["string"]);
-	qe.qSpace_setCircularWave = cwrap('qSpace_setCircularWave', "number", ["number"]);
-	qe.qSpace_setStandingWave = cwrap('qSpace_setStandingWave', "number", ["number"]);
-	qe.qSpace_setPulseWave = cwrap('qSpace_setPulseWave', "number", ["number","number"]);
+	qe.qWave_setCircularWave = cwrap('qWave_setCircularWave', "number", ["number"]);
+	qe.qWave_setStandingWave = cwrap('qWave_setStandingWave', "number", ["number"]);
+	qe.qWave_setPulseWave = cwrap('qWave_setPulseWave', "number", ["number","number"]);
+	qe.qWave_dumpWave = cwrap('qWave_dumpWave', "number", ["string"]);
 	qe.qSpace_oneRk2Step = cwrap('qSpace_oneRk2Step', "number", []);
 	qe.qSpace_oneRk4Step = cwrap('qSpace_oneRk4Step', "number", []);
 	qe.updateViewBuffer = cwrap('updateViewBuffer', "number", []);

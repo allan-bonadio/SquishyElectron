@@ -119,14 +119,11 @@ int32_t completeNewSpace(void) {
 	viewBuffer = new float[nPoints * 8];  // 4 floats per vertex, two verts per point
 
 	// a default
-	theQWave->setCircularWave(1);
-	theQWave->dumpWave("freshly created");
-	//theSpace->dimensions->setCircularWave(theWave, 1);
-	//theSpace->dumpWave("freshly created");
+//	theQWave->setCircularWave(1);  // you'll have to do this yourself
+	//theQWave->dumpWave("freshly created");
 
 	thePotential = new qReal[nPoints];
 	theSpace->setValleyPotential(1., 1., 0.); // another default
-	//theSpace->dumpPotential("freshly created");
 
 	theSpace->iterationCount = 0;
 
@@ -158,11 +155,6 @@ void qSpace_setValleyPotential(qReal power, qReal scale, qReal offset) {
 	theSpace->setValleyPotential(power, scale, offset);
 }
 
-void qSpace_dumpWave(char *title) { theQWave->dumpWave(title); }
-void qSpace_setCircularWave(qReal n) { theQWave->setCircularWave(n); }
-void qSpace_setStandingWave(qReal n) { theQWave->setStandingWave(n); }
-void qSpace_setPulseWave(qReal widthFactor, qReal cycles) { theQWave->setPulseWave(widthFactor, cycles);
-}
 void qSpace_oneRk2Step() { theSpace->oneRk2Step(); }
 void qSpace_oneRk4Step() { theSpace->oneRk4Step(); }
 

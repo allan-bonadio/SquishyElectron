@@ -24,46 +24,11 @@ export function createSpaceNWave(N, continuum, callback) {
 //	theJSpace = new jSpace(N, continuum);
 //	theJWave = new jWave(theJSpace);
 
-	// create the new C++ version
+	// create the new C++ version & populate the buffer
 	qe.space = new qeSpace([{N, continuum, label: 'x'}]);
+	qe.qWave_setCircularWave(1);
 
 	callback(qe.space);
-}
-
-// completely wipe out the Psi wavefunction and replace it with one of our canned waveforms.
-// (but do not change N)
-export function setWave(breed, freq) {
-	switch (breed) {
-	case 'standing':
-		qe.qSpace_setStandingWave(freq);
-		break;
-
-	case 'circular':
-		qe.qSpace_setCircularWave(freq);
-		break;
-
-	case 'pulse':
-		qe.qSpace_setPulseWave(10., 1.)
-		break;
-
-	default:
-		throw `setWave: no jWave breed '${breed}'`
-	}
-}
-
-export function setVoltage(breed, arg) {
-	switch (breed) {
-	case 'zero':
-		qe.qSpace_setZeroPotential()
-		break;
-
-	case 'valley':
-		qe.qSpace_setValleyPotential();
-		break;
-
-	default:
-		throw `setVoltage: no voltage breed '${breed}'`
-	}
 }
 
 /* ************************************************ iterateAnimate */
@@ -111,6 +76,7 @@ const areBenchmarking = true;
 const dumpTheViewBuffer = true;
 let prevStart  = performance.now();
 
+// OLD
 // the name says it all.  requestAnimationFrame() will call this probably 60x/sec
 // it will advance one 'frame' in wave time, which i dunno what that is need to tihink about it more.
 // deprecated; see SquishPanel
@@ -153,6 +119,7 @@ function animateOneFrame(now) {
 	}
 }
 
+// deprecated
 // start/stop or single step the animation
 // shouldAnimate falsy = stop it if running
 // true = start it or continue it if running

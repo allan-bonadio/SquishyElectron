@@ -30,10 +30,10 @@ exportsSrc  = [
 	{name: 'qSpace_setValleyPotential', retType: 'number', args: ['number', 'number', 'number']},
 
 	// the wave
-	{name: 'qSpace_dumpWave', retType: 'number', args: ['string']},
-	{name: 'qSpace_setCircularWave', retType: 'number', args: ['number']},
-	{name: 'qSpace_setStandingWave', retType: 'number', args: ['number']},
-	{name: 'qSpace_setPulseWave', retType: 'number', args: ['number', 'number']},
+	{name: 'qWave_setCircularWave', retType: 'number', args: ['number']},
+	{name: 'qWave_setStandingWave', retType: 'number', args: ['number']},
+	{name: 'qWave_setPulseWave', retType: 'number', args: ['number', 'number']},
+	{name: 'qWave_dumpWave', retType: 'number', args: ['string']},
 	{name: 'qSpace_oneRk2Step', retType: 'number', args: []},
 	{name: 'qSpace_oneRk4Step', retType: 'number', args: []},
 
@@ -46,7 +46,7 @@ exportsSrc  = [
 
 // the exports.json file, needed by emcc
 let exportsFile = exportsSrc.map(funcDesc => '_' + funcDesc.name);
-fs.writeFile(`${process.env.SQUISH_ROOT}/quantumEngine/building/exports.json`,
+fs.writeFile(`${process.env.SQUISHY_ROOT}/quantumEngine/building/exports.json`,
 	JSON.stringify(exportsFile) + '\n',
 	ex => ex && console.error('error building exports:', ex));
 
@@ -55,7 +55,6 @@ let defineFuncBody = exportsSrc.map(funcDesc => {
 	return `\tqe.${funcDesc.name} = cwrap('${funcDesc.name}', `+
 		`${JSON.stringify(funcDesc.retType)}, `+
 		`${JSON.stringify(funcDesc.args)});`;
-	'_' + name
 });
 
 const code = `// this file generated ${new Date()}
@@ -73,7 +72,6 @@ window.qe = qe;
 export default qe;
 `;
 
-process.env.SQUISH_ROOT
-fs.writeFile(`${process.env.SQUISH_ROOT}/src/wave/qe.js`, code,
+fs.writeFile(`${process.env.SQUISHY_ROOT}/src/wave/qe.js`, code,
 	ex => ex && console.error(ex));
 

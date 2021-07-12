@@ -133,7 +133,7 @@ struct qWave {
 	// the actual data, hopefully in the right size allocated block
 	qCx *buffer;
 
-	void dumpWave(const char *title);
+	void dumpWave(const char *title, bool withExtras = false);
 	void fixBoundaries(void);
 	void prune(void);
 	qReal innerProduct(void);
@@ -164,7 +164,13 @@ extern "C" {
 	int manyRk2Steps(void);
 
 	// refills the view  buffer; returns highest magnitude
-	float updateViewBuffer();
+	float updateViewBuffer(void);
+	int dumpViewBuffer(int nPoints);
+
+	void qWave_dumpWave(char *title);
+	void qWave_setCircularWave(qReal n);
+	void qWave_setStandingWave(qReal n);
+	void qWave_setPulseWave(qReal widthFactor, qReal cycles);
 }
 
 // internal
