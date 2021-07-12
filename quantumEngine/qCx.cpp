@@ -12,17 +12,17 @@ qCx qCx::operator/(qCx b) {
 
 // what is wrong with this?  this is handed in ÷ 10.
 qCx qCx::operator/=(qCx b) {
-	printf("÷ this=%lf %lf; b=%lf %lf\n", this->re, this->im, b.re, b.im);
-	printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
+	//printf("÷ this=%lf %lf; b=%lf %lf\n", this->re, this->im, b.re, b.im);
+	//printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
 	qReal det = b.re * b.re + b.im * b.im;
-	printf("÷ this=%lf %lf; b=%lf %lf\n", this->re, this->im, b.re, b.im);
-	printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
-	printf("÷ re * b.re=%lf; im * b.im=%lf\n", re * b.re, im * b.im);
+	//printf("÷ this=%lf %lf; b=%lf %lf\n", this->re, this->im, b.re, b.im);
+	//printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
+	//printf("÷ re * b.re=%lf; im * b.im=%lf\n", re * b.re, im * b.im);
 	qReal t = (re * b.re + im * b.im) / det;
-	printf("÷ det=%lf; t=%lf\n", det, t);
+	//printf("÷ det=%lf; t=%lf\n", det, t);
 	this->im = (im * b.re - re * b.im) / det;
 	this->re = t;
-	printf("÷ re=%lf  im=%lf\n", re, im);
+	//printf("÷ re=%lf  im=%lf\n", re, im);
 	return *this;
 }
 

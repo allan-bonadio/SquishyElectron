@@ -15,6 +15,8 @@ void verify(qCx actual, qCx expected, const char *msg) {
 #define VERIFY(actual, expected)  verify(actual, expected, #actual)
 
 void run_qCx_tests(void) {
+	printf("::::::::::::::::::::::::::::::::::::::: qCx tests\n");
+
 	/* ********************************************* constructor */
 
 	VERIFY(qCx(3), qCx(3, 0));
@@ -83,32 +85,32 @@ void run_qCx_tests(void) {
 
 	// i am completely mystified as to why these don't work.
 	// seems like arthemetic inside the method is bananas
-	qCx dividendBuuu(30, 40);
+	qCx horse(30, 40);
 	qCx plus2 = qCx(2);
-	printf("starting Buu... dividendBuuu=%lf %lf; plus2= %lf %lf\n",
-		dividendBuuu.re, dividendBuuu.im, plus2.re, plus2.im);
-	qCx retuu = (dividendB /= plus2);
-	printf("dividendBuuu is %lf %lf, but the return value is %lf, %lf\n",
-		dividendBuuu.re, dividendBuuu.im, retuu.re, retuu.im);
-	VERIFY(dividendBuuu, qCx(15, 20));
+	printf("starting horse... horse=%lf %lf; plus2= %lf %lf\n",
+		horse.re, horse.im, plus2.re, plus2.im);
+	qCx halfHorse = (horse /= plus2);
+	printf("horse is %lf %lf, but the return value is %lf, %lf\n",
+		horse.re, horse.im, halfHorse.re, halfHorse.im);
+	VERIFY(horse, qCx(15, 20));
 
-	qCx dividendBuu(30, 40);
+	qCx whale(30, 40);
 	qCx minus2 = -qCx(2);
-	printf("starting Buu... dividendBuu=%lf %lf; minus2= %lf %lf\n",
-		dividendBuu.re, dividendBuu.im, minus2.re, minus2.im);
-	qCx retu = (dividendB /= minus2);
-	printf("dividendBuu is %lf %lf, but the return value is %lf, %lf\n",
-		dividendBuu.re, dividendBuu.im, retu.re, retu.im);
-	VERIFY(dividendBuu, qCx(-15, -20));
+	printf("starting Buu... whale=%lf %lf; minus2= %lf %lf\n",
+		whale.re, whale.im, minus2.re, minus2.im);
+	qCx halfMinusWhale = (whale /= minus2);
+	printf("whale is %lf %lf, but the return value is %lf, %lf\n",
+		whale.re, whale.im, halfMinusWhale.re, halfMinusWhale.im);
+	VERIFY(whale, qCx(-15, -20));
 
-	qCx dividendBu(30, 40);
+	qCx giraffe(30, 40);
 	qCx minus10 = -qCx(10);
-	printf("starting Bu... dividendBu=%lf %lf; minus10= %lf %lf\n",
-		dividendBu.re, dividendBu.im, minus10.re, minus10.im);
-	qCx ret = (dividendB /= minus10);
-	printf("dividendBu is %lf %lf, but the return value is %lf, %lf\n",
-		dividendBu.re, dividendBu.im, ret.re, ret.im);
-	VERIFY(dividendBu, qCx(-3, -4));
+	printf("starting Bu... giraffe=%lf %lf; minus10= %lf %lf\n",
+		giraffe.re, giraffe.im, minus10.re, minus10.im);
+	qCx tenthMinusGiraffe = (giraffe /= minus10);
+	printf("giraffe is %lf %lf, but the return value is %lf, %lf\n",
+		giraffe.re, giraffe.im, tenthMinusGiraffe.re, tenthMinusGiraffe.im);
+	VERIFY(giraffe, qCx(-3, -4));
 
 	/* ********************************************* norm */
 	VERIFY(qCx(12, 5).norm(), qCx(169));
