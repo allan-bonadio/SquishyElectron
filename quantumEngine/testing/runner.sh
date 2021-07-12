@@ -13,7 +13,7 @@ allCpp=`cat building/allCpp.list`
 
 # note that main.cpp is NOT included in the .cpp files; that's for web use only
 # and makes all the diff.  Update list of test srcs as needed.
-emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED -g \
+emcc -o quantumTest.js -sLLD_REPORT_UNDEFINED -g \
 	testing/main.test.cpp \
 	testing/qCx.test.cpp testing/rk2.test.cpp testing/wave.test.cpp \
 	$allCpp \
@@ -22,4 +22,4 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED -g \
 # now run the tests
 echo
 echo ========================================================== Results:
-node quantumEngine.js
+node quantumTest.js

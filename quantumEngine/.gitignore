@@ -4,5 +4,5 @@ old
 # compiled results
 quantumEngine.js
 quantumEngine.wasm
-quantumEngineTest.js
-quantumEngineTest.wasm
+quantumTest.js
+quantumTest.wasm
