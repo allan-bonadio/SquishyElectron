@@ -3,22 +3,27 @@
 
 
 void handleEachPt(qCx psi, int ix) {
-	printf("I feel good!  %d: %lf %lf\n", ix, psi.re, psi.im);
+	printf("each pt:  %d: %lf %lf   norm: %lf\n", ix, psi.re, psi.im,
+		psi.re*psi.re + psi.im * psi.im);
 }
 
 void run_wave_tests(void) {
+	printf("::::::::::::::::::::::::::::::::::::::: wave tests\n");
+
 	//  creating/
 	startNewSpace();
 	addSpaceDimension(3, contWELL, "p");
+	completeNewSpace();
 
-	qWave  *wave = new qWave(theSpace);
+	qWave  *qw = new qWave(theSpace);
+	qw->setCircularWave(1.);
 
 	// dumpWave
-	wave->dumpWave("unit test");
+	qw->dumpWave("unit test");
 
 	// forEachPoint() & forEachState
 	printf("forEachPoint() demo\n");
-	wave->forEachPoint(handleEachPt);
+	qw->forEachPoint(handleEachPt);
 
 	// fixBoundaries
 
@@ -33,7 +38,8 @@ void run_wave_tests(void) {
 	// populate
 
 	// destroying
-	delete wave;
+	delete qw;
 	//delete theSpace;
+	printf("done with wave tests\n");
 }
 

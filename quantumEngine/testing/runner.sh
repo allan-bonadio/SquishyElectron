@@ -19,7 +19,7 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED -g \
 	$allCpp \
 	|| exit $?
 
-
+# now run the tests
 echo
-echo Results:
-
+echo ========================================================== Results:
+node quantumEngine.js
