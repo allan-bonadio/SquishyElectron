@@ -3,7 +3,8 @@
 #include <ctime>
 
 // dx is always 1.  dt is below.
-static const qReal dt = 0.02;
+static const qReal dt = 0.1;
+//static const qReal dt = 0.02;
 
 // if they're really over i, they should be negative, right?
 static const qCx dtOverI = qCx(0., -dt);
@@ -20,9 +21,12 @@ void qSpace::oneRk2Step(void) {
 		laosWave[ix] = theWave[ix] + hamiltonian(theWave, ix) * halfDtOverI;
 		qCheck(sumWave[ix]);
 	}
-	theQWave->fixBoundaries();
+	laosQWave->fixBoundaries();
 	laosQWave->dumpWave("laos Q Wave", true);
-
+//	printf("whats up with this space and its dimension? %d %lf %lf\n",
+//		laosQWave->space->dimensions->continuum, laosWave[0].re, laosWave[0].im);
+//	laosWave[0] = laosWave[5];
+//	laosWave[6] = laosWave[1];
 	//for (int ix = 0; ix <= dim->end; ix++)
 	//printf("INRK2 %d\t%lf\t%lf\n", ix, laosWave[ix].re, laosWave[ix].im);
 
@@ -31,6 +35,7 @@ void qSpace::oneRk2Step(void) {
 		sumWave[ix] = theWave[ix] + hamiltonian(laosWave, ix) * dtOverI;
 		qCheck(sumWave[ix]);
 	}
+	sumQWave->fixBoundaries();
 	sumQWave->dumpWave("sumWave", true);
 
 	// now flip them around.  This type of surgery; not sure about it...

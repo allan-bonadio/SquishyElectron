@@ -11,8 +11,11 @@ static void makeNewSpace(int32_t N, int32_t continuum, const char *label) {
 	theQWave->setCircularWave(1.);
 }
 
+// how to check these: calculate the phase and the magnitude of each.  Magnitudes
+// should be about .2 for a 5-state wave.  Phases should be separated by 72° (=360/5)
+
 // july 5 2021
-qCx expected[7] = {
+qCx july5Expected[7] = {
 	qCx(0.045880726689574651, -0.182224849951211909),
 	qCx(0.487437594505842064, -0.031982253127852210),
 	qCx(0.171718916258377263, 0.453359376678800163),
@@ -22,7 +25,7 @@ qCx expected[7] = {
 	qCx(0.487437594505842064, -0.031982253127852210),
 };
 
-// an older version
+// an older version; dt = 0.1
 qCx jun4Expected[7] = {
 	qCx( 0.07809841578326204, -0.44036220853561392),
 	qCx( 0.44294308566870949, -0.06180339887498949),
@@ -33,7 +36,7 @@ qCx jun4Expected[7] = {
 	qCx( 0.44294308566870949, -0.06180339887498949)
 };
 
-
+qCx *expected = jun4Expected;
 
 static void firstRK2Iteration5(void) {
 	// lemme seee this first
@@ -46,10 +49,10 @@ static void firstRK2Iteration5(void) {
 	}
 
 	for (int i = 0; i < 7; i++) {
-		qCx expe = expected[i];
+		qCx expe = july5Expected[i];
 		qReal phase = atan2(expe.im, expe.re) * 180. / PI;
 		qReal magn = expe.re * expe.re + expe.im * expe.im;
-		printf("expected %d: %lf %lf | %lf %lf\n",
+		printf("july5Expected %d: %lf %lf | %lf %lf\n",
 			i, expe.re, expe.im, phase, magn);
 	}
 

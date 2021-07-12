@@ -42,9 +42,9 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 void dumpThatWave(qDimension *dim, qCx *wave, bool withExtras) {
 	int ix;
 
-	if (dim->continuum) printf(" [O]=(%8.4lf, %8.4lf)",
-		wave[0].re, wave[0].im);
-	//printf("\n");
+// somehow, commenting out these lines fixes the nan problem
+//	if (dim->continuum) printf(" [O]=(%8.4lf, %8.4lf)",
+//		wave[0].re, wave[0].im);
 
 	for (ix = dim->start; ix < dim->end; ix++) {
 		qReal re = wave[ix].re;
@@ -92,6 +92,7 @@ void qWave::fixBoundaries(void) {
 		break;
 
 	case contENDLESS:
+		//printf("Endless ye said: on the endless case, %d = %d, %d = %d\n", 0, dims->N, dims->end, 1 );
 		// the points on the end get set to the opposite side
 		wave[0] = wave[dims->N];
 		wave[dims->end] = wave[1];
@@ -121,14 +122,18 @@ void qWave::prune() {
 	}
 }
 
-// calculate ⟨ψ | ψ⟩  'inner product' isn't the right name is it?
+// calculate ⟨ψ | ψ⟩  'inner product'
 qReal qWave::innerProduct(void) {
 	qCx *wave = this->buffer;
 	qDimension *dims = this->space->dimensions;
-	qReal sum;
+	qReal sum = 0.;
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
-		sum += wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im;
+		qCx point = wave[ix];
+		qReal re = point.re;
+		qReal im = point.im;
+		sum += re * re + im * im;
+		//sum += wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im;
 // 		printf("innerProduct point %d (%lf,%lf) %lf\n", ix, wave[ix].re, wave[ix].im,
 // 			wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im);
 	}
@@ -171,12 +176,12 @@ void qWave::normalize(void) {
 // average the wave's points with the two closest neighbors to fix the divergence
 // along the x axis I always see.  Since the thickness of our mesh is finite,
 // you can't expect noise at or near the frequency of the mesh to be meaningful.
-void qWave::lowPassFilter() {
+void qWave::lowPassFilter(void) {
 	qCx *wave = this->buffer;
 	qCx avg, d2prev = wave[0];
 	qDimension *dims = this->space->dimensions;
 
-	this->prune();
+	// not sure we need this this->prune();
 
 	// average each point with the neighbors; ¼ for each neightbor, ½ for the point itself
 	// drag your feet on setting the new value in so it doesn't interfere
@@ -187,7 +192,7 @@ void qWave::lowPassFilter() {
 			d2prev = avg;
 		}
 	}
-	this->normalize();
+	// do this separately this->normalize();
 }
 
 
@@ -210,11 +215,13 @@ void qWave::setCircularWave(qReal n) {
 
 		// why do I have to do this to keep the numbers from being NAN?
 		// either of these will fix it
-		printf("quality conrol: %lf %lf %lf\n", angle, wave[ix].re, wave[ix].im);
-		//printf("quality conrol: %lf %lf %lf\n", angle, cos(angle), sin(angle));
+//		printf("the circular wave: angle, magn, re, im: %lf %lf %lf %lf\n",
+//			angle, wave[ix].re*wave[ix].re + wave[ix].im*wave[ix].im, wave[ix].re, wave[ix].im);
+		printf("quality conrol: %lf %lf %lf\n", angle * 180./PI, cos(angle), sin(angle));
 	}
+	dumpThatWave(dims, wave, true);
 	this->normalize();
-	this->dumpWave("after set sircular");
+	this->dumpWave("after set sircular & normalize", true);
 }
 
 // make a superposition of two waves in opposite directions.
