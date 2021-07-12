@@ -76,10 +76,16 @@ export class SquishPanel extends React.Component {
 			currentView: null,
 
 			// this is controlled by the user (start/stop/step buttons)
-			// does not really influence the rendering of the canvas...
+			// does not really influence the rendering of the canvas... (other than running)
 			// but more the control panel
 			isTimeAdvancing: false,
+
+			// this is the actual 'frequency' in actual milliseconds, convert between like 1000/n
+			iteratePeriod: 250,
 		};
+
+		this.timeClock = 0;
+		this.iterateSerial = 0;
 
 		// never changes once set
 		this.canvas = null;
@@ -87,9 +93,11 @@ export class SquishPanel extends React.Component {
 		// runtime debugging flags
 		this.areBenchmarking = false;
 		this.dumpingTheViewBuffer = false;
-		if (this.areBenchmarking)
-			this.prevStart  = performance.now();
+		const now = performance.now();
+		this.prevStart  = now;
 
+		this.timeForNextTic = now + 10;
+		this.lastAniFrame = now;
 
 		console.log(`SquishPanel constructor done`);
 	}
@@ -102,6 +110,8 @@ export class SquishPanel extends React.Component {
 
 	// the canvas per panel, one panel per canvas
 	setGLCanvas(canvas) {
+		// dunno why, but sometimes this is null.  ?#?@?@
+		if (! canvas) return;
 		this.canvas = canvas;
 		canvas.squishPanel = this;
 	}
@@ -110,8 +120,6 @@ export class SquishPanel extends React.Component {
 	setNew1DResolution(N, continuum, viewClassName) {
 		qe.theCurrentView =  null;
 		createSpaceNWave(N, continuum, space => {
-			// we've now got a qeSpace etc all set up
-			this.setState({N, continuum, space});
 
 			// now create the view class instance as described by the space
 			const vClass = listOfViewClassNames[viewClassName];
@@ -121,7 +129,11 @@ export class SquishPanel extends React.Component {
 			const currentView = new vClass('main view', this.canvas, space);
 			currentView.completeView();
 
-			this.setState(currentView);
+			this.timeClock = 0;
+			this.iterateSerial = 0;
+
+			// we've now got a qeSpace etc all set up
+			this.setState({N, continuum, space, currentView});
 			this.currentView = currentView;  // this gets set sooner
 
 			// kinda paranoid?  this should be deprecated.
@@ -165,9 +177,11 @@ export class SquishPanel extends React.Component {
 
 		this.startUpdate = performance.now();
 		let highest = qe.updateViewBuffer();
-		let cView = this.curView;
-		//if (cView.reportHighest)
-		//	needsRepaint = needsRepaint || cView.ifNeedsPaint(highest);
+		this.curView.reloadAllVariables();  // am i doing this twice?
+
+		const s = this.state;
+		this.iterateSerial++;
+		this.timeClock += .43;
 
 		if (this.dumpingTheViewBuffer)
 			this.dumpViewBuffer();
@@ -181,15 +195,11 @@ export class SquishPanel extends React.Component {
 
 	}
 
-	oneFramePerTick: 60;
-	howManyTics:0
-
-	// the name says it all.  requestAnimationFrame() will call this probably 60x/sec
-	// it will advance one 'frame' in wave time, which i dunno what that
-	// is need to tihink about it more.
-	animateOneFrame(now) {
+	// Integrate the ODEs by one dt, and display.  One step in Squishy, one trip thru the RK and variables and draw.
+	// called every so often in animateOneFrame() which goes like 1/60 sec
+	// this is called usually more like 5 or 20 times a second, whatever the user chooses.
+	iterateOneFrame(isTimeAdvancing, needsRepaint) {
 		const s = this.state;
-		let needsRepaint = false;
 
 		//console.log(`time since last tic: ${now - startFrame}ms`)
 		this.startRK = this.startUpdate = this.startReload = this.startDraw = this.endFrame = 0;
@@ -197,20 +207,18 @@ export class SquishPanel extends React.Component {
 
 		// could be slow.  sometime in the future.
 		this.startRK = performance.now();
-		if (s.isTimeAdvancing) {
+		if (isTimeAdvancing) {
 			this.crunchOneFrame();
 		}
 
 		// if we need to repaint... if we're iterating, if the view says we have to,
 		// or if this is a one shot step
-		if (s.isTimeAdvancing || needsRepaint || this.onceMore) {
+		if (isTimeAdvancing || needsRepaint) {
 			// reload all variables
 			this.startReload = performance.now();
-			let cView = this.curView;
-			cView.viewVariables.forEach(v => v.reloadVariable());
-			cView.drawings.forEach(dr => {
-				dr.viewVariables.forEach(v => v.reloadVariable());
-			});
+			this.curView.reloadAllVariables();  // am i doing this twice?
+
+			// am i missing a step in here?
 
 			// draw
 			this.startDraw = performance.now();
@@ -229,9 +237,9 @@ export class SquishPanel extends React.Component {
 				this.prevStart = this.startRK;
 			}
 
-			if (this.onceMore)
-				this.setState({isTimeAdvancing: false});
-			this.onceMore = false;
+			//if (this.onceMore)
+			//	this.setState({isTimeAdvancing: false});
+			//this.onceMore = false;
 
 			//if (this.curUnitHeight != this.targetUnitHeight) {
 			//	// exponential relaxation
@@ -243,32 +251,71 @@ export class SquishPanel extends React.Component {
 			//	}
 			//}
 		}
-
-		// harmless if this just falls thru, right?
-		//if (isAnimating) {
-			requestAnimationFrame(now => this.animateOneFrame(now));
-		//}
 	}
+
+	// This is responsible for getting called once each animation frame according to requestAnimationFrame,
+	// and maintaining that as long as the website is running.  requestAnimationFrame() will call this probably 60x/sec
+	// it will advance one 'frame' in animation time, which every so often calls iterateOneFrame()
+	animateOneFrame(now) {
+		const s = this.state;
+
+		// nomatter how often animateOneFrame() is called, it'll only iterate once in the iteratePeriod
+		if (now >= this.timeForNextTic) {
+			this.iterateOneFrame(s.isTimeAdvancing);
+
+			// remember (now) is the one passed in, before iterateOneFrame(), not really 'now' anymore
+			this.timeForNextTic = now + s.iteratePeriod;
+		}
+
+		//if (this.onceMore)
+		//	this.setState({isTimeAdvancing: false});
+		//this.onceMore = false;
+
+			//if (this.curUnitHeight != this.targetUnitHeight) {
+			//	// exponential relaxation
+			//	this.curUnitHeight = (15 * this.curUnitHeight + this.targetUnitHeight) / 16;
+			//	if (Math.abs((this.curUnitHeight - this.targetUnitHeight) / this.targetUnitHeight) < .01) {
+			//		//ok we're done.  close enough.
+			//		this.curUnitHeight = this.targetUnitHeight;
+			//		//this.onceMore = true;  // just to make sure it paints
+			//	}
+			//}
+		//}
+
+		// this is in milliseconds
+		const timeSince = now - this.lastAniFrame;
+//		if (timeSince < 8) {
+//			console.info(` skipping an ani frame cuz we got too much: ${timeSince} ms`)
+//			return;  // we might have more than one cycle in here... this should fix it
+//		}
+
+		if (isNaN(timeSince)) debugger;
+		//console.info(` maintaining the ReqAniFra cycle: ${timeSince.toFixed(1)} ms`)
+		this.lastAniFrame = now;
+
+		requestAnimationFrame(now => this.animateOneFrame(now));
+	}
+
+	/* ******************************************************* UI & user actions */
 
 	// start/stop or single step the animation
 	// shouldAnimate falsy = stop it if running
 	// true = start it or continue it if running
-	// rate is how fast it goes, or 'one' to single step.
+	// freq is how fast it goes, or 'one' to single step.
 	// I guess it's irrelevant now with requestAnimationFrame()
-	iterateAnimate(shouldAnimate, rate) {
-		// hmmm i'm not using the Rate here...
-		if (! shouldAnimate || ! rate || !qe.theCurrentView) {
-			this.onceMore = false;
+	iterateAnimate(shouldAnimate, freq) {
+		if (! shouldAnimate || ! freq || !qe.theCurrentView) {
+			//this.onceMore = false;
 			this.setState({isTimeAdvancing: false});
 			return;
 		}
-		if (rate == 'one') {
-			this.onceMore = true;
+		if (freq == 'one') {
+			//this.onceMore = true;
 			this.setState({isTimeAdvancing: true});
 			return;
 		}
 
-		this.onceMore = false;
+		//this.onceMore = false;
 		if (this.state.isTimeAdvancing)
 			return;  // its already doing it
 
@@ -276,6 +323,72 @@ export class SquishPanel extends React.Component {
 
 		this.animateOneFrame(performance.now());
 	//	requestAnimationFrame(animateOneFrame);
+	}
+
+	// set the frequency of iteration frames.  Does not control whether iterating or not.
+	setIterateFrequency(newFreq) {
+		this.setState({iteratePeriod: 1000. / +newFreq});
+	}
+
+	startIterating() {
+		if (this.state.isTimeAdvancing)
+			return;
+
+		//this.onceMore = false;
+		this.setState({isTimeAdvancing: true});
+	}
+
+	stopIterating() {
+		if (!this.state.isTimeAdvancing)
+			return;
+
+		//this.onceMore = false;
+		this.setState({isTimeAdvancing: false});
+	}
+
+	singleStep() {
+		this.iterateOneFrame(true);
+		//this.onceMore = true;  // will stop iterating after next frame
+		//this.setState({isTimeAdvancing: true});
+	}
+
+	// completely wipe out the Psi wavefunction and replace it with one of our canned waveforms.
+	// (but do not change N)
+	setWave(breed, freq) {
+		switch (breed) {
+		case 'standing':
+			qe.qWave_setStandingWave(freq);
+			break;
+
+		case 'circular':
+			qe.qWave_setCircularWave(freq);
+			break;
+
+		case 'pulse':
+			qe.qWave_setPulseWave(10., 1.)
+			break;
+
+		default:
+			throw `setWave: no jWave breed '${breed}'`
+		}
+
+		this.iterateOneFrame(false, true);
+	}
+
+	setVoltage(breed, arg1 = 1, arg2 = 1, arg3 = 0) {
+		switch (breed) {
+		case 'zero':
+			qe.qSpace_setZeroPotential()
+			break;
+
+		case 'valley':
+			qe.qSpace_setValleyPotential(arg1, arg2, arg3);
+			break;
+
+		default:
+			throw `setVoltage: no voltage breed '${breed}'`
+		}
+		this.iterateOneFrame(false, true);
 	}
 
 	dumpViewBuffer() {
@@ -286,27 +399,6 @@ export class SquishPanel extends React.Component {
 		console.log(`dump of view buffer for ${s.space.nPoints} points in ${nRows} rows`);
 		for (let i = 0; i < nRows; i++)
 			console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
-	}
-
-	startIterating() {
-		if (this.state.isTimeAdvancing)
-			return;
-
-		this.onceMore = false;
-		this.setState({isTimeAdvancing: true});
-	}
-
-	stopIterating() {
-		if (!this.state.isTimeAdvancing)
-			return;
-
-		this.onceMore = false;
-		this.setState({isTimeAdvancing: false});
-	}
-
-	singleStep() {
-		this.onceMore = true;  // will stop iterating after next frame
-		this.setState({isTimeAdvancing: true});
 	}
 
 	/* ******************************************************* rendering etc */
@@ -335,17 +427,24 @@ export class SquishPanel extends React.Component {
 	}
 
 	render() {
+		const s = this.state;
 		return (
 			<div className="SquishPanel">
 				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
 				<SquishView setGLCanvas={canvas => this.setGLCanvas(canvas)} />
 				<ControlPanel
 					openResolutionDialog={() => this.openResolutionDialog()}
-					iterateAnimate={(shouldAnimate, rate) => this.iterateAnimate(shouldAnimate, rate)}
-					isTimeAdvancing={this.state.isTimeAdvancing}
+					iterateAnimate={(shouldAnimate, freq) => this.iterateAnimate(shouldAnimate, freq)}
+					isTimeAdvancing={s.isTimeAdvancing}
+					iterateFrequency={1000 / s.iteratePeriod}
 					startIterating={() => this.startIterating()}
 					stopIterating={() => this.stopIterating()}
-					singleStep={() => this.startIterating()}
+					singleStep={() => this.singleStep()}
+					setWave={(breed, freq) => this.setWave(breed, freq)}
+					setVoltage={(breed, power, scale, offset) => this.setVoltage(breed, power, scale, offset)}
+					setIterateFrequency={freq => this.setIterateFrequency(freq)}
+					timeClock={this.timeClock}
+					iterateSerial={this.iterateSerial}
 				/>
 			</div>
 		);

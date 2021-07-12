@@ -25,18 +25,18 @@ export class SquishView extends React.Component {
 
 
 	//  our setCanvas() calls App's setCanvas, hopefully before C++'s promise hits
-	setCanvas(canvas) {
-		if (this.canvas) return;
-
-		this.canvas = canvas;
-		this.props.setGLCanvas(this.canvas);
-	}
+//	setCanvas(canvas) {
+//		if (this.canvas) return;
+//
+//		this.canvas = canvas;
+//		this.props.setGLCanvas(this.canvas);
+//	}
 
 	render() {
 		return (<div>
 			<canvas className="SquishView"
 				width={800} height={400}
-				ref={element => this.setCanvas(element)}
+				ref={element => this.props.setGLCanvas(element)}
 				style={{width: '800px', height: '400px', border: '1px #666 inset'}}>
 			</canvas>
 		</div>);
