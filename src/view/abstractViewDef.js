@@ -196,6 +196,14 @@ export class abstractViewDef {
 //		gl.vertexAttribPointer(cornerAttributeLocation, size, type, normalize, stride, offset);
 	}
 
+	// reload ALL the variables on this view
+	reloadAllVariables() {
+		this.viewVariables.forEach(v => v.reloadVariable());
+		this.drawings.forEach(dr => {
+				dr.viewVariables.forEach(v => v.reloadVariable());
+		});
+	}
+
 	/* ************************************************** Geometry and transformations */
 	// abstract supermethod: another dummy submethod... write yer  own
 	// is this really needed?  seems like it can be omitted...

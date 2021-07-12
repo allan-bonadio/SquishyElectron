@@ -4,3 +4,7 @@ extern void run_wave_tests(void);
 
 
 extern const char *redAnsiStyle, *offAnsiStyle;
+
+extern bool isClose(double a, double b);
+
+
