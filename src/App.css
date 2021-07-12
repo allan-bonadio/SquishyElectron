@@ -25,7 +25,7 @@ h2.App-header {
 
 /* **************************************** controls in general */
 
-button {
+button.round {
 	font-size: 100%;
 	padding: .2em 1em;
 	margin: .2em;
