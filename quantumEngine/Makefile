@@ -10,6 +10,10 @@ building/exports.json : building/buildExports.js
 clean : quantumEngine.js quantumEngine.wasm
 	rm quantumEngine.js quantumEngine.wasm
 
+# i don't think this works
 watch :
 	while :; do date +%T; make; sleep 15; done
 
+
+test :
+	testing/runner.sh

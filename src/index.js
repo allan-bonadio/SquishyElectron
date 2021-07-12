@@ -9,7 +9,8 @@ ReactDOM.render(
 	<React.StrictMode>
 		<ErrorBoundary howToRecover={errorMsg => {
 			// just reload the page, dude
-			window.location = window.location;  // ??
+			debugger;
+			window.location = window.location;  // reload page??
 		}}>
 			<App />
 		</ErrorBoundary>

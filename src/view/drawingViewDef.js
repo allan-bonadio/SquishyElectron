@@ -22,12 +22,12 @@ class drawingViewDef extends abstractViewDef {
 
 	// this does shaders and inputs, iterating thru the list
 	setShaders() {
-		console.log('setShaders drawings', this.drawings);
-		console.dir(this.drawings);
+		//console.log('setShaders drawings', this.drawings);
+		//console.dir(this.drawings);
 
 		this.drawings.forEach(drawing => {
-			console.log('drawing.setShaders', drawing);
-			console.dir(drawing);
+			//console.log('drawing.setShaders', drawing);
+			//console.dir(drawing);
 
 			drawing.setShaders();
 		});
