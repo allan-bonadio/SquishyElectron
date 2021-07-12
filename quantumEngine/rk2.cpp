@@ -9,16 +9,11 @@ static const qReal dt = 0.02;
 static const qCx dtOverI = qCx(0., -dt);
 static const qCx halfDtOverI = qCx(0., -dt / 2.);
 
-void dumpMyPoint(qCx val, int ix) {
-	printf("appoint a point %6d  %8.4f %8.4f ", ix, val.re, val.im);
-}
-
 // crawl along x to find the next version of theWave, after dt, and store it there.
 void qSpace::oneRk2Step(void) {
 	qDimension *dim = theSpace->dimensions;
 	theQWave->fixBoundaries();
-	theQWave->dumpWave("starting theWave");
-	//qCx *laosWave = theWave;
+	theQWave->dumpWave("starting theWave", true);
 
 	// use laosWave for all the first-try psi values
 	for (int ix = dim->start; ix < dim->end; ix++) {
@@ -26,7 +21,7 @@ void qSpace::oneRk2Step(void) {
 		qCheck(sumWave[ix]);
 	}
 	theQWave->fixBoundaries();
-	laosQWave->dumpWave("laos Q Wave");
+	laosQWave->dumpWave("laos Q Wave", true);
 
 	//for (int ix = 0; ix <= dim->end; ix++)
 	//printf("INRK2 %d\t%lf\t%lf\n", ix, laosWave[ix].re, laosWave[ix].im);
@@ -36,7 +31,7 @@ void qSpace::oneRk2Step(void) {
 		sumWave[ix] = theWave[ix] + hamiltonian(laosWave, ix) * dtOverI;
 		qCheck(sumWave[ix]);
 	}
-	sumQWave->dumpWave("sumWave");
+	sumQWave->dumpWave("sumWave", true);
 
 	// now flip them around.  This type of surgery; not sure about it...
 	qCx *t = sumWave;
@@ -46,7 +41,7 @@ void qSpace::oneRk2Step(void) {
 	theQWave->buffer = t;
 
 	theQWave->fixBoundaries();
-	theQWave->dumpWave("almost done theWave");
+	theQWave->dumpWave("almost done theWave", true);
 
 	//printf("done with rk2: \n");
 	//for (int ix = 0; ix <= dim->end; ix++)
@@ -54,11 +49,9 @@ void qSpace::oneRk2Step(void) {
 
 	theSpace->elapsedTime += dt;
 
-	theQWave->lowPassFilter();
-
-	// which one i better?  who cares, forEachPoint works!
-	theQWave->forEachPoint(dumpMyPoint);
-	theQWave->dumpWave("after low pass theWave");
+//	theQWave->lowPassFilter();
+//
+//	theQWave->dumpWave("after low pass theWave", true);
 }
 
 /* ************************************************** benchmarking */
@@ -74,3 +67,4 @@ int manyRk2Steps(void) {
     printf(" time for %d rk2 steps: %lf", many, (double)(c_end - c_start) / CLOCKS_PER_SEC);
 	return many;
 }
+

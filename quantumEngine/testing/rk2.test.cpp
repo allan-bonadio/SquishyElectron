@@ -1,3 +1,4 @@
+#include <cmath>
 #include <stdio.h>
 #include "test.h"
 #include "../qSpace.h"
@@ -7,6 +8,7 @@ static void makeNewSpace(int32_t N, int32_t continuum, const char *label) {
 	startNewSpace();
 	addSpaceDimension(5, contENDLESS, "x");
 	completeNewSpace();
+	theQWave->setCircularWave(1.);
 }
 
 // july 5 2021
@@ -34,16 +36,35 @@ qCx jun4Expected[7] = {
 
 
 static void firstRK2Iteration5(void) {
+	// lemme seee this first
+	for (int i = 0; i < 7; i++) {
+		qCx expe = jun4Expected[i];
+		qReal phase = atan2(expe.im, expe.re) * 180. / PI;
+		qReal magn = expe.re * expe.re + expe.im * expe.im;
+		printf("jun4Expected %d: %lf %lf | %lf %lf\n",
+			i, expe.re, expe.im, phase, magn);
+	}
+
+	for (int i = 0; i < 7; i++) {
+		qCx expe = expected[i];
+		qReal phase = atan2(expe.im, expe.re) * 180. / PI;
+		qReal magn = expe.re * expe.re + expe.im * expe.im;
+		printf("expected %d: %lf %lf | %lf %lf\n",
+			i, expe.re, expe.im, phase, magn);
+	}
+
 	makeNewSpace(5, contENDLESS, "x");
+	theQWave->dumpWave("before rk2 test", true);
 
 	theSpace->oneRk2Step();
+	theQWave->dumpWave("after rk2 test", true);
 
 	for (int ix = 0; ix < 7; ix++) {
 		qCx act = theWave[ix];
 		qCx xpct = expected[ix];
 		if (act.re != xpct.re || act.im != xpct.im) {
-			printf("rk2: %sactual=(%lf, %lf) vs expected=(%lf, %lf) for row %d %s\n",
-			redAnsiStyle, act.re, act.im, xpct.re, xpct.im, ix, offAnsiStyle);
+			printf("%srk2 %d:actual=(%lf, %lf) vs expected=(%lf, %lf) %s\n",
+			redAnsiStyle, ix, act.re, act.im, xpct.re, xpct.im, offAnsiStyle);
 		}
 	}
 
@@ -53,6 +74,8 @@ static void firstRK2Iteration5(void) {
 }
 
 void run_rk2_tests(void) {
+	printf("::::::::::::::::::::::::::::::::::::::: rk2 tests\n");
+
 	firstRK2Iteration5();
 	printf("Done with RK2 tests\n");
 }
