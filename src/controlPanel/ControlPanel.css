@@ -110,16 +110,43 @@ button.stopButton div {
 	color: #eee;
 }
 
-/* **************************************** Reset Wave buttons */
+/* **************************************** Tab bar & Tabs */
 
-.resetWaveButtons {
-	flex: 0 0 15em;
-	margin: 1em;
+/* the bar */
+ul.TabBar {
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	z-index: 10;
+	position: relative;
 }
 
-.setVoltageButtons {
-	flex: 0 0 20em;
-	margin: 1em;
+/* a tab button */
+ul.TabBar li {
+	list-style: none;
+	display: block;
+	border: outset #aaa 2px;
+	border-radius: .5em 0 0 .5em;
+	padding: .2em .5em .2em 2em;
+	width: 7em;
+	margin: 0 0 .2em .5em;
+	text-align: right;
+}
+
+ul.TabBar li.selected {
+	background-color: #eef;
+	color: #222;
+	border-style: outset;
+	border-right: solid #eef 2px;
+	width: 7.2em;
+}
+
+.tabFrame {
+	border: outset #aaa 2px;
+	padding: .5em;
+	color: #222;
+	background-color: #eef;
+	margin-left: -.2em;
 }
 
 /* **************************************** Set Resolution dialog */

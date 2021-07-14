@@ -3,7 +3,11 @@ import PropTypes from 'prop-types';
 
 import './ControlPanel.css';
 import CPToolbar from './CPToolbar';
-//import {setWave, setVoltage} from './wave/theWave';
+import SetWaveTab from './SetWaveTab';
+import SetPotentialTab from './SetPotentialTab';
+import SetResolutionTab from './SetResolutionTab';
+
+//import {setWave, setPotential} from './wave/theWave';
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
@@ -15,8 +19,9 @@ export class ControlPanel extends React.Component {
 		stopIterating: PropTypes.func.isRequired,
 		singleStep: PropTypes.func.isRequired,
 
+		// these are the actual functions that change the SquishView on the screen
 		setWave: PropTypes.func.isRequired,
-		setVoltage: PropTypes.func.isRequired,
+		setPotential: PropTypes.func.isRequired,
 
 		isTimeAdvancing: PropTypes.bool.isRequired,
 		timeClock: PropTypes.number.isRequired,
@@ -32,13 +37,15 @@ export class ControlPanel extends React.Component {
 		// most of the state is really kept in the SquishPanel
 		this.state = {
 
-			// state for the wave resets
-			harmonicFrequency: 1,
-			constantFrequency: 1,
+			// state for the wave resets - these are control-panel only.  Only goes into effect if we call setWave or setPotential
+			standingFrequency: 1,
+			circularFrequency: 1,
 
 			valleyPower: 1,
 			valleyScale: 1,
 			valleyOffset: 50,
+
+			showingTab: 'SetWaveTab',
 		};
 	}
 
@@ -103,95 +110,41 @@ export class ControlPanel extends React.Component {
 		</div>;
 	}
 
-	/* ********************************************** resetWave */
 
-	renderResetWaveButtons() {
-		const p = this.props;
-
-		return <div className='resetWaveButtons subPanel'>
-			<h3>Reset Wave Function</h3>
-			<button type='button' className='harmonicWaveButton round'
-				onClick={ev => p.setWave('standing', this.state.harmonicFrequency)}>
-					Standing Wave
-			</button>
-			&nbsp;
-			<input type='number' placeholder='frequency'
-				value={this.state.harmonicFrequency} min='1' max='100'
-				onChange={ev => this.setState({harmonicFrequency: ev.currentTarget.value})} />
-
-			<br/>
-			<button type='button' className='constantWaveButton round'
-				onClick={ev => p.setWave('circular', this.state.constantFrequency)} >
-					Circular Wave
-			</button>
-			&nbsp;
-			<input type='number' placeholder='frequency'
-				value={this.state.constantFrequency} min='1' max='100'
-				onChange={ev => this.setState({constantFrequency: ev.currentTarget.value})} />
-
-			<br/>
-			<button type='button' className='diracDeltaButton round'
-				onClick={ev => p.setWave('pulse')} >
-					Wave Packet
-			</button>
-		</div>;
+	/* ********************************************** wave & pot */
+	setStandingFrequency(newFreq) {
+		this.setState({standingFrequency: newFreq});
 	}
 
-	/* ********************************************** set voltage */
-
-	renderSetVoltageButtons() {
-		const p = this.props;
-		const s = this.state;
-
-		return <div className='setVoltageButtons subPanel'>
-			<h3><big>⚡️</big> Reset Voltage Profile <br /> (potential energy function)</h3>
-			<button type='button' className='zeroVoltageButton round'
-				onClick={ev => p.setVoltage('zero')}>
-					Zero potential (default)
-			</button>
-
-			<br/>
-			<button type='button' className='valleyVoltageButton round'
-				onClick={ev => p.setVoltage('valley', s.valleyPower, s.valleyScale, s.valleyOffset)} >
-					Valley Potential
-			</button>
-
-			<br/>
-			Power:
-			<input className='powerSlider' type="range"
-				min={-3} max={10}
-				value={s.valleyPower}
-				style={{width: '8em'}}
-				onInput={ev => this.setState({valleyPower: ev.currentTarget.value}) }
-			/>
-			{s.valleyPower}
-
-			<br/>
-			Scale:
-			<input className='scaleSlider' type="range"
-				min={-3} max={3}
-				value={s.valleyScale}
-				style={{width: '8em'}}
-				onInput={ev => this.setState({valleyScale: ev.currentTarget.value}) }
-			/>
-			{s.valleyScale}
-
-			<br/>
-			Offset:
-			<input className='offsetSlider' type="range"
-				min={0} max={100}
-				value={s.valleyOffset}
-				style={{width: '8em'}}
-				onInput={ev => this.setState({valleyOffset: ev.currentTarget.value}) }
-			/>
-			{s.valleyOffset}
-		</div>;
+	setCircularFrequency(newFreq) {
+		this.setState({circularFrequency: newFreq});
 	}
+
 
 	/* ********************************************** render */
 
 	render() {
 		const p = this.props;
+		const s = this.state;
+
+		let showingTab = '';
+		if (s.showingTab == 'wave') {
+			showingTab = <SetWaveTab
+				setWave={p.setWave}
+				circularFrequency={s.circularFrequency}
+				setCircularFrequency={this.setCircularFrequency}
+				standingFrequency={s.standingFrequency}
+				setStandingFrequency={this.setStandingFrequency} />;
+		}
+		else if (s.showingTab == 'potential') {
+			showingTab = <SetPotentialTab setPotential={p.setPotential}
+					valleyPower={s.valleyPower} valleyScale={s.valleyScale}
+					valleyOffset={s.valleyOffset} />
+		}
+		else if (s.showingTab == 'resolution') {
+			showingTab = <SetResolutionTab openResolutionDialog={p.openResolutionDialog} />
+		}
+
 		return <div className='ControlPanel'>
 			<CPToolbar
 				startIterating={p.startIterating}
@@ -203,15 +156,17 @@ export class ControlPanel extends React.Component {
 			/>
 			<div className='cpSecondRow'>
 				{this.renderGoStopButtons()}
-				{this.renderResetWaveButtons()}
-				{this.renderSetVoltageButtons()}
-
-				<button type='button' className='setResolutionButton  round'
-					onClick={ev => p.openResolutionDialog()}>
-						Change Resolution
-						<div style={{fontSize: '.7em'}}>
-							(will reset current wave)</div>
-				</button>
+				<ul className='TabBar' >
+					<li className={s.showingTab == 'wave' && 'selected'}
+						onClick={ev => this.setState({showingTab: 'wave'})}>Wave</li>
+					<li  className={s.showingTab == 'potential' && 'selected'}
+						onClick={ev => this.setState({showingTab: 'potential'})}>Potential</li>
+					<li  className={s.showingTab == 'resolution' && 'selected'}
+						onClick={ev => this.setState({showingTab: 'resolution'})}>Universe</li>
+				</ul>
+				<div className='tabFrame'>
+					{showingTab}
+				</div>
 			</div>
 		</div>;
 	}

@@ -236,14 +236,6 @@ export default class ResolutionDialog extends React.Component {
 
 				<h3>Reconfigure the Universe</h3>
 
-				<p>
-					The actual universe is essentially infinite.
-					Nobody's computer has that much ram or power.
-					Squishy Electron's universe runs on a finite web page.
-					The universe where all this happens is very simplified.
-					You can recreate it here, if you want, with different settings.
-				</p>
-
 				<section className='dialogSection'>
 					{this.renderSlider()}
 				</section>
@@ -275,8 +267,3 @@ export default class ResolutionDialog extends React.Component {
 	}
 }
 
-
-
-
-//: {
-//:</td><td>{

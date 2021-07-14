@@ -375,7 +375,7 @@ export class SquishPanel extends React.Component {
 		this.iterateOneFrame(false, true);
 	}
 
-	setVoltage(breed, arg1 = 1, arg2 = 1, arg3 = 0) {
+	setPotential(breed, arg1 = 1, arg2 = 1, arg3 = 0) {
 		switch (breed) {
 		case 'zero':
 			qe.qSpace_setZeroPotential()
@@ -386,7 +386,7 @@ export class SquishPanel extends React.Component {
 			break;
 
 		default:
-			throw `setVoltage: no voltage breed '${breed}'`
+			throw `setPotential: no voltage breed '${breed}'`
 		}
 		this.iterateOneFrame(false, true);
 	}
@@ -441,7 +441,7 @@ export class SquishPanel extends React.Component {
 					stopIterating={() => this.stopIterating()}
 					singleStep={() => this.singleStep()}
 					setWave={(breed, freq) => this.setWave(breed, freq)}
-					setVoltage={(breed, power, scale, offset) => this.setVoltage(breed, power, scale, offset)}
+					setPotential={(breed, power, scale, offset) => this.setPotential(breed, power, scale, offset)}
 					setIterateFrequency={freq => this.setIterateFrequency(freq)}
 					timeClock={this.timeClock}
 					iterateSerial={this.iterateSerial}
