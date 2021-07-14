@@ -5,7 +5,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import ControlPanel from './ControlPanel';
+import ControlPanel from './controlPanel/ControlPanel';
 
 import {createSpaceNWave} from './wave/theWave';
 import {qeSpace, qeStartPromise, qeDefineAccess} from './wave/qEngine';

@@ -44,43 +44,6 @@ export class ControlPanel extends React.Component {
 
 	/* *********************************** start and stop buttons */
 
-	// toggle the isRunning boolean, that exists in two places
-//	setRunning(ev, isRunning) {
-//		isRunning = !!isRunning;
-//
-////		if (this.state.isRunning)
-////			iterate(theJWave);
-////		if (isRunning)
-////			theDraw.draw();
-//		p.iterateAnimate(isRunning && this.state.rate);
-//
-//		if (ev && ev.currentTarget) ev.currentTarget.blur();
-//
-//		// it is a state of this panel, to color the buttons
-//		//this.setState({isRunning});
-//
-//		// but also a state of the animation
-//		//theJWave.isRunning = isRunning;
-//	}
-//
-//	// set rate, which is 1, 2, 4, 8, ...
-//	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
-//	toggleRunning(ev) {
-//		//this.setState({isRunning: false});
-//
-//		p.iterateAnimate(this.props.isTimeAdvancing, this.state.rate);
-//
-//		if (ev && ev.currentTarget) ev.currentTarget.blur();
-//
-//	}
-//
-//	oneStep(ev) {
-//		//this.setState({isRunning: false});
-//
-//		p.iterateAnimate(false, 'one');
-//
-//		if (ev && ev.currentTarget) ev.currentTarget.blur();
-//	}
 
 	// set rate, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
 	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
@@ -149,7 +112,7 @@ export class ControlPanel extends React.Component {
 			<h3>Reset Wave Function</h3>
 			<button type='button' className='harmonicWaveButton round'
 				onClick={ev => p.setWave('standing', this.state.harmonicFrequency)}>
-					Harmonic Wave
+					Standing Wave
 			</button>
 			&nbsp;
 			<input type='number' placeholder='frequency'
@@ -159,7 +122,7 @@ export class ControlPanel extends React.Component {
 			<br/>
 			<button type='button' className='constantWaveButton round'
 				onClick={ev => p.setWave('circular', this.state.constantFrequency)} >
-					Constant Wave
+					Circular Wave
 			</button>
 			&nbsp;
 			<input type='number' placeholder='frequency'
@@ -169,7 +132,7 @@ export class ControlPanel extends React.Component {
 			<br/>
 			<button type='button' className='diracDeltaButton round'
 				onClick={ev => p.setWave('pulse')} >
-					Dirac Delta
+					Wave Packet
 			</button>
 		</div>;
 	}
@@ -190,7 +153,7 @@ export class ControlPanel extends React.Component {
 			<br/>
 			<button type='button' className='valleyVoltageButton round'
 				onClick={ev => p.setVoltage('valley', s.valleyPower, s.valleyScale, s.valleyOffset)} >
-					Potential Well
+					Valley Potential
 			</button>
 
 			<br/>
