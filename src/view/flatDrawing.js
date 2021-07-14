@@ -51,7 +51,7 @@ let ps = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
 
 // make the line number for the start a multiple of 10
 const vertexSrc = `${cxToColorGlsl}
-#line 122
+#line 154
 varying highp vec4 vColor;
 attribute vec4 row;
 uniform float barWidth;
@@ -127,7 +127,8 @@ class flatDrawing extends abstractDrawing {
 		barWidthUniform.setValue(barWidth, '1f');
 
 		let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
-		this.unitHeight = 1;
+		let nStates = this.nStates = this.space ? this.space.nStates : 10;
+		this.unitHeight = nStates / 4;
 		unitHeightUniform.setValue(this.unitHeight, '1f');
 
 		this.rowAttr = new viewAttribute('row', this);
