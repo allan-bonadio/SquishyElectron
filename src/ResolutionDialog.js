@@ -16,7 +16,7 @@ import SquishDialog from './SquishDialog';
 // 30=1000, 27=500, 23=>200, 20=>100, 13=>20, 10=>10 /*!!!*/, 7=>5
 // note 11=>12.5=>13 so start at 12 => 16, although it'll round up and always be an integer
 const MIN_SLIDER_RES = process.env.NODE_ENV == 'development' ? 0 : 12;
-const MAX_SLIDER_RES = 60;
+const MAX_SLIDER_RES = 30;
 
 // list of settings that are more better - not that simple!
 function createGoodPowersOf10() {
