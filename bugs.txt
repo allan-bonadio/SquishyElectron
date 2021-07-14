@@ -1,0 +1,12 @@
+
+------------------------------------------- done
+- vertical domain should adjust to N size
+- dt should be a property of the space.  rk2test should jimmy it up.
+
+
+------------------------------------------- to do
+- after setting wave or potential, redraw
+- ensure animate frame isn't called double
+- time & frame num should display in real time, not via react
+
+- control panel tabs
