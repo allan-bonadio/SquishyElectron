@@ -61,7 +61,6 @@ public:
 	//void setStandingWave(qReal n);
 	//void setPulseWave(qReal widthFactor, qReal cycles);
 
-	int iterationCount = 0;
 };
 
 // continuum values - same as in qDimension in qEngine.js; pls synchronize them
@@ -101,6 +100,12 @@ public:
 
 	// total number of times thru the number cruncher.
 	int iterationCount;
+
+	// time increment used in schrodinger's, plus constants handy in intgration
+	qReal dt;
+	qCx dtOverI;
+	qCx halfDtOverI;
+	int filterCount;
 
 	// Dimensions are listed from outer to inner as with the resulting psi array:
 	// psi[outermost-dim][dim][dim][innermost-dim]

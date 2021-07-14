@@ -9,6 +9,9 @@ static const qReal dt = 0.02;
 static const qCx dtOverI = qCx(0., -dt);
 static const qCx halfDtOverI = qCx(0., -dt / 2.);
 
+// when the Planck constant is expressed in SI units, it has the exact value
+// h = 6.62607015×10−34 J⋅sec
+
 // calculate deriv / dt down the entire wave,
 // generating increments from fromWave to nextYWave and sumWave.
 // store it by adding it to origWave into nextYWave,

@@ -11,22 +11,15 @@ static void makeNewSpace(int32_t N, int32_t continuum, const char *label) {
 	theQWave->setCircularWave(1.);
 }
 
-// how to check these: calculate the phase and the magnitude of each.  Magnitudes
-// should be about .2 for a 5-state wave.  Phases should be separated by 72° (=360/5)
+// how to check these: for 5 states, calculate the phase and the magnitude of each.
+//  Magnitudes should average 1/N or about .2 for a 5-state wave. Phases should be
+// separated by 72° (=360/5)
 
-// july 5 2021
-qCx july5Expected[7] = {
-	qCx(0.045880726689574651, -0.182224849951211909),
-	qCx(0.487437594505842064, -0.031982253127852210),
-	qCx(0.171718916258377263, 0.453359376678800163),
-	qCx(-0.388379208686506772, 0.301853831893821090),
-	qCx(-0.417227244385288243, -0.273890416546646753),
-	qCx(0.045880726689574651, -0.182224849951211909),
-	qCx(0.487437594505842064, -0.031982253127852210),
-};
+/* ********************************************************* first test */
+// five states, 1 iteration, no lowPass or normalize, faked dt
 
-// an older version; dt = 0.1
-qCx jun4Expected[7] = {
+//  version; dt = 0.1
+qCx firstExpected[7] = {
 	qCx( 0.07809841578326204, -0.44036220853561392),
 	qCx( 0.44294308566870949, -0.06180339887498949),
 	qCx( 0.19565546624175678,  0.40216560741060337),
@@ -36,50 +29,99 @@ qCx jun4Expected[7] = {
 	qCx( 0.44294308566870949, -0.06180339887498949)
 };
 
-qCx *expected = jun4Expected;
-
-static void firstRK2Iteration5(void) {
+static void firstRK2(void) {
 	// lemme seee this first
-	for (int i = 0; i < 7; i++) {
-		qCx expe = jun4Expected[i];
-		qReal phase = atan2(expe.im, expe.re) * 180. / PI;
-		qReal magn = expe.re * expe.re + expe.im * expe.im;
-		printf("jun4Expected %d: %lf %lf | %lf %lf\n",
-			i, expe.re, expe.im, phase, magn);
-	}
-
-	for (int i = 0; i < 7; i++) {
-		qCx expe = july5Expected[i];
-		qReal phase = atan2(expe.im, expe.re) * 180. / PI;
-		qReal magn = expe.re * expe.re + expe.im * expe.im;
-		printf("july5Expected %d: %lf %lf | %lf %lf\n",
-			i, expe.re, expe.im, phase, magn);
-	}
+	// for (int i = 0; i < 7; i++) {
+	// 	qCx expe = firstExpected[i];
+	// 	qReal phase = atan2(expe.im, expe.re) * 180. / PI;
+	// 	qReal magn = expe.re * expe.re + expe.im * expe.im;
+	// 	printf("firstExpected %d: %lf %lf | %lf %lf\n",
+	// 		i, expe.re, expe.im, phase, magn);
+	// }
 
 	makeNewSpace(5, contENDLESS, "x");
+	theSpace->dt = 0.1;  // to make the numbers come out right
+	printf("First Test - &&&&& dt is %lf\n", theSpace->dt);
 	theQWave->dumpWave("before rk2 test", true);
 
 	theSpace->oneRk2Step();
+
 	theQWave->dumpWave("after rk2 test", true);
 
 	for (int ix = 0; ix < 7; ix++) {
 		qCx act = theWave[ix];
-		qCx xpct = expected[ix];
+		qCx xpct = firstExpected[ix];
 		if (act.re != xpct.re || act.im != xpct.im) {
-			printf("%srk2 %d:actual=(%lf, %lf) vs expected=(%lf, %lf) %s\n",
+			printf("%srk2 %d:actual=(%lf, %lf) vs firstExpected=(%lf, %lf) %s\n",
 			redAnsiStyle, ix, act.re, act.im, xpct.re, xpct.im, offAnsiStyle);
 		}
 	}
 
-	// in case you need to regenerate Expected from Actual
+	// in case you need to regenerate firstExpected from Actual
 	for (int ix = 0; ix < 7; ix++) printf("\tqCx(%20.18lf, %20.18lf),\n",
 		theWave[ix].re, theWave[ix].im);
 }
 
+/* ********************************************************* second test */
+// five states, 5 iterations, lowPass & normalize on fifth iteration
+
+//  version; dt = 0.1
+qCx secondExpected[7] = {
+	qCx(-0.165469639483600328, -0.415475388451791827),
+	qCx(0.344007644893808584, -0.285759934656024339),
+	qCx(0.378078056417778141, 0.238866036211419941),
+	qCx(-0.110342555627121364, 0.433387263792644972),
+	qCx(-0.446273506200865144, 0.028982023103751399),
+	qCx(-0.165469639483600328, -0.415475388451791827),
+	qCx(0.344007644893808584, -0.285759934656024339),
+};
+
+// five states, 1 iteration, no lowPass or normalize, faked dt
+static void secondRK2(void) {
+	// lemme seee this second
+	// for (int i = 0; i < 7; i++) {
+	// 	qCx expe = secondExpected[i];
+	// 	qReal phase = atan2(expe.im, expe.re) * 180. / PI;
+	// 	qReal magn = expe.re * expe.re + expe.im * expe.im;
+	// 	printf("secondExpected %d: %lf %lf | %lf %lf\n",
+	// 		i, expe.re, expe.im, phase, magn);
+	// }
+
+	makeNewSpace(5, contENDLESS, "x");
+	printf("Second Test - &&&&& dt is %lf\n", theSpace->dt);
+	theQWave->dumpWave("before rk2 second test", true);
+
+	theSpace->oneRk2Step();
+	theSpace->oneRk2Step();
+	theSpace->oneRk2Step();
+	theSpace->oneRk2Step();
+	theSpace->oneRk2Step();  // this one should get the lowPass & normalize
+
+	theQWave->dumpWave("after rk2 second test", true);
+
+	for (int ix = 0; ix < 7; ix++) {
+		qCx act = theWave[ix];
+		qCx xpct = secondExpected[ix];
+		if (act.re != xpct.re || act.im != xpct.im) {
+			printf("%srk2 %d:actual=(%lf, %lf) vs secondExpected=(%lf, %lf) %s\n",
+			redAnsiStyle, ix, act.re, act.im, xpct.re, xpct.im, offAnsiStyle);
+		}
+	}
+
+	// in case you need to regenerate secondExpected from Actual
+	for (int ix = 0; ix < 7; ix++) printf("\tqCx(%20.18lf, %20.18lf),\n",
+		theWave[ix].re, theWave[ix].im);
+}
+
+/* ********************************************************* top level */
+
 void run_rk2_tests(void) {
 	printf("::::::::::::::::::::::::::::::::::::::: rk2 tests\n");
 
-	firstRK2Iteration5();
+	firstRK2();
+	secondRK2();
+
+	secondRK2();
 	printf("Done with RK2 tests\n");
 }
 
