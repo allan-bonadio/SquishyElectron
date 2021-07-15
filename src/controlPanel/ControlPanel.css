@@ -48,10 +48,17 @@
 	width: 4em;
 }
 
+/* **************************************** general controls */
 
 
+input {
+	background-color: #222;
+	color: #eee;
+}
 
-
+.MiniGraph {
+	border: 1px solid #888;
+}
 
 /* **************************************** run/stop buttons */
 
@@ -114,6 +121,7 @@ button.stopButton div {
 
 /* the bar */
 ul.TabBar {
+	flex: 0 0 11em;
 	margin: 0;
 	padding: 0;
 	position: absolute;
@@ -142,11 +150,40 @@ ul.TabBar li.selected {
 }
 
 .tabFrame {
+	flex: 1 0 auto;
 	border: outset #aaa 2px;
 	padding: .5em;
 	color: #222;
 	background-color: #eef;
 	margin-left: -.2em;
+}
+
+.MiniGraph {
+	border: #888 solid 1px;
+}
+
+/* **************************************** Set Potential panel */
+
+.setPotentialTab {
+	display: flex;
+}
+
+.potentialTitlePanel {
+	flex: 1 0 15em;
+}
+
+.potentialValleyPanel {
+	flex: 1 0 15em;
+}
+
+.valleyMiniGraph {
+	flex: 1 0 15em;
+}
+
+.setPotentialTab .divider {
+	flex: 1 0 1em;
+	border-left: 1px #888 solid;
+	margin: 1em .5em;
 }
 
 /* **************************************** Set Resolution dialog */

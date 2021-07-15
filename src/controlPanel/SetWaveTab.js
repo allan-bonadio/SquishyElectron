@@ -18,27 +18,27 @@ function SetWaveTab(props) {
 		<h3>Reset Wave Function</h3>
 		<button type='button' className='standingWaveButton round'
 			onClick={ev => p.setWave('standing', p.standingFrequency)}>
-				Standing Wave
+				Set to Standing Wave
 		</button>
 		&nbsp;
-		<input type='number' placeholder='frequency'
+		<input type='number' placeholder='frequency' className='numberInput'
 			value={p.standingFrequency} min='1' max='100'
 			onChange={ev => p.setStandingFrequency(ev.currentTarget.value)} />
 
 		<br/>
 		<button type='button' className='circularWaveButton round'
 			onClick={ev => p.setWave('circular', p.circularFrequency)} >
-				Circular Wave
+				Set to Circular Wave
 		</button>
 		&nbsp;
-		<input type='number' placeholder='frequency'
+		<input type='number' placeholder='frequency' className='numberInput'
 			value={p.circularFrequency} min='1' max='100'
 			onChange={ev => p.setCircularFrequency(ev.currentTarget.value)} />
 
 		<br/>
 		<button type='button' className='pulseWaveButton round'
 			onClick={ev => p.setWave('pulse')} >
-				Wave Packet
+				Set to Wave Packet
 		</button>
 	</div>;
 

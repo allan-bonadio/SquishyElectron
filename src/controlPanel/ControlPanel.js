@@ -45,7 +45,7 @@ export class ControlPanel extends React.Component {
 			valleyScale: 1,
 			valleyOffset: 50,
 
-			showingTab: 'SetWaveTab',
+			showingTab: 'wave',
 		};
 	}
 
@@ -55,10 +55,7 @@ export class ControlPanel extends React.Component {
 	// set rate, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
 	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
 	setFrequency(freq) {
-
 		this.props.setIterateFrequency(freq);
-
-		//this.props.iterateAnimate(this.props.isTimeAdvancing, freq);
 	}
 
 	renderGoStopButtons() {
@@ -120,6 +117,9 @@ export class ControlPanel extends React.Component {
 		this.setState({circularFrequency: newFreq});
 	}
 
+	setCPState(obj) {
+		this.setState(obj);
+	}
 
 	/* ********************************************** render */
 
@@ -132,12 +132,13 @@ export class ControlPanel extends React.Component {
 			showingTab = <SetWaveTab
 				setWave={p.setWave}
 				circularFrequency={s.circularFrequency}
-				setCircularFrequency={this.setCircularFrequency}
+				setCircularFrequency={freq => this.setCircularFrequency(freq)}
 				standingFrequency={s.standingFrequency}
-				setStandingFrequency={this.setStandingFrequency} />;
+				setStandingFrequency={freq => this.setStandingFrequency(freq)} />;
 		}
 		else if (s.showingTab == 'potential') {
 			showingTab = <SetPotentialTab setPotential={p.setPotential}
+					setCPState={obj => this.setState(obj)}
 					valleyPower={s.valleyPower} valleyScale={s.valleyScale}
 					valleyOffset={s.valleyOffset} />
 		}
