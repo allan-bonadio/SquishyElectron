@@ -1,6 +1,13 @@
+/*
+** squish View -- a webgl image of the quantum wave
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import {thousands} from '../lib';
+import qe from '../wave/qe';
+import './view.css';
 //import abstractViewDef from './abstractViewDef';
 //import SquishPanel, {listOfViewClasses} from '../SquishPanel';
 
@@ -20,24 +27,39 @@ export class SquishView extends React.Component {
 
 		this.state = {
 //			vertPotStretch: INITIAL_POT_STRETCH
+			width: 800,
+			height: 400,
 		};
 	}
 
 
-	//  our setCanvas() calls App's setCanvas, hopefully before C++'s promise hits
-//	setCanvas(canvas) {
-//		if (this.canvas) return;
-//
-//		this.canvas = canvas;
-//		this.props.setGLCanvas(this.canvas);
-//	}
-
 	render() {
-		return (<div>
-			<canvas className="SquishView"
-				width={800} height={400}
+		const s = this.state;
+		let et = '';
+		let iser = '';
+		if (qe.getElapsedTime) {
+			// after qe has been initialized
+			et = thousands(qe.getElapsedTime().toFixed(2));
+			iser = thousands(qe.qSpace_getIterateSerial());
+		}
+
+		// voNorthWest/East are populated during drawing, so this here is just for yucks
+		return (<div className='SquishView' >
+			<aside className='viewOverlay'
+				style={{width: `${s.width}px`, height: `${s.height}px`}}>
+
+
+				<div className='northWestWrapper'>
+					<span className='voNorthWest'>{et}</span> ps
+				</div>
+				<div className='northEastWrapper'>
+					frame <span className='voNorthEast'>{iser}</span>
+				</div>
+			</aside>
+			<canvas className='squishCanvas'
+				width={s.width} height={s.height}
 				ref={element => this.props.setGLCanvas(element)}
-				style={{width: '800px', height: '400px', border: '1px #666 inset'}}>
+				style={{width: `${s.width}px`, height: `${s.height}px`}}>
 			</canvas>
 		</div>);
 
