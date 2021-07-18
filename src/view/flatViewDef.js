@@ -1,3 +1,8 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 import abstractViewDef from './abstractViewDef';
 import {cxToColorGlsl} from './cxToColor.glsl';
 import qe from '../wave/qe';
@@ -85,7 +90,8 @@ class flatViewDef extends abstractViewDef {
 
 
 	setInputs() {
-		const highest = qe.updateViewBuffer();
+		//const highest =
+		qe.updateViewBuffer();
 
 		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
 		let nPoints = this.nPoints = this.space.nPoints;
@@ -96,7 +102,7 @@ class flatViewDef extends abstractViewDef {
 		let unitHeight = 1;
 		unitHeightUniform.setValue(unitHeight, '1f');
 
-		const rowAttr = this.rowAttr = new viewAttribute('row', this);
+		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
 		this.rowAttr.attachArray(qe.space.viewBuffer, this.rowFloats);
