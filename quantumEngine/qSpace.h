@@ -1,14 +1,13 @@
 /*
 ** quantum space - C++ code for optimized ODE integration for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
+
 
 #include "qCx.h"
 
 #define LABEL_LEN  16
 #define MAX_DIMENSIONS  1
-
-// we use fixed size int32_t and double here just so JS can calculate sizes more easily.
-// Please keep these class layouts synched with qEngine.js's estimate!
 
 extern class qSpace *theSpace;
 extern class qCx *theWave, *sumWave, *egyptWave, *laosWave;
@@ -74,7 +73,7 @@ struct qSpace {
 public:
 	qSpace(int nDims) {
 		this->nDimensions = nDims;
-		this->iterationCount = 0;
+		this->iterateSerial = 0;
 		this->elapsedTime = 0.;
 	}
 
@@ -98,8 +97,9 @@ public:
 	// of what a second is?  Resets to zero every so often.
 	double elapsedTime;
 
-	// total number of times thru the number cruncher.
-	int iterationCount;
+	// total number of times thru the number cruncher. (should always be an integer;
+	// it's a double cuz I don't know how big it'll get)
+	double iterateSerial;
 
 	// time increment used in schrodinger's, plus constants handy in intgration
 	qReal dt;
@@ -157,14 +157,15 @@ struct qWave {
 
 // for JS to call
 extern "C" {
-	int32_t startNewSpace(void);
-	int32_t addSpaceDimension(int32_t N, int32_t continuum, const char *label);
-	int32_t completeNewSpace(void);
+	qSpace *startNewSpace(void);
+	qSpace *addSpaceDimension(int32_t N, int32_t continuum, const char *label);
+	qSpace *completeNewSpace(void);
 
 	qCx *getWaveBuffer(void);
 	qReal *getPotentialBuffer(void);
 	float *getViewBuffer();
-	int32_t getElapsedTime(void);
+	qReal qSpace_getElapsedTime(void);
+	qReal qSpace_getIterateSerial(void);
 
 	int manyRk2Steps(void);
 

@@ -1,3 +1,8 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 #include <stdio.h>
 #include "qSpace.h"
 #include <ctime>
@@ -53,7 +58,8 @@ void qSpace::oneRk2Step(void) {
 	//printf("qCx(%20.17lf, %20.17lf)\n", theWave[ix].re, theWave[ix].im);
 
 	this->elapsedTime += dt;
-	this->iterationCount++;
+	this->iterateSerial++;
+
 	if (--this->filterCount <= 0) {
 		printf("@@@ it's time for a filter %d %d\n", this->filterCount, this->nStates);
 		//theQWave->dumpWave("filtering, starting", true);

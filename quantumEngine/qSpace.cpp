@@ -1,3 +1,8 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 #include "qSpace.h"
 #include <cmath>
 
@@ -13,7 +18,6 @@ class qCx *theWave = NULL, *sumWave = NULL,
 
 
 qReal *thePotential = NULL;
-qReal elapsedTime = 0;
 
 
 static int dimsSoFar;
@@ -26,7 +30,9 @@ static int dimsSoFar;
 extern "C" {
 
 // call this to throw away existing space and wave, and start new
-int32_t startNewSpace(void) {
+// it's hard to send a real data structure thru the emscripten interface, so the JS
+// constructs the dimensions by repeated calls to addSpaceDimension()
+qSpace *startNewSpace(void) {
 	//printf("startNewSpace()\n");
 
 	if (theSpace) {
@@ -43,17 +49,15 @@ int32_t startNewSpace(void) {
 		delete[] viewBuffer;
 		delete theSpace;
 	}
-	elapsedTime = 0;
-
 	dimsSoFar = 0;
 	theSpace = new qSpace(1);
 	//printf("  done startNewSpace()\n");
 
-	return 1;
+	return theSpace;
 }
 
 // call this from JS to add one or more dimensions
-int32_t addSpaceDimension(int32_t N, int32_t continuum, const char *label) {
+qSpace *addSpaceDimension(int32_t N, int32_t continuum, const char *label) {
 	//printf("addSpaceDimension(%d, %d, %s)\n", N, continuum, label);
 
 	qDimension *dim = theSpace->dimensions + dimsSoFar;
@@ -74,11 +78,11 @@ int32_t addSpaceDimension(int32_t N, int32_t continuum, const char *label) {
 
 	dimsSoFar++;
 	//printf("  done addSpaceDimension() %s\n", dim->label);
-	return 1;
+	return theSpace;
 }
 
 // call this from JS to finish the process
-int32_t completeNewSpace(void) {
+qSpace *completeNewSpace(void) {
 	//printf("completeNewSpace()\n");
 	int32_t ix;
 	int32_t nPoints = 1, nStates = 1;
@@ -126,7 +130,7 @@ int32_t completeNewSpace(void) {
 	//theSpace->setValleyPotential(1., 1., 0.); // another default
 
 	theSpace->elapsedTime = 0.;
-	theSpace->iterationCount = 0;
+	theSpace->iterateSerial = 0;
 	theSpace->filterCount = nStates;
 
 
@@ -139,7 +143,7 @@ int32_t completeNewSpace(void) {
 	//printf("  dimension N=%d  extraN=%d  continuum=%d  start=%d  end=%d  label=%s\n",
 	//	theSpace->dimensions->N, theSpace->dimensions->extraN, theSpace->dimensions->continuum,
 	//	theSpace->dimensions->start, theSpace->dimensions->end, theSpace->dimensions->label);
-	return nPoints;
+	return theSpace;
 }
 
 /* ********************************************************** glue functions for js */
@@ -149,12 +153,17 @@ int32_t completeNewSpace(void) {
 qCx *getWaveBuffer(void) {
 	return theWave;
 }
+
 qReal *getPotentialBuffer(void) {
 	return thePotential;
 }
 
-int32_t getElapsedTime(void) {
-	return elapsedTime;
+qReal qSpace_getElapsedTime(void) {
+	return theSpace->elapsedTime;
+}
+
+qReal qSpace_getIterateSerial(void) {
+	return theSpace->iterateSerial;
 }
 
 void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
