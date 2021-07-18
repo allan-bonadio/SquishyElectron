@@ -1,3 +1,8 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -24,8 +29,8 @@ export class ControlPanel extends React.Component {
 		setPotential: PropTypes.func.isRequired,
 
 		isTimeAdvancing: PropTypes.bool.isRequired,
-		timeClock: PropTypes.number.isRequired,
-		iterateSerial: PropTypes.number.isRequired,
+		//elapsedTime: PropTypes.number.isRequired,
+		//iterateSerial: PropTypes.number.isRequired,
 
 		iterateFrequency: PropTypes.number.isRequired,
 		setIterateFrequency: PropTypes.func.isRequired,
@@ -152,17 +157,17 @@ export class ControlPanel extends React.Component {
 				stopIterating={p.stopIterating}
 				singleStep={p.singleStep}
 				isTimeAdvancing={p.isTimeAdvancing}
-				timeClock={p.timeClock}
-				iterateSerial={p.iterateSerial}
+				XXXelapsedTime={p.elapsedTime}
+				YYYiterateSerial={p.iterateSerial}
 			/>
 			<div className='cpSecondRow'>
 				{this.renderGoStopButtons()}
 				<ul className='TabBar' >
-					<li className={s.showingTab == 'wave' && 'selected'}
+					<li className={s.showingTab == 'wave' ? 'selected' : ''}
 						onClick={ev => this.setState({showingTab: 'wave'})}>Wave</li>
-					<li  className={s.showingTab == 'potential' && 'selected'}
+					<li  className={s.showingTab == 'potential' ? 'selected' : ''}
 						onClick={ev => this.setState({showingTab: 'potential'})}>Potential</li>
-					<li  className={s.showingTab == 'resolution' && 'selected'}
+					<li  className={s.showingTab == 'resolution' ? 'selected' : ''}
 						onClick={ev => this.setState({showingTab: 'resolution'})}>Universe</li>
 				</ul>
 				<div className='tabFrame'>

@@ -1,7 +1,9 @@
 /*
 ** squish panel -- like a self-contained quantum system, including space,
 ** 				waves, and drawings and interactivity.
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -84,8 +86,8 @@ export class SquishPanel extends React.Component {
 			iteratePeriod: 250,
 		};
 
-		this.timeClock = 0;
-		this.iterateSerial = 0;
+		//this.elapsedTime = 0;
+		//this.iterateSerial = 0;
 
 		// never changes once set
 		this.canvas = null;
@@ -129,8 +131,8 @@ export class SquishPanel extends React.Component {
 			const currentView = new vClass('main view', this.canvas, space);
 			currentView.completeView();
 
-			this.timeClock = 0;
-			this.iterateSerial = 0;
+			//this.elapsedTime = 0;
+			//this.iterateSerial = 0;
 
 			// we've now got a qeSpace etc all set up
 			this.setState({N, continuum, space, currentView});
@@ -176,12 +178,8 @@ export class SquishPanel extends React.Component {
 		qe.updateToLatestWaveBuffer();
 
 		this.startUpdate = performance.now();
-		let highest = qe.updateViewBuffer();
+		qe.updateViewBuffer();
 		this.curView.reloadAllVariables();  // am i doing this twice?
-
-		const s = this.state;
-		this.iterateSerial++;
-		this.timeClock += .43;
 
 		if (this.dumpingTheViewBuffer)
 			this.dumpViewBuffer();
@@ -199,8 +197,6 @@ export class SquishPanel extends React.Component {
 	// called every so often in animateOneFrame() which goes like 1/60 sec
 	// this is called usually more like 5 or 20 times a second, whatever the user chooses.
 	iterateOneFrame(isTimeAdvancing, needsRepaint) {
-		const s = this.state;
-
 		//console.log(`time since last tic: ${now - startFrame}ms`)
 		this.startRK = this.startUpdate = this.startReload = this.startDraw = this.endFrame = 0;
 		const areBenchmarking = this.areBenchmarking;
@@ -236,20 +232,6 @@ export class SquishPanel extends React.Component {
 					`period:  ${(this.startRK - this.prevStart).toFixed(2)}ms\n`);
 				this.prevStart = this.startRK;
 			}
-
-			//if (this.onceMore)
-			//	this.setState({isTimeAdvancing: false});
-			//this.onceMore = false;
-
-			//if (this.curUnitHeight != this.targetUnitHeight) {
-			//	// exponential relaxation
-			//	this.curUnitHeight = (15 * this.curUnitHeight + this.targetUnitHeight) / 16;
-			//	if (Math.abs((this.curUnitHeight - this.targetUnitHeight) / this.targetUnitHeight) < .01) {
-			//		//ok we're done.  close enough.
-			//		this.curUnitHeight = this.targetUnitHeight;
-			//		//this.onceMore = true;  // just to make sure it paints
-			//	}
-			//}
 		}
 	}
 
@@ -382,7 +364,7 @@ export class SquishPanel extends React.Component {
 			break;
 
 		case 'valley':
-			qe.qSpace_setValleyPotential(arg1, arg2, arg3);
+			qe.qSpace_setValleyPotential(+arg1, +arg2, +arg3);
 			break;
 
 		default:
@@ -443,12 +425,11 @@ export class SquishPanel extends React.Component {
 					setWave={(breed, freq) => this.setWave(breed, freq)}
 					setPotential={(breed, power, scale, offset) => this.setPotential(breed, power, scale, offset)}
 					setIterateFrequency={freq => this.setIterateFrequency(freq)}
-					timeClock={this.timeClock}
-					iterateSerial={this.iterateSerial}
 				/>
 			</div>
 		);
 
+		/* 					elapsedTime={this.elapsedTime} iterateSerial={this.iterateSerial} */
 	}
 }
 

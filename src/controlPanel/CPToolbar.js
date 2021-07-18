@@ -1,3 +1,8 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 import PropTypes from 'prop-types';
 
 function setPT() {
@@ -7,8 +12,6 @@ function setPT() {
 		singleStep: PropTypes.func.isRequired,
 
 		isTimeAdvancing: PropTypes.bool.isRequired,
-		timeClock: PropTypes.number.isRequired,
-		iterateSerial: PropTypes.number.isRequired,
 	};
 }
 
@@ -38,8 +41,6 @@ function CPToolbar(props) {
 		</button>
 
 		<div className='toolbarGradient toolbarSpacer'>&nbsp;</div>
-
-		<span >frame {props.iterateSerial}  at time {props.timeClock.toFixed(2)}</span>
 	</div>;
 }
 
