@@ -1,0 +1,38 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
+
+
+/* top of the squish view where the graphics goes */
+.SquishView {
+	position: relative;
+}
+
+
+/* canvas itself */
+canvas.squishCanvas {
+	position: relative;
+	border: '1px #666 inset';
+}
+
+/* overlay with frame ct and virtual time */
+aside.viewOverlay {
+	position: absolute;
+	border: '1px #0000 solid';
+}
+
+.northWestWrapper {
+	position: absolute;
+	left: .5em;
+	top: .5em;
+	z-index: 10;
+}
+
+.northEastWrapper {
+	position: absolute;
+	right: .5em;
+	top: .5em;
+	z-index: 10;
+}

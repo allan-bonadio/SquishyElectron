@@ -1,7 +1,21 @@
 
 ------------------------------------------- done
+- Emscripten engine in C - definitely
+https://emscripten.org/docs/getting_started/downloads.html
+Multiprocessing must be done with pThreads and/or web workers, it seems.
+
+- test harness to run C++ iterator for testing
+
+- OpenGL, if possible (maybe v4?)  Must be webgl cuz emscripten doesn't do full OpenGL
+(basically OpenGL ES = WebGL anyway).
+
 - vertical domain should adjust to N size
 - dt should be a property of the space.  rk2test should jimmy it up.
+- control panel tabs
+
+- ability to alter speed of animation/calculation
+
+- some diagnostics for me
 
 
 ------------------------------------------- to do
@@ -9,4 +23,24 @@
 - ensure animate frame isn't called double
 - time & frame num should display in real time, not via react
 
-- control panel tabs
+- UI ability to set n of dimensions, and to specify angular momentum, and any energy/potential differences therein.  Two particles in the same space should have the same X coordinates; one in 2-d space should have X  and Y coords.  The V potential would be 1-dimensional or 2 dimensional, depending.
+Any number of dimensions, eg x and s, the spin, becomes ψ[1...N][-½, ½]
+or a 2d wave is ψ[1...N][1...N], either two 1D particles or 1 2D particle
+whats the diff?  well, the potential V with two particles, each depends on the loc of the other.
+For one particle in 2D, the potential is a 2d map.
+
+- display Spiral in 3d could be easy.  Dual waves for an electron with spin.
+
+- ability to create two wave functions and superimpose them, with varying complex ratio between
+
+- ability to 'stick your finger in' and measure a state variable and thereby change the state
+
+- small key image indicating phase-color correspondence. ?? does it  really matter?  Maybe just an explanation.
+
+- time display, iterations, (working on it)
+
+
+- Fourier transforms with http://www.fftw.org to xform space domain to momentum domain
+
+- extensive documentation, and tooltips here and there for them.  Use MathJax and myPhysicsLab.com for docs.
+
