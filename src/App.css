@@ -1,11 +1,20 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
+* {
+	box-sizing: border-box;
+}
+
 body {
 	background-color: #222;
 	font-size: 16px;
 	font-family: verdana, helvetica, sans-serif;
 	color: #eee;
 	margin: 0;
-	padding: .5em;
-	box-sizing: border-box;
+	padding: 0;
+	/* padding: .5em; */
 
 }
 
@@ -34,71 +43,72 @@ button.round {
 	border-radius: .5em;
 }
 
+/* applies to text boxes, checkboxes, radios, sliders, ... */
 input {
 	background-color: transparent;
 	color: #eee;
 }
 
-/* **************************************** psi display */
+/* **************************************** SquishDialog */
 
-/* this is full width; svg will conform to its width via code */
-section.WaveWrapper {
-	position: relative;
-	border-color: #aaa;
-	background-color: #111;
+.backdrop {
+	display: flex;
+	background-color: #8888;
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+
+	padding-top: 10%;
 }
 
-/* the SVG itself */
-svg.WaveView {
-	border: 1px solid #aaa;
+.dialogSpacer {
+	flex: 1 1;
+}
+
+.dialog {
+	flex: 0 0 50em;
+	padding: 2em;
+	line-height: 1.5em;
+	height: 30em;
+
+	border: 5px ridge #888;
+	background-color: #111;
+	color: #eee;
+	box-shadow: 5px 5px 5px 5px #0008;
+}
+
+.dialog label {
+	display: block;
 	margin: 0;
 }
 
-/* each bar in the bargraph */
-rect.psiBar {
-	float: left;
-	background-color: gray;  /* default; each bar has its own color */
+.dialog input[type=radio] {
+	margin: 0 1em 0 0;
 }
 
-/* the active area of the wave, excluding the wrap around ends.
-** The potential can squirm around inside this area.  */
-svg.WaveView rect.waveCard {
-	background: #000;
-	z-index: 40;
+.dialog input[type=number] {
+	color: #ddf;
+	margin: 0;
 }
 
-/* the active area of the wave, excluding the wrap around ends.
-** The potential can squirm around inside this area.  */
-g.potentialArea {
-	background: #000;
-	z-index: 40;
-	/*position: relative;  / * does this have an effect? */
+.dialog input[type=range] {
+	color: #8cf;
+	background-color: #888;
+	margin: 0;
 }
 
-/* the line for the potential, displayed in white on top of the wave */
-g.potentialArea path.potentialLine {
-	stroke-width: 5px;
-	stroke: #fef;
-	z-index: 100;
+.dialog button {
+	margin: 2em;
 }
 
-/* a fat line for hit testing.  same path as the potentialLine,
-	but wider and has event handlers */
-g.potentialArea path.tactileLine {
-	stroke-width: 200px;
-	stroke: #844;
-    cursor: row-resize;
-    pointer-events: stroke;
-	z-index: 110;
+.dialog tr td:first {
+	text-align: right;
 }
 
-/* a fat line for hit testing.  same path as the potentialLine,
-	but wider and has event handlers */
-g.potentialArea text.elapsedTime {
-	fill: #ff8;
-	stroke: #f8f;
-	color: #8ff;
-	background-color: #f88;
-	z-index: 100;
+.dialog .dialogSection {
+	margin: 1em 0 0 0;
 }
+
 

@@ -1,3 +1,7 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
 
 .ControlPanel {
 }
@@ -121,7 +125,6 @@ button.stopButton div {
 
 /* the bar */
 ul.TabBar {
-	flex: 0 0 11em;
 	margin: 0;
 	padding: 0;
 	position: absolute;
@@ -133,7 +136,7 @@ ul.TabBar {
 ul.TabBar li {
 	list-style: none;
 	display: block;
-	border: outset #aaa 2px;
+	border: outset #abc 2px;
 	border-radius: .5em 0 0 .5em;
 	padding: .2em .5em .2em 2em;
 	width: 7em;
@@ -144,14 +147,14 @@ ul.TabBar li {
 ul.TabBar li.selected {
 	background-color: #eef;
 	color: #222;
-	border-style: outset;
+	border-style: inset;
+	border-color: #abc;
 	border-right: solid #eef 2px;
 	width: 7.2em;
 }
 
 .tabFrame {
-	flex: 1 0 auto;
-	border: outset #aaa 2px;
+	border: inset #abc 2px;
 	padding: .5em;
 	color: #222;
 	background-color: #eef;
@@ -165,25 +168,28 @@ ul.TabBar li.selected {
 /* **************************************** Set Potential panel */
 
 .setPotentialTab {
-	display: flex;
+	width: calc( 28em + 200px );
 }
 
 .potentialTitlePanel {
-	flex: 1 0 15em;
-}
-
-.potentialValleyPanel {
-	flex: 1 0 15em;
-}
-
-.valleyMiniGraph {
-	flex: 1 0 15em;
+	float: left;
+	width: 14em;
 }
 
 .setPotentialTab .divider {
 	flex: 1 0 1em;
 	border-left: 1px #888 solid;
 	margin: 1em .5em;
+}
+
+.potentialValleyPanel {
+	float: left;
+	width: 14em;
+}
+
+.valleyMiniGraph {
+	float: left;
+	width: 200px;
 }
 
 /* **************************************** Set Resolution dialog */
@@ -194,65 +200,4 @@ ul.TabBar li.selected {
 	margin: 1em;
 	/*height: 6em;*/
 }
-
-.backdrop {
-	display: flex;
-	background-color: #8888;
-	position: fixed;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-
-	padding-top: 10%;
-}
-
-.dialogSpacer {
-	flex: 1 1;
-}
-
-.dialog {
-	flex: 0 0 50em;
-	padding: 2em;
-	line-height: 1.5em;
-	height: 30em;
-
-	border: 5px ridge #aaa;
-	background-color: #111;
-	color: #eee;
-	box-shadow: 5px 5px 5px 5px #0008;
-}
-
-.dialog label {
-	display: block;
-	margin: 0;
-}
-
-.dialog input[type=radio] {
-	margin: 0 1em 0 0;
-}
-
-.dialog input[type=number] {
-	color: #ddf;
-	margin: 0;
-}
-
-.dialog input[type=range] {
-	color: #8cf;
-	background-color: #888;
-	margin: 0;
-}
-
-.dialog button {
-	margin: 2em;
-}
-
-.dialog tr td:first {
-	text-align: right;
-}
-
-.dialog .dialogSection {
-	margin: 1em 0 0 0;
-}
-
 
