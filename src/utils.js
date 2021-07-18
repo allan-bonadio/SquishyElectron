@@ -1,3 +1,9 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
+/* ********************************** toSiPieces() */
 
 const prefixes = [
 	// e-24 thru e-3
@@ -32,3 +38,19 @@ function toSiPrefix(f, nDigits) {
 //	console.log(`${ff.toPrecision(5)} = ${toSiUnits(ff, 6)}`);
 //}
 
+/* ********************************** thousands() */
+export function thousands(num) {
+	return num.toString()
+		.replace(/(\d)(\d\d\d)$/, '$1 $2')  // if it's  an integer at end of string
+		.replace(/(\d)(\d\d\d)\./, '$1 $2.')  // if it's a decimal
+		.replace(/(\d)(\d\d\d)(\d\d\d) /, '$1 $2 $3 ')  // if it's got a LOT of digits
+		.replace(/(\d)(\d\d\d) /, '$1 $2 ')  // another three digits
+}
+
+// testing
+if (false) {
+	for (let b = 1; b < 1e20; b *= 10) {
+		console.log(thousands(b));
+		console.log(thousands(b + .1));
+	}
+}
