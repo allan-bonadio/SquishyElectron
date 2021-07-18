@@ -1,3 +1,8 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 import PropTypes from 'prop-types';
 
 import MiniGraph from './MiniGraph';
@@ -6,9 +11,9 @@ function setPT() {
 	SetPotentialTab.propTypes = {
 		setPotential: PropTypes.func.isRequired,
 
-		valleyPower: PropTypes.number.isRequired,
-		valleyScale: PropTypes.number.isRequired,
-		valleyOffset: PropTypes.number.isRequired,
+		valleyPower: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+		valleyScale: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+		valleyOffset: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 	};
 }
 
@@ -17,7 +22,7 @@ function ValleyPanel(props) {
 	const p = props;
 
 	function valleyFunc(x) {
-		 return p.valleyScale * (Math.abs(x - (p.valleyOffset / 50 - 1))) ** p.valleyPower
+		 return +p.valleyScale / 100 * (Math.abs(x - (+p.valleyOffset / 50 - 1))) ** +p.valleyPower
 	}
 
 	return <>
@@ -34,7 +39,7 @@ function ValleyPanel(props) {
 			<br/>
 			Scale:
 			<input className='scaleSlider' type="range"
-				min={-1} max={1} step={.01}
+				min={-10} max={10} step={.1}
 				value={p.valleyScale}
 				style={{width: '8em'}}
 				onInput={ev => p.setCPState({valleyScale: ev.currentTarget.value}) }
