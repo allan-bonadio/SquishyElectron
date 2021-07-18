@@ -1,3 +1,8 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 // we have an N element array for the psi values, indexed (sortof) by X,
 // whatever mins/maxes/increments, will be calculated.
 // Boundary conditions: each row will have N+2 elements, where the 0th and the

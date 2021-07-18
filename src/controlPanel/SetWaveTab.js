@@ -1,11 +1,15 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 import PropTypes from 'prop-types';
 
 function setPT() {
 	SetWaveTab.propTypes = {
 		setWave: PropTypes.func.isRequired,
 		setCircularFrequency: PropTypes.func.isRequired,
-		standingFrequency: PropTypes.func.isRequired,
-
+		//standingFrequency: PropTypes.func.isRequired,
 		standingFrequency: PropTypes.number.isRequired,
 		circularFrequency: PropTypes.number.isRequired,
 	};

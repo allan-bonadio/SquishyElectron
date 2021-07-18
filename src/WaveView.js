@@ -1,3 +1,8 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 
 import React from 'react';
 import {theDraw} from './wave/theWave';

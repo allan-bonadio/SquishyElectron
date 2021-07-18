@@ -1,11 +1,13 @@
 // wave.js and theJWave, draw and iterate are all about the internals of the wave.
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 // all of this is svg and d3, no react.
-//import {jSpace, jWave} from './wave';
-//import draw from './draw';
 import iterate from './iterate';
 import {qeSpace} from './qEngine';
 import qe from './qe';
-//import App from '../App';
 
 // the (old js) jWave that we're displaying and animating
 export let theJSpace;
@@ -92,7 +94,8 @@ function animateOneFrame(now) {
 	qe.updateToLatestWaveBuffer();
 
 	if (areBenchmarking) startUpdate = performance.now();
-	let highest = qe.updateViewBuffer();
+	//let highest =
+	qe.updateViewBuffer();
 	if (dumpTheViewBuffer) dumpViewBuffer();
 
 	if (areBenchmarking) startReload = performance.now();
