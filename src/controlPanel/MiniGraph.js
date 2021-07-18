@@ -1,4 +1,9 @@
 // small rectangular graph showing user what kind of wave or potential they're asking for
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 import PropTypes from 'prop-types';
 import {scaleLinear} from 'd3-scale';
 import {path} from 'd3-path';
@@ -64,7 +69,7 @@ function MiniGraph(props) {
 	if (p.yMax !== undefined) maxi = +p.yMax;
 
 	// figure out the scaling
-	const yScale = scaleLinear([mini - .2, maxi + .2], [0, p.height]);
+	const yScale = scaleLinear([mini - .2, maxi + .2], [p.height, 0]);  // upside down
 
 	let colorScale;
 	if (p.complex) {
