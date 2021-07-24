@@ -14,7 +14,7 @@ static void makeNewSpace(int32_t N, int32_t continuum, const char *label) {
 // how to check these: calculate the phase and the magnitude of each.  Magnitudes
 // should be about .2 for a 5-state wave.  Phases should be separated by 72° (=360/5)
 
-// july 5 2021
+// july 5 2021 - bunch of crap
 qCx july5Expected[7] = {
 	qCx(0.045880726689574651, -0.182224849951211909),
 	qCx(0.487437594505842064, -0.031982253127852210),
@@ -25,7 +25,7 @@ qCx july5Expected[7] = {
 	qCx(0.487437594505842064, -0.031982253127852210),
 };
 
-// an older version; dt = 0.1
+// an older but CORRECT version; dt = 0.1 and no lowPass or normalize
 qCx jun4Expected[7] = {
 	qCx( 0.07809841578326204, -0.44036220853561392),
 	qCx( 0.44294308566870949, -0.06180339887498949),
