@@ -8,12 +8,13 @@
 const prefixes = [
 	// e-24 thru e-3
 	'y', 'z', 'a', 'f', 'p', 'n', 'µ', 'm',
+
 	'',
 
 	// e3, kilo, to e24,
 	'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y',
 ];
-const prefixMid = 8;
+const prefixMid = prefixes.indexOf('');
 
 // return a string for this real number, with greek/roman suffixes for the exponent
 function toSiPieces(f) {
@@ -27,7 +28,7 @@ function toSiPieces(f) {
 }
 
 // return a string for this real number, with greek/roman suffixes for the exponent
-function toSiPrefix(f, nDigits) {
+export function toSiPrefix(f, nDigits) {
 	const pieces = toSiPieces(f);
 
 	return pieces.mantissa.toPrecision(nDigits) + pieces.prefix;
@@ -39,6 +40,8 @@ function toSiPrefix(f, nDigits) {
 //}
 
 /* ********************************** thousands() */
+
+// take number (str or num) passed in, and depict it with spaces as thousands  separators
 export function thousands(num) {
 	return num.toString()
 		.replace(/(\d)(\d\d\d)$/, '$1 $2')  // if it's  an integer at end of string
