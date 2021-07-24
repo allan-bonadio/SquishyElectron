@@ -60,13 +60,14 @@ function ValleyPanel(props) {
 
 			<button type='button' className='valleyVoltageButton round'
 				onClick={ev => p.setPotential('valley', p.valleyPower, p.valleyScale, p.valleyOffset)} >
-					Set Valley Potential
+					Set to Valley Potential
 			</button>
-
 		</div>
 		<div className='valleyMiniGraph'>
-			<MiniGraph xMin={-2} xMax={2} yFunction={x => valleyFunc(x)} />
+			<MiniGraph xMin={-2} xMax={2} yFunction={x => valleyFunc(x)}
+			width={200} height={100} />
 		</div>
+		<div style={{clear: 'left'}}></div>
 	</>;
 }
 
@@ -78,7 +79,7 @@ function SetPotentialTab(props) {
 			<h3>Set Potential</h3>
 			<button type='button' className='zeroVoltageButton round'
 				onClick={ev => p.setPotential('zero')}>
-					Set Zero (flat) Potential
+					Set to Flat Potential
 			</button>
 
 		</div>

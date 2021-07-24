@@ -20,13 +20,22 @@
 	float: none;
 }
 
+.CPToolbar .frameRateBox {
+	display: inline-block;
+	margin-left: .5em;
+}
+
+.CPToolbar .rateSelector {
+	background-color: transparent;
+	color: #eee;
+}
 
 .CPToolbar .toolbarGradient {
 	background: linear-gradient(#889, #dcd 20%, #ccd 25%, #cdd 30%, #223);
 	display: inline-block;
-	font-size: 3em;
+	font-size: 2em;
 	padding: .1em .5em .2em;
-	margin: .1em 0;
+	margin: .1em .3em;
 	line-height: 1.3em;
 	border: none;
 }
@@ -38,10 +47,6 @@
 
 .CPToolbar button.toolbarButton:active {
 	color: #000;
-}
-
-.CPToolbar .toolbarSpacer {
-	width: .1em;
 }
 
 .CPToolbar .startStopToggle {
@@ -116,11 +121,6 @@ button.stopButton div {
 	top: .125em
 }
 
-.rateSelector {
-	background-color: transparent;
-	color: #eee;
-}
-
 /* **************************************** Tab bar & Tabs */
 
 /* the bar */
@@ -155,7 +155,7 @@ ul.TabBar li.selected {
 
 .tabFrame {
 	border: inset #abc 2px;
-	padding: .5em;
+	padding: .2em .5em;
 	color: #222;
 	background-color: #eef;
 	margin-left: -.2em;
@@ -163,12 +163,14 @@ ul.TabBar li.selected {
 
 .MiniGraph {
 	border: #888 solid 1px;
+	background: #222;
 }
 
 /* **************************************** Set Potential panel */
 
 .setPotentialTab {
-	width: calc( 28em + 200px );
+	width: calc( 30em + 200px );
+	height: 8em;
 }
 
 .potentialTitlePanel {
@@ -177,7 +179,8 @@ ul.TabBar li.selected {
 }
 
 .setPotentialTab .divider {
-	flex: 1 0 1em;
+	float: left;
+	height: 6em;
 	border-left: 1px #888 solid;
 	margin: 1em .5em;
 }
