@@ -1,6 +1,5 @@
-// small rectangular graph showing user what kind of wave or potential they're asking for
 /*
-** blah blah -- like a source file for Squishy Electron
+** Mini Graph -- small rectangular graph showing user what kind of wave or potential they're asking for
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
@@ -43,9 +42,27 @@ function setPT() {
 	};
 }
 
+//  sets value for this pt.  returns magn.
+const calcOnePoint = {
+	// p is props, y is real.  eg for potential.
+	linear: function(values, xPx, y) {
+		values[xPx] = {x: xPx, y};
+		return y;
+	}
+
+	// y is a qCx object.  eg for wave.  sets value for this pt.  returns magn.
+	complex: function(values, xPx, y) {
+		values[xPx] = {x: xPx, ...y};
+		return y.re * y.re + y.im * y.im;
+	}
+};
+
 function MiniGraph(props) {
 	const p = props;
 	let viewBox = `0 0 ${+p.width} ${+p.height}`;
+
+	// this tells whether it's a 'linear' graph vs  "complex" graph
+	let yType;
 
 	// calculate all and find extents
 	const xScale = scaleLinear([+p.xMin, +p.xMax], [0, p.width]);
@@ -54,25 +71,38 @@ function MiniGraph(props) {
 	for (let xPx = 0; xPx <= +p.width; xPx++) {
 		let x = xScale.invert(xPx);
 		let y = p.yFunction(x);
-		let magn = y;
-		if (typeof y == 'object') {
-			values[xPx] = {x: xPx, ...y};
-			magn = y.re * y.re + y.im * y.im;
-		}
-		else {
-			values[xPx] = {x: xPx, y};
-		}
+		if (!yType)
+			yType = (typeof y == 'object')
+				? 'complex'
+				: 'linear';
+		let magn = calcOnePoint[yType](values, xPx, y);
+
+
+//		let magn = y;
+//		if (isComplex) {
+//			values[xPx] = {x: xPx, ...y};
+//			magn = y.re * y.re + y.im * y.im;
+//		}
+//		else {
+//			values[xPx] = {x: xPx, y};
+//		}
+
+
 		if (magn < mini) mini = magn;
 		if (magn > maxi) maxi = magn;
 	}
 	if (p.yMin !== undefined) mini = +p.yMin;
 	if (p.yMax !== undefined) maxi = +p.yMax;
 
-	// figure out the scaling
-	const yScale = scaleLinear([mini - .2, maxi + .2], [p.height, 0]);  // upside down
+	// figure out the scaling -
+	const yScale = scaleLinear(
+		[mini - .2, maxi + .2],  // domain fits the data, plus a small margin at the edges
+		[p.height, 0]);  // upside down to the screen space in the svg
 
-	let colorScale;
-	if (p.complex) {
+
+
+	let colorScale = '#fff';  // if scalar
+	if (isComplex) {
 		colorScale = scaleLinear([0, 1, 2, 3, 4, 5, 6],
 					['#f00', '#ff0', '#0f0', '#0ff', '#00f', '#f0f', '#f00']);
 	}
@@ -96,7 +126,7 @@ function MiniGraph(props) {
 						preserveAspectRatio='none' >
 
 		<g className='line-paths'>
-			<path d={d} stroke='#f80' fill='none' />
+			<path d={d} stroke={colorScale} fill='none' />
 		</g>
 
 	</svg>;
