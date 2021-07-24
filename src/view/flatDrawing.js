@@ -1,3 +1,8 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 import abstractDrawing from './abstractDrawing';
 import {cxToColorGlsl} from './cxToColor.glsl';
 import qe from '../wave/qe';
@@ -51,7 +56,7 @@ let ps = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
 
 // make the line number for the start a multiple of 10
 const vertexSrc = `${cxToColorGlsl}
-#line 122
+#line 154
 varying highp vec4 vColor;
 attribute vec4 row;
 uniform float barWidth;
@@ -101,12 +106,6 @@ void main() {
 // the original display that's worth watching
 class flatDrawing extends abstractDrawing {
 
-	constructor(view, space) {
-		super(view, space);
-		//view.drawings.push(this);
-		//this.view = view;
-	}
-
 	static drawingClassName: 'flatDrawing';
 	drawingClassName: 'flatDrawing';
 
@@ -119,7 +118,8 @@ class flatDrawing extends abstractDrawing {
 
 
 	setInputs() {
-		const highest = qe.updateViewBuffer();
+		//const highest =
+		qe.updateViewBuffer();
 
 		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
 		let nPoints = this.nPoints = this.space ? this.space.nPoints : 10;
@@ -127,7 +127,8 @@ class flatDrawing extends abstractDrawing {
 		barWidthUniform.setValue(barWidth, '1f');
 
 		let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
-		this.unitHeight = 1;
+		let nStates = this.nStates = this.space ? this.space.nStates : 10;
+		this.unitHeight = nStates / 4;
 		unitHeightUniform.setValue(this.unitHeight, '1f');
 
 		this.rowAttr = new viewAttribute('row', this);

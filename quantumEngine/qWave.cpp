@@ -1,3 +1,8 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 #include "qSpace.h"
 #include <cmath>
 
@@ -42,9 +47,10 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 void dumpThatWave(qDimension *dim, qCx *wave, bool withExtras) {
 	int ix;
 
-// somehow, commenting out these lines fixes the nan problem
-//	if (dim->continuum) printf(" [O]=(%8.4lf, %8.4lf)",
-//		wave[0].re, wave[0].im);
+	// somehow, commenting out these lines fixes the nan problem.
+	// but the nan problem doesn't happen on flores?
+	if (dim->continuum) printf(" [O]=(%8.4lf, %8.4lf)",
+		wave[0].re, wave[0].im);
 
 	for (ix = dim->start; ix < dim->end; ix++) {
 		qReal re = wave[ix].re;
@@ -182,17 +188,19 @@ void qWave::lowPassFilter(void) {
 	qDimension *dims = this->space->dimensions;
 
 	// not sure we need this this->prune();
+	this->fixBoundaries();
 
 	// average each point with the neighbors; ¼ for each neightbor, ½ for the point itself
 	// drag your feet on setting the new value in so it doesn't interfere
 	for (int ix = dims->start; ix < dims->end; ix++) {
-		if ((ix && ix < dims->N - 1)) {
-			avg = (wave[ix-1] + wave[ix] * 2. + wave[ix+1]) / 4.;
-			wave[ix-1] = d2prev;
-			d2prev = avg;
-		}
+		avg = (wave[ix-1] + wave[ix] * 2. + wave[ix+1]) / 4.;
+		// printf("filtering %d  d2prev=(%lf,%lf)  avg=(%lf,%lf)",
+		// 	ix, d2prev.re, d2prev.im, avg.re, avg.im);
+		wave[ix-1] = d2prev;
+		d2prev = avg;
+		//this->dumpWave("low pass filtering", true);
 	}
-	// do this separately this->normalize();
+	wave[dims->N] = d2prev;
 }
 
 
@@ -261,7 +269,9 @@ void qWave::setPulseWave(qReal widthFactor, qReal cycles) {
 	for (int ix = dims->start; ix < dims->end; ix++)
 		wave[ix] *= exp(-(ix - peak) * (ix - peak) / stdDev);
 
+	theQWave->dumpWave("just did PulseWave", true);
 	this->normalize();
+	theQWave->dumpWave("normalized PulseWave", true);
 }
 
 

@@ -1,6 +1,8 @@
 /*
 ** q complex - complex and other types we use all over
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
+
 
 #include <emscripten.h>
 #include <stdlib.h>

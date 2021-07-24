@@ -1,3 +1,7 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
 
 import abstractDrawing from './abstractDrawing';
 import qe from '../wave/qe';
@@ -63,12 +67,6 @@ void main() {
 // the original display that's worth watching
 class potentialDrawing extends abstractDrawing {
 
-	constructor(view, space) {
-		super(view, space);
-		//view.drawings.push(this);
-		//this.view = view;
-	}
-
 	static drawingClassName: 'potentialDrawing';
 	drawingClassName: 'potentialDrawing';
 
@@ -81,7 +79,8 @@ class potentialDrawing extends abstractDrawing {
 
 
 	setInputs() {
-		const highest = qe.updateViewBuffer();
+		//const highest =
+		qe.updateViewBuffer();
 
 		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
 		let nPoints = this.nPoints = this.space.nPoints;

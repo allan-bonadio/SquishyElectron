@@ -1,3 +1,8 @@
+/*
+** Potential Area -- the white potential line, and its tactile
+**	      interactions when the user moves it.  for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
 
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -5,14 +10,11 @@ import PropTypes from 'prop-types';
 import qe from './wave/qe';
 import PropTypes from 'prop-types';
 
-import {qeSpace} from './wave/qEngine';  // makes it owrk?
+import {qeSpace} from './wave/qEngine';
 
 /* This draws the white potential line, and handels interaction
-	when the user moves it.
+
 */
-
-const INITIAL_POTENTIAL_STRETCH = 2;
-
 
 /* *************************************************** potential click & drag */
 
@@ -26,8 +28,6 @@ export class PotentialArea extends React.Component {
 		super(props);
 
 		this.state = {
-			vertPotentialStretch: INITIAL_POTENTIAL_STRETCH,  // always a power of  2
-
 			// we increment this in lieu of storing the whole potential in the state
 			changeSerial: 0,
 		};

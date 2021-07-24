@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-//import './index.css';
 import ErrorBoundary from './ErrorBoundary';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -10,7 +9,7 @@ ReactDOM.render(
 		<ErrorBoundary howToRecover={errorMsg => {
 			// just reload the page, dude
 			debugger;
-			window.location = window.location;  // reload page??
+			//window.location = window.location;  // reload page??
 		}}>
 			<App />
 		</ErrorBoundary>

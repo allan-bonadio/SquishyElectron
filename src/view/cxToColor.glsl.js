@@ -1,3 +1,8 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 // line numbers should correspond!  Be careful how many lines this is!
 export const cxToColorGlsl = `
 float sqrtOneThird = sqrt(1. / 3.);  // 0.57735..

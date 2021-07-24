@@ -1,3 +1,8 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -16,7 +21,7 @@ import SquishDialog from './SquishDialog';
 // 30=1000, 27=500, 23=>200, 20=>100, 13=>20, 10=>10 /*!!!*/, 7=>5
 // note 11=>12.5=>13 so start at 12 => 16, although it'll round up and always be an integer
 const MIN_SLIDER_RES = process.env.NODE_ENV == 'development' ? 0 : 12;
-const MAX_SLIDER_RES = 60;
+const MAX_SLIDER_RES = 30;
 
 // list of settings that are more better - not that simple!
 function createGoodPowersOf10() {
@@ -236,14 +241,6 @@ export default class ResolutionDialog extends React.Component {
 
 				<h3>Reconfigure the Universe</h3>
 
-				<p>
-					The actual universe is essentially infinite.
-					Nobody's computer has that much ram or power.
-					Squishy Electron's universe runs on a finite web page.
-					The universe where all this happens is very simplified.
-					You can recreate it here, if you want, with different settings.
-				</p>
-
 				<section className='dialogSection'>
 					{this.renderSlider()}
 				</section>
@@ -275,8 +272,3 @@ export default class ResolutionDialog extends React.Component {
 	}
 }
 
-
-
-
-//: {
-//:</td><td>{

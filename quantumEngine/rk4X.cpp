@@ -10,12 +10,13 @@
 // dx is always 1.  dt is below.
 static const qReal dt = 0.02;
 
+// when the Planck constant is expressed in SI units, it has the exact value
+// h = 6.62607015×10−34 J⋅sec
+
+
 // if they're really over i, they should be negative, right?
 static const qCx dtOverI = qCx(0., -dt);
 static const qCx halfDtOverI = qCx(0., -dt / 2.);
-
-// when the Planck constant is expressed in SI units, it has the exact value
-// h = 6.62607015×10−34 J⋅sec
 
 // calculate deriv / dt down the entire wave,
 // generating increments from fromWave to nextYWave and sumWave.
@@ -24,12 +25,9 @@ static const qCx halfDtOverI = qCx(0., -dt / 2.);
 // note how time is not an input to the hamiltonian - right now at least.
 // factor = 1/3 or 1/6, see NumRecFort p552.
 void waveDDT(qDimension *dim,
-			qWave *origQWave, qWave *fromQWave, qWave *nextYQWave,
+			qCx *origWave, qCx *fromWave, qCx *nextYWave,
 			qReal nextYFactor, qReal sumFactor) {
-	qCx *origWave = origQWave->buffer;
-	qCx *fromWave = fromQWave->buffer;
-	qCx *nextYWave = nextYQWave->buffer;
-	fromQWave->fixBoundaries(); // always before hamiltonian
+	dim->fixBoundaries(fromWave); // always before hamiltonian
 	for (int ix = dim->start; ix < dim->end; ix++) {
 		qCx dPsi = hamiltonian(fromWave, ix) * dtOverI * nextYFactor;
 		qCheck(dPsi);
@@ -47,26 +45,26 @@ void waveDDT(qDimension *dim,
 // I'll figure out how to minimize the number of buffers later.
 void qSpace::oneRk4Step(void) {
 	qDimension *dim = theSpace->dimensions;
-	theQWave->fixBoundaries();
+	dim->fixBoundaries(theWave);
 
 	// the sumwave collects the k1/6 + k2/3 ... from p552
 	for (int ix = dim->start; ix < dim->end; ix++)
 		sumWave[ix] = qCx(0);
 
-	theQWave->dumpWave("theWave ");
+	this->dumpWave("theWave ", theWave);
 
 	// always start from theWave.  I need (nextYWave = k_1/2) and (sumWave += k_1/6)
 	// into two separate wave buffers.  waveDDT() does both.
-	waveDDT(dim, theQWave, theQWave, k1QWave, 1./2., 1./6.);
-	k1QWave->dumpWave("after k1, k1Wave ");
+	waveDDT(dim, theWave, theWave, k1Wave, 1./2., 1./6.);
+	this->dumpWave("after k1, k1Wave ", k1Wave);
 
 	// same for the steps on p551
-	waveDDT(dim, theQWave, k1QWave, k2QWave, 1./2., 1./3.);
-	k2QWave->dumpWave("after k2 ");
-	waveDDT(dim, theQWave, k2QWave, k3QWave, 1./2., 1./3.);
-	k3QWave->dumpWave("after k3 ");
-	waveDDT(dim, theQWave, k3QWave, k4QWave, 1., 1./6.);
-	k4QWave->dumpWave("after k4 ");
+	waveDDT(dim, theWave, k1Wave, k2Wave, 1./2., 1./3.);
+	this->dumpWave("after k2 ", k2Wave);
+	waveDDT(dim, theWave, k2Wave, k3Wave, 1./2., 1./3.);
+	this->dumpWave("after k3 ", k3Wave);
+	waveDDT(dim, theWave, k3Wave, k4Wave, 1., 1./6.);
+	this->dumpWave("after k4 ", k4Wave);
 
 	// now we have our dPsi, correct to  4th order, theoretically
 	for (int ix = dim->start; ix < dim->end; ix++)
@@ -97,7 +95,7 @@ void qSpace::oneRk4Step(void) {
 	// sumWave = theWave;
 	// theWave = t;
 
-	theQWave->fixBoundaries();
+	dim->fixBoundaries(theWave);
 
 	//printf("done with rk2: \n");
 	//for (int ix = 0; ix <= dim->end; ix++)

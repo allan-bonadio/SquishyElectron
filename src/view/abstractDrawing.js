@@ -1,3 +1,8 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
 import {viewUniform, viewAttribute} from './viewVariable';
 
 // superclass of all drawings.  A drawing is a piece of code that draws one thing on
@@ -105,6 +110,8 @@ export class abstractDrawing {
 		this.aPointAttr = new viewAttribute('aPoint', this);
 		this.aPoint = new Float32Array([0, 0, 0., 1.]);
 		this.aPointAttr.attachArray(this.aPoint, 4);
+
+		this.aPointAttr = new viewUniform('aNumber', this);
 	}
 
 
