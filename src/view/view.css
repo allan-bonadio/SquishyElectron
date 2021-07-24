@@ -23,16 +23,12 @@ aside.viewOverlay {
 	border: '1px #0000 solid';
 }
 
-.northWestWrapper {
+.northWestWrapper, .northEastWrapper {
 	position: absolute;
-	left: .5em;
 	top: .5em;
 	z-index: 10;
+	text-shadow: 1px 1px 3px #000f;
 }
 
-.northEastWrapper {
-	position: absolute;
-	right: .5em;
-	top: .5em;
-	z-index: 10;
-}
+.northWestWrapper { left: .5em; }
+.northEastWrapper { right: .5em; }

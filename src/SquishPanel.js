@@ -220,6 +220,10 @@ export class SquishPanel extends React.Component {
 			this.startDraw = performance.now();
 			qe.theCurrentView.draw();
 
+			// populate the on-screen numbers
+			document.querySelector('.voNorthWest').innerHTML = qe.qSpace_getElapsedTime().toFixed(2);
+			document.querySelector('.voNorthEast').innerHTML = qe.qSpace_getIterateSerial();
+
 			// print out benchmarks
 			this.endFrame = performance.now();
 			if (areBenchmarking) {
@@ -354,6 +358,7 @@ export class SquishPanel extends React.Component {
 			throw `setWave: no jWave breed '${breed}'`
 		}
 
+		qe.updateViewBuffer();
 		this.iterateOneFrame(false, true);
 	}
 
@@ -370,6 +375,7 @@ export class SquishPanel extends React.Component {
 		default:
 			throw `setPotential: no voltage breed '${breed}'`
 		}
+		qe.updateViewBuffer();
 		this.iterateOneFrame(false, true);
 	}
 
