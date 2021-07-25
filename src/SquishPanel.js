@@ -355,7 +355,7 @@ export class SquishPanel extends React.Component {
 			break;
 
 		default:
-			throw `setWave: no jWave breed '${breed}'`
+			throw `setWave: no vave breed '${breed}'`
 		}
 
 		qe.updateViewBuffer();

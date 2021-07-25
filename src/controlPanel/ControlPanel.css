@@ -162,7 +162,14 @@ ul.TabBar li.selected {
 }
 
 .tabFrame h3 {
-	margin: .2em 0;
+	margin: .2em;
+}
+.tabFrame h4 {
+	margin: .2em;
+	display: inline-block;
+
+	width: 6em;
+	text-align: right;
 }
 
 .MiniGraph {
@@ -172,6 +179,20 @@ ul.TabBar li.selected {
 
 /* **************************************** Set Wave tab */
 
+/* a column in the SetWave band */
+.waveTabCol {
+	float: left;
+	text-align: right;
+	padding: 0 .5em;
+}
+
+.waveTabCol input {
+	display: inline;
+}
+
+.waveTabCol .selected {
+	background: #ccf;
+}
 
 /* **************************************** Set Potential tab */
 
@@ -202,7 +223,11 @@ ul.TabBar li.selected {
 	width: 200px;
 }
 
-/* **************************************** Set Resolution dialog */
+/* **************************************** Set Resolution tab/dialog */
+
+.setResolutionButton {
+	float: right;
+}
 
 /* button in control panel */
 .setResolutionOKButton {

@@ -58,6 +58,7 @@ const potentialRecipe = {
 	// generate React nodes of svg objects, return them, like render
 	// xmin/max are sides of the graph; min/,maxY are autoranged based on data
 	render(values, xMin, xMax, minY, maxY, height) {
+		//absolute potential doesn't matter - just relative changes.  hence autorange.
 		const yScale = scaleLinear(
 			[minY - .2, maxY + .2],  // domain fits the data, plus a small margin at the edges
 			[height, 0]);  // upside down to the screen space in the svg
@@ -117,7 +118,8 @@ const waveRecipe = {
 			let angle = Math.atan2(val.im, val.real);
 			angle = complexColorScale(angle);  // stroke color
 			let magn = yScale(val.magn).toFixed(2)
-			return <path  d={`M${val.x},0V${magn}`} stroke={angle} fill='none' />
+			return <path  d={`M${val.x},0V${magn}`} stroke={angle} fill='none'
+				key={val.x}/>
 		})
 	}
 }

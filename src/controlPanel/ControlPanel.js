@@ -46,6 +46,8 @@ export class ControlPanel extends React.Component {
 			waveBreed: 'circular',
 			standingFrequency: 1,
 			circularFrequency: 1,
+			pulseWidth: 5,
+
 
 			// state for potential resets - control panel only, setPotential()
 			potentialBreed: 'flat',
