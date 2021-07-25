@@ -74,7 +74,7 @@ void qSpace::oneRk2Step(void) {
 
 //	theQWave->lowPassFilter();
 //
-//	theQWave->dumpWave("after low pass theWave", true);
+	theQWave->dumpWave("at end of rk2", true);
 }
 
 /* ************************************************** benchmarking */

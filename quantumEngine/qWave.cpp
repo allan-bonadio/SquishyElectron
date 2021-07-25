@@ -266,8 +266,10 @@ void qWave::setPulseWave(qReal widthFactor, qReal cycles) {
 	// modulate with a gaussian
 	int peak = lround(dims->N * widthFactor) % dims->N;  // ?? i dunno
 	qReal stdDev = dims->N * widthFactor / 2.;  // ?? i'm making this up
-	for (int ix = dims->start; ix < dims->end; ix++)
-		wave[ix] *= exp(-(ix - peak) * (ix - peak) / stdDev);
+	for (int ix = dims->start; ix < dims->end; ix++) {
+		int del = ix - peak;
+		wave[ix] *= exp(-del * del / stdDev);
+	}
 
 	theQWave->dumpWave("just did PulseWave", true);
 	this->normalize();
