@@ -22,6 +22,7 @@ function ValleyPanel(props) {
 	const p = props;
 
 	function valleyFunc(x) {
+		// this is scale * (x-offset) ** power where + converts a string to a number
 		 return +p.valleyScale / 100 * (Math.abs(x - (+p.valleyOffset / 50 - 1))) ** +p.valleyPower
 	}
 

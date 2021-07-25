@@ -161,12 +161,19 @@ ul.TabBar li.selected {
 	margin-left: -.2em;
 }
 
+.tabFrame h3 {
+	margin: .2em 0;
+}
+
 .MiniGraph {
 	border: #888 solid 1px;
 	background: #222;
 }
 
-/* **************************************** Set Potential panel */
+/* **************************************** Set Wave tab */
+
+
+/* **************************************** Set Potential tab */
 
 .setPotentialTab {
 	width: calc( 30em + 200px );

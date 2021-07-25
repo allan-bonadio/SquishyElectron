@@ -140,9 +140,9 @@ export class ControlPanel extends React.Component {
 		if (s.showingTab == 'wave') {
 			showingTab = <SetWaveTab
 				setWave={p.setWave}  breed={s.waveBreed}
-				circularFrequency={s.circularFrequency}
+				circularFrequency={+s.circularFrequency}
 				setCircularFrequency={freq => this.setCircularFrequency(freq)}
-				standingFrequency={s.standingFrequency}
+				standingFrequency={+s.standingFrequency}
 				setStandingFrequency={freq => this.setStandingFrequency(freq)} />;
 		}
 		else if (s.showingTab == 'potential') {
