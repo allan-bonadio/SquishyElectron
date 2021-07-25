@@ -190,10 +190,10 @@ export default class ResolutionDialog extends React.Component {
 			const radioz = [];
 			for (let vuName in viewz) {
 				const vu = viewz[vuName];
-				console.log(`doin this vu:`, vu.viewClassName);
-				console.dir(vu);
-				console.log(`   typeof:`, typeof vuName, typeof vu);
-				console.log(`   names:`, vu.viewClassName, vu.viewClassName, vu.name);
+				//console.log(`doin this vu:`, vu.viewClassName);
+				//console.dir(vu);
+				//console.log(`   typeof:`, typeof vuName, typeof vu);
+				//console.log(`   names:`, vu.viewClassName, vu.viewClassName, vu.name);
 				radioz.push(<label key={vu.viewClassName}>
 					<input type='radio' key={vu.viewClassName} name='viewClassName'
 						value={vu.viewClassName}
