@@ -43,7 +43,7 @@ const DEFAULT_VIEW_CLASS_NAME =
 //'flatViewDef';
 'flatDrawingViewDef';
 
-const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 5;
+const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 25;
 const DEFAULT_CONTINUUM = qeSpace.contENDLESS;
 
 
