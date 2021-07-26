@@ -13,7 +13,7 @@ void handleEachPt(qCx psi, int ix) {
 }
 
 void run_wave_tests(void) {
-	printf("::::::::::::::::::::::::::::::::::::::: wave tests\n");
+	printf(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: wave tests\n");
 
 	//  creating/
 	startNewSpace();

@@ -20,7 +20,7 @@ void verify(qCx actual, qCx expected, const char *msg) {
 #define VERIFY(actual, expected)  verify(actual, expected, #actual)
 
 void run_qCx_tests(void) {
-	printf("::::::::::::::::::::::::::::::::::::::: qCx tests\n");
+	printf(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: qCx tests\n");
 
 	/* ********************************************* constructor */
 

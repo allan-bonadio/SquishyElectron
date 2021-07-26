@@ -43,36 +43,52 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 
 }
 
+// if it overflows the buffer, screw it.  just dump a row for a cx datapoint.
+static void dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtras) {
+	qReal re = w.re;
+	qReal im = w.im;
+	if (withExtras) {
+		qReal mag = re * re + im * im;
+		qReal phase = atan2(im, re) * 180 / PI;
+		qReal dPhase = phase - *pPrevPhase + 360.;
+		while (dPhase > 360.) dPhase -= 360.;
+
+		sprintf(buf, "[%d] (%8.4lf,%8.4lf) | %8.2lf %8.2lf %8.4lf",
+			ix, re, im, phase, dPhase, mag);
+		*pPrevPhase = phase;
+	}
+	else {
+		sprintf(buf,"[%d] (%8.4lf,%8.4lf)", ix, re, im);
+	}
+}
+
 // NOT a member function; this is wave and space independent
-void dumpThatWave(qDimension *dim, qCx *wave, bool withExtras) {
+static void dumpThatWave(qDimension *dim, qCx *wave, bool withExtras) {
 	int ix;
+	char buf[100];
+	double prevPhase = 0.;
 
 	// somehow, commenting out these lines fixes the nan problem.
 	// but the nan problem doesn't happen on flores?
-	if (dim->continuum) printf(" [O]=(%8.4lf, %8.4lf)",
-		wave[0].re, wave[0].im);
-
-	for (ix = dim->start; ix < dim->end; ix++) {
-		qReal re = wave[ix].re;
-		qReal im = wave[ix].im;
-		if (withExtras) {
-			qReal mag = re * re + im * im;
-			qReal phase = atan2(im, re) * 180 / PI;
-
-			printf("\n[%d] (%8.4lf,%8.4lf) | %8.2lf %8.4lf", ix, re, im, phase, mag);
-
-		}
-		else {
-			printf("\n[%d] (%8.4lf,%8.4lf) ", ix, re, im);
-		}
+	if (dim->continuum) {
+		dumpRow(buf, ix, wave[0], &prevPhase, withExtras);
+		printf("%s", buf);
 	}
 
-	if (dim->continuum) printf("\nend [%d]=(%8.4lf, %8.4lf)",
-		ix, wave[ix].re, wave[ix].im);
+	for (ix = dim->start; ix < dim->end; ix++) {
+		dumpRow(buf, ix, wave[ix], &prevPhase, withExtras);
+		printf("\n%s", buf);
+	}
+
+	if (dim->continuum) {
+		dumpRow(buf, ix, wave[dim->end], &prevPhase, withExtras);
+		printf("\nend %s", buf);
+	}
+
 	printf("\n");
 }
 
-// this is the member function that uses its own wave and space
+// this is the member function that dumps its own wave and space
 void qWave::dumpWave(const char *title, bool withExtras) {
 	printf("\n== Wave | %s", title);
 	dumpThatWave(this->space->dimensions, this->buffer, withExtras);
@@ -180,9 +196,13 @@ void qWave::normalize(void) {
 }
 
 // average the wave's points with the two closest neighbors to fix the divergence
-// along the x axis I always see.  Since the thickness of our mesh is finite,
+// along the x axis I always see.  Since the density of our mesh is finite,
 // you can't expect noise at or near the frequency of the mesh to be meaningful.
-void qWave::lowPassFilter(void) {
+// dilution works like this: formerly 1/2, it's the fraction of the next point
+// that comes from the avg of the two neighboring points.
+// Changes the wave in-place
+void qWave::lowPassFilter(double dilution) {
+	printf("qWave::lowPassFilter(%5.3lf)\n", dilution);
 	qCx *wave = this->buffer;
 	qCx avg, d2prev = wave[0];
 	qDimension *dims = this->space->dimensions;
@@ -192,10 +212,13 @@ void qWave::lowPassFilter(void) {
 
 	// average each point with the neighbors; ¼ for each neightbor, ½ for the point itself
 	// drag your feet on setting the new value in so it doesn't interfere
+	double concentration = 1. - dilution;
 	for (int ix = dims->start; ix < dims->end; ix++) {
-		avg = (wave[ix-1] + wave[ix] * 2. + wave[ix+1]) / 4.;
+		avg = (wave[ix-1] + wave[ix+1]) * dilution +  wave[ix] * concentration;
 		// printf("filtering %d  d2prev=(%lf,%lf)  avg=(%lf,%lf)",
 		// 	ix, d2prev.re, d2prev.im, avg.re, avg.im);
+
+		// put new number back, etcept one point behind so you don't need a separate buffer
 		wave[ix-1] = d2prev;
 		d2prev = avg;
 		//this->dumpWave("low pass filtering", true);
@@ -225,9 +248,9 @@ void qWave::setCircularWave(qReal n) {
 		// either of these will fix it
 //		printf("the circular wave: angle, magn, re, im: %lf %lf %lf %lf\n",
 //			angle, wave[ix].re*wave[ix].re + wave[ix].im*wave[ix].im, wave[ix].re, wave[ix].im);
-		printf("quality conrol: %lf %lf %lf\n", angle * 180./PI, cos(angle), sin(angle));
+		//printf("setCircularWave: %lf %lf %lf\n", angle * 180./PI, cos(angle), sin(angle));
 	}
-	dumpThatWave(dims, wave, true);
+	//dumpThatWave(dims, wave, true);
 	this->normalize();
 	this->dumpWave("after set sircular & normalize", true);
 }
@@ -252,9 +275,10 @@ void qWave::setStandingWave(qReal n) {
 		wave[ix] = qCx(sin(dAngle * (ix - start)));
 	}
 	this->normalize();
+	this->dumpWave("after set standing & normalize", true);
 }
 
-// widthFactor is number of points wide it is, fraction of N.
+// widthFactor is fraction of total width the packet it is, 0.0-1.0, for a fraction of N.
 // Cycles is how many circles (360°) it goes thru in that width.
 void qWave::setPulseWave(qReal widthFactor, qReal cycles) {
 	qCx *wave = this->buffer;
@@ -263,7 +287,7 @@ void qWave::setPulseWave(qReal widthFactor, qReal cycles) {
 	// start with a real wave
 	this->setCircularWave(cycles / widthFactor);
 
-	// modulate with a gaussian
+	// modulate with a gaussian, centered at the peak, with stdDev like the real one within some factor
 	int peak = lround(dims->N * widthFactor) % dims->N;  // ?? i dunno
 	qReal stdDev = dims->N * widthFactor / 2.;  // ?? i'm making this up
 	for (int ix = dims->start; ix < dims->end; ix++) {
