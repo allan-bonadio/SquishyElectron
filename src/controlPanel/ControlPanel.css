@@ -194,6 +194,12 @@ ul.TabBar li.selected {
 	background: #ccf;
 }
 
+.waveTabCol.middle  label {
+	display: block;
+	text-align: right;
+}
+
+
 /* **************************************** Set Potential tab */
 
 .setPotentialTab {

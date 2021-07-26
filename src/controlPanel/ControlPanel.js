@@ -44,9 +44,9 @@ export class ControlPanel extends React.Component {
 
 			// state for the wave resets - these are control-panel only.  Only goes into effect if we call setWave()
 			waveBreed: 'circular',
-			standingFrequency: 1,
 			circularFrequency: 1,
-			pulseWidth: 5,
+			pulseWidth: .05,
+			pulseOffset: .05,
 
 
 			// state for potential resets - control panel only, setPotential()
@@ -120,12 +120,12 @@ export class ControlPanel extends React.Component {
 
 
 	/* ********************************************** wave & pot */
-	setStandingFrequency(newFreq) {
-		this.setState({standingFrequency: newFreq});
+	setCircularFrequency(circularFrequency) {
+		this.setState({circularFrequency});
 	}
 
-	setCircularFrequency(newFreq) {
-		this.setState({circularFrequency: newFreq});
+	setPulseWidth(pulseWidth) {
+		this.setState({pulseWidth});
 	}
 
 	setCPState(obj) {
