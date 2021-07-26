@@ -27,6 +27,16 @@ static int dimsSoFar;
 // someday I need an C++ error handling layer.  See
 // https://emscripten.org/docs/porting/Debugging.html?highlight=assertions#handling-c-exceptions-from-javascript
 
+qSpace::qSpace(int nDims) {
+	this->nDimensions = nDims;
+	this->iterateSerial = 0;
+	this->elapsedTime = 0.;
+
+	// magic flags
+	this->doLowPass = true;
+	this->continuousLowPass = 0;
+}
+
 
 extern "C" {
 

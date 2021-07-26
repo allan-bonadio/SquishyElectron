@@ -71,11 +71,7 @@ const int contENDLESS = 2;
 
 struct qSpace {
 public:
-	qSpace(int nDims) {
-		this->nDimensions = nDims;
-		this->iterateSerial = 0;
-		this->elapsedTime = 0.;
-	}
+	qSpace(int nDims);
 
 	// potential energy as function of state; reals (not complex)
 	// otherwise same layout as wave
@@ -105,7 +101,15 @@ public:
 	qReal dt;
 	qCx dtOverI;
 	qCx halfDtOverI;
+
+	// set to N or whatever, count down, when you hhit zero, lowPass (sometimes)
 	int filterCount;
+
+	// true if you want rk to go through periodic lowpass or whatever filter
+	int doLowPass;
+
+	// zero = off.  true to do it every iteration a little and use value as dilution factor
+	qReal continuousLowPass;
 
 	// Dimensions are listed from outer to inner as with the resulting psi array:
 	// psi[outermost-dim][dim][dim][innermost-dim]
@@ -143,7 +147,7 @@ struct qWave {
 	void prune(void);
 	qReal innerProduct(void);
 	void normalize(void);
-	void lowPassFilter(void);
+	void lowPassFilter(double dilution = 0.5);
 
 	void setCircularWave(qReal n);
 	void setStandingWave(qReal n);

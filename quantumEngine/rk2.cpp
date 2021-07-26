@@ -53,28 +53,35 @@ void qSpace::oneRk2Step(void) {
 	theQWave->fixBoundaries();
 	//theQWave->dumpWave("almost done theWave", true);
 
-	//printf("done with rk2: \n");
-	//for (int ix = 0; ix <= dim->end; ix++)
-	//printf("qCx(%20.17lf, %20.17lf)\n", theWave[ix].re, theWave[ix].im);
+	if (this->continuousLowPass) {
+ 		theQWave->lowPassFilter(this->continuousLowPass);
+	}
 
-	this->elapsedTime += dt;
-	this->iterateSerial++;
-
-	if (--this->filterCount <= 0) {
-		printf("@@@ it's time for a filter %d %d\n", this->filterCount, this->nStates);
+	if (this->doLowPass && --this->filterCount <= 0) {
+		printf("\n@@@@@@ it's time for a filter %d %d  frame%1.0lf @@@@@@\n",
+			this->filterCount, this->nStates, this->iterateSerial);
 		//theQWave->dumpWave("filtering, starting", true);
- 		theQWave->lowPassFilter();
+ 		//theQWave->lowPassFilter();
 		//theQWave->dumpWave("filtering, after LP, before normalize", true);
  		theQWave->normalize();
 		//theQWave->dumpWave("filtering, after normalize", true);
 
-		this->filterCount = this->nStates;
+		// just a guess but this should depend on how wayward the wave has gotten.
+		this->filterCount = 100;
+		//this->filterCount = this->nStates;
 	}
+
+	this->elapsedTime += dt;
+	this->iterateSerial++;
 
 
 //	theQWave->lowPassFilter();
 //
-	theQWave->dumpWave("at end of rk2", true);
+	if (true) {
+		char atRk2[100];
+		sprintf(atRk2, "at end of rk2 frame %1.0lf ", this->iterateSerial);
+		theQWave->dumpWave(atRk2, true);
+	}
 }
 
 /* ************************************************** benchmarking */
