@@ -85,8 +85,6 @@ class App extends React.Component {
 					&nbsp; &nbsp;
 					Squishy Electron
 				</h2>
-				{/*}<WaveView N={s.N} useQuantumEngine={s.useQuantumEngine}*/}
-				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
 				<SquishPanel />
 
 				{sqDialog}

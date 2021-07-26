@@ -11,10 +11,19 @@ import MiniGraph from './MiniGraph';
 function setPT() {
 	SetWaveTab.propTypes = {
 		setWave: PropTypes.func.isRequired,
+
 		setCircularFrequency: PropTypes.func.isRequired,
-		standingFrequency: PropTypes.number.isRequired,
 		circularFrequency: PropTypes.number.isRequired,
+
+		setPulseWidth: PropTypes.func.isRequired,
+		pulseWidth: PropTypes.number.isRequired,
+
+		setPulseOffset: PropTypes.func.isRequired,
+		pulseOffset: PropTypes.number.isRequired,
+
+
 		breed: PropTypes.string,
+		resetTime: PropTypes.func,
 	};
 }
 
@@ -29,7 +38,7 @@ function SetWaveTab(props) {
 			return qCx(Math.cos(x * p.circularFrequency), Math.cos(x * p.circularFrequency));
 
 		case 'standing':
-			return qCx(Math.cos(.5 * x * p.standingFrequency), 0);
+			return qCx(Math.cos(.5 * x * p.circularFrequency), 0);
 
 		case 'pulse':
 			break;
@@ -42,59 +51,66 @@ function SetWaveTab(props) {
 		 return // something like (cos, sin)  // +p.valleyScale / 100 * (Math.abs(x - (+p.valleyOffset / 50 - 1))) ** +p.valleyPower
 	}
 
+	function setWave(ev) {
+		p.setWave(p.breed, p.circularFrequency);
+		p.resetTime();
+
+	}
+
 	//debugger;
 	return <div className='SetWaveTab'>
 
 		<div className='waveTabCol'>
 			<h3>Choose New Wave</h3>
 
-			<div className={`SetCircularWaveBand ${'circular' == p.breed && 'selected'}`} >
-				<h4>circular</h4>
-				{/*
-				<button type='button' className='circularWaveButton round'
-					onClick={ev => p.setWave('circular', p.circularFrequency)} >
-						Set to Circular Wave
-				</button>
-					&nbsp;
-				 */}
-				<input type='number' placeholder='frequency' className='numberInput'
-						value={p.circularFrequency} min='0' max='10'
+			<div  >
+				<span>frequency</span>
+				<input type='number' placeholder='frequency' className='numberInput frequency'
+						value={p.circularFrequency} min='0' max='100' step={'standing' == p.breed ? .5 : 1}
 						onChange={ev => p.setCircularFrequency(ev.currentTarget.value)} />
-				<input type='range' className='circularSlider'
-					value={p.circularFrequency} min='0' max='10'
+				<input type='range'
+					value={p.circularFrequency} min='0' max='100'
 					onChange={ev => p.setCircularFrequency(ev.currentTarget.value)} />
 			</div>
 
-			<div className={`SetStandingWaveBand ${'standing' == p.breed ? 'selected' : ''}`} >
-				<h4>standing</h4>
-				{/*
-				<button type='button' className='standingWaveButton round'
-					onClick={ev => p.setWave('standing', p.standingFrequency)}>
-						Set to Standing Wave
-				</button>
-				&nbsp;
-				 */}
-				<input type='number' placeholder='frequency' className='numberInput'
-					value={p.standingFrequency} min='0' max='10'
-					onChange={ev => p.setStandingFrequency(ev.currentTarget.value)} />
-				<input type='range' className='standingSlider'
-					value={p.standingFrequency} min='0' max='10'
-					onChange={ev => p.setStandingFrequency(ev.currentTarget.value)} />
+			<div  >
+				<span>pulse width</span>
+				<input type='number' placeholder='pulse width' className='numberInput pulseWidth'
+						value={p.pulseWidth} min='0' max='10' step={.01}
+						onChange={ev => p.setPulseWidth(ev.currentTarget.value)} />
+				<input type='range'
+					value={p.pulseWidth} min='0' max='1.0' step='.01'
+					onChange={ev => p.setPulseWidth(ev.currentTarget.value)} />
 			</div>
 
-			<div className={`SetPulseWaveBand ${'pulse' == p.breed ? 'selected' : ''}`}>
-				<h4>pulse</h4>
-				<input type='range' className='pulseSlider'
-					value={p.standingFrequency} min='0' max='10'
-					onChange={ev => p.setStandingFrequency(ev.currentTarget.value)} />
-				{/*
-				<button type='button' className='pulseWaveButton round'
-					onClick={ev => p.setWave('pulse')} >
-						Set to Wave Packet
-				</button>
-				 */}
+			<div  >
+				<span>pulse offset</span>
+				<input type='number' placeholder='pulse offset' className='numberInput pulseOffset'
+						value={p.pulseOffset} min='0' max='1' step={.01}
+						onChange={ev => p.setPulseOffset(ev.currentTarget.value)} />
+				<input type='range'
+					value={p.pulseOffset} min='0' max='1.0' step='.01'
+					onChange={ev => p.setPulseOffset(ev.currentTarget.value)} />
 			</div>
 		</div>
+
+		<div className='waveTabCol middle'>
+			<label>
+				circular
+				<input type='radio' checked={'circular' == p.breed}/>
+			</label>
+
+			<label>
+				standing
+				<input type='radio'  checked={'standing' == p.breed}/>
+			</label>
+
+			<label>
+				pulse
+				<input type='radio'  checked={'pulse' == p.breed}/>
+			</label>
+		</div>
+
 		<div className='waveTabCol'>
 			&nbsp;
 			<div className='waveMiniGraph'>
@@ -102,7 +118,7 @@ function SetWaveTab(props) {
 				width={200} height={100} complex={true} />
 			</div>
 			<button type='button' className='setWaveButton round'
-				onClick={ev => p.setWave(p.breed, p.standingFrequency)}>
+				onClick={ev => p.setWave()}>
 					Set Wave
 			</button>
 

@@ -35,8 +35,10 @@ export class SquishView extends React.Component {
 
 	render() {
 		const s = this.state;
-		let et = '';
-		let iser = '';
+
+		// if c++ isn't initialized yet, we can assume the time and frame serial
+		let et = '0';
+		let iser = '0';
 		if (qe.getElapsedTime) {
 			// after qe has been initialized
 			et = thousands(qe.getElapsedTime().toFixed(2));
