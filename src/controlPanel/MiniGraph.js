@@ -116,9 +116,10 @@ const waveRecipe = {
 			// each val is {x, real, im, magn} and each turns to a <path> node so it looks like a squishview.
 
 			let angle = Math.atan2(val.im, val.real);
-			angle = complexColorScale(angle);  // stroke color
+			let color = complexColorScale(angle);  // stroke color
 			let magn = yScale(val.magn).toFixed(2)
-			return <path  d={`M${val.x},0V${magn}`} stroke={angle} fill='none'
+			console.log(`values.map==> angle = '${angle}'  color = '${color}'  magn = '${magn}' `);
+			return <path  d={`M${val.x},0V${magn}`} stroke={color} fill='none'
 				key={val.x}/>
 		})
 	}

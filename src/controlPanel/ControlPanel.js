@@ -28,11 +28,11 @@ export class ControlPanel extends React.Component {
 		setWave: PropTypes.func.isRequired,
 		setPotential: PropTypes.func.isRequired,
 
-		isTimeAdvancing: PropTypes.bool.isRequired,
+		isTimeAdvancing: PropTypes.bool.isRequired,  // ie is it running?
 		//elapsedTime: PropTypes.number.isRequired,
 		//iterateSerial: PropTypes.number.isRequired,
 
-		iterateFrequency: PropTypes.number.isRequired,
+		iterateFrequency: PropTypes.number.isRequired,  // frames per second
 		setIterateFrequency: PropTypes.func.isRequired,
 	};
 
@@ -64,59 +64,9 @@ export class ControlPanel extends React.Component {
 
 	// set rate, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
 	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
-	setFrequency(freq) {
+	setIterateFrequency(freq) {
 		this.props.setIterateFrequency(freq);
 	}
-
-//				{this.renderGoStopButtons()}
-//	renderGoStopButtons() {
-//		const p = this.props;
-//		let isRunning = p.isTimeAdvancing;
-//
-//		// it was easier to just type this in by hand than to come up with some nifty algorithm
-//		const repRates = <>
-//			<option key='60' value='60'>60 per sec</option>
-//			<option key='30' value='30'>30 per sec</option>
-//			<option key='20' value='20'>20 per sec</option>
-//			<option key='10' value='10'>10 per sec</option>
-//			<option key='7' value='7'>7 per sec</option>
-//			<option key='5' value='5'>5 per sec</option>
-//			<option key='4' value='4'>4 per sec</option>
-//			<option key='3' value='3'>3 per sec</option>
-//			<option key='2' value='2'>2 per sec</option>
-//			<option key='1' value='1'>1 per sec</option>
-//			<option key='.5' value='0.500'>every 2 sec</option>
-//			<option key='.2' value='0.200'>every 5 sec</option>
-//			<option key='.1' value='0.100'>every 10 sec</option>
-//			<option key='.05' value='0.050'>every 20 sec</option>
-//			<option key='.01667' value='0.017'>every minute</option>
-//		</>;
-//
-//		// nail this down so roundoff error doesn't spoil everything.
-//		// It's always of the form n or 1/n where n is an integer
-//		let iterateFrequency = this.props.iterateFrequency;
-//		if (iterateFrequency >= 1)
-//			iterateFrequency = Math.round(iterateFrequency);
-//		else
-//			iterateFrequency = (1 / Math.round(1 / iterateFrequency)).toFixed(3);
-//
-//		return <div className='goStopButtons subPanel'>
-//			<button type='button' className={'goButton ' + (isRunning && 'on')}
-//				onClick={ev => p.startIterating()}>
-//					▶
-//			</button>
-//			<button type='button' className={'stopButton ' + (!isRunning && 'on')}
-//				onClick={ev => p.stopIterating()}>
-//					◼
-//			</button>
-//
-//			frame rate:
-//			<select className='rateSelector' value={iterateFrequency}
-//					onChange={ev => this.setFrequency(ev.currentTarget.value)}>
-//				{repRates}
-//			</select>
-//		</div>;
-//	}
 
 
 	/* ********************************************** wave & pot */
@@ -126,6 +76,10 @@ export class ControlPanel extends React.Component {
 
 	setPulseWidth(pulseWidth) {
 		this.setState({pulseWidth});
+	}
+
+	setPulseOffset(pulseOffset) {
+		this.setState({pulseOffset});
 	}
 
 	setCPState(obj) {
@@ -142,10 +96,16 @@ export class ControlPanel extends React.Component {
 		if (s.showingTab == 'wave') {
 			showingTab = <SetWaveTab
 				setWave={p.setWave}  breed={s.waveBreed}
+
 				circularFrequency={+s.circularFrequency}
+				pulseWidth={+s.pulseWidth}
+				pulseOffset={+s.pulseOffset}
+
 				setCircularFrequency={freq => this.setCircularFrequency(freq)}
-				standingFrequency={+s.standingFrequency}
-				setStandingFrequency={freq => this.setStandingFrequency(freq)} />;
+				setPulseWidth={pw => this.setState({pulseWidth: pw})}
+				setPulseOffset={po => this.setState({pulseOffset: po})}
+				setBreed={br => this.setState({breed: br})}
+			/>;
 		}
 		else if (s.showingTab == 'potential') {
 			showingTab = <SetPotentialTab setPotential={p.setPotential}
@@ -163,7 +123,7 @@ export class ControlPanel extends React.Component {
 				singleStep={p.singleStep}
 				isTimeAdvancing={p.isTimeAdvancing}
 				iterateFrequency={p.iterateFrequency}
-				setFrequency={freq => this.setFrequency(freq)}
+				setIterateFrequency={freq => this.setIterateFrequency(freq)}
 			/>
 			<div className='cpSecondRow'>
 				<ul className='TabBar' >

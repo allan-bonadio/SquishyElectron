@@ -9,20 +9,22 @@ import qCx from '../wave/qCx';
 import MiniGraph from './MiniGraph';
 
 function setPT() {
+	// variables from on high, and the funcs needed to change them
 	SetWaveTab.propTypes = {
 		setWave: PropTypes.func.isRequired,
 
-		setCircularFrequency: PropTypes.func.isRequired,
 		circularFrequency: PropTypes.number.isRequired,
+		setCircularFrequency: PropTypes.func.isRequired,
 
-		setPulseWidth: PropTypes.func.isRequired,
 		pulseWidth: PropTypes.number.isRequired,
+		setPulseWidth: PropTypes.func.isRequired,
 
-		setPulseOffset: PropTypes.func.isRequired,
 		pulseOffset: PropTypes.number.isRequired,
-
+		setPulseOffset: PropTypes.func.isRequired,
 
 		breed: PropTypes.string,
+		setBreed: PropTypes.func.isRequired,
+
 		resetTime: PropTypes.func,
 	};
 }
@@ -51,11 +53,11 @@ function SetWaveTab(props) {
 		 return // something like (cos, sin)  // +p.valleyScale / 100 * (Math.abs(x - (+p.valleyOffset / 50 - 1))) ** +p.valleyPower
 	}
 
-	function setWave(ev) {
-		p.setWave(p.breed, p.circularFrequency);
-		p.resetTime();
-
-	}
+	//function setWave(ev) {
+	//	p.setWave(p.breed, p.circularFrequency);
+	//	p.resetTime();
+	//
+	//}
 
 	//debugger;
 	return <div className='SetWaveTab'>
@@ -97,17 +99,20 @@ function SetWaveTab(props) {
 		<div className='waveTabCol middle'>
 			<label>
 				circular
-				<input type='radio' checked={'circular' == p.breed}/>
+				<input type='radio' checked={'circular' == p.breed}
+					onChange={ev => p.setBreed('circular')}/>
 			</label>
 
 			<label>
 				standing
-				<input type='radio'  checked={'standing' == p.breed}/>
+				<input type='radio'  checked={'standing' == p.breed}
+					onChange={ev => p.setBreed('standing')}/>
 			</label>
 
 			<label>
 				pulse
-				<input type='radio'  checked={'pulse' == p.breed}/>
+				<input type='radio'  checked={'pulse' == p.breed}
+					onChange={ev => p.setBreed('pulse')}/>
 			</label>
 		</div>
 
@@ -115,7 +120,7 @@ function SetWaveTab(props) {
 			&nbsp;
 			<div className='waveMiniGraph'>
 				<MiniGraph xMin={0} xMax={2 * Math.PI} yFunction={x => waveWaveFunc(x)}
-				width={200} height={100} complex={true} />
+					width={200} height={100} complex={true} />
 			</div>
 			<button type='button' className='setWaveButton round'
 				onClick={ev => p.setWave()}>

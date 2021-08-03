@@ -10,6 +10,7 @@ function setPT() {
 		startIterating: PropTypes.func.isRequired,
 		stopIterating: PropTypes.func.isRequired,
 		singleStep: PropTypes.func.isRequired,
+		setIterateFrequency: PropTypes.func.isRequired,
 
 		isTimeAdvancing: PropTypes.bool.isRequired,
 		iterateFrequency: PropTypes.number.isRequired,
@@ -49,7 +50,7 @@ function CPToolbar(props) {
 		<div className='frameRateBox'>
 			frame rate:<br />
 			<select className='rateSelector' value={props.iterateFrequency}
-					onChange={ev => props.setFrequency(ev.currentTarget.value)}>
+					onChange={ev => props.setIterateFrequency(ev.currentTarget.value)}>
 				{repRates}
 			</select>
 		</div>
