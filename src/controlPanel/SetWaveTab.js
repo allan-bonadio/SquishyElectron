@@ -37,7 +37,7 @@ function SetWaveTab(props) {
 	function waveWaveFunc(x) {
 		switch (p.breed) {
 		case 'circular':
-			return qCx(Math.cos(x * p.circularFrequency), Math.cos(x * p.circularFrequency));
+			return qCx(Math.cos(x * p.circularFrequency), Math.sin(x * p.circularFrequency));
 
 		case 'standing':
 			return qCx(Math.cos(.5 * x * p.circularFrequency), 0);
@@ -100,19 +100,19 @@ function SetWaveTab(props) {
 			<label>
 				circular
 				<input type='radio' checked={'circular' == p.breed}
-					onChange={ev => p.setBreed('circular')}/>
+					onChange={ev => p.setBreed('circular')} />
 			</label>
 
 			<label>
 				standing
 				<input type='radio'  checked={'standing' == p.breed}
-					onChange={ev => p.setBreed('standing')}/>
+					onChange={ev => p.setBreed('standing')} />
 			</label>
 
 			<label>
 				pulse
 				<input type='radio'  checked={'pulse' == p.breed}
-					onChange={ev => p.setBreed('pulse')}/>
+					onChange={ev => p.setBreed('pulse')} />
 			</label>
 		</div>
 

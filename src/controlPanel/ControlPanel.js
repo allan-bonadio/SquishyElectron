@@ -42,7 +42,8 @@ export class ControlPanel extends React.Component {
 		// most of the state is really kept in the SquishPanel
 		this.state = {
 
-			// state for the wave resets - these are control-panel only.  Only goes into effect if we call setWave()
+			// state for the wave resets - these are control-panel only.
+			// Only goes into effect if we call setWave()
 			waveBreed: 'circular',
 			circularFrequency: 1,
 			pulseWidth: .05,
@@ -70,13 +71,6 @@ export class ControlPanel extends React.Component {
 
 
 	/* ********************************************** wave & pot */
-	setCircularFrequency(circularFrequency) {
-		this.setState({circularFrequency});
-	}
-
-	setPulseWidth(pulseWidth) {
-		this.setState({pulseWidth});
-	}
 
 	setPulseOffset(pulseOffset) {
 		this.setState({pulseOffset});
@@ -95,16 +89,16 @@ export class ControlPanel extends React.Component {
 		let showingTab = '';
 		if (s.showingTab == 'wave') {
 			showingTab = <SetWaveTab
-				setWave={p.setWave}  breed={s.waveBreed}
+				setWave={p.setWave}
 
 				circularFrequency={+s.circularFrequency}
+				setCircularFrequency={freq => this.setState({circularFrequency: freq})}
 				pulseWidth={+s.pulseWidth}
+				setPulseWidth={wid =>this.setState({pulseWidth: wid})}
 				pulseOffset={+s.pulseOffset}
-
-				setCircularFrequency={freq => this.setCircularFrequency(freq)}
-				setPulseWidth={pw => this.setState({pulseWidth: pw})}
-				setPulseOffset={po => this.setState({pulseOffset: po})}
-				setBreed={br => this.setState({breed: br})}
+				setPulseOffset={off => this.setState({pulseOffset: off})}
+				breed={s.waveBreed}
+				setBreed={br => this.setState({waveBreed: br})}
 			/>;
 		}
 		else if (s.showingTab == 'potential') {
