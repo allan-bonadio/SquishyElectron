@@ -12,17 +12,18 @@ function setPT() {
 	SetWaveTab.propTypes = {
 		setWave: PropTypes.func.isRequired,
 
-		setCircularFrequency: PropTypes.func.isRequired,
 		circularFrequency: PropTypes.number.isRequired,
+		setCircularFrequency: PropTypes.func.isRequired,
 
-		setPulseWidth: PropTypes.func.isRequired,
 		pulseWidth: PropTypes.number.isRequired,
+		setPulseWidth: PropTypes.func.isRequired,
 
-		setPulseOffset: PropTypes.func.isRequired,
 		pulseOffset: PropTypes.number.isRequired,
-
+		setPulseOffset: PropTypes.func.isRequired,
 
 		breed: PropTypes.string,
+		setBreed: PropTypes.func.isRequired,
+
 		resetTime: PropTypes.func,
 	};
 }
@@ -35,7 +36,7 @@ function SetWaveTab(props) {
 	function waveWaveFunc(x) {
 		switch (p.breed) {
 		case 'circular':
-			return qCx(Math.cos(x * p.circularFrequency), Math.cos(x * p.circularFrequency));
+			return qCx(Math.cos(x * p.circularFrequency), Math.sin(x * p.circularFrequency));
 
 		case 'standing':
 			return qCx(Math.cos(.5 * x * p.circularFrequency), 0);
@@ -51,11 +52,11 @@ function SetWaveTab(props) {
 		 return // something like (cos, sin)  // +p.valleyScale / 100 * (Math.abs(x - (+p.valleyOffset / 50 - 1))) ** +p.valleyPower
 	}
 
-	function setWave(ev) {
-		p.setWave(p.breed, p.circularFrequency);
-		p.resetTime();
-
-	}
+	//function setWave(ev) {
+	//	p.setWave(p.breed, p.circularFrequency);
+	//	p.resetTime();
+	//
+	//}
 
 	//debugger;
 	return <div className='SetWaveTab'>
@@ -97,17 +98,20 @@ function SetWaveTab(props) {
 		<div className='waveTabCol middle'>
 			<label>
 				circular
-				<input type='radio' checked={'circular' == p.breed}/>
+				<input type='radio' checked={'circular' == p.breed}
+					onChange={ev => p.setBreed('circular')} />
 			</label>
 
 			<label>
 				standing
-				<input type='radio'  checked={'standing' == p.breed}/>
+				<input type='radio'  checked={'standing' == p.breed}
+					onChange={ev => p.setBreed('standing')} />
 			</label>
 
 			<label>
 				pulse
-				<input type='radio'  checked={'pulse' == p.breed}/>
+				<input type='radio'  checked={'pulse' == p.breed}
+					onChange={ev => p.setBreed('pulse')} />
 			</label>
 		</div>
 
