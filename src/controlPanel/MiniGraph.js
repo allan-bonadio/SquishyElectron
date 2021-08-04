@@ -10,6 +10,8 @@ import {path as d3path} from 'd3-path';
 const π = Math.PI;
 const radsPerDeg = π / 180;
 
+const miniDebug = false;
+
 function setPT() {
 	MiniGraph.propTypes = {
 		className: PropTypes.string,
@@ -66,13 +68,13 @@ const potentialRecipe = {
 		// generate points.  Really, we want to generate per-pixel or per-two-pixel
 		let pathObj = d3path();
 		let yyy = values[0];
-		console.log('val 0: ', yyy);
+		if (miniDebug) console.log('val 0: ', yyy);
 		yyy = yyy.y;
-		console.log(' . y: ', yyy);
+		if (miniDebug) console.log(' . y: ', yyy);
 		yyy = yScale(yyy);
-		console.log('yscale: ', yyy);
+		if (miniDebug) console.log('yscale: ', yyy);
 		yyy = (yyy).toFixed(2);
-		console.log('toFixed: ', yyy);
+		if (miniDebug) console.log('toFixed: ', yyy);
 		pathObj.moveTo(xMin, (yScale(values[0].y)).toFixed(2));
 		values.forEach((val, xPx) => {
 			pathObj.lineTo(xPx, (yScale(val.y)).toFixed(2));
@@ -118,7 +120,7 @@ const waveRecipe = {
 			let angle = Math.atan2(val.im, val.real);
 			let color = complexColorScale(angle);  // stroke color
 			let magn = yScale(val.magn).toFixed(2)
-			console.log(`values.map==> angle = '${angle}'  color = '${color}'  magn = '${magn}' `);
+			if (miniDebug) console.log(`miniGraph values.map==> angle = '${angle}'  color = '${color}'  magn = '${magn}' `);
 			return <path  d={`M${val.x},0V${magn}`} stroke={color} fill='none'
 				key={val.x}/>
 		})
