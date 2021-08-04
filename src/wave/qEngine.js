@@ -28,6 +28,8 @@ function quantumEngineHasStarted(mDimensions, mLabel) {
 	maxDimensions = mDimensions;
 	maxLabel = mLabel;
 
+	qe.cppLoaded = true;
+
 	//console.log(`quantumEngineHasStarted:  resolving qeStartPromise`);
 	qeStartPromiseSucceed({mDimensions, mLabel});
 

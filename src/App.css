@@ -51,6 +51,14 @@ input {
 
 /* **************************************** SquishDialog */
 
+.spinner {
+	position: absolute;
+	margin: auto;
+	top: 20%;
+}
+
+/* **************************************** SquishDialog */
+
 .backdrop {
 	display: flex;
 	background-color: #8888;

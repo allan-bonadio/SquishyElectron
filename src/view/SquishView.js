@@ -45,6 +45,9 @@ export class SquishView extends React.Component {
 			iser = thousands(qe.qSpace_getIterateSerial());
 		}
 
+		const spinner = qe.cppLoaded ? ''
+			: <img className='spinner' alt='spinner' src='eclipseOnBlack.gif' />;
+
 		// voNorthWest/East are populated during drawing, so this here is just for yucks
 		return (<div className='SquishView' >
 			<aside className='viewOverlay'
@@ -57,6 +60,8 @@ export class SquishView extends React.Component {
 				<div className='northEastWrapper'>
 					frame <span className='voNorthEast'>{iser}</span>
 				</div>
+
+				{spinner}
 			</aside>
 			<canvas className='squishCanvas'
 				width={s.width} height={s.height}
