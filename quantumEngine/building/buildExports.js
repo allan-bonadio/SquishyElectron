@@ -42,6 +42,7 @@ exportsSrc  = [
 	{name: 'qWave_dumpWave', retType: 'number', args: ['string']},
 	{name: 'qSpace_oneRk2Step', retType: 'number', args: []},
 	{name: 'qSpace_oneRk4Step', retType: 'number', args: []},
+	{name: 'qSpace_oneVisscherStep', retType: 'number', args: []},
 
 	// views
 	{name: 'updateViewBuffer', retType: 'number', args: []},

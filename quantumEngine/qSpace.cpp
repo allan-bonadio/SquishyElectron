@@ -47,18 +47,30 @@ qSpace *startNewSpace(void) {
 	//printf("startNewSpace()\n");
 
 	if (theSpace) {
+		printf("about to delete theQWave:\n");
 		delete theQWave;
+		printf("about to delete sumQWave:\n");
 		delete sumQWave;
+		printf("about to delete k1QWave:\n");
 		delete k1QWave;
+		printf("about to delete k2QWave:\n");
 		delete k2QWave;
+		printf("about to delete k3QWave:\n");
 		delete k3QWave;
+		printf("about to delete k4QWave:\n");
 		delete k4QWave;
+		printf("about to delete egyptQWave:\n");
 		delete egyptQWave;
+		printf("about to delete laosQWave:\n");
 		delete laosQWave;
 
+		printf("about to delete thePotential:\n");
 		delete[] thePotential;
+		printf("about to delete viewBuffer:\n");
 		delete[] viewBuffer;
+		printf("about to delete theSpace:\n");
 		delete theSpace;
+		printf("done deleting.\n");
 	}
 	dimsSoFar = 0;
 	theSpace = new qSpace(1);
@@ -185,6 +197,7 @@ void qSpace_setValleyPotential(qReal power, qReal scale, qReal offset) {
 
 void qSpace_oneRk2Step() { theSpace->oneRk2Step(); }
 void qSpace_oneRk4Step() { theSpace->oneRk4Step(); }
+void qSpace_oneVisscherStep() { theSpace->oneVisscherStep(); }
 
 
 }

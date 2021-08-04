@@ -43,7 +43,9 @@ const DEFAULT_VIEW_CLASS_NAME =
 //'flatViewDef';
 'flatDrawingViewDef';
 
-const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 25;
+const DEFAULT_RESOLUTION = 5;
+//const DEFAULT_RESOLUTION = 25;
+//const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 25;
 const DEFAULT_CONTINUUM = qeSpace.contENDLESS;
 
 
@@ -174,7 +176,8 @@ export class SquishPanel extends React.Component {
 
 	// take one RK integration step
 	crunchOneFrame() {
-		qe.qSpace_oneRk2Step();
+		qe.qSpace_oneVisscherStep();
+		//qe.qSpace_oneRk2Step();
 		qe.updateToLatestWaveBuffer();
 
 		this.startUpdate = performance.now();

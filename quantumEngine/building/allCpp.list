@@ -6,3 +6,4 @@ qWave.cpp
 rk2.cpp
 rk4.cpp
 viewBuffer.cpp
+visscher.cpp

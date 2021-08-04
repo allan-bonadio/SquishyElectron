@@ -127,6 +127,7 @@ public:
 
 	void oneRk2Step(void);
 	void oneRk4Step(void);
+	void oneVisscherStep(void);
 };
 
 /* ************************************************************ a wave buffer */
