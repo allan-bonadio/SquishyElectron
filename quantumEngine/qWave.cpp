@@ -15,9 +15,13 @@ qWave::qWave(qSpace *space) {
 }
 
 qWave::~qWave() {
+	printf("start the qWave instance destructor...\n");
 	this->space = NULL;
+	printf("    set space to null...\n");
 	free(this->buffer);
+	printf("    freed buffer...\n");
 	this->buffer = NULL;
+	printf("set buffer to null; done with qWave destructor...\n");
 }
 
 void qWave::forEachPoint(void (*callback)(qCx, int) ) {
