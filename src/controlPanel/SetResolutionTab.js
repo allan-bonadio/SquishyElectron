@@ -25,10 +25,12 @@ function SetResolutionTab(props) {
 
 		<p>
 			The actual universe is essentially infinite.
+			<small>(Well, actually it's probably finite, but so incredibly huge, you'll never notice the difference.)</small>
 			Nobody's computer has that much ram or power.
-			Squishy Electron's universe runs on a finite web page.
-			The universe where all this happens is very simplified.
-			You can recreate it here, if you want, with different settings.
+			Squishy Electron's universe runs on this web page, much smaller,
+			but we can simulate the microscopic... no, the <u>nanoscopic </u>
+			world of the squishy electron.
+			You can recreate this nanoscopic universe here, if you want, with different settings.
 		</p>
 
 	</div>);
