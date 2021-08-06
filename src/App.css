@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** App -- CSS overall for Squishy Electron
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
@@ -47,14 +47,6 @@ button.round {
 input {
 	background-color: transparent;
 	color: #eee;
-}
-
-/* **************************************** SquishDialog */
-
-.spinner {
-	position: absolute;
-	margin: auto;
-	top: 20%;
 }
 
 /* **************************************** SquishDialog */

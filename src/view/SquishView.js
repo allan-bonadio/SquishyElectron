@@ -46,7 +46,7 @@ export class SquishView extends React.Component {
 		}
 
 		const spinner = qe.cppLoaded ? ''
-			: <img className='spinner' alt='spinner' src='eclipseOnBlack.gif' />;
+			: <img className='spinner' alt='spinner' src='eclipseOn222.gif' />;
 
 		// voNorthWest/East are populated during drawing, so this here is just for yucks
 		return (<div className='SquishView' >
