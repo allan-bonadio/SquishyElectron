@@ -27,6 +27,8 @@ exportsSrc  = [
 	{name: 'getWaveBuffer', retType: 'number', args: []},
 	{name: 'getPotentialBuffer', retType: 'number', args: []},
 	{name: 'getViewBuffer', retType: 'number', args: []},
+
+	// the qSpace ones act on theSpace in the c++ code
 	{name: 'qSpace_getElapsedTime', retType: 'number', args: []},
 	{name: 'qSpace_getIterateSerial', retType: 'number', args: []},
 
@@ -35,17 +37,17 @@ exportsSrc  = [
 	{name: 'qSpace_setZeroPotential', retType: 'number', args: []},
 	{name: 'qSpace_setValleyPotential', retType: 'number', args: ['number', 'number', 'number']},
 
-	// the wave
+	// theWave and theQWave is what these act upon
 	{name: 'qWave_setCircularWave', retType: 'number', args: ['number']},
 	{name: 'qWave_setStandingWave', retType: 'number', args: ['number']},
-	{name: 'qWave_setPulseWave', retType: 'number', args: ['number', 'number']},
+	{name: 'qWave_setPulseWave', retType: 'number', args: ['number', 'number', 'number']},
 	{name: 'qWave_dumpWave', retType: 'number', args: ['string']},
-	{name: 'qSpace_oneRk2Step', retType: 'number', args: []},
-	{name: 'qSpace_oneRk4Step', retType: 'number', args: []},
-	{name: 'qSpace_oneVisscherStep', retType: 'number', args: []},
+
+	{name: 'qSpace_oneIntegrationStep', retType: 'number', args: []},
+	{name: 'qSpace_setAlgorithm', retType: 'number', args: ['number']},
 
 	// views
-	{name: 'updateViewBuffer', retType: 'number', args: []},
+	// not any more, it's internal now {name: 'updateViewBuffer', retType: 'number', args: ['array']},
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():

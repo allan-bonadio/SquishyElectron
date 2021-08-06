@@ -10,14 +10,21 @@ function setPT() {
 		startIterating: PropTypes.func.isRequired,
 		stopIterating: PropTypes.func.isRequired,
 		singleStep: PropTypes.func.isRequired,
+		isTimeAdvancing: PropTypes.bool.isRequired,
+
+		iterateFrequency: PropTypes.number.isRequired,
 		setIterateFrequency: PropTypes.func.isRequired,
 
-		isTimeAdvancing: PropTypes.bool.isRequired,
-		iterateFrequency: PropTypes.number.isRequired,
+		algorithm: PropTypes.number.isRequired,
+		setAlgorithm: PropTypes.func.isRequired,
+
+
 	};
 }
 
 function CPToolbar(props) {
+	const {iterateFrequency, setIterateFrequency, algorithm, setAlgorithm,
+		isTimeAdvancing, startIterating, stopIterating, singleStep} = props;
 
 	const repRates = <>
 		<option key='60' value='60'>60 per sec</option>
@@ -39,18 +46,15 @@ function CPToolbar(props) {
 
 	// nail this down so roundoff error doesn't spoil everything.
 	// It's always of the form n or 1/n where n is an integer
-	let iterateFrequency = props.iterateFrequency;
-	if (iterateFrequency >= 1)
-		iterateFrequency = Math.round(iterateFrequency);
-	else
-		iterateFrequency = (1 / Math.round(1 / iterateFrequency)).toFixed(3);
-
+	const apparentFrequency = (iterateFrequency >= 1)
+		? Math.round(iterateFrequency)
+		: (1 / Math.round(1 / iterateFrequency)).toFixed(3);
 
 	return <div className='CPToolbar'>
 		<div className='frameRateBox'>
 			frame rate:<br />
-			<select className='rateSelector' value={props.iterateFrequency}
-					onChange={ev => props.setIterateFrequency(ev.currentTarget.value)}>
+			<select className='rateSelector' value={apparentFrequency}
+					onChange={ev => setIterateFrequency(ev.currentTarget.value)}>
 				{repRates}
 			</select>
 		</div>
@@ -58,12 +62,12 @@ function CPToolbar(props) {
 
 		<button type='button' className={`startStopToggle toolbarButton toolbarGradient`}
 			onClick={ev => {
-				if (props.isTimeAdvancing)
-					props.stopIterating();
+				if (isTimeAdvancing)
+					stopIterating();
 				else
-					props.startIterating();
+					startIterating();
 			}}>
-			{ props.isTimeAdvancing
+			{ isTimeAdvancing
 				? <span><big>&nbsp;</big>▐▐ <big>&nbsp;</big></span>
 				: <big>►</big> }
 		</button>
@@ -71,9 +75,20 @@ function CPToolbar(props) {
 
 
 		<button type='button' className={`stepButton toolbarButton toolbarGradient `}
-			onClick={ev => props.singleStep()}>
+			onClick={ev => singleStep()}>
 			<big>►</big> ▌
 		</button>
+
+
+		<div className='algorithmBox'>
+			algorithm:
+			<select className='algorithmSelector' value={algorithm}
+					onChange={ev => setAlgorithm(ev.currentTarget.value)}>
+				<option value='2'>RK2</option>
+				<option value='4'>RK4</option>
+				<option value='7'>Visscher</option>
+			</select>
+		</div>
 
 
 	</div>;

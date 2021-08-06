@@ -53,7 +53,7 @@ export function oldIterateAnimate(useQuantumEngine, rate) {
 		//console.time('one iteration & draw');
 		try {
 			if (useQuantumEngine) {
-				qe.qSpace_oneRk2Step();
+				qe.qSpace_oneIntegrationStep();
 			}
 			else {
 				iterate(theJWave);
@@ -90,7 +90,7 @@ function animateOneFrame(now) {
 
 	// could be slow.  sometime in the future.
 	if (areBenchmarking) startRK = performance.now();
-	qe.qSpace_oneRk2Step();
+	qe.qSpace_oneIntegrationStep();
 	qe.updateToLatestWaveBuffer();
 
 	if (areBenchmarking) startUpdate = performance.now();

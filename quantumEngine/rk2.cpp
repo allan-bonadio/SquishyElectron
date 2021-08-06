@@ -15,16 +15,22 @@
 // static const qCx dtOverI = qCx(0., -dt);
 // static const qCx halfDtOverI = qCx(0., -dt / 2.);
 
-// crawl along x to find the next version of theWave, after dt, and store it there.
-void qSpace::oneRk2Step(void) {
+// crawl along x to find the next version of the Wave, after dt, and store it there.
+void qSpace::oneRk2Step(qWave *oldQWave, qWave *newQWave) {
+	qWave *oldQW = oldQWave;
+	qCx *oldW = oldQW->buffer;
+	qWave *newQW = newQWave;
+	qCx *newW = newQW->buffer;
+
+
 	qDimension *dim = this->dimensions;
-	theQWave->fixBoundaries();
-	//theQWave->dumpWave("starting theWave", true);
+	oldQW->fixBoundaries();
+	//oldQW->dumpWave("starting oldW", true);
 
 	// use laosWave for all the first-try psi values
 	for (int ix = dim->start; ix < dim->end; ix++) {
-		laosWave[ix] = theWave[ix] + hamiltonian(theWave, ix) * this->halfDtOverI;
-		qCheck(sumWave[ix]);
+		laosWave[ix] = oldW[ix] + hamiltonian(oldW, ix) * this->halfDtOverI;
+		qCheck(newW[ix]);
 	}
 	laosQWave->fixBoundaries();
 	//laosQWave->dumpWave("laos Q Wave", true);
@@ -35,36 +41,36 @@ void qSpace::oneRk2Step(void) {
 	//for (int ix = 0; ix <= dim->end; ix++)
 	//printf("INRK2 %d\t%lf\t%lf\n", ix, laosWave[ix].re, laosWave[ix].im);
 
-	// then use laosWave as the input to a better rate and a better inc at sumWave.
+	// then use laosWave as the input to a better rate and a better inc at newW.
 	for (int ix = dim->start; ix < dim->end; ix++) {
-		sumWave[ix] = theWave[ix] + hamiltonian(laosWave, ix) * this->dtOverI;
-		qCheck(sumWave[ix]);
+		newW[ix] = oldW[ix] + hamiltonian(laosWave, ix) * this->dtOverI;
+		qCheck(newW[ix]);
 	}
-	sumQWave->fixBoundaries();
-	//sumQWave->dumpWave("sumWave", true);
+	newQW->fixBoundaries();
+	//newQW->dumpWave("newW", true);
 
 	// now flip them around.  This type of surgery; not sure about it...
-	qCx *t = sumWave;
-	sumWave = theWave;
-	sumQWave->buffer = theWave;
-	theWave = t;
-	theQWave->buffer = t;
-
-	theQWave->fixBoundaries();
-	//theQWave->dumpWave("almost done theWave", true);
+	qCx *t = newW;
+	// 	newW = oldW;
+	// 	newQW->buffer = oldW;
+	// 	oldW = t;
+	// 	oldQW->buffer = t;
+oldW = newW;  // fix this someday!!!
+	oldQW->fixBoundaries();
+	//oldQW->dumpWave("almost done oldW", true);
 
 	if (this->continuousLowPass) {
- 		theQWave->lowPassFilter(this->continuousLowPass);
+ 		oldQW->lowPassFilter(this->continuousLowPass);
 	}
 
 	if (this->doLowPass && --this->filterCount <= 0) {
 		printf("\n@@@@@@ it's time for a filter %d %d  frame%1.0lf @@@@@@\n",
 			this->filterCount, this->nStates, this->iterateSerial);
-		//theQWave->dumpWave("filtering, starting", true);
- 		//theQWave->lowPassFilter();
-		//theQWave->dumpWave("filtering, after LP, before normalize", true);
- 		theQWave->normalize();
-		//theQWave->dumpWave("filtering, after normalize", true);
+		//oldQW->dumpWave("filtering, starting", true);
+ 		//oldQW->lowPassFilter();
+		//oldQW->dumpWave("filtering, after LP, before normalize", true);
+ 		oldQW->normalize();
+		//oldQW->dumpWave("filtering, after normalize", true);
 
 		// just a guess but this should depend on how wayward the wave has gotten.
 		this->filterCount = 100;
@@ -75,26 +81,26 @@ void qSpace::oneRk2Step(void) {
 	this->iterateSerial++;
 
 
-//	theQWave->lowPassFilter();
+//	oldQW->lowPassFilter();
 //
 	if (true) {
 		char atRk2[100];
 		sprintf(atRk2, "at end of rk2 frame %1.0lf ", this->iterateSerial);
-		theQWave->dumpWave(atRk2, true);
+		oldQW->dumpWave(atRk2, true);
 	}
 }
 
 /* ************************************************** benchmarking */
 
-int manyRk2Steps(void) {
-	const int many = 100;
-
-    std::clock_t c_start = std::clock();
-	for (int i = 0; i < many; i++) {
-		theSpace->oneRk2Step();
-	}
-    std::clock_t c_end = std::clock();
-    printf(" time for %d rk2 steps: %lf", many, (double)(c_end - c_start) / CLOCKS_PER_SEC);
-	return many;
-}
-
+// int manyRk2Steps(void) {
+// 	const int many = 100;
+//
+//     std::clock_t c_start = std::clock();
+// 	for (int i = 0; i < many; i++) {
+// 		theSpace->oneRk2Step();
+// 	}
+//     std::clock_t c_end = std::clock();
+//     printf(" time for %d rk2 steps: %lf", many, (double)(c_end - c_start) / CLOCKS_PER_SEC);
+// 	return many;
+// }
+//

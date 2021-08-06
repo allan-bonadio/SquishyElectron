@@ -22,8 +22,8 @@ The present algorithm is motivated by writing the Schrodinger equation in terms
 of the real and imaginary parts R and I of the wave function
 
 We will define
-		• R = x.re at times O,dt,2dt,..., and
-		• I = x.im at times .5dt, 1.5dt, ...
+		• R = ψ.re at times O,dt,2dt,..., and
+		• I = ψ.im at times .5dt, 1.5dt, ...
 so that in our buffer of complex numbers, the Im part is dt/2 ahead of the Re part.
 The natural discretization of Eqs. (6) is therefore
 	R(t + dt) = R(t) + dt H I(t + dt/2)
@@ -32,10 +32,13 @@ Half a tick later, at a half odd integer multiple of dt,
 where H is hamiltonian, and the time arguments aren't used here so don't worry
  */
 
-void qSpace::oneVisscherStep(void) {
+// form the new wave from the old wave, in separate buffers, decided by our caller.
+void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
+	qWave *oldQW = oldQWave;
+	qWave *newQW = newQWave;
 	qDimension *dim = this->dimensions;
-	theQWave->fixBoundaries();
-	//theQWave->dumpWave("starting theWave", true);
+	oldQW->fixBoundaries();
+	//oldQW->dumpWave("starting theWave", true);
 
 
 	// first step: advance the Reals of psi a dt, from 0 to dt
@@ -44,8 +47,8 @@ void qSpace::oneVisscherStep(void) {
 		laosWave[ix].re = theWave[ix].re + dt * H * theWave[ix].im;
 		qCheck(laosWave[ix]);
 	}
-	laosQWave->fixBoundaries();
-	//laosQWave->dumpWave("Visscher wave after the Re step", true);
+	newQW->fixBoundaries();
+	//newQW->dumpWave("Visscher wave after the Re step", true);
 
 
 	// second step: advance the Imaginaries of psi a dt, from dt/2 to 3dt/2
@@ -55,21 +58,23 @@ void qSpace::oneVisscherStep(void) {
 		laosWave[ix].im = theWave[ix].im - dt * H * laosWave[ix].re;
 		qCheck(laosWave[ix]);
 	}
-	laosQWave->fixBoundaries();
-	// see below laosQWave->dumpWave("Visscher laosQWave after the Im step", true);
+	newQW->fixBoundaries();
+	// see below newQW->dumpWave("Visscher newQW after the Im step", true);
 
-	// now flip them around. The qWaves point to the buffers.  should do this differently...
 	if (false) {
-		qWave t = *laosQWave;
-		*laosQWave = *theQWave;
-		*theQWave = t;
-		t.buffer = NULL;
-	}
-	else {
-		// just swap buffers
-		qCx *t = laosQWave->buffer;
-		laosQWave->buffer = theQWave->buffer;
-		theQWave->buffer = t;
+		// now flip them around. The qWaves point to the buffers.  should do this differently...
+		if (false) {
+			qWave t = *newQW;
+			*newQW = *oldQW;
+			*oldQW = t;
+			t.buffer = NULL;
+		}
+		else {
+			// just swap buffers
+			qCx *t = newQW->buffer;
+			newQW->buffer = oldQW->buffer;
+			oldQW->buffer = t;
+		}
 	}
 
 
@@ -81,8 +86,8 @@ void qSpace::oneVisscherStep(void) {
 
 	if (debug) {
 		char atVisscher[100];
-		sprintf(atVisscher, "at end of Visscher frame %1.0lf ", this->iterateSerial);
-		theQWave->dumpWave(atVisscher, true);
+		sprintf(atVisscher, "at end of Visscher frame %1.0lf | ", this->iterateSerial);
+		oldQW->dumpWave(atVisscher, true);
 	}
 }
 

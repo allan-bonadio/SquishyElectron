@@ -19,9 +19,9 @@ static const qCx dtOverI = qCx(0., -dt);
 static const qCx halfDtOverI = qCx(0., -dt / 2.);
 
 // calculate deriv / dt down the entire wave,
-// generating increments from fromWave to nextYWave and sumWave.
+// generating increments from fromWave to nextYWave and peruWave.
 // store it by adding it to origWave into nextYWave,
-//		and by adding it onto sumWave, each with multiply factors passed
+//		and by adding it onto peruWave, each with multiply factors passed
 // note how time is not an input to the hamiltonian - right now at least.
 // factor = 1/3 or 1/6, see NumRecFort p552.
 void waveDDT(qDimension *dim,
@@ -35,7 +35,7 @@ void waveDDT(qDimension *dim,
 		// we don't actually save the dPsi, we just pour it into where
 		// it needs to go for the next iteration
 		nextYWave[ix] = origWave[ix] + dPsi * nextYFactor;
-		sumWave[ix] += dPsi * sumFactor;
+		peruWave[ix] += dPsi * sumFactor;
 	}
 
 }
@@ -49,11 +49,11 @@ void qSpace::oneRk4Step(void) {
 
 	// the sumwave collects the k1/6 + k2/3 ... from p552
 	for (int ix = dim->start; ix < dim->end; ix++)
-		sumWave[ix] = qCx(0);
+		peruWave[ix] = qCx(0);
 
 	this->dumpWave("theWave ", theWave);
 
-	// always start from theWave.  I need (nextYWave = k_1/2) and (sumWave += k_1/6)
+	// always start from theWave.  I need (nextYWave = k_1/2) and (peruWave += k_1/6)
 	// into two separate wave buffers.  waveDDT() does both.
 	waveDDT(dim, theWave, theWave, k1Wave, 1./2., 1./6.);
 	this->dumpWave("after k1, k1Wave ", k1Wave);
@@ -68,7 +68,7 @@ void qSpace::oneRk4Step(void) {
 
 	// now we have our dPsi, correct to  4th order, theoretically
 	for (int ix = dim->start; ix < dim->end; ix++)
-		theWave[ix] += sumWave[ix];
+		theWave[ix] += peruWave[ix];
 
 
 
@@ -77,22 +77,22 @@ void qSpace::oneRk4Step(void) {
 	// use egyptWave for all the first-try psi values
 	// for (int ix = dim->start; ix < dim->end; ix++) {
 	// 	laosWave[ix] = theWave[ix] + hamiltonian(theWave, ix) * halfDtOverI;
-	// 	qCheck(sumWave[ix]);
+	// 	qCheck(peruWave[ix]);
 	// }
 	// dim->fixBoundaries(egyptWave);
 	//
 	// //for (int ix = 0; ix <= dim->end; ix++)
 	// //printf("INRK2 %d\t%lf\t%lf\n", ix, laosWave[ix].re, egyptWave[ix].im);
 	//
-	// // then use laosWave as the input to a better rate and a better inc at sumWave.
+	// // then use laosWave as the input to a better rate and a better inc at peruWave.
 	// for (int ix = dim->start; ix < dim->end; ix++) {
-	// 	sumWave[ix] = theWave[ix] + hamiltonian(egyptWave, ix) * dtOverI;
-	// 	qCheck(sumWave[ix]);
+	// 	peruWave[ix] = theWave[ix] + hamiltonian(egyptWave, ix) * dtOverI;
+	// 	qCheck(peruWave[ix]);
 	// }
 	//
 	// // now flip them around
-	// qCx *t = sumWave;
-	// sumWave = theWave;
+	// qCx *t = peruWave;
+	// peruWave = theWave;
 	// theWave = t;
 
 	dim->fixBoundaries(theWave);

@@ -12,6 +12,8 @@ import SetWaveTab from './SetWaveTab';
 import SetPotentialTab from './SetPotentialTab';
 import SetResolutionTab from './SetResolutionTab';
 
+import qe from '../wave/qe';
+
 //import {setWave, setPotential} from './wave/theWave';
 
 export class ControlPanel extends React.Component {
@@ -80,6 +82,11 @@ export class ControlPanel extends React.Component {
 		this.setState(obj);
 	}
 
+	setAlgorithm(newAlg) {
+		this.setState({algorithm: newAlg});
+		qe.qSpace_setAlgorithm(newAlg);
+	}
+
 	/* ********************************************** render */
 
 	render() {
@@ -112,12 +119,14 @@ export class ControlPanel extends React.Component {
 
 		return <div className='ControlPanel'>
 			<CPToolbar
+				isTimeAdvancing={p.isTimeAdvancing}
 				startIterating={p.startIterating}
 				stopIterating={p.stopIterating}
 				singleStep={p.singleStep}
-				isTimeAdvancing={p.isTimeAdvancing}
 				iterateFrequency={p.iterateFrequency}
 				setIterateFrequency={freq => this.setIterateFrequency(freq)}
+				algorithm={p.algorithm}
+				setAlgorithm={alg => this.setAlgorithm(alg)}
 			/>
 			<div className='cpSecondRow'>
 				<ul className='TabBar' >

@@ -10,12 +10,11 @@
 #define MAX_DIMENSIONS  1
 
 extern class qSpace *theSpace;
-extern class qCx *theWave, *sumWave, *egyptWave, *laosWave;
+extern class qCx *theWave, *peruWave, *egyptWave, *laosWave;
 extern class qCx *k1Wave, *k2Wave, *k3Wave, *k4Wave;
 
-extern class qWave *theQWave, *sumQWave,
-	*k1QWave, *k2QWave, *k3QWave, *k4QWave,
-	*egyptQWave, *laosQWave;
+extern class qWave *theQWave, *peruQWave, *egyptQWave, *laosQWave;
+extern class qWave *k1QWave, *k2QWave, *k3QWave, *k4QWave;
 
 extern qReal *thePotential;
 extern float *viewBuffer;
@@ -69,6 +68,11 @@ const int contENDLESS = 2;
 
 /* ************************************************************ the space */
 
+// algorithm
+const int algRK2 = 2;
+const int algRK4 = 4;
+const int algVISSCHER = 7;
+
 struct qSpace {
 public:
 	qSpace(int nDims);
@@ -97,11 +101,17 @@ public:
 	// it's a double cuz I don't know how big it'll get)
 	double iterateSerial;
 
+	struct qWave *latestQWave;
+
 	// time increment used in schrodinger's, plus constants handy in intgration
 	qReal dt;
 	qCx dtOverI;
 	qCx halfDtOverI;
 
+	int algorithm;
+	int bufferNum;
+
+	/* ****************************************** hacks that might go away */
 	// set to N or whatever, count down, when you hhit zero, lowPass (sometimes)
 	int filterCount;
 
@@ -111,6 +121,7 @@ public:
 	// zero = off.  true to do it every iteration a little and use value as dilution factor
 	qReal continuousLowPass;
 
+	/* *********************************************** Dimensions & other serious stuff */
 	// Dimensions are listed from outer to inner as with the resulting psi array:
 	// psi[outermost-dim][dim][dim][innermost-dim]
 	// always a fixed size, for simplicity.
@@ -120,14 +131,10 @@ public:
 	void setZeroPotential(void);
 	void setValleyPotential(qReal power, qReal scale, qReal offset);
 
-//	void dumpThatWave(qCx *wave);
-//	void dumpWave(const char *title, qCx *aWave = theWave);
-//	void forEach(void callback(qCx));
-//	void map(qCx callback(qCx*));
-
-	void oneRk2Step(void);
-	void oneRk4Step(void);
-	void oneVisscherStep(void);
+	void oneIntegrationStep(void);
+	void oneRk2Step(qWave *oldQWave, qWave *newQWave);
+	void oneRk4Step(qWave *oldQWave, qWave *newQWave);
+	void oneVisscherStep(qWave *oldQWave, qWave *newQWave);
 };
 
 /* ************************************************************ a wave buffer */
@@ -175,7 +182,6 @@ extern "C" {
 	int manyRk2Steps(void);
 
 	// refills the view  buffer; returns highest magnitude
-	float updateViewBuffer(void);
 	int dumpViewBuffer(int nPoints);
 
 	void qWave_dumpWave(char *title);
@@ -185,15 +191,15 @@ extern "C" {
 }
 
 // internal
-extern void oneRk2Step(void);
+// obsolete i believe  extern void oneRk2Step(void);
 
-
+extern float updateViewBuffer(qWave *);
 
 //extern void oneRk4Step(void);
 extern qCx hamiltonian(qCx *wave, int x);
 
 extern class qSpace *theSpace;
-extern class qCx *theWave, *egyptWave, *laosWave, *sumWave;
+extern class qCx *theWave, *egyptWave, *laosWave, *peruWave;
 extern qReal *thePotential;
 extern float *viewBuffer;
 extern qReal elapsedTime;

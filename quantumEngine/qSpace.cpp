@@ -10,10 +10,10 @@
 class qSpace *theSpace = NULL;
 
 // a transitional kind of thing from raw wave arrays to the new qWave buffer obj
-class qWave *theQWave = NULL, *sumQWave = NULL,
+class qWave *theQWave = NULL, *peruQWave = NULL,
 	*k1QWave = NULL, *k2QWave = NULL, *k3QWave = NULL, *k4QWave = NULL,
 	*egyptQWave = NULL, *laosQWave = NULL;
-class qCx *theWave = NULL, *sumWave = NULL,
+class qCx *theWave = NULL, *peruWave = NULL,
 	*k1Wave = NULL, *k2Wave = NULL, *k3Wave = NULL, *k4Wave = NULL,
 	*egyptWave = NULL, *laosWave = NULL;
 
@@ -26,6 +26,8 @@ static int dimsSoFar;
 
 // someday I need an C++ error handling layer.  See
 // https://emscripten.org/docs/porting/Debugging.html?highlight=assertions#handling-c-exceptions-from-javascript
+
+/* ********************************************************** qSpace construction */
 
 qSpace::qSpace(int nDims) {
 	this->nDimensions = nDims;
@@ -49,8 +51,12 @@ qSpace *startNewSpace(void) {
 	if (theSpace) {
 		printf("about to delete theQWave:\n");
 		delete theQWave;
-		printf("about to delete sumQWave:\n");
-		delete sumQWave;
+		printf("about to delete peruQWave:\n");
+		delete peruQWave;
+		printf("about to delete egyptQWave:\n");
+		delete egyptQWave;
+		printf("about to delete laosQWave:\n");
+		delete laosQWave;
 		printf("about to delete k1QWave:\n");
 		delete k1QWave;
 		printf("about to delete k2QWave:\n");
@@ -59,10 +65,6 @@ qSpace *startNewSpace(void) {
 		delete k3QWave;
 		printf("about to delete k4QWave:\n");
 		delete k4QWave;
-		printf("about to delete egyptQWave:\n");
-		delete egyptQWave;
-		printf("about to delete laosQWave:\n");
-		delete laosQWave;
 
 		printf("about to delete thePotential:\n");
 		delete[] thePotential;
@@ -126,16 +128,16 @@ qSpace *completeNewSpace(void) {
 
 	//  allocate the buffers
 	theQWave = new qWave(theSpace);
-	sumQWave = new qWave(theSpace);
+	peruQWave = new qWave(theSpace);
+	egyptQWave = new qWave(theSpace);
+	laosQWave = new qWave(theSpace);
 	k1QWave = new qWave(theSpace);
 	k2QWave = new qWave(theSpace);
 	k3QWave = new qWave(theSpace);
 	k4QWave = new qWave(theSpace);
-	egyptQWave = new qWave(theSpace);
-	laosQWave = new qWave(theSpace);
 
 	theWave = theQWave->buffer;
-	sumWave = sumQWave->buffer;
+	peruWave = peruQWave->buffer;
 	k1Wave = k1QWave->buffer;
 	k2Wave = k2QWave->buffer;
 	k3Wave = k3QWave->buffer;
@@ -161,6 +163,8 @@ qSpace *completeNewSpace(void) {
 	theSpace->dtOverI = qCx(0., -dt);
 	theSpace->halfDtOverI = qCx(0., -dt / 2.);
 
+	theSpace->algorithm = algRK2;
+	theSpace->bufferNum = 0;
 
 	//printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", nStates, nPoints);
 	//printf("  dimension N=%d  extraN=%d  continuum=%d  start=%d  end=%d  label=%s\n",
@@ -195,10 +199,9 @@ void qSpace_setValleyPotential(qReal power, qReal scale, qReal offset) {
 	theSpace->setValleyPotential(power, scale, offset);
 }
 
-void qSpace_oneRk2Step() { theSpace->oneRk2Step(); }
-void qSpace_oneRk4Step() { theSpace->oneRk4Step(); }
-void qSpace_oneVisscherStep() { theSpace->oneVisscherStep(); }
+void qSpace_oneIntegrationStep(void) { theSpace->oneIntegrationStep(); }
 
+void qSpace_setAlgorithm(int newAlg) { theSpace->algorithm = newAlg; }
 
 }
 
@@ -224,6 +227,8 @@ void qSpace::setZeroPotential(void) {
 	qDimension *dim = theSpace->dimensions;
 	for (int ix = 0; ix < dim->nPoints; ix++)
 		thePotential[ix] = 0.;
+
+	updateViewBuffer(this->latestQWave);
 }
 
 void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset = 0) {
@@ -232,5 +237,50 @@ void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset =
 	for (int ix = 0; ix < dim->nPoints; ix++) {
 		thePotential[ix] = pow(abs(ix - mid), power) * scale + offset;
 	}
+
+	// this is overkill but gotta update the Potential column in the view buffer
+	updateViewBuffer(this->latestQWave);
 }
+
+
+/* ********************************************************** integration */
+
+// does one visscher step, or an rk2 or rk4 iteration step
+void qSpace::oneIntegrationStep() {
+	qWave *oldQWave, *newQWave;
+
+	// each calculates the new wave into the opposite buffer
+	if (this->bufferNum) {
+		newQWave = theQWave;
+		oldQWave = peruQWave;
+		this->bufferNum = 0;
+	}
+	else {
+		oldQWave = theQWave;
+		newQWave = peruQWave;
+		this->bufferNum = 1;
+	}
+
+	switch (this->algorithm) {
+	case algRK2:
+		this->oneRk2Step(oldQWave, newQWave);
+		break;
+
+	case algRK4:
+		break;
+		this->oneRk4Step(oldQWave, newQWave);
+
+	case algVISSCHER:
+		this->oneVisscherStep(oldQWave, newQWave);
+		break;
+
+	default:
+		printf("*** unknown algorithm %d\n", this->algorithm);
+		return;
+	}
+
+	this->latestQWave = newQWave;
+	updateViewBuffer(newQWave);
+}
+
 

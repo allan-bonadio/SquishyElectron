@@ -20,16 +20,18 @@ float *getViewBuffer(void) {
 //     real   imaginary    potential    serial
 // Two vertices per datapoint: bottom then top, same data.
 // also converts to doubles from floats.
-float updateViewBuffer() {
+float updateViewBuffer(qWave *latestQWave) {
+	qCx *latestWave = latestQWave->buffer;
+
 	int nPoints = theSpace->nPoints;
 	qReal highest = 0;
 	qReal tiny = 1e-8;
 
-	//theQWave->dumpWave("at start of updateViewBuffer()");
+	//'array'->dumpWave("at start of updateViewBuffer()");
 
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
 		float *twoRowPtr = viewBuffer + pointNum * 8;
-		qCx *wavePtr = theWave + pointNum;
+		qCx *wavePtr = latestWave + pointNum;
 		qReal *potPtr = thePotential + pointNum;
 		qReal re = wavePtr->re;
 		qReal im = wavePtr->im;
@@ -50,7 +52,7 @@ float updateViewBuffer() {
 			highest = height;
 	}
 
-	// dump of viewbuffer.  Was good until I realized theWave itself was what to pay attention to.
+	// dump of viewbuffer.  Was good until I realized latestWave itself was what to pay attention to.
 	if (false) {
 		printf("viewBuffer.cpp, as written to view buffer:\n");
 		dumpViewBuffer(nPoints);

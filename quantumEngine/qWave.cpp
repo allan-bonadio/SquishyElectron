@@ -140,6 +140,8 @@ qReal cleanOneNumber(qReal u, int ix, int sense) {
 
 // look for NaNs and other foul numbers, and replace them with something .. better.
 void qWave::prune() {
+	printf("Do we really have to do this?  let's stop.\n");
+
 	qDimension *dims = this->space->dimensions;
 	qCx *wave = this->buffer;
 	for (int ix = dims->start; ix < dims->end; ix++) {
@@ -257,6 +259,8 @@ void qWave::setCircularWave(qReal n) {
 	//dumpThatWave(dims, wave, true);
 	this->normalize();
 	this->dumpWave("after set sircular & normalize", true);
+
+	updateViewBuffer(this);
 }
 
 // make a superposition of two waves in opposite directions.
@@ -280,6 +284,8 @@ void qWave::setStandingWave(qReal n) {
 	}
 	this->normalize();
 	this->dumpWave("after set standing & normalize", true);
+
+	updateViewBuffer(this);
 }
 
 // widthFactor is fraction of total width the packet it is, 0.0-1.0, for a fraction of N.
@@ -302,6 +308,8 @@ void qWave::setPulseWave(qReal widthFactor, qReal cycles) {
 	theQWave->dumpWave("just did PulseWave", true);
 	this->normalize();
 	theQWave->dumpWave("normalized PulseWave", true);
+
+	updateViewBuffer(this);
 }
 
 

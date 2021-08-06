@@ -174,14 +174,18 @@ export class SquishPanel extends React.Component {
 	/* ******************************************************* iteration & animation */
 
 
-	// take one RK integration step
+	// take one integration step
 	crunchOneFrame() {
-		qe.qSpace_oneVisscherStep();
+		this.startIntegrate = performance.now();
+
+		qe.qSpace_oneIntegrationStep();
+		//qe.qSpace_oneVisscherStep();
 		//qe.qSpace_oneRk2Step();
-		qe.updateToLatestWaveBuffer();
 
 		this.startUpdate = performance.now();
-		qe.updateViewBuffer();
+		qe.updateToLatestWaveBuffer();
+
+		// always done at end of integration qe.updateViewBuffer( ahem some qwave );
 		this.curView.reloadAllVariables();  // am i doing this twice?
 
 		if (this.dumpingTheViewBuffer)
@@ -201,11 +205,10 @@ export class SquishPanel extends React.Component {
 	// this is called usually more like 5 or 20 times a second, whatever the user chooses.
 	iterateOneFrame(isTimeAdvancing, needsRepaint) {
 		//console.log(`time since last tic: ${now - startFrame}ms`)
-		this.startRK = this.startUpdate = this.startReload = this.startDraw = this.endFrame = 0;
+		this.startIntegrate = this.startUpdate = this.startReload = this.startDraw = this.endFrame = 0;
 		const areBenchmarking = this.areBenchmarking;
 
 		// could be slow.  sometime in the future.
-		this.startRK = performance.now();
 		if (isTimeAdvancing) {
 			this.crunchOneFrame();
 		}
@@ -231,13 +234,13 @@ export class SquishPanel extends React.Component {
 			this.endFrame = performance.now();
 			if (areBenchmarking) {
 				console.log(`times:\n`+
-					`RK:     ${(this.startUpdate - this.startRK).toFixed(2)}ms\n`+
+					`RK:     ${(this.startUpdate - this.startIntegrate).toFixed(2)}ms\n`+
 					`up:     ${(this.startReload - this.startUpdate).toFixed(2)}ms\n`+
 					`reload: ${(this.startDraw - this.startReload).toFixed(2)}ms\n`+
 					`draw:   ${(this.endFrame - this.startDraw).toFixed(2)}ms\n`+
-					`total:  ${(this.endFrame - this.startRK).toFixed(2)}ms\n\n` +
-					`period:  ${(this.startRK - this.prevStart).toFixed(2)}ms\n`);
-				this.prevStart = this.startRK;
+					`total:  ${(this.endFrame - this.startIntegrate).toFixed(2)}ms\n\n` +
+					`period:  ${(this.startIntegrate - this.prevStart).toFixed(2)}ms\n`);
+				this.prevStart = this.startIntegrate;
 			}
 		}
 	}
@@ -360,9 +363,6 @@ export class SquishPanel extends React.Component {
 		default:
 			throw `setWave: no vave breed '${breed}'`
 		}
-
-		qe.updateViewBuffer();
-		this.iterateOneFrame(false, true);
 	}
 
 	setPotential(breed, arg1 = 1, arg2 = 1, arg3 = 0) {
@@ -378,7 +378,6 @@ export class SquishPanel extends React.Component {
 		default:
 			throw `setPotential: no voltage breed '${breed}'`
 		}
-		qe.updateViewBuffer();
 		this.iterateOneFrame(false, true);
 	}
 

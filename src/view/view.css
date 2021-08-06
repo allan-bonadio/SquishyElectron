@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** view -- CSS for SquishView and contents
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
@@ -14,13 +14,13 @@
 /* canvas itself */
 canvas.squishCanvas {
 	position: relative;
-	border: '1px #666 inset';
+	border: 1px #666 inset;
 }
 
 /* overlay with frame ct and virtual time */
 aside.viewOverlay {
 	position: absolute;
-	border: '1px #0000 solid';
+	border: 1px #0000 solid;
 }
 
 .northWestWrapper, .northEastWrapper {
@@ -32,3 +32,10 @@ aside.viewOverlay {
 
 .northWestWrapper { left: .5em; }
 .northEastWrapper { right: .5em; }
+
+.spinner {
+	position: absolute;
+	left: calc(50% - 100px);
+	top: 20%;
+}
+

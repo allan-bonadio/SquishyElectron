@@ -57,6 +57,11 @@
 	width: 4em;
 }
 
+.CPToolbar .algorithmBox {
+	display: inline-block;
+	margin-right: .5em;
+}
+
 /* **************************************** general controls */
 
 
