@@ -9,14 +9,6 @@
 
 class qSpace *theSpace = NULL;
 
-// a transitional kind of thing from raw wave arrays to the new qWave buffer obj
-class qWave *theQWave = NULL, *peruQWave = NULL,
-	*k1QWave = NULL, *k2QWave = NULL, *k3QWave = NULL, *k4QWave = NULL,
-	*egyptQWave = NULL, *laosQWave = NULL;
-class qCx *theWave = NULL, *peruWave = NULL,
-	*k1Wave = NULL, *k2Wave = NULL, *k3Wave = NULL, *k4Wave = NULL,
-	*egyptWave = NULL, *laosWave = NULL;
-
 
 qReal *thePotential = NULL;
 

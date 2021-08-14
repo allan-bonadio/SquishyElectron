@@ -6,24 +6,43 @@
 #include "qSpace.h"
 #include <cmath>
 
+// a transitional kind of thing from raw wave arrays to the new qWave buffer obj
+class qWave *theQWave = NULL,
+	*k1QWave = NULL, *k2QWave = NULL, *k3QWave = NULL, *k4QWave = NULL,
+	*egyptQWave = NULL, *laosQWave = NULL, *peruQWave = NULL;
+class qCx *theWave = NULL,
+	*k1Wave = NULL, *k2Wave = NULL, *k3Wave = NULL, *k4Wave = NULL,
+	*egyptWave = NULL, *laosWave = NULL, *peruWave = NULL;
+
 /* ************************************************************ birth & death & basics */
 
 // buffer is initialized to zero bytes therefore 0.0 everywhere
 qWave::qWave(qSpace *space) {
 	this->space = space;
 	this->buffer = (qCx *) malloc(space->nPoints * sizeof(qCx));
+	this->dynamicallyAllocated = 1;
+}
+
+qWave::qWave(qSpace *space, qCx *buffer) {
+	this->space = space;
+	this->buffer = buffer;
+	this->dynamicallyAllocated = 0;
 }
 
 qWave::~qWave() {
 	printf("start the qWave instance destructor...\n");
 	this->space = NULL;
 	printf("    set space to null...\n");
-	free(this->buffer);
+
+	if (this->dynamicallyAllocated)
+		free(this->buffer);
 	printf("    freed buffer...\n");
+
 	this->buffer = NULL;
-	printf("set buffer to null; done with qWave destructor...\n");
+	printf("setted buffer to null; done with qWave destructor.\n");
 }
 
+/* never tested */
 void qWave::forEachPoint(void (*callback)(qCx, int) ) {
 	qDimension *dim = this->space->dimensions;
 	qCx *wave = this->buffer;
@@ -35,6 +54,7 @@ void qWave::forEachPoint(void (*callback)(qCx, int) ) {
 	}
 }
 
+/* never tested */
 void qWave::forEachState(void (*callback)(qCx, int) ) {
 	qDimension *dim = this->space->dimensions;
 	qCx *wave = this->buffer;
@@ -47,14 +67,16 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 
 }
 
+/* ******************************************************** diagnostic dump **/
+
 // if it overflows the buffer, screw it.  just dump a row for a cx datapoint.
 static void dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtras) {
 	qReal re = w.re;
 	qReal im = w.im;
 	if (withExtras) {
 		qReal mag = re * re + im * im;
-		qReal phase = atan2(im, re) * 180 / PI;
-		qReal dPhase = phase - *pPrevPhase + 360.;
+		qReal phase = atan2(im, re) * 180 / PI;  // pos or neg
+		qReal dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
 		while (dPhase > 360.) dPhase -= 360.;
 
 		sprintf(buf, "[%d] (%8.4lf,%8.4lf) | %8.2lf %8.2lf %8.4lf",
@@ -68,7 +90,7 @@ static void dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtra
 
 // NOT a member function; this is wave and space independent
 static void dumpThatWave(qDimension *dim, qCx *wave, bool withExtras) {
-	int ix;
+	int ix = 0;
 	char buf[100];
 	double prevPhase = 0.;
 
@@ -170,37 +192,48 @@ qReal qWave::innerProduct(void) {
 
 // enforce ⟨ψ | ψ⟩ = 1 by dividing out the current value
 void qWave::normalize(void) {
-	qCx *wave = this->buffer;
+	// for visscher, we have to make it in a temp wave and copy back to our buffer
+	qCx tempWave[this->space->nPoints];
+	qWave tqWave(this->space, tempWave);
+	qWave *tempQWave = &tqWave;
+	//qCx *wave = tempWave;
+	//qWave *tempQWave = new qWave(this->space, tempWave);
+	//qCx *wave = this->buffer;
 	qDimension *dims = this->space->dimensions;
 	qReal mag = this->innerProduct();
-	printf("normalizing.  iprod=%lf", mag);
-	//this->dumpWave("The wave,before normalize", true);
+	printf("normalizing.  magnitude=%lf", mag);
+	tempQWave->dumpWave("The wave,before normalize", true);
 
 	if (mag == 0.) {
-		// ALL ZEROES!??! set them all to a constant, normalized
+		// ALL ZEROES!??! this is bogus, shouldn't be happening
 		printf("ALL ZEROES ! ? ? ! set them all to a constant, normalized\n");
 		const qReal f = 1e-9;
 		for (int ix = dims->start; ix < dims->end; ix++)
-			wave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
+			tempWave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
 	}
 	else if (! isfinite(mag)) {
 		//
 		printf("not finite ! ? ? ! set them all to a constant, normalized\n");
 		const qReal f = 1e-9;
 		for (int ix = dims->start; ix < dims->end; ix++)
-			wave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
+			tempWave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
 	}
 	else {
 		mag = pow(mag, -0.5);
 
 		for (int ix = dims->start; ix < dims->end; ix++)
-			wave[ix] *= mag;
+			tempWave[ix] *= mag;
 	}
+	tempQWave->fixBoundaries();
+	tempQWave->dumpWave("The tempWave,before visscher ½", true);
+	tempQWave->space->visscherHalfStep(tempQWave, this);
+	this->dumpWave("this wave,after visscher ½", true);
 	this->fixBoundaries();
 	//printf("    normalizing.  new IP=%lf\n", this->space->innerProduct(wave));
 	//this->dumpWave("The wave,after normalize", true);
 }
 
+// possibly obsolete if we use visscher
 // average the wave's points with the two closest neighbors to fix the divergence
 // along the x axis I always see.  Since the density of our mesh is finite,
 // you can't expect noise at or near the frequency of the mesh to be meaningful.
@@ -297,7 +330,8 @@ void qWave::setPulseWave(qReal widthFactor, qReal cycles) {
 	// start with a real wave
 	this->setCircularWave(cycles / widthFactor);
 
-	// modulate with a gaussian, centered at the peak, with stdDev like the real one within some factor
+	// modulate with a gaussian, centered at the peak, with stdDev
+	// like the real one within some factor
 	int peak = lround(dims->N * widthFactor) % dims->N;  // ?? i dunno
 	qReal stdDev = dims->N * widthFactor / 2.;  // ?? i'm making this up
 	for (int ix = dims->start; ix < dims->end; ix++) {
