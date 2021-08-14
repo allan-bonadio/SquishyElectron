@@ -10,7 +10,8 @@ import PropTypes from 'prop-types';
 import ControlPanel from './controlPanel/ControlPanel';
 
 import {createSpaceNWave} from './wave/theWave';
-import {qeSpace, qeStartPromise, qeDefineAccess} from './wave/qEngine';
+// eslint-disable-next-line no-unused-vars
+import {qeSpace, qeStartPromise, qeDefineAccess, algRK2, algRK4, algVISSCHER} from './wave/qEngine';
 import qe from './wave/qe';
 
 import SquishView from './view/SquishView';
@@ -208,14 +209,15 @@ export class SquishPanel extends React.Component {
 		this.startIntegrate = this.startUpdate = this.startReload = this.startDraw = this.endFrame = 0;
 		const areBenchmarking = this.areBenchmarking;
 
-		// could be slow.  sometime in the future.
+		// could be slow.
 		if (isTimeAdvancing) {
 			this.crunchOneFrame();
+			needsRepaint = true;
 		}
 
 		// if we need to repaint... if we're iterating, if the view says we have to,
 		// or if this is a one shot step
-		if (isTimeAdvancing || needsRepaint) {
+		if (needsRepaint) {
 			// reload all variables
 			this.startReload = performance.now();
 			this.curView.reloadAllVariables();  // am i doing this twice?
@@ -237,7 +239,7 @@ export class SquishPanel extends React.Component {
 					`RK:     ${(this.startUpdate - this.startIntegrate).toFixed(2)}ms\n`+
 					`up:     ${(this.startReload - this.startUpdate).toFixed(2)}ms\n`+
 					`reload: ${(this.startDraw - this.startReload).toFixed(2)}ms\n`+
-					`draw:   ${(this.endFrame - this.startDraw).toFixed(2)}ms\n`+
+					`draw:   ${(this.endFrame - this.startDraw).toFixed(2)}ms\n\n`+
 					`total:  ${(this.endFrame - this.startIntegrate).toFixed(2)}ms\n\n` +
 					`period:  ${(this.startIntegrate - this.prevStart).toFixed(2)}ms\n`);
 				this.prevStart = this.startIntegrate;
@@ -259,21 +261,6 @@ export class SquishPanel extends React.Component {
 			this.timeForNextTic = now + s.iteratePeriod;
 		}
 
-		//if (this.onceMore)
-		//	this.setState({isTimeAdvancing: false});
-		//this.onceMore = false;
-
-			//if (this.curUnitHeight != this.targetUnitHeight) {
-			//	// exponential relaxation
-			//	this.curUnitHeight = (15 * this.curUnitHeight + this.targetUnitHeight) / 16;
-			//	if (Math.abs((this.curUnitHeight - this.targetUnitHeight) / this.targetUnitHeight) < .01) {
-			//		//ok we're done.  close enough.
-			//		this.curUnitHeight = this.targetUnitHeight;
-			//		//this.onceMore = true;  // just to make sure it paints
-			//	}
-			//}
-		//}
-
 		// this is in milliseconds
 		const timeSince = now - this.lastAniFrame;
 //		if (timeSince < 8) {
@@ -290,12 +277,13 @@ export class SquishPanel extends React.Component {
 
 	/* ******************************************************* UI & user actions */
 
-	// start/stop or single step the animation
+	// start/stop or single step the animation (obsolete?)
 	// shouldAnimate falsy = stop it if running
 	// true = start it or continue it if running
 	// freq is how fast it goes, or 'one' to single step.
 	// I guess it's irrelevant now with requestAnimationFrame()
 	iterateAnimate(shouldAnimate, freq) {
+		debugger;  // see i tol ja
 		if (! shouldAnimate || ! freq || !qe.theCurrentView) {
 			//this.onceMore = false;
 			this.setState({isTimeAdvancing: false});
@@ -423,16 +411,16 @@ export class SquishPanel extends React.Component {
 				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
 				<SquishView setGLCanvas={canvas => this.setGLCanvas(canvas)} />
 				<ControlPanel
-					openResolutionDialog={() => this.openResolutionDialog()}
 					iterateAnimate={(shouldAnimate, freq) => this.iterateAnimate(shouldAnimate, freq)}
 					isTimeAdvancing={s.isTimeAdvancing}
-					iterateFrequency={1000 / s.iteratePeriod}
 					startIterating={() => this.startIterating()}
 					stopIterating={() => this.stopIterating()}
 					singleStep={() => this.singleStep()}
 					setWave={(breed, freq) => this.setWave(breed, freq)}
 					setPotential={(breed, power, scale, offset) => this.setPotential(breed, power, scale, offset)}
+					iterateFrequency={1000 / s.iteratePeriod}
 					setIterateFrequency={freq => this.setIterateFrequency(freq)}
+					openResolutionDialog={() => this.openResolutionDialog()}
 				/>
 			</div>
 		);
