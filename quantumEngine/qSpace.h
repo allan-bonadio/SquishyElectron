@@ -20,6 +20,10 @@ extern qReal *thePotential;
 extern float *viewBuffer;
 extern qReal elapsedTime;
 
+extern float updateViewBuffer(qWave *);
+extern qCx hamiltonian(qCx *wave, int x);
+extern void qeStarted(void);
+
 /* *************************************** one for each DIMENSION of the wave array */
 struct qDimension {
 public:
@@ -122,8 +126,8 @@ public:
 	qReal continuousLowPass;
 
 	/* *********************************************** Dimensions & other serious stuff */
-	// Dimensions are listed from outer to inner as with the resulting psi array:
-	// psi[outermost-dim][dim][dim][innermost-dim]
+	// Dimensions are listed from outer to inner as with the resulting ψ array:
+	// ψ[outermost-dim][dim][dim][innermost-dim]
 	// always a fixed size, for simplicity.
 	qDimension dimensions[MAX_DIMENSIONS];
 
@@ -135,20 +139,26 @@ public:
 	void oneRk2Step(qWave *oldQWave, qWave *newQWave);
 	void oneRk4Step(qWave *oldQWave, qWave *newQWave);
 	void oneVisscherStep(qWave *oldQWave, qWave *newQWave);
+
+	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);
 };
 
 /* ************************************************************ a wave buffer */
 
 struct qWave {
 
-	// create a qWave
+	// create a qWave, dynamically allocated or hand in a buffer to use
 	qWave(qSpace *space);
+	qWave(qSpace *space, qCx *buffer);
 	~qWave();
 
 	qSpace *space;
 
 	// the actual data, hopefully in the right size allocated block
 	qCx *buffer;
+
+	// if it used the first constructor
+	int dynamicallyAllocated: 1;
 
 	void dumpWave(const char *title, bool withExtras = false);
 	void fixBoundaries(void);
@@ -190,18 +200,3 @@ extern "C" {
 	void qWave_setPulseWave(qReal widthFactor, qReal cycles);
 }
 
-// internal
-// obsolete i believe  extern void oneRk2Step(void);
-
-extern float updateViewBuffer(qWave *);
-
-//extern void oneRk4Step(void);
-extern qCx hamiltonian(qCx *wave, int x);
-
-extern class qSpace *theSpace;
-extern class qCx *theWave, *egyptWave, *laosWave, *peruWave;
-extern qReal *thePotential;
-extern float *viewBuffer;
-extern qReal elapsedTime;
-
-extern void qeStarted(void);
