@@ -27,7 +27,7 @@ void qSpace::oneRk2Step(qWave *oldQWave, qWave *newQWave) {
 	oldQW->fixBoundaries();
 	//oldQW->dumpWave("starting oldW", true);
 
-	// use laosWave for all the first-try psi values
+	// use laosWave for all the first-try ψ values
 	for (int ix = dim->start; ix < dim->end; ix++) {
 		laosWave[ix] = oldW[ix] + hamiltonian(oldW, ix) * this->halfDtOverI;
 		qCheck(newW[ix]);

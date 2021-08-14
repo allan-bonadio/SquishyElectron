@@ -44,7 +44,7 @@ export function coastUnitHeight() {
 
 /*
 ** data format of attributes:  four column table of floats
-** psi.re  psi.im   potential    ...0?...
+** ψ.re  ψ.im   potential    ...0?...
 ** uses gl_VertexID to figure out whether the y should be re^2+im^2  NO! opengl 2 only
 ** or zero
 */

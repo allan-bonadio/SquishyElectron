@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 
 import PotentialArea from './PotentialArea';
 
-/* This draws the well, without the psi wave (see draw.js).
+/* This draws the well, without the ψ wave (see draw.js).
 coordinate systems:
 pixel = screen pixels; inside the svg
 wave = actual value of ⟨ψ | ψ⟩, average about 1/N, in y direction, positive is up

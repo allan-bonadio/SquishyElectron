@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** Hamiltonian -- calculate the energy of the wave, H | psi >
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
@@ -14,9 +14,9 @@
 // or, per-view or per-space.
 qCx hamiltonian(qCx *wave, int x) {
 	// so at location x, if dx = 1,
-	// the derivative would be (psi[x+1] - psi[x])
-	//                      or (psi[x] - psi[x-1])
-	// so second deriv would be psi[x+1] + psi[x-1] - 2* psi[x]
+	// the derivative would be (ψ[x+1] - ψ[x])
+	//                      or (ψ[x] - ψ[x-1])
+	// so second deriv would be ψ[x+1] + ψ[x-1] - 2* ψ[x]
 	qCx d2 = wave[x-1] + wave[x+1] - wave[x] * 2;
 	qCheck(d2);
 

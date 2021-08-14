@@ -6,7 +6,7 @@ import qCx from './qCx';
 let jWaveBuffers;
 
 // schrodinger's:
-//    ih ∂psi / ∂t  =  [V - (h^2/2m) (∂^2/∂x^2)] psi
+//    ih ∂ψ / ∂t  =  [V - (h^2/2m) (∂^2/∂x^2)] ψ
 // so have to calculate second derivative of it all.  dx=1 always.
 //
 
@@ -23,9 +23,9 @@ export function iterate(wave, dt = DEFAULT_DT) {
 	let {V, N} = space;
 
 	// so at location n,
-	// the derivative would be (psi[n+1] - psi[n]) / dn
-	//                      or (psi[n] - psi[n-1]) / dn
-	// so second deriv would be psi[n+1] + psi[n-1] - 2* psi[n]
+	// the derivative would be (ψ[n+1] - ψ[n]) / dn
+	//                      or (ψ[n] - ψ[n-1]) / dn
+	// so second deriv would be ψ[n+1] + ψ[n-1] - 2* ψ[n]
 
 	wave.fixBoundaries();
 	//console.info(`𝜓(t_0): `, mainWave);
@@ -50,7 +50,7 @@ export function iterate(wave, dt = DEFAULT_DT) {
 		dPsi_dt_t0 = dPsi_dt_t0.multBy(qCx(0,-1));
 		check(dPsi_dt_t0);
 
-		// psi at t_1/2 given that derivative - must finish in this loop
+		// ψ at t_1/2 given that derivative - must finish in this loop
 		// to take 2nd derivitive next loop
 		jWaveBuffers.alt[ix] = mainWave[ix].addTo(dPsi_dt_t0, dt/2);
 		check(jWaveBuffers.alt[ix]);
@@ -84,7 +84,7 @@ export function iterate(wave, dt = DEFAULT_DT) {
 		dPsi_dt_tHalf = dPsi_dt_tHalf.multBy(qCx(0,-1));
 		check(dPsi_dt_tHalf);
 
-		// now increment psi by full step dt * derivative_Half, shbe right
+		// now increment ψ by full step dt * derivative_Half, shbe right
 		jWaveBuffers.next[ix] = mainWave[ix].addTo(dPsi_dt_tHalf, dt);
 		check(jWaveBuffers.next[ix]);
 	}

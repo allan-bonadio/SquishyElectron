@@ -3,10 +3,10 @@
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
-// we have an N element array for the psi values, indexed (sortof) by X,
+// we have an N element array for the ψ values, indexed (sortof) by X,
 // whatever mins/maxes/increments, will be calculated.
 // Boundary conditions: each row will have N+2 elements, where the 0th and the
-// N+1-th element are the low and high boundaries.  They kindof have to be clamped to psi =
+// N+1-th element are the low and high boundaries.  They kindof have to be clamped to ψ =
 // zero, and the corresponding V must be infinite, to completely shut out any ψ
 // off the ends.
 
@@ -64,7 +64,7 @@ export class jSpace {
 
 }
 
-// psi itself; can have more than one per jSpace
+// ψ itself; can have more than one per jSpace
 export class jWave {
 	// N is the resolution of the jWave buffer; the array is 2 more cells
 	constructor(space) {
@@ -80,10 +80,10 @@ export class jWave {
 
 	dump(title = 'a jWave') {
 		console.info(`${title} ==> ⟨ψ | ψ⟩ = `, this.innerProduct());
-		this.psi.forEach((p, ix) => console.info(`   psi[${ix}]: ${p.real.toFixed(6)}\t${p.im.toFixed(6)}`));
+		this.psi.forEach((p, ix) => console.info(`   ψ[${ix}]: ${p.real.toFixed(6)}\t${p.im.toFixed(6)}`));
 	}
 
-	// just iterate over all.  psi must be created already
+	// just iterate over all.  ψ must be created already
 	forEach(callback) {
 		let {space: {N}, psi} = this;
 		for (let ix = 1; ix <= N; ix++)
@@ -91,7 +91,7 @@ export class jWave {
 	}
 
 	// for in-place arithmetic on each point
-	// we can use this for original wavefunctions with no psi existing;
+	// we can use this for original wavefunctions with no ψ existing;
 	map(callback) {
 		let {space: {N}, psi} = this;
 		if (!psi)
