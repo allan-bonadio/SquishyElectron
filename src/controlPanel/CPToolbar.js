@@ -4,6 +4,7 @@
 */
 
 import PropTypes from 'prop-types';
+import {algRK2, algRK4, algVISSCHER} from '../wave/qEngine';
 
 function setPT() {
 	CPToolbar.propTypes = {
@@ -84,9 +85,9 @@ function CPToolbar(props) {
 			algorithm:
 			<select className='algorithmSelector' value={algorithm}
 					onChange={ev => setAlgorithm(ev.currentTarget.value)}>
-				<option value='2'>RK2</option>
-				<option value='4'>RK4</option>
-				<option value='7'>Visscher</option>
+				<option value={algRK2}>RK2</option>
+				<option value={algRK4}>RK4</option>
+				<option value={algVISSCHER}>Visscher</option>
 			</select>
 		</div>
 
