@@ -11,6 +11,8 @@ import CPToolbar from './CPToolbar';
 import SetWaveTab from './SetWaveTab';
 import SetPotentialTab from './SetPotentialTab';
 import SetResolutionTab from './SetResolutionTab';
+// eslint-disable-next-line no-unused-vars
+import {algRK2, algRK4, algVISSCHER} from '../wave/qEngine';
 
 import qe from '../wave/qe';
 
@@ -31,11 +33,11 @@ export class ControlPanel extends React.Component {
 		setPotential: PropTypes.func.isRequired,
 
 		isTimeAdvancing: PropTypes.bool.isRequired,  // ie is it running?
-		//elapsedTime: PropTypes.number.isRequired,
-		//iterateSerial: PropTypes.number.isRequired,
 
 		iterateFrequency: PropTypes.number.isRequired,  // frames per second
 		setIterateFrequency: PropTypes.func.isRequired,
+
+		// algorithm is handled right here in the control panel
 	};
 
 	constructor(props) {
@@ -43,6 +45,7 @@ export class ControlPanel extends React.Component {
 
 		// most of the state is really kept in the SquishPanel
 		this.state = {
+			algorithm: algRK2,
 
 			// state for the wave resets - these are control-panel only.
 			// Only goes into effect if we call setWave()
@@ -50,7 +53,6 @@ export class ControlPanel extends React.Component {
 			circularFrequency: 1,
 			pulseWidth: .05,
 			pulseOffset: .05,
-
 
 			// state for potential resets - control panel only, setPotential()
 			potentialBreed: 'flat',
@@ -125,8 +127,8 @@ export class ControlPanel extends React.Component {
 				singleStep={p.singleStep}
 				iterateFrequency={p.iterateFrequency}
 				setIterateFrequency={freq => this.setIterateFrequency(freq)}
-				algorithm={p.algorithm}
-				setAlgorithm={alg => this.setAlgorithm(alg)}
+				algorithm={+s.algorithm}
+				setAlgorithm={alg => this.setAlgorithm(+alg)}
 			/>
 			<div className='cpSecondRow'>
 				<ul className='TabBar' >

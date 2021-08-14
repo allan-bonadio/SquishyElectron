@@ -10,6 +10,12 @@ import qCx from './qCx';
 
 // all of these must be attached to window to  get called by c++
 
+// algorithm
+export const algRK2 = 2;
+export const algRK4 = 4;
+export const algVISSCHER = 7;
+
+
 /* ****************************************************** app startup */
 
 // c++ main() calls us to tell us that it's up, and to pass the sizes of different data structures.
@@ -126,10 +132,10 @@ export class qeSpace {
 //		);
 //	}
 //
-//	qe.set1DWave = function set1DWave(ix, psi) {
+//	qe.set1DWave = function set1DWave(ix, ψ) {
 //		const vPtr = qe.latestWaveBuffer + 8*2*ix;
-//		Module.setValue(vPtr, psi, 'double');
-//		Module.setValue(vPtr + 8, psi, 'double');
+//		Module.setValue(vPtr, ψ, 'double');
+//		Module.setValue(vPtr + 8, ψ, 'double');
 //	}
 //
 //	// tune into the most recently used wave and potential buffers
