@@ -69,7 +69,8 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 
 /* ******************************************************** diagnostic dump **/
 
-// if it overflows the buffer, screw it.  just dump a row for a cx datapoint.
+// print one complex number, plus maybe some more, on a line in the dump on stdout.
+// if it overflows the buffer, it won't.  just dump a row for a cx datapoint.
 static void dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtras) {
 	qReal re = w.re;
 	qReal im = w.im;
@@ -88,6 +89,7 @@ static void dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtra
 	}
 }
 
+// print an entire wave, with start-1 and end+1 included
 // NOT a member function; this is wave and space independent
 static void dumpThatWave(qDimension *dim, qCx *wave, bool withExtras) {
 	int ix = 0;
