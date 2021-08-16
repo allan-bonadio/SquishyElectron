@@ -122,6 +122,7 @@ qSpace *completeNewSpace(void) {
 	theQWave = new qFlick(theSpace, 4);
 	theQWave->setCircularWave(1);
 
+	// the other buffers...
 	peruQWave = new qWave(theSpace);
 	egyptQWave = new qWave(theSpace);
 	laosQWave = new qWave(theSpace);
