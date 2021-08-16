@@ -7,7 +7,7 @@ import React from 'react';
 import './App.css';
 
 import SquishPanel from './SquishPanel';
-import SquishDialog from './SquishDialog';
+import CommonDialog from './CommonDialog';
 
 class App extends React.Component {
 	constructor(props) {
@@ -54,7 +54,7 @@ class App extends React.Component {
 
 	static hideDialog() {
 		App.me.setState({isDialogShowing: false});
-		SquishDialog.finishClosingDialog();
+		CommonDialog.finishClosingDialog();
 	}
 
 	/* ************************************************ App */
@@ -73,7 +73,7 @@ class App extends React.Component {
 	render() {
 		const s = this.state;
 		//const stateParams = sParams || s.stateParams;
-		const sqDialog = s.isDialogShowing ? <SquishDialog  /> : null;
+		const sqDialog = s.isDialogShowing ? <CommonDialog  /> : null;
 			//stateParams={stateParams}
 			//closeResolutionDialog={() => this.closeResolutionDialog()}
 

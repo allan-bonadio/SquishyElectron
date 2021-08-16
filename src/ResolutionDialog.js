@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 
 import {qeSpace} from './wave/qEngine';
 import SquishPanel from './SquishPanel';
-import SquishDialog from './SquishDialog';
+import CommonDialog from './CommonDialog';
 
 // had this been a real webiste, I would not have to copy/paste these here
 //export const listOfViewClasses = {
@@ -94,7 +94,7 @@ export default class ResolutionDialog extends React.Component {
 		ResolutionDialog.cancelCallback = cancelCallback;
 
 		// open the general dialog with resolutionDialog as the main component
-		SquishDialog.openDialog(
+		CommonDialog.openDialog(
 			<ResolutionDialog
 				N={initialParams.N}
 				continuum={initialParams.continuum}
@@ -117,13 +117,13 @@ export default class ResolutionDialog extends React.Component {
 	OK(ev) {
 		//const s = //this.state;
 		ResolutionDialog.okCallback(this.state);
-		SquishDialog.startClosingDialog();
+		CommonDialog.startClosingDialog();
 	}
 
 	// called when user clicks Cancel, before dialog is hidden in App
 	cancel(ev) {
 		ResolutionDialog.cancelCallback();
-		SquishDialog.startClosingDialog();
+		CommonDialog.startClosingDialog();
 	}
 
 
