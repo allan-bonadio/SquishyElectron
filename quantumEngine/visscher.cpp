@@ -31,36 +31,36 @@ The natural discretization of Eqs. (6) is therefore
 	R(t + dt) = R(t) + dt H I(t + dt/2)
 Half a tick later, at a half odd integer multiple of dt,
 	I(t + dt) = I(t) - dt H R(t + dt/2)
+
+allan:
 where H is hamiltonian, and the time arguments aren't used here so don't worry
  */
 
 // first step: advance the Reals of ψ a dt, from 0 to dt
-void stepReal(qWave *oldQWave, qWave *newQWave, qDimension *dim, double dt) {
-	qCx *oldW = oldQWave->buffer;
-	qCx *newW = newQWave->buffer;
-	printf("stepReal(oldQWave(%lf %lf), newQWave(%lf %lf), dim(%d), dt=%lf\n",
-		oldW[1].re, oldW[1].im, newW[1].re, newW[1].im, dim->nStates, dt);
+void stepReal(qCx *oldW, qCx *newW, qSpace *space, double dt) {
+	qDimension *dims = space->dimensions;
+	printf("stepReal(oldQWave(%lf %lf), newQWave(%lf %lf), dims(%d), dt=%lf\n",
+		oldW[1].re, oldW[1].im, newW[1].re, newW[1].im, dims->nStates, dt);
 
-	for (int ix = dim->start; ix < dim->end; ix++) {
+	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx oldW1 = oldW[ix];
 		qCx H = hamiltonian(oldW, ix).re;
 		printf("the hamiltonian at x=%d   %lf,%lf \n", ix, H.re, H.im);
 		newW[ix].re = oldW1.re + dt * H.re * oldW1.im;
 		qCheck(newW[ix]);
 	}
-	newQWave->fixBoundaries();
-	newQWave->dumpWave("end of stepReal");
+	space->fixThoseBoundaries(newW);
+	//newQWave->dumpWave("end of stepReal");
 }
 
 // second step: advance the Imaginaries of ψ a dt, from dt/2 to 3dt/2
 // given the reals we just generated
-void stepImaginary(qWave *oldQWave, qWave *newQWave, qDimension *dim, double dt) {
-	qCx *oldW = oldQWave->buffer;
-	qCx *newW = newQWave->buffer;
-	printf("stepImaginary(oldQWave(%lf %lf), newQWave(%lf %lf), dim(%d), dt=%lf\n",
-		oldW[1].re, oldW[1].im, newW[1].re, newW[1].im, dim->nStates, dt);
+void stepImaginary(qCx *oldW, qCx *newW, qSpace *space, double dt) {
+	qDimension *dims = space->dimensions;
+	printf("stepImaginary(oldQWave(%lf %lf), newQWave(%lf %lf), dims(%d), dt=%lf\n",
+		oldW[1].re, oldW[1].im, newW[1].re, newW[1].im, dims->nStates, dt);
 
-	for (int ix = dim->start; ix < dim->end; ix++) {
+	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx oldW1 = oldW[ix];
 		//qCx HH = hamiltonian(oldW, ix);
 
@@ -70,8 +70,8 @@ void stepImaginary(qWave *oldQWave, qWave *newQWave, qDimension *dim, double dt)
 		newW[ix].im = oldW1.im - dt * H.im * newW[ix].re;
 		qCheck(newW[ix]);
 	}
-	newQWave->fixBoundaries();
-	newQWave->dumpWave("end of stepImaginary");
+	space->fixThoseBoundaries(newW);
+	//newQWave->dumpWave("end of stepImaginary");
 }
 
 // form the new wave from the old wave, in separate buffers, chosen by our caller.
@@ -81,18 +81,20 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 	qWave *newQW = newQWave;
 	qCx *newW = newQWave->buffer;
 
-	qDimension *dim = this->dimensions;
+	qDimension *dims = this->dimensions;
 	oldQW->fixBoundaries();
 	//oldQW->dumpWave("starting oldW", true);
 
 	// see if this makes a diff
-	for (int i = dim->start; i < dim->end; i++)
-		newW[i] = qCx(i);
+//	for (int i = dims->start; i < dims->end; i++)
+//		newW[i] = qCx(i);
 
-	stepReal(oldQWave, newQWave, dim, dt);
+	stepReal(oldW, newW, this, dt);
 	if (debugHalfway) newQWave->dumpWave("Visscher wave after the Re step", true);
+	// now at an half-odd fraction of dt
 
-	stepImaginary(oldQWave, newQWave, dim, dt);
+	stepImaginary(oldW, newW, this, dt);
+	// now at an integer fraction of dt
 
 	// ok so after this, the time has advanced dt, and real is at elapsedTime and
 	// imaginary is at elapsedTime + dt/2.  Yes the re and the im are not synchronized.
@@ -107,17 +109,38 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 	}
 }
 
+// shift the Im components of the old wave a half tick forward and store in newQWave.
 // if we're using visscher, we need to initialize waves with the
-// im component a half dt ahead.  This does it.
+// im component a half dt ahead.  This does it for newly created stuff, like set waves.
 // If not visscher, returns harmlessly.
 void qSpace::visscherHalfStep(qWave *oldQWave, qWave *newQWave) {
 	if (this->algorithm != algVISSCHER)
-		return;
+		throw "qSpace::visscherHalfStep() shouldn't on non-Visscher";
+	qDimension *dims = this->dimensions;
+	qCx *oldW = oldQWave->buffer;
+	qCx *newW = newQWave->buffer;
 
-	// let's try moving the real backward 1/4  dt and moving im forward 1/4
-	qReal quarterDt = this->dt / 4;
+	// let's try moving the im forward dt/2 for the next wave.
+	// the current wave here is corrupt (being at the same time re/im) so add new one
+	qReal halfDt = this->dt / 2;
 
-	stepReal(oldQWave, newQWave, this->dimensions, -quarterDt);
+	// fake stepReal() by just copying over the real values
+	for (int ix = dims->start; ix < dims->end; ix++)
+		newW[ix].re = oldW[ix].re;
 
-	stepImaginary(oldQWave, newQWave, this->dimensions, quarterDt);
+	stepImaginary(oldQWave->buffer, newQWave->buffer, this, halfDt);
+	this->fixThoseBoundaries(newW);
 }
+
+// If not visscher, returns harmlessly.
+//void qSpace::visscherHalfStep4(qWave *oldQWave, qWave *newQWave) {
+//	if (this->algorithm != algVISSCHER)
+//		return;
+//
+//	// let's try moving the real backward 1/4  dt and moving im forward 1/4
+//	qReal quarterDt = this->dt / 4;
+//
+//	stepReal(oldQWave, newQWave, this->dimensions, -quarterDt);
+//
+//	stepImaginary(oldQWave, newQWave, this->dimensions, quarterDt);
+//}

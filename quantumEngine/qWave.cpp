@@ -19,7 +19,7 @@ class qCx *theWave = NULL,
 // buffer is initialized to zero bytes therefore 0.0 everywhere
 qWave::qWave(qSpace *space) {
 	this->space = space;
-	this->buffer = (qCx *) malloc(space->nPoints * sizeof(qCx));
+	this->buffer = this->allocateWave();
 	this->dynamicallyAllocated = 1;
 }
 
@@ -35,18 +35,25 @@ qWave::~qWave() {
 	printf("    set space to null...\n");
 
 	if (this->dynamicallyAllocated)
-		free(this->buffer);
+		this->freeWave(this->buffer);
 	printf("    freed buffer...\n");
 
-	this->buffer = NULL;
 	printf("setted buffer to null; done with qWave destructor.\n");
+}
+
+qCx *qWave::allocateWave(void) {
+	return (qCx *) malloc(this->space->nPoints * sizeof(qCx));
+}
+
+void qWave::freeWave(qCx *wave) {
+	free(wave);
 }
 
 /* never tested */
 void qWave::forEachPoint(void (*callback)(qCx, int) ) {
-	qDimension *dim = this->space->dimensions;
+	qDimension *dims = this->space->dimensions;
 	qCx *wave = this->buffer;
-	int end = dim->end + dim->start;
+	int end = dims->end + dims->start;
 	for (int ix = 0; ix < end; ix++) {
 		//printf("\n[%d] ", ix);
 		//printf("(%lf,%lf) \n", wave[ix].re, wave[ix].im);
@@ -56,10 +63,10 @@ void qWave::forEachPoint(void (*callback)(qCx, int) ) {
 
 /* never tested */
 void qWave::forEachState(void (*callback)(qCx, int) ) {
-	qDimension *dim = this->space->dimensions;
+	qDimension *dims = this->space->dimensions;
 	qCx *wave = this->buffer;
-	int end = dim->end;
-	for (int ix = dim->start; ix < end; ix++) {
+	int end = dims->end;
+	for (int ix = dims->start; ix < end; ix++) {
 		//printf("\n[%d] ", ix);
 		//printf("(%lf,%lf) ", wave[ix].re, wave[ix].im);
 		callback(wave[ix], ix);
@@ -88,26 +95,27 @@ static void dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtra
 	}
 }
 
-// NOT a member function; this is wave and space independent
-static void dumpThatWave(qDimension *dim, qCx *wave, bool withExtras) {
+// this is wave and space independent
+void qWave::dumpThatWave(qCx *wave, bool withExtras) {
+	const qDimension *dims = this->space->dimensions;
 	int ix = 0;
-	char buf[100];
+	char buf[200];
 	double prevPhase = 0.;
 
 	// somehow, commenting out these lines fixes the nan problem.
 	// but the nan problem doesn't happen on flores?
-	if (dim->continuum) {
+	if (dims->continuum) {
 		dumpRow(buf, ix, wave[0], &prevPhase, withExtras);
 		printf("%s", buf);
 	}
 
-	for (ix = dim->start; ix < dim->end; ix++) {
+	for (ix = dims->start; ix < dims->end; ix++) {
 		dumpRow(buf, ix, wave[ix], &prevPhase, withExtras);
 		printf("\n%s", buf);
 	}
 
-	if (dim->continuum) {
-		dumpRow(buf, ix, wave[dim->end], &prevPhase, withExtras);
+	if (dims->continuum) {
+		dumpRow(buf, ix, wave[dims->end], &prevPhase, withExtras);
 		printf("\nend %s", buf);
 	}
 
@@ -117,15 +125,22 @@ static void dumpThatWave(qDimension *dim, qCx *wave, bool withExtras) {
 // this is the member function that dumps its own wave and space
 void qWave::dumpWave(const char *title, bool withExtras) {
 	printf("\n== Wave | %s", title);
-	dumpThatWave(this->space->dimensions, this->buffer, withExtras);
+	qWave::dumpThatWave(this->buffer, withExtras);
 }
 
 /* ************************************************************ arithmetic */
 
-// refresh the wraparound points on the ends of continuum dimensions from their counterpoints
-void qWave::fixBoundaries(void) {
-	qDimension *dims = this->space->dimensions;
-	qCx *wave = this->buffer;
+void qWave::copyOut(qCx *wave) {
+	const qDimension *dims = this->space->dimensions;
+	int finis = dims->start + dims->end;
+	qCx *buf = this->buffer;
+	for (int ix = 0; ix < finis; ix++)
+		wave[ix] = buf[ix];
+}
+
+// refresh the wraparound points for ANY WAVE subscribing to this space
+void qSpace::fixThoseBoundaries(qCx *wave) {
+	qDimension *dims = this->dimensions;
 	switch (dims->continuum) {
 	case contDISCRETE:
 		break;
@@ -150,26 +165,10 @@ void qWave::fixBoundaries(void) {
 	}
 }
 
-qReal cleanOneNumber(qReal u, int ix, int sense) {
-	if (!isfinite(u)) {
-		// just enough to be nonzero without affecting the balance
-		printf("had to prune [%d]= %f\n", ix, u);
-		qReal faker = sense ? 1e-9 :  -1e-9;
-		return faker;
-	}
-	return u;
-}
-
-// look for NaNs and other foul numbers, and replace them with something .. better.
-void qWave::prune() {
-	printf("Do we really have to do this?  let's stop.\n");
-
-	qDimension *dims = this->space->dimensions;
-	qCx *wave = this->buffer;
-	for (int ix = dims->start; ix < dims->end; ix++) {
-		wave[ix].re = cleanOneNumber(wave[ix].re, ix, ix & 1);
-		wave[ix].im = cleanOneNumber(wave[ix].im, ix, ix & 2);
-	}
+// refresh the wraparound points on the ends of continuum dimensions
+// from their counterpoints
+void qWave::fixBoundaries(void) {
+	this->space->fixThoseBoundaries(this->buffer);
 }
 
 // calculate ⟨ψ | ψ⟩  'inner product'
@@ -190,7 +189,7 @@ qReal qWave::innerProduct(void) {
 	return sum;
 }
 
-// enforce ⟨ψ | ψ⟩ = 1 by dividing out the current value
+// enforce ⟨ψ | ψ⟩ = 1 by dividing out the current magnitude sum
 void qWave::normalize(void) {
 	// for visscher, we have to make it in a temp wave and copy back to our buffer
 	qCx tempWave[this->space->nPoints];
@@ -219,18 +218,42 @@ void qWave::normalize(void) {
 			tempWave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
 	}
 	else {
-		mag = pow(mag, -0.5);
+		const qReal factor = pow(mag, -0.5);
 
 		for (int ix = dims->start; ix < dims->end; ix++)
-			tempWave[ix] *= mag;
+			tempWave[ix] *= factor;
 	}
 	tempQWave->fixBoundaries();
-	tempQWave->dumpWave("The tempWave,before visscher ½", true);
-	tempQWave->space->visscherHalfStep(tempQWave, this);
-	this->dumpWave("this wave,after visscher ½", true);
-	this->fixBoundaries();
+	tempQWave->dumpWave("qWave::normalize done", true);
+	///tempQWave->space->visscherHalfStep(tempQWave, this);
+	//this->dumpWave("this wave,after visscher ½", true);
+	//this->fixBoundaries();
 	//printf("    normalizing.  new IP=%lf\n", this->space->innerProduct(wave));
 	//this->dumpWave("The wave,after normalize", true);
+}
+
+/* ********************************************************** bad ideas */
+
+qReal cleanOneNumber(qReal u, int ix, int sense) {
+	if (!isfinite(u)) {
+		// just enough to be nonzero without affecting the balance
+		printf("had to prune [%d]= %f\n", ix, u);
+		qReal faker = sense ? 1e-9 :  -1e-9;
+		return faker;
+	}
+	return u;
+}
+
+// look for NaNs and other foul numbers, and replace them with something .. better.
+void qWave::prune() {
+	printf("Do we really have to do this?  let's stop.\n");
+
+	qDimension *dims = this->space->dimensions;
+	qCx *wave = this->buffer;
+	for (int ix = dims->start; ix < dims->end; ix++) {
+		wave[ix].re = cleanOneNumber(wave[ix].re, ix, ix & 1);
+		wave[ix].im = cleanOneNumber(wave[ix].im, ix, ix & 2);
+	}
 }
 
 // possibly obsolete if we use visscher
@@ -273,7 +296,13 @@ void qWave::lowPassFilter(double dilution) {
 // pass negative to make it go backward.
 // the first point here is like x=0 as far as the trig functions, and the last like x=-1
 void qWave::setCircularWave(qReal n) {
-	qCx *wave = this->buffer;
+	qCx tempWave[this->space->nPoints];
+	qWave tqWave(this->space, tempWave);
+	qWave *tempQWave = &tqWave;
+
+	this->dumpWave("after set sircular & normalize", true);
+	qCx *wave = tempWave;
+	//qCx *wave = this->buffer;
 	qDimension *dims = this->space->dimensions;
 	int start = dims->start;
 	int end = dims->end;
@@ -282,15 +311,17 @@ void qWave::setCircularWave(qReal n) {
 	for (int ix = start; ix < end; ix++) {
 		angle = dAngle * (ix - start);
 		wave[ix] = qCx(cos(angle), sin(angle));
-
-		// why do I have to do this to keep the numbers from being NAN?
-		// either of these will fix it
-//		printf("the circular wave: angle, magn, re, im: %lf %lf %lf %lf\n",
-//			angle, wave[ix].re*wave[ix].re + wave[ix].im*wave[ix].im, wave[ix].re, wave[ix].im);
-		//printf("setCircularWave: %lf %lf %lf\n", angle * 180./PI, cos(angle), sin(angle));
 	}
 	//dumpThatWave(dims, wave, true);
-	this->normalize();
+
+	if (this->space->algorithm == algVISSCHER) {
+		this->space->visscherHalfStep(tempQWave, this);
+		this->normalize();
+	}
+	else {
+		tempQWave->copyOut(this->buffer);
+		this->normalize();
+	}
 	this->dumpWave("after set sircular & normalize", true);
 
 	updateViewBuffer(this);

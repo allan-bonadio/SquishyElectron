@@ -28,7 +28,7 @@ export function createSpaceNWave(N, continuum, callback) {
 
 	// create the new C++ version & populate the buffer
 	qe.space = new qeSpace([{N, continuum, label: 'x'}]);
-	qe.qWave_setCircularWave(1);
+	// done inside new space    qe.qWave_setCircularWave(1);
 
 	callback(qe.space);
 }
@@ -50,7 +50,7 @@ export function oldIterateAnimate(useQuantumEngine, rate) {
 	}
 
 	repeatId = setInterval(() => {
-		//console.time('one iteration & draw');
+		console.time('one iteration & draw');
 		try {
 			if (useQuantumEngine) {
 				qe.qSpace_oneIntegrationStep();

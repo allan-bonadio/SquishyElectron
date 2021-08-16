@@ -141,10 +141,15 @@ public:
 	void oneVisscherStep(qWave *oldQWave, qWave *newQWave);
 
 	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);
+
+	void fixThoseBoundaries(qCx *wave);  // like for qWave but on any wave
 };
 
 /* ************************************************************ a wave buffer */
 
+// a 'wave' is a straight array of qCx, of length space->nPoints.
+// a 'qWave' is an object with cool methods for the wave it encloses.
+// a qFlick (see below) is a sequence of waves
 struct qWave {
 
 	// create a qWave, dynamically allocated or hand in a buffer to use
@@ -152,27 +157,63 @@ struct qWave {
 	qWave(qSpace *space, qCx *buffer);
 	~qWave();
 
+	// for a naked wave, and for a qWave
+	void dumpThatWave(qCx *wave, bool withExtras = false);
+	void dumpWave(const char *title, bool withExtras = false);
+	void copyOut(qCx *wave);
+
 	qSpace *space;
 
-	// the actual data, hopefully in the right size allocated block
+	// the actual data, hopefully in the right size allocated block, space->nPoints
 	qCx *buffer;
 
 	// if it used the first constructor
 	int dynamicallyAllocated: 1;
 
-	void dumpWave(const char *title, bool withExtras = false);
-	void fixBoundaries(void);
+	void forEachPoint(void (*callback)(qCx, int));
+	void forEachState(void (*callback)(qCx, int));
+
+	// just allocate the wave as long as needed by the space (used by qFlick for the others)
+	qCx *allocateWave(void);
+	void freeWave(qCx *);
+
+	void fixBoundaries(void);  // on this buffer
 	void prune(void);
 	qReal innerProduct(void);
-	void normalize(void);
+	virtual void normalize(void);
 	void lowPassFilter(double dilution = 0.5);
 
 	void setCircularWave(qReal n);
 	void setStandingWave(qReal n);
 	void setPulseWave(qReal widthFactor, qReal cycles);
+};
 
-	void forEachPoint(void (*callback)(qCx, int));
-	void forEachState(void (*callback)(qCx, int));
+/* ************************************************************ a flick */
+
+// a flick is a sequence of Wave buffers.
+// Multiple complex buffers; they all share the same characteristics in the qWave fields.
+// Acts like a qWave that only points to the 'current' buffer.
+// as of mid-august, should be ok
+struct qFlick : public qWave {
+	qFlick(qSpace *space, int maxWaves);
+	~qFlick();
+	void dumpFlickPointers(const char *title);
+
+	// them, all dynamically allocated
+	qCx **waves;
+	int maxWaves;  // how long waves is, in pointiers
+	int nWaves;  // how many are actually in use (those behond should be null!)
+
+	// create and add a new buffer, zeroed, at the 0 position, pushing the others up
+	void unshiftWave(void);
+
+	// the current one is === the one pointed to by buffer.  usually zero for the first one.
+	int currentIx;
+	void setCurrent(int which);
+
+	// for vischer
+	qReal innerProduct(int doubleT);
+	void normalize(void) override;
 };
 
 /* ************************************************************ the space */
@@ -188,6 +229,9 @@ extern "C" {
 	float *getViewBuffer();
 	qReal qSpace_getElapsedTime(void);
 	qReal qSpace_getIterateSerial(void);
+
+	void qSpace_oneIntegrationStep(void);
+
 
 	int manyRk2Steps(void);
 
