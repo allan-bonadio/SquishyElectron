@@ -1,6 +1,18 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** q Wave -- quantum wave buffer
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
+/*
+Data structures used for these buffers:
+qCx *wave  # wave: just an array of complex nums that's nPoints long
+qWave - object that owns a single wave, and points to its space
+qFlick - object that owns a list of waves, and points to its space
+
+Visscher has upended so much of this, splitting the real and imaginary parts of
+schrodinger's.  qFlick can do visscher; you need at least 3 time inrements to
+calculate an inner product.  I don't know how to make a circular wave anymore
+not sure how much dt/2 is.
 */
 
 #include "qSpace.h"
@@ -84,7 +96,7 @@ static void dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtra
 		qReal mag = re * re + im * im;
 		qReal phase = atan2(im, re) * 180 / PI;  // pos or neg
 		qReal dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
-		while (dPhase > 360.) dPhase -= 360.;
+		while (dPhase >= 360.) dPhase -= 360.;
 
 		sprintf(buf, "[%d] (%8.4lf,%8.4lf) | %8.2lf %8.2lf %8.4lf",
 			ix, re, im, phase, dPhase, mag);
@@ -95,9 +107,9 @@ static void dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtra
 	}
 }
 
-// this is wave and space independent
-void qWave::dumpThatWave(qCx *wave, bool withExtras) {
-	const qDimension *dims = this->space->dimensions;
+// this is wave independent
+void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
+	const qDimension *dims = this->dimensions;
 	int ix = 0;
 	char buf[200];
 	double prevPhase = 0.;
@@ -122,10 +134,15 @@ void qWave::dumpThatWave(qCx *wave, bool withExtras) {
 	printf("\n");
 }
 
+// any wave
+void qWave::dumpThatWave(qCx *wave, bool withExtras) {
+	this->space->dumpThatWave(wave, withExtras);
+}
+
 // this is the member function that dumps its own wave and space
 void qWave::dumpWave(const char *title, bool withExtras) {
 	printf("\n== Wave | %s", title);
-	qWave::dumpThatWave(this->buffer, withExtras);
+	this->space->dumpThatWave(this->buffer, withExtras);
 }
 
 /* ************************************************************ arithmetic */
@@ -166,7 +183,7 @@ void qSpace::fixThoseBoundaries(qCx *wave) {
 }
 
 // refresh the wraparound points on the ends of continuum dimensions
-// from their counterpoints
+// from their counterpoints or zerro or whatever they get set to.
 void qWave::fixBoundaries(void) {
 	this->space->fixThoseBoundaries(this->buffer);
 }
@@ -300,7 +317,7 @@ void qWave::setCircularWave(qReal n) {
 	qWave tqWave(this->space, tempWave);
 	qWave *tempQWave = &tqWave;
 
-	this->dumpWave("after set sircular & normalize", true);
+	this->dumpWave("before set sircular & normalize", true);
 	qCx *wave = tempWave;
 	//qCx *wave = this->buffer;
 	qDimension *dims = this->space->dimensions;
@@ -308,14 +325,22 @@ void qWave::setCircularWave(qReal n) {
 	int end = dims->end;
 	qReal angle, dAngle = 2. * PI / dims->N * n;
 
+	// visscher gap.How much angle would the Im component go in dt/2?
+	// I have no idea.
+	qReal vGap = this->space->algorithm == algVISSCHER ? dAngle / 4 : 0;
+
 	for (int ix = start; ix < end; ix++) {
 		angle = dAngle * (ix - start);
-		wave[ix] = qCx(cos(angle), sin(angle));
+		wave[ix] = qCx(cos(angle), sin(angle + vGap));
 	}
-	//dumpThatWave(dims, wave, true);
+	printf("wave, freshly generated, before halfstep");
+	this->dumpThatWave(wave, true);
 
 	if (this->space->algorithm == algVISSCHER) {
-		this->space->visscherHalfStep(tempQWave, this);
+
+		tempQWave->copyOut(this->buffer);
+		//this->space->visscherHalfStep(tempQWave, this);
+		this->dumpWave("after set sircular & normalize", true);
 		this->normalize();
 	}
 	else {

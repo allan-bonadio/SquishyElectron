@@ -100,7 +100,7 @@ qSpace *addSpaceDimension(int32_t N, int32_t continuum, const char *label) {
 
 // call this from JS to finish the process
 qSpace *completeNewSpace(void) {
-	//printf("completeNewSpace()\n");
+	printf("completeNewSpace() starts\n");
 	int32_t ix;
 	int32_t nPoints = 1, nStates = 1;
 
@@ -120,7 +120,6 @@ qSpace *completeNewSpace(void) {
 
 	//  allocate the buffers.  theQWave's special
 	theQWave = new qFlick(theSpace, 4);
-	theQWave->setCircularWave(1);
 
 	// the other buffers...
 	peruQWave = new qWave(theSpace);
@@ -141,13 +140,12 @@ qSpace *completeNewSpace(void) {
 	laosWave = laosQWave->buffer;
 
 	viewBuffer = new float[nPoints * 8];  // 4 floats per vertex, two verts per point
-
-	// a default
-//	theQWave->setCircularWave(1);  // see above
+	printf("completeNewSpace(): viewBuffer %ld \n",
+		(long) viewBuffer);
 
 	//theQWave->dumpWave("freshly created");
 
-	thePotential = new qReal[nPoints];
+	thePotential = new qReal[nPoints];  // slow down, we just made this wave, don't blow it
 	//theSpace->setValleyPotential(1., 1., 0.); // another default
 
 	theSpace->elapsedTime = 0.;
@@ -159,14 +157,17 @@ qSpace *completeNewSpace(void) {
 	theSpace->dtOverI = qCx(0., -dt);
 	theSpace->halfDtOverI = qCx(0., -dt / 2.);
 
-	theSpace->algorithm = algVISSCHER;
+	theSpace->algorithm = algVISSCHER;  // also change on ControlPanel.js:48
 	//theSpace->algorithm = algRK2;
 	theSpace->bufferNum = 0;
 
-	//printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", nStates, nPoints);
-	//printf("  dimension N=%d  extraN=%d  continuum=%d  start=%d  end=%d  label=%s\n",
-	//	theSpace->dimensions->N, theSpace->dimensions->extraN, theSpace->dimensions->continuum,
-	//	theSpace->dimensions->start, theSpace->dimensions->end, theSpace->dimensions->label);
+	// a default.  must be done After viewBuffer and thePotential are in place.
+	theQWave->setCircularWave(1);
+
+	printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", nStates, nPoints);
+	printf("  dimension N=%d  continuum=%d  start=%d  end=%d  label=%s\n",
+		theSpace->dimensions->N, theSpace->dimensions->continuum,
+		theSpace->dimensions->start, theSpace->dimensions->end, theSpace->dimensions->label);
 	return theSpace;
 }
 

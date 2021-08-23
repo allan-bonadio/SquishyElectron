@@ -39,39 +39,47 @@ where H is hamiltonian, and the time arguments aren't used here so don't worry
 // first step: advance the Reals of ψ a dt, from 0 to dt
 void stepReal(qCx *oldW, qCx *newW, qSpace *space, double dt) {
 	qDimension *dims = space->dimensions;
-	printf("stepReal(oldQWave(%lf %lf), newQWave(%lf %lf), dims(%d), dt=%lf\n",
-		oldW[1].re, oldW[1].im, newW[1].re, newW[1].im, dims->nStates, dt);
+	printf("end of stepREal");
+	space->dumpThatWave(oldW, true);
+	printf("stepReal start dims(%d), dt=%lf\n",
+		dims->nStates, dt);
 
+	printf("the hamiltonian ψ.re at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx oldW1 = oldW[ix];
 		qCx H = hamiltonian(oldW, ix).re;
-		printf("the hamiltonian at x=%d   %lf,%lf \n", ix, H.re, H.im);
+		printf("x=%d  Hψ = %lf,%lf \n", ix, H.re, H.im);
 		newW[ix].re = oldW1.re + dt * H.re * oldW1.im;
 		qCheck(newW[ix]);
 	}
 	space->fixThoseBoundaries(newW);
-	//newQWave->dumpWave("end of stepReal");
+	printf("end of stepREal");
+	space->dumpThatWave(newW, true);
 }
 
 // second step: advance the Imaginaries of ψ a dt, from dt/2 to 3dt/2
 // given the reals we just generated
 void stepImaginary(qCx *oldW, qCx *newW, qSpace *space, double dt) {
 	qDimension *dims = space->dimensions;
-	printf("stepImaginary(oldQWave(%lf %lf), newQWave(%lf %lf), dims(%d), dt=%lf\n",
-		oldW[1].re, oldW[1].im, newW[1].re, newW[1].im, dims->nStates, dt);
+	printf("start of stepImaginary");
+	space->dumpThatWave(oldW, true);
+	printf("dt=%lf\n", dt);
 
+	printf("the hamiltonian ψ.im at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx oldW1 = oldW[ix];
 		//qCx HH = hamiltonian(oldW, ix);
 
+		// actually H times ψ
 		qCx H = hamiltonian(oldW, ix);
-		printf("the hamiltonian.im at x=%d  then dt=%lf H=%lf,%lf oldW1=%lf,%lf\n",
+		printf("the hamiltonian ψ.im at x=%d  then dt=%lf H=%lf,%lf oldW1=%lf,%lf\n",
 			ix, dt, H.re, H.im, oldW1.re, oldW1.im);
 		newW[ix].im = oldW1.im - dt * H.im * newW[ix].re;
 		qCheck(newW[ix]);
 	}
 	space->fixThoseBoundaries(newW);
-	//newQWave->dumpWave("end of stepImaginary");
+	printf("end of stepImaginary ");
+	space->dumpThatWave(newW, true);
 }
 
 // form the new wave from the old wave, in separate buffers, chosen by our caller.
@@ -83,7 +91,7 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 
 	qDimension *dims = this->dimensions;
 	oldQW->fixBoundaries();
-	//oldQW->dumpWave("starting oldW", true);
+	oldQW->dumpWave("starting oneVisscherStep", true);
 
 	// see if this makes a diff
 //	for (int i = dims->start; i < dims->end; i++)
@@ -102,7 +110,7 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 	this->elapsedTime += dt;
 	this->iterateSerial++;
 
-	if (debug) {
+	if (true) {
 		char atVisscher[100];
 		sprintf(atVisscher, "at end of Visscher frame %1.0lf | ", this->iterateSerial);
 		newQW->dumpWave(atVisscher, true);

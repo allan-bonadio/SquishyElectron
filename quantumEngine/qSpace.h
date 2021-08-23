@@ -131,6 +131,9 @@ public:
 	// always a fixed size, for simplicity.
 	qDimension dimensions[MAX_DIMENSIONS];
 
+	// will dump any wave that uses this space.  same as in qWave::
+	void dumpThatWave(qCx *wave, bool withExtras = false);
+
 	void dumpPotential(const char *title);
 	void setZeroPotential(void);
 	void setValleyPotential(qReal power, qReal scale, qReal offset);
@@ -157,7 +160,7 @@ struct qWave {
 	qWave(qSpace *space, qCx *buffer);
 	~qWave();
 
-	// for a naked wave, and for a qWave
+	// for a naked wave, and for a qWave.  dumpThatWave same as in qSpace::
 	void dumpThatWave(qCx *wave, bool withExtras = false);
 	void dumpWave(const char *title, bool withExtras = false);
 	void copyOut(qCx *wave);
@@ -193,7 +196,6 @@ struct qWave {
 // a flick is a sequence of Wave buffers.
 // Multiple complex buffers; they all share the same characteristics in the qWave fields.
 // Acts like a qWave that only points to the 'current' buffer.
-// as of mid-august, should be ok
 struct qFlick : public qWave {
 	qFlick(qSpace *space, int maxWaves);
 	~qFlick();
@@ -235,7 +237,6 @@ extern "C" {
 
 	int manyRk2Steps(void);
 
-	// refills the view  buffer; returns highest magnitude
 	int dumpViewBuffer(int nPoints);
 
 	void qWave_dumpWave(char *title);
