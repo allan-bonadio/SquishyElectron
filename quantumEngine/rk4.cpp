@@ -34,7 +34,7 @@ void waveDDT(qDimension *dims,
 		qCx dPsi = hamiltonian(fromWave, ix) * dtOverI * nextYFactor;
 		qCheck(dPsi);
 
-		// we don't actually save the dPsi, we just pour it into where
+		// we don't actually save the dψ, we just pour it into where
 		// it needs to go for the next iteration
 		nextYWave[ix] = origWave[ix] + dPsi * nextYFactor;
 		peruWave[ix] += dPsi * sumFactor;
@@ -71,7 +71,7 @@ void qSpace::oneRk4Step(qWave *oldQWave, qWave *newQWave) {
 	waveDDT(dims, theQWave, k3QWave, k4QWave, 1., 1./6.);
 	k4QWave->dumpWave("after k4 ");
 
-	// now we have our dPsi, correct to  4th order, theoretically
+	// now we have our dψ, correct to  4th order, theoretically
 	for (int ix = dims->start; ix < dims->end; ix++)
 		theWave[ix] += peruWave[ix];
 

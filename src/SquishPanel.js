@@ -333,7 +333,7 @@ export class SquishPanel extends React.Component {
 		//this.setState({isTimeAdvancing: true});
 	}
 
-	// completely wipe out the Psi wavefunction and replace it with one of our canned waveforms.
+	// completely wipe out the ψ wavefunction and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)
 	setWave(breed, freq) {
 		switch (breed) {
