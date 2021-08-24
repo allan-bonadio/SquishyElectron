@@ -10,7 +10,7 @@ import qCx from './qCx';
 
 // all of these must be attached to window to  get called by c++
 
-// algorithm
+// algorithm - keep in  sync with qSpace.h
 export const algRK2 = 2;
 export const algRK4 = 4;
 export const algVISSCHER = 7;

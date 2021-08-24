@@ -72,7 +72,7 @@ const int contENDLESS = 2;
 
 /* ************************************************************ the space */
 
-// algorithm
+// algorithm - keep in  sync with qEngine.js
 const int algRK2 = 2;
 const int algRK4 = 4;
 const int algVISSCHER = 7;

@@ -155,7 +155,7 @@ qSpace *completeNewSpace(void) {
 	theSpace->dtOverI = qCx(0., -dt);
 	theSpace->halfDtOverI = qCx(0., -dt / 2.);
 
-	theSpace->algorithm = algRK2;
+	theSpace->algorithm = algVISSCHER;
 	theSpace->bufferNum = 0;
 
 	//printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", nStates, nPoints);

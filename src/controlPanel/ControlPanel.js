@@ -45,7 +45,7 @@ export class ControlPanel extends React.Component {
 
 		// most of the state is really kept in the SquishPanel
 		this.state = {
-			algorithm: algRK2,
+			algorithm: algVISSCHER,
 
 			// state for the wave resets - these are control-panel only.
 			// Only goes into effect if we call setWave()
