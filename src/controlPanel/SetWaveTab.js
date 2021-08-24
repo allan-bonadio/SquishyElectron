@@ -123,7 +123,7 @@ function SetWaveTab(props) {
 					width={200} height={100} complex={true} />
 			</div>
 			<button type='button' className='setWaveButton round'
-				onClick={ev => p.setWave()}>
+				onClick={ev => p.setWave(p.breed, p.circularFrequency)}>
 					Set Wave
 			</button>
 

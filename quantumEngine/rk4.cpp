@@ -23,18 +23,18 @@ static const qCx halfDtOverI = qCx(0., -dt / 2.);
 //		and by adding it onto peruWave, each with multiply factors passed
 // note how time is not an input to the hamiltonian - right now at least.
 // factor = 1/3 or 1/6, see NumRecFort p552.
-void waveDDT(qDimension *dim,
+void waveDDT(qDimension *dims,
 			qWave *origQWave, qWave *fromQWave, qWave *nextYQWave,
 			qReal nextYFactor, qReal sumFactor) {
 	qCx *origWave = origQWave->buffer;
 	qCx *fromWave = fromQWave->buffer;
 	qCx *nextYWave = nextYQWave->buffer;
 	fromQWave->fixBoundaries(); // always before hamiltonian
-	for (int ix = dim->start; ix < dim->end; ix++) {
+	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx dPsi = hamiltonian(fromWave, ix) * dtOverI * nextYFactor;
 		qCheck(dPsi);
 
-		// we don't actually save the dPsi, we just pour it into where
+		// we don't actually save the dψ, we just pour it into where
 		// it needs to go for the next iteration
 		nextYWave[ix] = origWave[ix] + dPsi * nextYFactor;
 		peruWave[ix] += dPsi * sumFactor;
@@ -49,30 +49,30 @@ void qSpace::oneRk4Step(qWave *oldQWave, qWave *newQWave) {
 
 	qWave *oldQW = oldQWave;
 	qWave *newQW = newQWave;
-	qDimension *dim = theSpace->dimensions;
+	qDimension *dims = theSpace->dimensions;
 	theQWave->fixBoundaries();
 
 	// the peruWave collects the k1/6 + k2/3 ... from p552
-	for (int ix = dim->start; ix < dim->end; ix++)
+	for (int ix = dims->start; ix < dims->end; ix++)
 		peruWave[ix] = qCx(0);
 
 	theQWave->dumpWave("theWave ");
 
 	// always start from theWave.  I need (nextYWave = k_1/2) and (peruWave += k_1/6)
 	// into two separate wave buffers.  waveDDT() does both.
-	waveDDT(dim, theQWave, theQWave, k1QWave, 1./2., 1./6.);
+	waveDDT(dims, theQWave, theQWave, k1QWave, 1./2., 1./6.);
 	k1QWave->dumpWave("after k1, k1Wave ");
 
 	// same for the steps on p551
-	waveDDT(dim, theQWave, k1QWave, k2QWave, 1./2., 1./3.);
+	waveDDT(dims, theQWave, k1QWave, k2QWave, 1./2., 1./3.);
 	k2QWave->dumpWave("after k2 ");
-	waveDDT(dim, theQWave, k2QWave, k3QWave, 1./2., 1./3.);
+	waveDDT(dims, theQWave, k2QWave, k3QWave, 1./2., 1./3.);
 	k3QWave->dumpWave("after k3 ");
-	waveDDT(dim, theQWave, k3QWave, k4QWave, 1., 1./6.);
+	waveDDT(dims, theQWave, k3QWave, k4QWave, 1., 1./6.);
 	k4QWave->dumpWave("after k4 ");
 
-	// now we have our dPsi, correct to  4th order, theoretically
-	for (int ix = dim->start; ix < dim->end; ix++)
+	// now we have our dψ, correct to  4th order, theoretically
+	for (int ix = dims->start; ix < dims->end; ix++)
 		theWave[ix] += peruWave[ix];
 
 
@@ -80,17 +80,17 @@ void qSpace::oneRk4Step(qWave *oldQWave, qWave *newQWave) {
 
 
 	// use egyptWave for all the first-try ψ values
-	// for (int ix = dim->start; ix < dim->end; ix++) {
+	// for (int ix = dims->start; ix < dims->end; ix++) {
 	// 	laosWave[ix] = theWave[ix] + hamiltonian(theWave, ix) * halfDtOverI;
 	// 	qCheck(peruWave[ix]);
 	// }
-	// dim->fixBoundaries(egyptWave);
+	// dims->fixBoundaries(egyptWave);
 	//
-	// //for (int ix = 0; ix <= dim->end; ix++)
+	// //for (int ix = 0; ix <= dims->end; ix++)
 	// //printf("INRK2 %d\t%lf\t%lf\n", ix, laosWave[ix].re, egyptWave[ix].im);
 	//
 	// // then use laosWave as the input to a better rate and a better inc at peruWave.
-	// for (int ix = dim->start; ix < dim->end; ix++) {
+	// for (int ix = dims->start; ix < dims->end; ix++) {
 	// 	peruWave[ix] = theWave[ix] + hamiltonian(egyptWave, ix) * dtOverI;
 	// 	qCheck(peruWave[ix]);
 	// }
@@ -103,7 +103,7 @@ void qSpace::oneRk4Step(qWave *oldQWave, qWave *newQWave) {
 	theQWave->fixBoundaries();
 
 	//printf("done with rk2: \n");
-	//for (int ix = 0; ix <= dim->end; ix++)
+	//for (int ix = 0; ix <= dims->end; ix++)
 	//printf("qCx(%20.17lf, %20.17lf)\n", theWave[ix].re, theWave[ix].im);
 
 	theSpace->elapsedTime += dt;

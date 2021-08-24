@@ -40,12 +40,12 @@ class drawingViewDef extends abstractViewDef {
 	}
 
 	setInputs() {
-		console.log('setInputs drawings', this.drawings);
-		console.dir(this.drawings);
+		//console.log('setInputs drawings', this.drawings);
+		//console.dir(this.drawings);
 
 		this.drawings.forEach(drawing => {
-			console.log('drawing.setInputs', drawing);
-			console.dir(drawing);
+			//console.log('drawing.setInputs', drawing);
+			//console.dir(drawing);
 
 			drawing.setInputs();
 		});

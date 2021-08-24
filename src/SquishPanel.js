@@ -98,10 +98,11 @@ export class SquishPanel extends React.Component {
 		// runtime debugging flags
 		this.areBenchmarking = false;
 		this.dumpingTheViewBuffer = false;
+
+		// ticks and benchmarks
 		const now = performance.now();
 		this.prevStart  = now;
-
-		this.timeForNextTic = now + 10;
+		this.timeForNextTic = now + 10;  // default so we can get rolling
 		this.lastAniFrame = now;
 
 		console.log(`SquishPanel constructor done`);
@@ -332,8 +333,8 @@ export class SquishPanel extends React.Component {
 		//this.setState({isTimeAdvancing: true});
 	}
 
-	// completely wipe out the Psi wavefunction and replace it with one of our canned waveforms.
-	// (but do not change N)
+	// completely wipe out the ψ wavefunction and replace it with one of our canned waveforms.
+	// (but do not change N or anything in the state)
 	setWave(breed, freq) {
 		switch (breed) {
 		case 'standing':
@@ -349,7 +350,7 @@ export class SquishPanel extends React.Component {
 			break;
 
 		default:
-			throw `setWave: no vave breed '${breed}'`
+			throw `setWave: no wave breed '${breed}'`
 		}
 	}
 

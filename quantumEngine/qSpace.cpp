@@ -77,30 +77,30 @@ qSpace *startNewSpace(void) {
 qSpace *addSpaceDimension(int32_t N, int32_t continuum, const char *label) {
 	//printf("addSpaceDimension(%d, %d, %s)\n", N, continuum, label);
 
-	qDimension *dim = theSpace->dimensions + dimsSoFar;
-	dim->N = N;
-	dim->continuum = continuum;
+	qDimension *dims = theSpace->dimensions + dimsSoFar;
+	dims->N = N;
+	dims->continuum = continuum;
 
-	dim->continuum = continuum;
+	dims->continuum = continuum;
 	if (continuum) {
-		dim->start = 1;
-		dim->end = N + 1;
+		dims->start = 1;
+		dims->end = N + 1;
 	}
 	else {
-		dim->start = 0;
-		dim->end = N;
+		dims->start = 0;
+		dims->end = N;
 	}
 
-	strncpy(dim->label, label, LABEL_LEN-1);
+	strncpy(dims->label, label, LABEL_LEN-1);
 
 	dimsSoFar++;
-	//printf("  done addSpaceDimension() %s\n", dim->label);
+	//printf("  done addSpaceDimension() %s\n", dims->label);
 	return theSpace;
 }
 
 // call this from JS to finish the process
 qSpace *completeNewSpace(void) {
-	//printf("completeNewSpace()\n");
+	printf("completeNewSpace() starts\n");
 	int32_t ix;
 	int32_t nPoints = 1, nStates = 1;
 
@@ -108,18 +108,20 @@ qSpace *completeNewSpace(void) {
 
 	// finish up all the dimensions now that we know them all
 	for (ix = dimsSoFar-1; ix >= 0; ix--) {
-		qDimension *dim = theSpace->dimensions + ix;
+		qDimension *dims = theSpace->dimensions + ix;
 
-		nStates *= dim->N;
-		dim->nStates = nStates;
-		nPoints *= dim->start + dim->end;
-		dim->nPoints = nPoints;
+		nStates *= dims->N;
+		dims->nStates = nStates;
+		nPoints *= dims->start + dims->end;
+		dims->nPoints = nPoints;
 	}
 	theSpace->nStates = nStates;
 	theSpace->nPoints = nPoints;
 
-	//  allocate the buffers
-	theQWave = new qWave(theSpace);
+	//  allocate the buffers.  theQWave's special
+	theQWave = new qFlick(theSpace, 4);
+
+	// the other buffers...
 	peruQWave = new qWave(theSpace);
 	egyptQWave = new qWave(theSpace);
 	laosQWave = new qWave(theSpace);
@@ -138,12 +140,12 @@ qSpace *completeNewSpace(void) {
 	laosWave = laosQWave->buffer;
 
 	viewBuffer = new float[nPoints * 8];  // 4 floats per vertex, two verts per point
+	printf("completeNewSpace(): viewBuffer %ld \n",
+		(long) viewBuffer);
 
-	// a default
-//	theQWave->setCircularWave(1);  // you'll have to do this yourself
 	//theQWave->dumpWave("freshly created");
 
-	thePotential = new qReal[nPoints];
+	thePotential = new qReal[nPoints];  // slow down, we just made this wave, don't blow it
 	//theSpace->setValleyPotential(1., 1., 0.); // another default
 
 	theSpace->elapsedTime = 0.;
@@ -155,13 +157,17 @@ qSpace *completeNewSpace(void) {
 	theSpace->dtOverI = qCx(0., -dt);
 	theSpace->halfDtOverI = qCx(0., -dt / 2.);
 
-	theSpace->algorithm = algVISSCHER;
+	theSpace->algorithm = algVISSCHER;  // also change on ControlPanel.js:48
+	//theSpace->algorithm = algRK2;
 	theSpace->bufferNum = 0;
 
-	//printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", nStates, nPoints);
-	//printf("  dimension N=%d  extraN=%d  continuum=%d  start=%d  end=%d  label=%s\n",
-	//	theSpace->dimensions->N, theSpace->dimensions->extraN, theSpace->dimensions->continuum,
-	//	theSpace->dimensions->start, theSpace->dimensions->end, theSpace->dimensions->label);
+	// a default.  must be done After viewBuffer and thePotential are in place.
+	theQWave->setCircularWave(1);
+
+	printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", nStates, nPoints);
+	printf("  dimension N=%d  continuum=%d  start=%d  end=%d  label=%s\n",
+		theSpace->dimensions->N, theSpace->dimensions->continuum,
+		theSpace->dimensions->start, theSpace->dimensions->end, theSpace->dimensions->label);
 	return theSpace;
 }
 
@@ -201,32 +207,32 @@ void qSpace_setAlgorithm(int newAlg) { theSpace->algorithm = newAlg; }
 
 void qSpace::dumpPotential(const char *title) {
 	int ix;
-	qDimension *dim = this->dimensions;
+	qDimension *dims = this->dimensions;
 
-	printf("== Potential %s, %d...%d", title, dim->start, dim->end);
-	if (dim->continuum) printf("  start [O]=%lf", thePotential[0]);
+	printf("== Potential %s, %d...%d", title, dims->start, dims->end);
+	if (dims->continuum) printf("  start [O]=%lf", thePotential[0]);
 	printf("\n");
 
-	for (ix = dim->start; ix < dim->end; ix++) {
+	for (ix = dims->start; ix < dims->end; ix++) {
 		if (0 == ix % 10) printf("\n[%d] ", ix);
 		printf("%lf ", thePotential[ix]);
 	}
-	if (dim->continuum) printf("\nend [%d]=%lf", ix, thePotential[ix]);
+	if (dims->continuum) printf("\nend [%d]=%lf", ix, thePotential[ix]);
 	printf("\n");
 }
 
 void qSpace::setZeroPotential(void) {
-	qDimension *dim = theSpace->dimensions;
-	for (int ix = 0; ix < dim->nPoints; ix++)
+	qDimension *dims = theSpace->dimensions;
+	for (int ix = 0; ix < dims->nPoints; ix++)
 		thePotential[ix] = 0.;
 
 	updateViewBuffer(this->latestQWave);
 }
 
 void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset = 0) {
-	qDimension *dim = theSpace->dimensions;
-	qReal mid = floor(dim->nPoints / 2);
-	for (int ix = 0; ix < dim->nPoints; ix++) {
+	qDimension *dims = theSpace->dimensions;
+	qReal mid = floor(dims->nPoints / 2);
+	for (int ix = 0; ix < dims->nPoints; ix++) {
 		thePotential[ix] = pow(abs(ix - mid), power) * scale + offset;
 	}
 

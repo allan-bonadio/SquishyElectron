@@ -7,7 +7,7 @@
 #include <cmath>
 
 // prep wave & potential  data for GL.  For rows of floats in a big Float32Array,
-// will be fed directly into gl.
+// will be fed directly into gl.  This is allocated in qSpace.cpp & depends on nPoints
 float *viewBuffer;
 
 // for the JS side
@@ -27,17 +27,27 @@ float updateViewBuffer(qWave *latestQWave) {
 	qReal highest = 0;
 	qReal tiny = 1e-8;
 
-	//'array'->dumpWave("at start of updateViewBuffer()");
+	//printf("updateViewBuffer(): latestQWave=%ld  thePotential=%ld\n",
+	//(long) latestQWave, (long) thePotential);
+	//printf("updateViewBuffer(): viewBuffer %ld and latestQWave->buffer=%ld\n",
+	//(long) viewBuffer, (long) latestQWave->buffer);
+	latestQWave->dumpWave("at start of updateViewBuffer()");
 
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
 		float *twoRowPtr = viewBuffer + pointNum * 8;
 		qCx *wavePtr = latestWave + pointNum;
+
+		//printf("updateViewBuffer(%d): twoRowPtr %ld and wavePtr=%ld\n",
+		//	pointNum, (long) twoRowPtr, (long) wavePtr);
+
 		qReal *potPtr = thePotential + pointNum;
 		qReal re = wavePtr->re;
 		qReal im = wavePtr->im;
 
 		twoRowPtr[0] = re * tiny;
 		twoRowPtr[1] = im * tiny;
+
+
 		twoRowPtr[2] = potPtr[0];  // this isn't going to be used
 		twoRowPtr[3] = pointNum * 2.;  // vertexSerial: at zero
 
@@ -52,7 +62,7 @@ float updateViewBuffer(qWave *latestQWave) {
 			highest = height;
 	}
 
-	// dump of viewbuffer.  Was good until I realized latestWave itself was what to pay attention to.
+	// false of viewbuffer.  Was good until I realized latestWave itself was what to pay attention to.
 	if (false) {
 		printf("viewBuffer.cpp, as written to view buffer:\n");
 		dumpViewBuffer(nPoints);

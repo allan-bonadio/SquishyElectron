@@ -1,5 +1,6 @@
 hamiltonian.cpp
 qCx.cpp
+qFlick.cpp
 qSpace.cpp
 qStepper.cpp
 qWave.cpp

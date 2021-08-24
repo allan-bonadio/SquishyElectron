@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 
 import App from './App';
 
-export default class SquishDialog extends React.Component {
+export default class CommonDialog extends React.Component {
 
 	static propTypes = {
 		token: PropTypes.number,
@@ -25,7 +25,7 @@ export default class SquishDialog extends React.Component {
 	static me = this;
 
 	static openDialog(centralComponent) {
-		SquishDialog.centralComponent = centralComponent;
+		CommonDialog.centralComponent = centralComponent;
 		App.showDialog();
 	}
 
@@ -36,14 +36,14 @@ export default class SquishDialog extends React.Component {
 
 	// called when App finishes closing it
 	static finishClosingDialog() {
-		SquishDialog.centralComponent = null;
+		CommonDialog.centralComponent = null;
 	}
 
 	render() {
 		return (
 			<aside className='backdrop'>
 				<div className='dialogSpacer' />
-				{SquishDialog.centralComponent}
+				{CommonDialog.centralComponent}
 				<div className='dialogSpacer' />
 			</aside>
 		);

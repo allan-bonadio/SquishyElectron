@@ -45,7 +45,7 @@ export class ControlPanel extends React.Component {
 
 		// most of the state is really kept in the SquishPanel
 		this.state = {
-			algorithm: algVISSCHER,
+			algorithm: algVISSCHER,  // also change in qSpace.cpp:160
 
 			// state for the wave resets - these are control-panel only.
 			// Only goes into effect if we call setWave()
@@ -89,15 +89,15 @@ export class ControlPanel extends React.Component {
 		qe.qSpace_setAlgorithm(newAlg);
 	}
 
-	/* ********************************************** render */
+	/* ********************************************** render  pieces */
 
-	render() {
+	createShowingTab() {
 		const p = this.props;
 		const s = this.state;
 
-		let showingTab = '';
-		if (s.showingTab == 'wave') {
-			showingTab = <SetWaveTab
+		switch (s.showingTab) {
+		case 'wave':
+			return <SetWaveTab
 				setWave={p.setWave}
 
 				circularFrequency={+s.circularFrequency}
@@ -109,15 +109,56 @@ export class ControlPanel extends React.Component {
 				breed={s.waveBreed}
 				setBreed={br => this.setState({waveBreed: br})}
 			/>;
+
+		case 'potential':
+			return <SetPotentialTab setPotential={p.setPotential}
+				setCPState={obj => this.setState(obj)}
+				breed={s.potentialBreed}
+				valleyPower={s.valleyPower}
+				valleyScale={s.valleyScale}
+				valleyOffset={s.valleyOffset}
+			/>;
+
+
+
+		case 'resolution':
+			return <SetResolutionTab openResolutionDialog={p.openResolutionDialog} />;
+
+		default:
+			return `Do not understand showingTab='${s.showingTab}'`;
 		}
-		else if (s.showingTab == 'potential') {
-			showingTab = <SetPotentialTab setPotential={p.setPotential}
-					setCPState={obj => this.setState(obj)} breed={s.potentialBreed}
-					valleyPower={s.valleyPower} valleyScale={s.valleyScale} valleyOffset={s.valleyOffset} />
-		}
-		else if (s.showingTab == 'resolution') {
-			showingTab = <SetResolutionTab openResolutionDialog={p.openResolutionDialog} />
-		}
+	}
+
+	/* ********************************************** render */
+
+	render() {
+		const p = this.props;
+		const s = this.state;
+
+		let showingTabHtml = this.createShowingTab();
+// 		let showingTab = '';
+// 		if (s.showingTab == 'wave') {
+// 			showingTab = <SetWaveTab
+// 				setWave={p.setWave}
+//
+// 				circularFrequency={+s.circularFrequency}
+// 				setCircularFrequency={freq => this.setState({circularFrequency: freq})}
+// 				pulseWidth={+s.pulseWidth}
+// 				setPulseWidth={wid =>this.setState({pulseWidth: wid})}
+// 				pulseOffset={+s.pulseOffset}
+// 				setPulseOffset={off => this.setState({pulseOffset: off})}
+// 				breed={s.waveBreed}
+// 				setBreed={br => this.setState({waveBreed: br})}
+// 			/>;
+// 		}
+// 		else if (s.showingTab == 'potential') {
+// 			showingTab = <SetPotentialTab setPotential={p.setPotential}
+// 					setCPState={obj => this.setState(obj)} breed={s.potentialBreed}
+// 					valleyPower={s.valleyPower} valleyScale={s.valleyScale} valleyOffset={s.valleyOffset} />
+// 		}
+// 		else if (s.showingTab == 'resolution') {
+// 			showingTab = <SetResolutionTab openResolutionDialog={p.openResolutionDialog} />
+// 		}
 
 		return <div className='ControlPanel'>
 			<CPToolbar
@@ -140,7 +181,7 @@ export class ControlPanel extends React.Component {
 						onClick={ev => this.setState({showingTab: 'resolution'})}>Universe</li>
 				</ul>
 				<div className='tabFrame'>
-					{showingTab}
+					{showingTabHtml}
 				</div>
 			</div>
 		</div>;
