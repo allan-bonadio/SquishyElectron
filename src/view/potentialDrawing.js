@@ -124,7 +124,7 @@ class potentialDrawing extends abstractDrawing {
 	}
 
 	mouseDown(ev) {
-		console.log(`from the canvas to the top:`)
+		console.log(`mouseDown: from the canvas to the top:`)
 		for (let here = ev.target; here; here = here.parentNode) {
 			console.log(` ¬ element <${here.localName} id=${here.id} class=${here.className}`,
 				here.offsetLeft, here.offsetTop, '>');}
