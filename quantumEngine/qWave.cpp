@@ -107,7 +107,10 @@ static void dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtra
 	}
 }
 
-// this is wave independent
+// this is wave-independent.  This prints N+2 lines:
+// one for the 0 element if it's a continuum
+// the complete set of states
+// one for the N+1
 void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
 	const qDimension *dims = this->dimensions;
 	int ix = 0;
@@ -116,6 +119,7 @@ void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
 
 	// somehow, commenting out these lines fixes the nan problem.
 	// but the nan problem doesn't happen on flores?
+	// i haven't seen the nan problem since like a month ago.  ab 2021-08-25
 	if (dims->continuum) {
 		dumpRow(buf, ix, wave[0], &prevPhase, withExtras);
 		printf("%s", buf);
