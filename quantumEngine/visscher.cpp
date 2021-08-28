@@ -36,6 +36,12 @@ allan:
 where H is hamiltonian, and the time arguments aren't used here so don't worry
  */
 
+
+// 	qCx d2 = wave[x-1] + wave[x+1] - wave[x] * 2;
+// 	qCheck(d2);
+
+
+
 // first step: advance the Reals of ψ a dt, from 0 to dt
 void stepReal(qCx *oldW, qCx *newW, qSpace *space, double dt) {
 	qDimension *dims = space->dimensions;
@@ -47,9 +53,14 @@ void stepReal(qCx *oldW, qCx *newW, qSpace *space, double dt) {
 	printf("the hamiltonian ψ.re at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx oldW1 = oldW[ix];
-		qCx H = hamiltonian(oldW, ix).re;
-		printf("x=%d  Hψ = %lf,%lf \n", ix, H.re, H.im);
-		newW[ix].re = oldW1.re + dt * H.re * oldW1.im;
+
+		qCx d2 = oldW[ix-1] + oldW[ix+1] - oldW[ix] * 2;
+		// qCx H = hamiltonian(oldW, ix).re;
+
+		printf("x=%d  Hψ = %lf,%lf \n", ix, d2.re, d2.im);
+
+		newW[ix].re = oldW1.re + dt * d2.re;
+		//newW[ix].re = oldW1.re + dt * H.re * oldW1.im;
 		qCheck(newW[ix]);
 	}
 	space->fixThoseBoundaries(newW);
@@ -68,13 +79,18 @@ void stepImaginary(qCx *oldW, qCx *newW, qSpace *space, double dt) {
 	printf("the hamiltonian ψ.im at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx oldW1 = oldW[ix];
+
+		qCx d2 = oldW[ix-1] + oldW[ix+1] - oldW[ix] * 2;
 		//qCx HH = hamiltonian(oldW, ix);
 
 		// actually H times ψ
-		qCx H = hamiltonian(oldW, ix);
-		printf("the hamiltonian ψ.im at x=%d  then dt=%lf H=%lf,%lf oldW1=%lf,%lf\n",
-			ix, dt, H.re, H.im, oldW1.re, oldW1.im);
-		newW[ix].im = oldW1.im - dt * H.im * newW[ix].re;
+		// qCx H = hamiltonian(oldW, ix);
+
+		printf("the hamiltonian ψ.im at x=%d  then dt=%lf d2x=%lf,%lf oldW1=%lf,%lf\n",
+			ix, dt, d2.re,d2.im, oldW1.re, oldW1.im);
+
+		newW[ix].im = oldW1.im - dt * d2.im;
+		//newW[ix].im = oldW1.im - dt * H.im * newW[ix].re;
 		qCheck(newW[ix]);
 	}
 	space->fixThoseBoundaries(newW);
