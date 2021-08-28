@@ -61,7 +61,13 @@ void qWave::freeWave(qCx *wave) {
 	free(wave);
 }
 
-/* never tested */
+void qWave::copyWave(qCx *dest, qCx *src) {
+	if (!dest) dest = this->buffer;
+	if (!src) src = this->buffer;
+	memcpy(dest, src, this->space->nPoints * sizeof(qCx));
+}
+
+/* never tested - might never work under visscher */
 void qWave::forEachPoint(void (*callback)(qCx, int) ) {
 	qDimension *dims = this->space->dimensions;
 	qCx *wave = this->buffer;
@@ -73,11 +79,11 @@ void qWave::forEachPoint(void (*callback)(qCx, int) ) {
 	}
 }
 
-/* never tested */
+/* never tested - might never work under visscher  */
 void qWave::forEachState(void (*callback)(qCx, int) ) {
 	qDimension *dims = this->space->dimensions;
-	qCx *wave = this->buffer;
 	int end = dims->end;
+	qCx *wave = this->buffer;
 	for (int ix = dims->start; ix < end; ix++) {
 		//printf("\n[%d] ", ix);
 		//printf("(%lf,%lf) ", wave[ix].re, wave[ix].im);
@@ -88,7 +94,8 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 
 /* ******************************************************** diagnostic dump **/
 
-// if it overflows the buffer, screw it.  just dump a row for a cx datapoint.
+// print one complex number, plus maybe some more, on a line in the dump on stdout.
+// if it overflows the buffer, it won't.  just dump a row for a cx datapoint.
 static void dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtras) {
 	qReal re = w.re;
 	qReal im = w.im;
@@ -110,7 +117,7 @@ static void dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtra
 // this is wave-independent.  This prints N+2 lines:
 // one for the 0 element if it's a continuum
 // the complete set of states
-// one for the N+1
+// one for the N+1 if continuum
 void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
 	const qDimension *dims = this->dimensions;
 	int ix = 0;
@@ -150,14 +157,6 @@ void qWave::dumpWave(const char *title, bool withExtras) {
 }
 
 /* ************************************************************ arithmetic */
-
-void qWave::copyOut(qCx *wave) {
-	const qDimension *dims = this->space->dimensions;
-	int finis = dims->start + dims->end;
-	qCx *buf = this->buffer;
-	for (int ix = 0; ix < finis; ix++)
-		wave[ix] = buf[ix];
-}
 
 // refresh the wraparound points for ANY WAVE subscribing to this space
 void qSpace::fixThoseBoundaries(qCx *wave) {
@@ -338,17 +337,18 @@ void qWave::setCircularWave(qReal n) {
 		wave[ix] = qCx(cos(angle), sin(angle + vGap));
 	}
 	printf("wave, freshly generated, before halfstep");
+	this->fixBoundaries();
 	this->dumpThatWave(wave, true);
 
+	// ?????!?!??!
 	if (this->space->algorithm == algVISSCHER) {
-
-		tempQWave->copyOut(this->buffer);
+		tempQWave->copyWave(this->buffer, tempQWave->buffer);
 		//this->space->visscherHalfStep(tempQWave, this);
 		this->dumpWave("after set sircular & normalize", true);
 		this->normalize();
 	}
 	else {
-		tempQWave->copyOut(this->buffer);
+		tempQWave->copyWave(this->buffer, tempQWave->buffer);
 		this->normalize();
 	}
 	this->dumpWave("after set sircular & normalize", true);

@@ -72,7 +72,7 @@ const int contENDLESS = 2;
 
 /* ************************************************************ the space */
 
-// algorithm
+// algorithm - keep in  sync with qEngine.js
 const int algRK2 = 2;
 const int algRK4 = 4;
 const int algVISSCHER = 7;
@@ -163,7 +163,7 @@ struct qWave {
 	// for a naked wave, and for a qWave.  dumpThatWave same as in qSpace::
 	void dumpThatWave(qCx *wave, bool withExtras = false);
 	void dumpWave(const char *title, bool withExtras = false);
-	void copyOut(qCx *wave);
+	void copyWave(qCx *dest, qCx *src);
 
 	qSpace *space;
 
@@ -207,14 +207,19 @@ struct qFlick : public qWave {
 	int nWaves;  // how many are actually in use (those behond should be null!)
 
 	// create and add a new buffer, zeroed, at the 0 position, pushing the others up
-	void unshiftWave(void);
+	void pushWave(qCx *wave = NULL);
+
+	// make a new wave, copy of wave (can't have duplicate waves in the
+	// flick or it'll be confusing deallocating?)
+	void pushCopy(qCx *wave);
+	void installWave(qCx *wave);
 
 	// the current one is === the one pointed to by buffer.  usually zero for the first one.
 	int currentIx;
 	void setCurrent(int which);
 
 	// for vischer
-	qReal innerProduct(int doubleT);
+	qReal innerProduct(int doubleTime);
 	void normalize(void) override;
 };
 
