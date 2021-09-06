@@ -47,7 +47,7 @@ exportsSrc  = [
 	{name: 'qSpace_setAlgorithm', retType: 'number', args: ['number']},
 
 	// views
-	// not any more, it's internal now {name: 'updateViewBuffer', retType: 'number', args: ['array']},
+	// not any more, it's internal now {name: 'loadViewBuffer', retType: 'number', args: ['array']},
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():

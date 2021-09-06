@@ -91,7 +91,7 @@ class flatViewDef extends abstractViewDef {
 
 	setInputs() {
 		//const highest =
-		// always done at end of integration qe.updateViewBuffer();
+		// always done at end of integration qe.loadViewBuffer();
 
 		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
 		let nPoints = this.nPoints = this.space.nPoints;

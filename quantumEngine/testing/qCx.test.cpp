@@ -1,13 +1,13 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** complex tests -- for Squishy Electron
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
 #include <stdio.h>
-#include "test.h"
 #include "../qCx.h"
+#include "test.h"
 
-void verify(qCx actual, qCx expected, const char *msg) {
+static void cxVerify(qCx actual, qCx expected, const char *msg) {
 	printf("testing %s\n", msg);
 	if (actual.re != expected.re)
 		printf("%s*** qCx re err:%s %s actual.re=%f ≠ expected.re=%f\n",
@@ -17,7 +17,7 @@ void verify(qCx actual, qCx expected, const char *msg) {
 			redAnsiStyle, offAnsiStyle, msg, actual.im, expected.im);
 }
 
-#define VERIFY(actual, expected)  verify(actual, expected, #actual)
+#define VERIFY(actual, expected)  cxVerify(actual, expected, #actual)
 
 void run_qCx_tests(void) {
 	printf(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: qCx tests\n");
@@ -92,16 +92,16 @@ void run_qCx_tests(void) {
 	// seems like arthemetic inside the method is bananas
 	qCx horse(30, 40);
 	qCx plus2 = qCx(2);
-	printf("starting horse... horse=%lf %lf; plus2= %lf %lf\n",
+	printf("starting horse... horse=%lf %lf shdbe 30 40; plus2= %lf %lf shbe 2 0\n",
 		horse.re, horse.im, plus2.re, plus2.im);
 	qCx halfHorse = (horse /= plus2);
-	printf("horse is %lf %lf, but the return value is %lf, %lf\n",
+	printf("horse is %lf %lf, but the return value is %lf, %lf shdbe half\n",
 		horse.re, horse.im, halfHorse.re, halfHorse.im);
 	VERIFY(horse, qCx(15, 20));
 
 	qCx whale(30, 40);
 	qCx minus2 = -qCx(2);
-	printf("starting Buu... whale=%lf %lf; minus2= %lf %lf\n",
+	printf("starting whale=%lf %lf shbe 30 40; minus2= %lf %lf shbe -2\n",
 		whale.re, whale.im, minus2.re, minus2.im);
 	qCx halfMinusWhale = (whale /= minus2);
 	printf("whale is %lf %lf, but the return value is %lf, %lf\n",
@@ -110,7 +110,7 @@ void run_qCx_tests(void) {
 
 	qCx giraffe(30, 40);
 	qCx minus10 = -qCx(10);
-	printf("starting Bu... giraffe=%lf %lf; minus10= %lf %lf\n",
+	printf("starting giraffe=%lf %lf; minus10= %lf %lf\n",
 		giraffe.re, giraffe.im, minus10.re, minus10.im);
 	qCx tenthMinusGiraffe = (giraffe /= minus10);
 	printf("giraffe is %lf %lf, but the return value is %lf, %lf\n",

@@ -95,7 +95,7 @@ function animateOneFrame(now) {
 
 	if (areBenchmarking) startUpdate = performance.now();
 	//let highest =
-	qe.updateViewBuffer();
+	qe.loadViewBuffer();
 	if (dumpTheViewBuffer) dumpViewBuffer();
 
 	if (areBenchmarking) startReload = performance.now();

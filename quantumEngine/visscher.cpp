@@ -5,8 +5,9 @@
 */
 
 #include <stdio.h>
-#include "qSpace.h"
 #include <ctime>
+#include "qSpace.h"
+#include "qWave.h"
 
 static bool debug = true;
 //bool debug = false;

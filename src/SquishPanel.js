@@ -44,7 +44,8 @@ const DEFAULT_VIEW_CLASS_NAME =
 //'flatViewDef';
 'flatDrawingViewDef';
 
-const DEFAULT_RESOLUTION = 5;
+const DEFAULT_RESOLUTION = 12;
+//const DEFAULT_RESOLUTION = 5;
 //const DEFAULT_RESOLUTION = 25;
 //const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 25;
 const DEFAULT_CONTINUUM = qeSpace.contENDLESS;
@@ -140,7 +141,7 @@ export class SquishPanel extends React.Component {
 
 			// we've now got a qeSpace etc all set up
 			this.setState({N, continuum, space, currentView});
-			this.currentView = currentView;  // this gets set sooner
+			this.currentView = currentView;  // this set before the setState finishes
 
 			// kinda paranoid?  this should be deprecated.
 			qe.theCurrentView = currentView;
@@ -187,7 +188,7 @@ export class SquishPanel extends React.Component {
 		this.startUpdate = performance.now();
 		qe.updateToLatestWaveBuffer();
 
-		// always done at end of integration qe.updateViewBuffer( ahem some qwave );
+		// always done at end of integration qe.loadViewBuffer( ahem some qwave );
 		this.curView.reloadAllVariables();  // am i doing this twice?
 
 		if (this.dumpingTheViewBuffer)
@@ -399,7 +400,7 @@ export class SquishPanel extends React.Component {
 			// Make sure you call the new view's domSetup method.
 			this.currentView.domSetup(this.canvas);
 		}).catch(ex => {
-			console.error(`error in SquishPanel.didMount.then:`, ex);
+			console.error(`error in SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
 			debugger;
 		});
 

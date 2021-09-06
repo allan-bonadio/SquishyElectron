@@ -4,8 +4,9 @@
 */
 
 #include <stdio.h>
-#include "qSpace.h"
 #include <ctime>
+#include "qSpace.h"
+#include "qWave.h"
 
 // dx is always 1.  dt is below.
 // static const qReal dt = 0.1;
