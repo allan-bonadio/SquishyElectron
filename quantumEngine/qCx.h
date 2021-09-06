@@ -4,12 +4,13 @@
 */
 
 
-#include <emscripten.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <float.h>
+
+#include <emscripten.h>
 
 #define byte unsigned char
 #define char16 char16_t
