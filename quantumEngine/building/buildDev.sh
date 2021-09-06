@@ -13,9 +13,10 @@ cd ..
 
 # https://emscripten.org/docs/tools_reference/emcc.html
 emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
-	-g -s ASSERTIONS=2 -s SAFE_HEAP=1 -s STACK_OVERFLOW_CHECK=2 -s DEMANGLE_SUPPORT=1 \
-	-s EXPORTED_FUNCTIONS=@building/exports.json \
-	-s EXPORTED_RUNTIME_METHODS='["ccall","cwrap","getValue","setValue"]' \
+	-g -sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 \
+	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \
+	-sEXPORTED_FUNCTIONS=@building/exports.json \
+	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","getValue","setValue"]' \
 	main.cpp $allCpp
 
 cp quantumEngine.wasm quantumEngine.js ../public
@@ -49,3 +50,8 @@ exit 0
 
 # in order for this to work I have to mess with the wasm mem blob
 # 	-s WASM_ASYNC_COMPILATION=0 \
+
+#aug '21:
+# EXCEPTION_CATCHING_ALLOWED and NO_DISABLE_EXCEPTION_CATCHING can apparently
+# allow exception catching but there's overhead each throw.
+# in the short term i'm using -fexceptions
