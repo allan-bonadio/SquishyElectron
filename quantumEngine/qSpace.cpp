@@ -4,16 +4,14 @@
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
-#include "qSpace.h"
 #include <cmath>
+#include "qSpace.h"
+#include "qWave.h"
 
 class qSpace *theSpace = NULL;
 
 
 qReal *thePotential = NULL;
-
-
-static int dimsSoFar;
 
 
 // someday I need an C++ error handling layer.  See
@@ -22,65 +20,29 @@ static int dimsSoFar;
 /* ********************************************************** qSpace construction */
 
 qSpace::qSpace(int nDims) {
-	this->nDimensions = nDims;
 	this->iterateSerial = 0;
 	this->elapsedTime = 0.;
 
 	// magic flags
 	this->doLowPass = true;
 	this->continuousLowPass = 0;
+
+	this->elapsedTime = 0.;
+	this->iterateSerial = 0;
+	this->nDimensions = 0;
 }
 
-
-extern "C" {
-
-// call this to throw away existing space and wave, and start new
-// it's hard to send a real data structure thru the emscripten interface, so the JS
-// constructs the dimensions by repeated calls to addSpaceDimension()
-qSpace *startNewSpace(void) {
-	//printf("startNewSpace()\n");
-
-	if (theSpace) {
-		printf("about to delete theQWave:\n");
-		delete theQWave;
-		printf("about to delete peruQWave:\n");
-		delete peruQWave;
-		printf("about to delete egyptQWave:\n");
-		delete egyptQWave;
-		printf("about to delete laosQWave:\n");
-		delete laosQWave;
-		printf("about to delete k1QWave:\n");
-		delete k1QWave;
-		printf("about to delete k2QWave:\n");
-		delete k2QWave;
-		printf("about to delete k3QWave:\n");
-		delete k3QWave;
-		printf("about to delete k4QWave:\n");
-		delete k4QWave;
-
-		printf("about to delete thePotential:\n");
-		delete[] thePotential;
-		printf("about to delete viewBuffer:\n");
-		delete[] viewBuffer;
-		printf("about to delete theSpace:\n");
-		delete theSpace;
-		printf("done deleting.\n");
-	}
-	dimsSoFar = 0;
-	theSpace = new qSpace(1);
-	//printf("  done startNewSpace()\n");
-
-	return theSpace;
+qSpace::~qSpace(void) {
+	// nothing yet but stay tuned
 }
 
-// call this from JS to add one or more dimensions
-qSpace *addSpaceDimension(int32_t N, int32_t continuum, const char *label) {
-	//printf("addSpaceDimension(%d, %d, %s)\n", N, continuum, label);
+// after teh contructor, call this to add each dimension up to MAX_DIMENSIONS
+void qSpace::addDimension(int N, int continuum, const char *label) {
+	if (this->nDimensions >= MAX_DIMENSIONS)
+		throw "too many dimensions";
 
-	qDimension *dims = theSpace->dimensions + dimsSoFar;
+	qDimension *dims = this->dimensions + this->nDimensions;
 	dims->N = N;
-	dims->continuum = continuum;
-
 	dims->continuum = continuum;
 	if (continuum) {
 		dims->start = 1;
@@ -92,22 +54,18 @@ qSpace *addSpaceDimension(int32_t N, int32_t continuum, const char *label) {
 	}
 
 	strncpy(dims->label, label, LABEL_LEN-1);
+	dims->label[LABEL_LEN-1] = 0;
 
-	dimsSoFar++;
-	//printf("  done addSpaceDimension() %s\n", dims->label);
-	return theSpace;
+	this->nDimensions++;
 }
 
-// call this from JS to finish the process
-qSpace *completeNewSpace(void) {
-	printf("completeNewSpace() starts\n");
-	int32_t ix;
-	int32_t nPoints = 1, nStates = 1;
+// after all the addDimension calls, what have we got?  calculate, not alloc.
+void qSpace::tallyDimensions(void) {
+	int nPoints = 1, nStates = 1;
 
-	theSpace->nDimensions = dimsSoFar;
-
+	int ix;
 	// finish up all the dimensions now that we know them all
-	for (ix = dimsSoFar-1; ix >= 0; ix--) {
+	for (ix = this->nDimensions-1; ix >= 0; ix--) {
 		qDimension *dims = theSpace->dimensions + ix;
 
 		nStates *= dims->N;
@@ -117,91 +75,19 @@ qSpace *completeNewSpace(void) {
 	}
 	theSpace->nStates = nStates;
 	theSpace->nPoints = nPoints;
-
-	//  allocate the buffers.  theQWave's special
-	theQWave = new qFlick(theSpace, 4);
-
-	// the other buffers...
-	peruQWave = new qWave(theSpace);
-	egyptQWave = new qWave(theSpace);
-	laosQWave = new qWave(theSpace);
-	k1QWave = new qWave(theSpace);
-	k2QWave = new qWave(theSpace);
-	k3QWave = new qWave(theSpace);
-	k4QWave = new qWave(theSpace);
-
-	theWave = theQWave->buffer;
-	peruWave = peruQWave->buffer;
-	k1Wave = k1QWave->buffer;
-	k2Wave = k2QWave->buffer;
-	k3Wave = k3QWave->buffer;
-	k4Wave = k4QWave->buffer;
-	egyptWave = egyptQWave->buffer;
-	laosWave = laosQWave->buffer;
-
-	viewBuffer = new float[nPoints * 8];  // 4 floats per vertex, two verts per point
-	printf("completeNewSpace(): viewBuffer %ld \n",
-		(long) viewBuffer);
-
-	//theQWave->dumpWave("freshly created");
-
-	thePotential = new qReal[nPoints];  // slow down, we just made this wave, don't blow it
-	//theSpace->setValleyPotential(1., 1., 0.); // another default
-
-	theSpace->elapsedTime = 0.;
-	theSpace->iterateSerial = 0;
-	theSpace->filterCount = nStates;
+printf(" got past tallyDimensions; nStates=%d  nPoints=%d\n",
+	nStates, nPoints);
 
 
-	qReal dt = theSpace->dt = nStates * 0.02;  // try out different factors here
-	theSpace->dtOverI = qCx(0., -dt);
-	theSpace->halfDtOverI = qCx(0., -dt / 2.);
-
-	theSpace->algorithm = algVISSCHER;  // also change on ControlPanel.js:48
-	//theSpace->algorithm = algRK2;
-	theSpace->bufferNum = 0;
-
-	// a default.  must be done After viewBuffer and thePotential are in place.
-	theQWave->setCircularWave(1);
-
-	printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", nStates, nPoints);
-	printf("  dimension N=%d  continuum=%d  start=%d  end=%d  label=%s\n",
-		theSpace->dimensions->N, theSpace->dimensions->continuum,
-		theSpace->dimensions->start, theSpace->dimensions->end, theSpace->dimensions->label);
-	return theSpace;
 }
 
-/* ********************************************************** glue functions for js */
-
-// these are for JS only; they're all extern "C"
-
-qCx *getWaveBuffer(void) {
-	return theWave;
-}
-
-qReal *getPotentialBuffer(void) {
-	return thePotential;
-}
-
-qReal qSpace_getElapsedTime(void) {
-	return theSpace->elapsedTime;
-}
-
-qReal qSpace_getIterateSerial(void) {
-	return theSpace->iterateSerial;
-}
-
-void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
-void qSpace_setZeroPotential(void) { theSpace->setZeroPotential(); }
-void qSpace_setValleyPotential(qReal power, qReal scale, qReal offset) {
-	theSpace->setValleyPotential(power, scale, offset);
-}
-
-void qSpace_oneIntegrationStep(void) { theSpace->oneIntegrationStep(); }
-
-void qSpace_setAlgorithm(int newAlg) { theSpace->algorithm = newAlg; }
-
-}
+// call this from JS to create/allocate the
+//void qSpace::allocViewBuffer(void) {
+//NYET!
+//	float *viewBuffer = new float[this->nPoints * 8];  // 4 floats per vertex, two verts per point
+//	printf("viewBuffer(): viewBuffer %ld \n",
+//		(long) theQViewBuffer->viewBuffer);
+//}
 
 /* ********************************************************** potential */
 
@@ -226,7 +112,7 @@ void qSpace::setZeroPotential(void) {
 	for (int ix = 0; ix < dims->nPoints; ix++)
 		thePotential[ix] = 0.;
 
-	updateViewBuffer(this->latestQWave);
+	theQViewBuffer->loadViewBuffer(this->latestQWave);
 }
 
 void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset = 0) {
@@ -237,7 +123,7 @@ void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset =
 	}
 
 	// this is overkill but gotta update the Potential column in the view buffer
-	updateViewBuffer(this->latestQWave);
+	theQViewBuffer->loadViewBuffer(this->latestQWave);
 }
 
 
@@ -278,7 +164,7 @@ void qSpace::oneIntegrationStep() {
 	}
 
 	this->latestQWave = newQWave;
-	updateViewBuffer(newQWave);
+	theQViewBuffer->loadViewBuffer(newQWave);
 }
 
 
