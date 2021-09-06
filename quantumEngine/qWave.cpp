@@ -1,5 +1,5 @@
 /*
-** q Wave -- quantum wave buffer
+** quantum Wave -- quantum wave buffer
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
@@ -15,8 +15,9 @@ calculate an inner product.  I don't know how to make a circular wave anymore
 not sure how much dt/2 is.
 */
 
-#include "qSpace.h"
 #include <cmath>
+#include "qSpace.h"
+#include "qWave.h"
 
 // a transitional kind of thing from raw wave arrays to the new qWave buffer obj
 class qWave *theQWave = NULL,
@@ -61,7 +62,7 @@ void qWave::freeWave(qCx *wave) {
 	free(wave);
 }
 
-void qWave::copyWave(qCx *dest, qCx *src) {
+void qWave::copyThatWave(qCx *dest, qCx *src) {
 	if (!dest) dest = this->buffer;
 	if (!src) src = this->buffer;
 	memcpy(dest, src, this->space->nPoints * sizeof(qCx));
@@ -159,6 +160,7 @@ void qWave::dumpWave(const char *title, bool withExtras) {
 /* ************************************************************ arithmetic */
 
 // refresh the wraparound points for ANY WAVE subscribing to this space
+// 'those' or 'that' means some wave other than this->buffer
 void qSpace::fixThoseBoundaries(qCx *wave) {
 	qDimension *dims = this->dimensions;
 	switch (dims->continuum) {
@@ -187,6 +189,7 @@ void qSpace::fixThoseBoundaries(qCx *wave) {
 
 // refresh the wraparound points on the ends of continuum dimensions
 // from their counterpoints or zerro or whatever they get set to.
+// 'those' or 'that' means some wave other than this->buffer
 void qWave::fixBoundaries(void) {
 	this->space->fixThoseBoundaries(this->buffer);
 }
@@ -220,7 +223,7 @@ void qWave::normalize(void) {
 	//qCx *wave = this->buffer;
 	qDimension *dims = this->space->dimensions;
 	qReal mag = this->innerProduct();
-	printf("normalizing.  magnitude=%lf", mag);
+	printf("normalizing qWave.  magnitude=%lf", mag);
 	tempQWave->dumpWave("The wave,before normalize", true);
 
 	if (mag == 0.) {
@@ -311,8 +314,11 @@ void qWave::lowPassFilter(double dilution) {
 
 /* ********************************************************** populate wave */
 
+// how big the delay between re and im, in radians kindof.  see code.
+const double gapFactor = .01;
+
 // n is  number of cycles all the way across N points.
-// n 'should' be an integer to make it meet up on ends if wraparound
+// n 'should' be an integer to make it meet up on ends if endless
 // pass negative to make it go backward.
 // the first point here is like x=0 as far as the trig functions, and the last like x=-1
 void qWave::setCircularWave(qReal n) {
@@ -320,40 +326,55 @@ void qWave::setCircularWave(qReal n) {
 	qWave tqWave(this->space, tempWave);
 	qWave *tempQWave = &tqWave;
 
-	this->dumpWave("before set sircular & normalize", true);
+printf(" starting qWave::setCircularWave\n");
+	//this->dumpWave("before set sircular & normalize", true);
 	qCx *wave = tempWave;
 	//qCx *wave = this->buffer;
 	qDimension *dims = this->space->dimensions;
 	int start = dims->start;
 	int end = dims->end;
+
+	// dAngle is change in phase per x point
 	qReal angle, dAngle = 2. * PI / dims->N * n;
 
-	// visscher gap.How much angle would the Im component go in dt/2?
+printf(" got past dAngle\n");
+	// visscher gap. How much angle would the Im component go in dt/2?
 	// I have no idea.
-	qReal vGap = this->space->algorithm == algVISSCHER ? dAngle / 4 : 0;
-
+	qReal dt = this->space->dt;
+	qReal nN = n * dims->N;
+	qReal vGap = this->space->algorithm == algVISSCHER
+		? -nN * nN * dt / 2 * gapFactor
+		: 0;
+	printf("Set circular wave:  n=%lf  nN=%lf  dt=%lf vGap=%lf or %lf * π\n",
+		n, nN, dt, vGap, vGap/PI);
 	for (int ix = start; ix < end; ix++) {
 		angle = dAngle * (ix - start);
 		wave[ix] = qCx(cos(angle), sin(angle + vGap));
 	}
-	printf("wave, freshly generated, before halfstep");
+//	this->dumpThatWave(wave, true);
+	//printf("wave, freshly generated, before halfstep");
 	this->fixBoundaries();
-	this->dumpThatWave(wave, true);
+	//this->dumpThatWave(wave, true);
 
+	printf(" got past wave fitting.  this->buffer=%d  tempQWave->buffer=%d  \n",
+			(int) this->buffer, (int) tempQWave->buffer);
 	// ?????!?!??!
 	if (this->space->algorithm == algVISSCHER) {
-		tempQWave->copyWave(this->buffer, tempQWave->buffer);
+		tempQWave->copyThatWave(this->buffer, tempQWave->buffer);
+	printf(" got past copy that wave\n");
 		//this->space->visscherHalfStep(tempQWave, this);
-		this->dumpWave("after set sircular & normalize", true);
+		//this->dumpWave("after set sircular & normalize", true);
 		this->normalize();
 	}
 	else {
-		tempQWave->copyWave(this->buffer, tempQWave->buffer);
+		tempQWave->copyThatWave(this->buffer, tempQWave->buffer);
 		this->normalize();
 	}
-	this->dumpWave("after set sircular & normalize", true);
-
-	updateViewBuffer(this);
+printf(" got past normalize here\n");
+	//	this->dumpWave("after set sircular & normalize", true);
+	this->fixBoundaries();
+	theQViewBuffer->loadViewBuffer(this);
+printf(" got past loadViewBuffer\n");
 }
 
 // make a superposition of two waves in opposite directions.
@@ -378,7 +399,7 @@ void qWave::setStandingWave(qReal n) {
 	this->normalize();
 	this->dumpWave("after set standing & normalize", true);
 
-	updateViewBuffer(this);
+	theQViewBuffer->loadViewBuffer(this);
 }
 
 // widthFactor is fraction of total width the packet it is, 0.0-1.0, for a fraction of N.
@@ -403,7 +424,7 @@ void qWave::setPulseWave(qReal widthFactor, qReal cycles) {
 	this->normalize();
 	theQWave->dumpWave("normalized PulseWave", true);
 
-	updateViewBuffer(this);
+	theQViewBuffer->loadViewBuffer(this);
 }
 
 
