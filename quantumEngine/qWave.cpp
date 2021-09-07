@@ -43,15 +43,15 @@ qWave::qWave(qSpace *space, qCx *buffer) {
 }
 
 qWave::~qWave() {
-	printf("start the qWave instance destructor...\n");
+	//printf("start the qWave instance destructor...\n");
 	this->space = NULL;
-	printf("    set space to null...\n");
+	//printf("    set space to null...\n");
 
 	if (this->dynamicallyAllocated)
 		this->freeWave(this->buffer);
-	printf("    freed buffer...\n");
+	//printf("    freed buffer...\n");
 
-	printf("setted buffer to null; done with qWave destructor.\n");
+	//printf("setted buffer to null; done with qWave destructor.\n");
 }
 
 qCx *qWave::allocateWave(void) {
@@ -345,6 +345,11 @@ printf(" got past dAngle\n");
 	qReal vGap = this->space->algorithm == algVISSCHER
 		? -nN * nN * dt / 2 * gapFactor
 		: 0;
+
+
+	vGap = 0;
+
+
 	printf("Set circular wave:  n=%lf  nN=%lf  dt=%lf vGap=%lf or %lf * π\n",
 		n, nN, dt, vGap, vGap/PI);
 	for (int ix = start; ix < end; ix++) {

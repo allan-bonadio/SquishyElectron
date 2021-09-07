@@ -47,28 +47,28 @@ float qViewBuffer::loadViewBuffer(qWave *latestQWave) {
 		float *twoRowPtr = this->viewBuffer + pointNum * 8;
 		qCx *wavePtr = latestWave + pointNum;
 
-		printf("loadViewBuffer(%d): twoRowPtr %ld and wavePtr=%ld\n",
-			pointNum, (long) twoRowPtr, (long) wavePtr);
+	//printf("loadViewBuffer(%d): twoRowPtr %ld and wavePtr=%ld\n",
+	//	pointNum, (long) twoRowPtr, (long) wavePtr);
 
 		qReal *potPtr = thePotential + pointNum;
 		qReal re = wavePtr->re;
 		qReal im = wavePtr->im;
 
-//		twoRowPtr[0] = re * tiny;
-//		twoRowPtr[1] = im * tiny;
-//
-//		twoRowPtr[2] = potPtr[0];  // this isn't going to be used
-//		twoRowPtr[3] = pointNum * 2.;  // vertexSerial: at zero
-//
-//		twoRowPtr[4] = re;
-//		twoRowPtr[5] = im;
-//		twoRowPtr[6] = potPtr[0];
-//		twoRowPtr[7] = pointNum * 2. + 1.;  // at magnitude, top
-//
-//		// while we're here, collect the highest point
-//		qReal height = re * re + im * im;
-//		if (height > highest)
-//			highest = height;
+		twoRowPtr[0] = re * tiny;
+		twoRowPtr[1] = im * tiny;
+
+		twoRowPtr[2] = potPtr[0];  // this isn't going to be used
+		twoRowPtr[3] = pointNum * 2.;  // vertexSerial: at zero
+
+		twoRowPtr[4] = re;
+		twoRowPtr[5] = im;
+		twoRowPtr[6] = potPtr[0];
+		twoRowPtr[7] = pointNum * 2. + 1.;  // at magnitude, top
+
+		// while we're here, collect the highest point
+		qReal height = re * re + im * im;
+		if (height > highest)
+			highest = height;
 	}
 
 	// false of viewbuffer.  Was good until I realized latestWave itself was what to pay attention to.

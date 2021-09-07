@@ -19,6 +19,8 @@ qReal *thePotential = NULL;
 
 /* ********************************************************** qSpace construction */
 
+// note if you just use the constructor and these functions,
+// NO waves will be allocated for you
 qSpace::qSpace(int nDims) {
 	this->iterateSerial = 0;
 	this->elapsedTime = 0.;
@@ -36,7 +38,7 @@ qSpace::~qSpace(void) {
 	// nothing yet but stay tuned
 }
 
-// after teh contructor, call this to add each dimension up to MAX_DIMENSIONS
+// after the contructor, call this to add each dimension up to MAX_DIMENSIONS
 void qSpace::addDimension(int N, int continuum, const char *label) {
 	if (this->nDimensions >= MAX_DIMENSIONS)
 		throw "too many dimensions";

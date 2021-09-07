@@ -15,11 +15,11 @@
 // after the tallyDimensions call, allocate the buffers.
 // i'm not really using most of these...
 void allocWaves(void) {
-printf(" got past sites & points\n");
+//printf(" got past sites & points\n");
 	//  allocate the buffers.  theQWave's special
 	theQWave = new qFlick(theSpace, 4);
 
-printf(" got past new qFlick\n");
+//printf(" got past new qFlick\n");
 	// the other buffers...
 	peruQWave = new qWave(theSpace);
 	egyptQWave = new qWave(theSpace);
@@ -29,7 +29,7 @@ printf(" got past new qFlick\n");
 	k3QWave = new qWave(theSpace);
 	k4QWave = new qWave(theSpace);
 
-printf(" got past k4QWave\n");
+//printf(" got past k4QWave\n");
 	theWave = theQWave->buffer;
 	peruWave = peruQWave->buffer;
 	k1Wave = k1QWave->buffer;
@@ -38,32 +38,22 @@ printf(" got past k4QWave\n");
 	k4Wave = k4QWave->buffer;
 	egyptWave = egyptQWave->buffer;
 	laosWave = laosQWave->buffer;
-printf(" got past egypt & laos\n");
+//printf(" got past egypt & laos\n");
 }
 
 static void freeWaves(void) {
-	printf("about to delete theQWave:\n");
+	printf("about to delete qWaves:\n");
 	delete theQWave;
-	printf("about to delete peruQWave:\n");
 	delete peruQWave;
-	printf("about to delete egyptQWave:\n");
 	delete egyptQWave;
-	printf("about to delete laosQWave:\n");
 	delete laosQWave;
-	printf("about to delete k1QWave:\n");
 	delete k1QWave;
-	printf("about to delete k2QWave:\n");
 	delete k2QWave;
-	printf("about to delete k3QWave:\n");
 	delete k3QWave;
-	printf("about to delete k4QWave:\n");
 	delete k4QWave;
 
-	printf("about to delete thePotential:\n");
 	delete[] thePotential;
-	printf("about to delete viewBuffer:\n");
 	delete theQViewBuffer;
-	printf("about to delete theSpace:\n");
 	delete theSpace;
 	printf("done deleting.\n");
 }
@@ -186,7 +176,7 @@ qSpace *completeNewSpace(void) {
 
 	allocWaves();
 
-printf(" got past allocWaves()\n");
+//printf(" got past allocWaves()\n");
 	theQViewBuffer = new qViewBuffer(theSpace);
 	//theSpace->allocViewBuffer();
 	//theQWave->dumpWave("freshly created");
@@ -208,15 +198,15 @@ printf(" got past allocWaves()\n");
 	//theSpace->algorithm = algRK2;
 	theSpace->bufferNum = 0;
 
-printf(" got past algorithm = algVISSCHER\n");
+//printf(" got past algorithm = algVISSCHER\n");
 	// a default.  must be done After viewBuffer and thePotential are in place.
 	theQWave->setCircularWave(1);
-printf(" got past setCircularWave\n");
+//printf(" got past setCircularWave\n");
 
-	printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", theSpace->nStates, theSpace->nPoints);
-	printf("  dimension N=%d  continuum=%d  start=%d  end=%d  label=%s\n",
-		theSpace->dimensions->N, theSpace->dimensions->continuum,
-		theSpace->dimensions->start, theSpace->dimensions->end, theSpace->dimensions->label);
+	//printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", theSpace->nStates, theSpace->nPoints);
+	//printf("  dimension N=%d  continuum=%d  start=%d  end=%d  label=%s\n",
+//		theSpace->dimensions->N, theSpace->dimensions->continuum,
+//		theSpace->dimensions->start, theSpace->dimensions->end, theSpace->dimensions->label);
 	return theSpace;
 }
 

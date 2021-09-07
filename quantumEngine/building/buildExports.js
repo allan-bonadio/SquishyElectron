@@ -4,6 +4,7 @@
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
+if (! process.env.SQUISH_ROOT) throw "SQUISH_ROOT not defined!";
 
 console.log(`Run this whenever the list of C++ functions to call from JS changes.`)
 const fs = require('fs');

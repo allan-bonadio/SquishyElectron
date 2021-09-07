@@ -18,8 +18,6 @@ int main() {
 	//printf("trial %sred stuff%s\n", redAnsiStyle, offAnsiStyle);
 
 
-	//run_vissFlicks_tests();
-
 	//run_space_tests();
 
 	run_qCx_tests();
@@ -27,6 +25,8 @@ int main() {
 	//run_rk2_tests();
 
 	run_wave_tests();
+
+	run_vissFlicks_tests();
 
 	return 0;
 }
@@ -81,6 +81,7 @@ bool qtVerify(qSpace * actual, qSpace * expected, const char *msg) {
 //}
 
 // make a new 1d space with N state locations along x
+// using the JS interfaces.  Needed for most stuff.
 qSpace *make1dSpace(int N) {
 	startNewSpace();
 	addSpaceDimension(N, contENDLESS, "x");

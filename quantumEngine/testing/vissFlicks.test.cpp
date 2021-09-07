@@ -11,10 +11,22 @@
 
 static void someTestz(void) {
 	qSpace *space = make1dSpace(8);
+	// default is algVisscher;
+
 	qFlick *flick = new qFlick(space, 4);
+	// default contains 2 waves
+	flick->dumpWave("vissFlicks test zeroes\n", true);
+	flick->setCircularWave(1.);
+	flick->dumpWave("vissFlicks test circular\n", true);
+	flick->buffer = flick->waves[1];
+	flick->setCircularWave(1.);
+	flick->buffer = flick->waves[1];
 
 
+	flick->dumpAllWaves("full qFlick dump");
 
+	delete flick;
+	delete space;
 }
 
 

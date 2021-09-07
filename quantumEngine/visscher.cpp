@@ -44,10 +44,10 @@ where H is hamiltonian, and the time arguments aren't used here so don't worry
 
 
 // first step: advance the Reals of ψ a dt, from 0 to dt
-void stepReal(qCx *oldW, qCx *newW, qSpace *space, double dt) {
-	qDimension *dims = space->dimensions;
+void qSpace::stepReal(qCx *oldW, qCx *newW, double dt) {
+	qDimension *dims = this->dimensions;
 	printf("end of stepREal");
-	space->dumpThatWave(oldW, true);
+	this->dumpThatWave(oldW, true);
 	printf("stepReal start dims(%d), dt=%lf\n",
 		dims->nStates, dt);
 
@@ -64,17 +64,17 @@ void stepReal(qCx *oldW, qCx *newW, qSpace *space, double dt) {
 		//newW[ix].re = oldW1.re + dt * H.re * oldW1.im;
 		qCheck(newW[ix]);
 	}
-	space->fixThoseBoundaries(newW);
+	this->fixThoseBoundaries(newW);
 	printf("end of stepREal");
-	space->dumpThatWave(newW, true);
+	this->dumpThatWave(newW, true);
 }
 
 // second step: advance the Imaginaries of ψ a dt, from dt/2 to 3dt/2
 // given the reals we just generated
-void stepImaginary(qCx *oldW, qCx *newW, qSpace *space, double dt) {
-	qDimension *dims = space->dimensions;
+void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
+	qDimension *dims = this->dimensions;
 	printf("start of stepImaginary");
-	space->dumpThatWave(oldW, true);
+	this->dumpThatWave(oldW, true);
 	printf("dt=%lf\n", dt);
 
 	printf("the hamiltonian ψ.im at ...\n");
@@ -94,9 +94,9 @@ void stepImaginary(qCx *oldW, qCx *newW, qSpace *space, double dt) {
 		//newW[ix].im = oldW1.im - dt * H.im * newW[ix].re;
 		qCheck(newW[ix]);
 	}
-	space->fixThoseBoundaries(newW);
+	this->fixThoseBoundaries(newW);
 	printf("end of stepImaginary ");
-	space->dumpThatWave(newW, true);
+	this->dumpThatWave(newW, true);
 }
 
 // form the new wave from the old wave, in separate buffers, chosen by our caller.
@@ -114,11 +114,11 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 //	for (int i = dims->start; i < dims->end; i++)
 //		newW[i] = qCx(i);
 
-	stepReal(oldW, newW, this, dt);
+	stepReal(oldW, newW, dt);
 	if (debugHalfway) newQWave->dumpWave("Visscher wave after the Re step", true);
 	// now at an half-odd fraction of dt
 
-	stepImaginary(oldW, newW, this, dt);
+	stepImaginary(oldW, newW, dt);
 	// now at an integer fraction of dt
 
 	// ok so after this, the time has advanced dt, and real is at elapsedTime and
@@ -134,6 +134,8 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 	}
 }
 
+// can I make this useful?  Is it needed ? when I get viss working,
+// I should know.
 // shift the Im components of the old wave a half tick forward and store in newQWave.
 // if we're using visscher, we need to initialize waves with the
 // im component a half dt ahead.  This does it for newly created stuff, like set waves.
@@ -153,7 +155,7 @@ void qSpace::visscherHalfStep(qWave *oldQWave, qWave *newQWave) {
 	for (int ix = dims->start; ix < dims->end; ix++)
 		newW[ix].re = oldW[ix].re;
 
-	stepImaginary(oldQWave->buffer, newQWave->buffer, this, halfDt);
+	stepImaginary(oldQWave->buffer, newQWave->buffer, halfDt);
 	this->fixThoseBoundaries(newW);
 }
 

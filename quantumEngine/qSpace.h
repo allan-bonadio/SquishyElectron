@@ -138,6 +138,8 @@ public:
 
 	void fixThoseBoundaries(qCx *wave);  // like for qWave but on any wave
 
+	void stepReal(qCx *oldW, qCx *newW, double dt);
+	void stepImaginary(qCx *oldW, qCx *newW, double dt);
 };
 
 /* ************************************************************ the space */

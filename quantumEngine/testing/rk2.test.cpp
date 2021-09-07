@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "test.h"
 #include "../qSpace.h"
+#include "../qWave.h"
 
 // construct our space & stuff
 static void makeNewSpace(int32_t N, int32_t continuum, const char *label) {
@@ -34,7 +35,11 @@ qCx firstExpected[7] = {
 	qCx( 0.44294308566870949, -0.06180339887498949)
 };
 
+
+
 static void firstRK2(void) {
+	qWave *otherQWave = new qWave(theSpace);
+
 	// lemme seee this first
 	// for (int i = 0; i < 7; i++) {
 	// 	qCx expe = firstExpected[i];
@@ -50,12 +55,12 @@ static void firstRK2(void) {
 	printf("First Test - &&&&& dt is %lf\n", theSpace->dt);
 	theQWave->dumpWave("before rk2 test", true);
 
-	theSpace->oneRk2Step();
+	theSpace->oneRk2Step(theQWave, otherQWave);
 
-	theQWave->dumpWave("after rk2 test", true);
+	otherQWave->dumpWave("after rk2 test", true);
 
 	for (int ix = 0; ix < 7; ix++) {
-		qCx act = theWave[ix];
+		qCx act = otherQWave->buffer[ix];
 		qCx xpct = firstExpected[ix];
 		if (act.re != xpct.re || act.im != xpct.im) {
 			printf("%srk2 %d:actual=(%lf, %lf) vs firstExpected=(%lf, %lf) %s\n",
@@ -65,7 +70,10 @@ static void firstRK2(void) {
 
 	// in case you need to regenerate firstExpected from Actual
 	for (int ix = 0; ix < 7; ix++) printf("\tqCx(%20.18lf, %20.18lf),\n",
-		theWave[ix].re, theWave[ix].im);
+		otherQWave->buffer[ix].re, otherQWave->buffer[ix].im);
+
+
+	delete otherQWave;
 }
 
 /* ********************************************************* second test */
@@ -84,6 +92,8 @@ qCx secondExpected[7] = {
 
 // five states, 1 iteration, no lowPass or normalize, faked dt
 static void secondRK2(void) {
+	qWave *otherQWave = new qWave(theSpace);
+
 	// lemme seee this second
 	// for (int i = 0; i < 7; i++) {
 	// 	qCx expe = secondExpected[i];
@@ -97,11 +107,12 @@ static void secondRK2(void) {
 	printf("Second Test - &&&&& dt is %lf\n", theSpace->dt);
 	theQWave->dumpWave("before rk2 second test", true);
 
-	theSpace->oneRk2Step();
-	theSpace->oneRk2Step();
-	theSpace->oneRk2Step();
-	theSpace->oneRk2Step();
-	theSpace->oneRk2Step();  // this one should get the lowPass & normalize
+	theSpace->oneRk2Step(theQWave, otherQWave);
+	theSpace->oneRk2Step(otherQWave, theQWave);
+	theSpace->oneRk2Step(theQWave, otherQWave);
+	theSpace->oneRk2Step(otherQWave, theQWave);
+	theSpace->oneRk2Step(theQWave, otherQWave);
+	theSpace->oneRk2Step(otherQWave, theQWave);  // i added this does it mess up the test?
 
 	theQWave->dumpWave("after rk2 second test", true);
 
@@ -117,6 +128,8 @@ static void secondRK2(void) {
 	// in case you need to regenerate secondExpected from Actual
 	for (int ix = 0; ix < 7; ix++) printf("\tqCx(%20.18lf, %20.18lf),\n",
 		theWave[ix].re, theWave[ix].im);
+
+	delete otherQWave;
 }
 
 /* ********************************************************* top level */

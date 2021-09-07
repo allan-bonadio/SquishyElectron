@@ -4,6 +4,7 @@
 */
 
 #include "../qSpace.h"
+#include "../qWave.h"
 #include "test.h"
 
 

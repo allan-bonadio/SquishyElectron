@@ -59,6 +59,7 @@ struct qFlick : public qWave {
 	void dumpRow(char *buf, int doubleAge, int ix, double *pPrevPhase, bool withExtras);
 	void dumpOneAge(const char *title, int doubleAge, bool withExtras);
 	void dumpLatest(const char *titleIn, bool withExtras);
+	void dumpAllWaves(const char *title);
 
 	// them, all dynamically allocated
 	qCx **waves;
@@ -78,8 +79,9 @@ struct qFlick : public qWave {
 	void setCurrent(int which);
 
 	// for vischer
-	qReal innerProduct(int doubleAge);
-	void normalize(void) override;
+	qReal innerProduct(int doubleAge = 1);
+	void normalize(int doubleAge = 1) override;
+	void setCircularWave(qReal n, int doubleAge = 1);
 
 	// retrieve properly interpolated values here
 	qReal magnitude(int doubleAge, int ix = 1);
