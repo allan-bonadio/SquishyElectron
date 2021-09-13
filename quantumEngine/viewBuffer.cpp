@@ -40,7 +40,8 @@ float qViewBuffer::loadViewBuffer(qWave *latestQWave) {
 	//(long) latestQWave, (long) thePotential);
 	//printf("loadViewBuffer(): viewBuffer %ld and latestQWave->buffer=%ld\n",
 	//(long) viewBuffer, (long) latestQWave->buffer);
-	latestQWave->dumpWave("at start of loadViewBuffer()");
+
+	//latestQWave->dumpWave("at start of loadViewBuffer()");
 
 	// this is index into the
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {

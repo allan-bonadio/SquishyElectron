@@ -15,16 +15,17 @@ const char *offAnsiStyle = "\e[0m";
 // do not include both in the same build.  This just runs tests.
 int main() {
 
-	//printf("trial %sred stuff%s\n", redAnsiStyle, offAnsiStyle);
+	printf("trial %sred stuff%s\n", redAnsiStyle, offAnsiStyle);
 
+	printf(":::::::::::::::::::::::::::::::::::::::::::::: Start of Tests\n");
+
+	//run_qCx_tests();
 
 	//run_space_tests();
 
-	run_qCx_tests();
-
 	//run_rk2_tests();
 
-	run_wave_tests();
+	//run_wave_tests();
 
 	run_vissFlicks_tests();
 
@@ -87,4 +88,19 @@ qSpace *make1dSpace(int N) {
 	addSpaceDimension(N, contENDLESS, "x");
 	qSpace *space = completeNewSpace();
 	return space;
+}
+
+// not with all the crud from above
+qSpace *makeBareSpace(int N) {
+	theSpace = new qSpace(1);
+
+	theSpace->addDimension(N, contENDLESS, "x");
+
+	theSpace->tallyDimensions();
+	// allocate a wave
+
+	theSpace->algorithm = algVISSCHER;  // also change on ControlPanel.js:48
+	theSpace->dt = .01;
+
+	theQWave = new qFlick(theSpace, 4);
 }

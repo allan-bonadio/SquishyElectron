@@ -10,20 +10,26 @@
 
 
 static void someTestz(void) {
-	qSpace *space = make1dSpace(8);
-	// default is algVisscher;
+	qSpace *space = makeBareSpace(8);
+	//qSpace *space = make1dSpace(8);
+
 
 	qFlick *flick = new qFlick(space, 4);
 	// default contains 2 waves
-	flick->dumpWave("vissFlicks test zeroes\n", true);
+	flick->dumpAllWaves("brand new flick, should be all zeroes:");
+	//flick->dumpWave("vissFlicks test zeroes\n", true);
 	flick->setCircularWave(1.);
-	flick->dumpWave("vissFlicks test circular\n", true);
-	flick->buffer = flick->waves[1];
-	flick->setCircularWave(1.);
-	flick->buffer = flick->waves[1];
+	flick->dumpAllWaves("    after circular: should be normalized and duplicated");
+	//flick->dumpWave("vissFlicks test circular\n", true);
 
 
-	flick->dumpAllWaves("full qFlick dump");
+
+//	flick->buffer = flick->waves[1];
+//	flick->setCircularWave(1.);
+//	flick->buffer = flick->waves[1];
+//
+//
+//	flick->dumpAllWaves("full qFlick dump");
 
 	delete flick;
 	delete space;

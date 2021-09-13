@@ -315,6 +315,7 @@ void qWave::lowPassFilter(double dilution) {
 /* ********************************************************** populate wave */
 
 // how big the delay between re and im, in radians kindof.  see code.
+// see also same thing in qFlick
 const double gapFactor = .01;
 
 // n is  number of cycles all the way across N points.

@@ -35,13 +35,13 @@ struct qWave {
 	qCx *allocateWave(void);
 	void freeWave(qCx *);
 
-	void fixBoundaries(void);  // on this buffer
+	virtual void fixBoundaries(void);  // on this buffer
 	void prune(void);
 	qReal innerProduct(void);
 	virtual void normalize(void);
 	void lowPassFilter(double dilution = 0.5);
 
-	void setCircularWave(qReal n);
+	virtual void setCircularWave(qReal n);
 	void setStandingWave(qReal n);
 	void setPulseWave(qReal widthFactor, qReal cycles);
 };
@@ -79,13 +79,14 @@ struct qFlick : public qWave {
 	void setCurrent(int which);
 
 	// for vischer
-	qReal innerProduct(int doubleAge = 1);
-	void normalize(int doubleAge = 1) override;
-	void setCircularWave(qReal n, int doubleAge = 1);
+	qReal innerProduct(void);
+	void normalize(void);
+	void setCircularWave(qReal n);
 
 	// retrieve properly interpolated values here
 	qReal magnitude(int doubleAge, int ix = 1);
 	qCx value(int doubleAge, int ix = 1);
+	void fixBoundaries(void);  // on latest two buffers
 };
 
 

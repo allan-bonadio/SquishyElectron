@@ -8,6 +8,9 @@
 #include "qSpace.h"
 #include "qWave.h"
 
+// how big the delay between re and im, in radians kindof.  see code.
+// see also same thing in qWave
+const double gapFactor = .01;
 
 /* ************************************************************ birth & death & basics */
 
@@ -57,7 +60,7 @@ void qFlick::pushCopy(qCx *wave) {
 }
 
 // initialize this flick by pushing this wave twice (two allocated),
-// so you can take the inner product at .5 and 1.0 .
+// so you can take the inner product at .5 and 1.0 (doubleAges 1 and 2).
 void qFlick::installWave(qCx *wave) {
 	this->pushCopy(wave);
 	this->pushCopy(wave);
@@ -153,8 +156,10 @@ qReal qFlick::magnitude(int doubleAge, int ix) {
 // if doubleAge is a odd integer, it takes an Im value at doubleAge and mean
 // 		between the reals from doubleAge and doubleAge+1
 // you can't take it at zero cuz there's no Im before that.
-qReal qFlick::innerProduct(int doubleAge) {
-	printf("qFlick::innerProduct starting at dage %d\n", doubleAge);
+qReal qFlick::innerProduct(void) {
+	int doubleAge = 1;  // not sure if I'll ever want this as a variable
+
+	printf("qFlick::innerProduct starting at age %d\n", doubleAge);
 	qDimension *dims = this->space->dimensions;
 	qReal sum = 0.;
 	int end = dims->end;
@@ -169,19 +174,8 @@ qReal qFlick::innerProduct(int doubleAge) {
 	for (int ix = dims->start; ix < end; ix++) {
 		double mag = this->magnitude(doubleAge, ix);
 		sum += mag;
-		printf("qFlick::innerProduct: [%d][%d]  mag=%lf  sum=%lf\n",
+		printf("                dage=%d ix=%d  mag=%lf  sum=%lf\n",
 			doubleAge, ix, mag, sum);
-//		qCx newPoint = newWave[ix];
-//		qCx oldPoint = oldWave[ix];
-//
-//		if (even) {
-//			// even - real is squared, im is interpolated.  visualize doubleAge = 2
-//			sum += newPoint.re * newPoint.re + newPoint.im * oldPoint.im;
-//		}
-//		else {
-//			// odd - im is squared, real is interpolated.  visualize doubleAge = 1
-//			sum += newPoint.re * oldPoint.re + newPoint.im * newPoint.im;
-//		}
 	}
 	return sum;
 }
@@ -193,13 +187,15 @@ void qFlick::normalize(void) {
 	this->dumpWave("qFlick::normalize starting", true);
 
 	qDimension *dims = this->space->dimensions;
-	qReal innerProduct = this->innerProduct(1);
+	qReal innerProduct = this->innerProduct();
 	qCx *wave = this->waves[0];
+	qCx *older = this->waves[1];
 	qReal factor = sqrt(1/innerProduct);
 	printf("qFlick::normalize() total innerProduct is %lf factor=%lf\r", innerProduct, factor);
-	for (int ix = dims->start; ix < dims->end; ix++)
+	for (int ix = dims->start; ix < dims->end; ix++) {
 		wave[ix] *= factor;
-
+		older[ix] *= factor;
+	}
 	this->fixBoundaries();
 	this->dumpWave("qFlick::normalize done", true);
 }
@@ -245,17 +241,18 @@ printf(" got past dAngle\n");
 		angle = dAngle * (ix - start);
 		wave[ix] = qCx(cos(angle), sin(angle + vGap));
 	}
-//	this->dumpThatWave(wave, true);
-	//printf("wave, freshly generated, before halfstep");
 	this->fixBoundaries();
-	//this->dumpThatWave(wave, true);
+	printf("wave, freshly generated, 1 copy");
+	this->dumpThatWave(wave, true);
 
-	printf(" got past wave fitting.  this->buffer=%d  tempQWave->buffer=%d  \n",
+	printf("      this->buffer=%d  tempQWave->buffer=%d  \n",
 			(int) this->buffer, (int) tempQWave->buffer);
 	// ?????!?!??!
 	if (this->space->algorithm == algVISSCHER) {
-		tempQWave->copyThatWave(this->buffer, tempQWave->buffer);
-	printf(" got past copy that wave\n");
+		tempQWave->copyThatWave(this->waves[0], tempQWave->buffer);
+		tempQWave->copyThatWave(this->waves[1], tempQWave->buffer);
+		printf("  copied that wave\n");
+		this->dumpAllWaves("qFlick::setCircularWave: copied wave 2ice; about to normalize");
 		//this->space->visscherHalfStep(tempQWave, this);
 		//this->dumpWave("after set sircular & normalize", true);
 		this->normalize();
@@ -267,6 +264,7 @@ printf(" got past dAngle\n");
 printf(" got past normalize here\n");
 	//	this->dumpWave("after set sircular & normalize", true);
 	this->fixBoundaries();
+	this->dumpAllWaves("qFlick::setCircularWave: normalize");
 	theQViewBuffer->loadViewBuffer(this);
 printf(" got past loadViewBuffer\n");
 }
