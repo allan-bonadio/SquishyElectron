@@ -9,19 +9,40 @@
 #include "test.h"
 
 
-static void someTestz(void) {
-	qSpace *space = makeBareSpace(8);
+static void makeASpaceAndIterate(void) {
+
+
+
+	qSpace *space = makeBare1dSpace(8);
 	//qSpace *space = make1dSpace(8);
 
 
 	qFlick *flick = new qFlick(space, 4);
-	// default contains 2 waves
-	flick->dumpAllWaves("brand new flick, should be all zeroes:");
-	//flick->dumpWave("vissFlicks test zeroes\n", true);
+
 	flick->setCircularWave(1.);
 	flick->dumpAllWaves("    after circular: should be normalized and duplicated");
-	//flick->dumpWave("vissFlicks test circular\n", true);
+	flick->dumpWave("vissFlicks test circular\n", true);
 
+	const int dumpCycle = 10;
+	for (int k = 0; k < 100; k++) {
+		flick->pushWave();
+
+		qCx *newWave = flick->waves[0];
+		qCx *oldWave = flick->waves[1];
+
+		space->stepReal(oldWave, newWave, .01);
+		//flick->dumpAllWaves("    after stepReal()");
+
+		space->stepImaginary(oldWave, newWave, .01);
+
+		//flick->dumpAllWaves("    after stepImaginary()");
+
+		if (k % dumpCycle == 0) {
+			printf("\n________ generation %d   ", k);
+			flick->dumpThatWave(newWave, true);
+		}
+
+	}
 
 
 //	flick->buffer = flick->waves[1];
@@ -41,7 +62,7 @@ static void someTestz(void) {
 void run_vissFlicks_tests(void) {
 	printf(":::::::::::::::::::::::::::::::::::::::::::::: viss flicks tests\n");
 
-	someTestz();
+	makeASpaceAndIterate();
 	printf("Done with viss flicks tests\n");
 }
 
