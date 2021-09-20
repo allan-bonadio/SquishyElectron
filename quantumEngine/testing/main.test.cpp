@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include "../qSpace.h"
+#include "../qWave.h"
 #include "test.h"
 
 
@@ -90,17 +91,13 @@ qSpace *make1dSpace(int N) {
 	return space;
 }
 
-// not with all the crud from above
-qSpace *makeBareSpace(int N) {
-	theSpace = new qSpace(1);
-
-	theSpace->addDimension(N, contENDLESS, "x");
-
-	theSpace->tallyDimensions();
-	// allocate a wave
-
-	theSpace->algorithm = algVISSCHER;  // also change on ControlPanel.js:48
-	theSpace->dt = .01;
-
-	theQWave = new qFlick(theSpace, 4);
+// 1d space, not with all the crud from above
+qSpace *makeBare1dSpace(int N) {
+	qSpace *space = new qSpace(2);
+	printf("sizeof(qSpace) = %ld   alignof(qSpace) = %ld  qSpace* = 0x%lx = %ld\n",
+		sizeof(qSpace), alignof(qSpace), (long int) space, (long int) space);
+	space->addDimension(N, contENDLESS, "x");
+	space->initSpace();
+	return space;
 }
+

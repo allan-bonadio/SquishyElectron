@@ -24,6 +24,6 @@ extern bool qtVerify(struct qSpace *actual, struct qSpace *expected, const char 
 #define qtVERIFY(a, b, msg)  if (a != b) printf("*** mismatch %s: #a ≠ #b\n", msg)
 
 extern struct qSpace *make1dSpace(int N);  // handy
-extern struct qSpace *makeBareSpace(int N);
+extern struct qSpace *makeBare1dSpace(int N);
 
 
