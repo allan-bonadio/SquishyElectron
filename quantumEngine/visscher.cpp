@@ -46,38 +46,38 @@ where H is hamiltonian, and the time arguments aren't used here so don't worry
 // first step: advance the Reals of ψ a dt, from 0 to dt
 void qSpace::stepReal(qCx *oldW, qCx *newW, double dt) {
 	qDimension *dims = this->dimensions;
-	printf("end of stepREal");
-	this->dumpThatWave(oldW, true);
-	printf("stepReal start dims(%d), dt=%lf\n",
-		dims->nStates, dt);
+	//printf("⚛️ start of stepReal");
+	//this->dumpThatWave(oldW, true);
+	//printf("⚛︎ stepReal start N States=(%d), dt=%lf\n",
+	//	dims->nStates, dt);
 
-	printf("the hamiltonian ψ.re at ...\n");
+	//printf("⚛︎ the hamiltonian ψ.re at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx oldW1 = oldW[ix];
 
 		qCx d2 = oldW[ix-1] + oldW[ix+1] - oldW[ix] * 2;
 		// qCx H = hamiltonian(oldW, ix).re;
 
-		printf("x=%d  Hψ = %lf,%lf \n", ix, d2.re, d2.im);
+		//printf("⚛︎ x=%d  Hψ = %lf,%lf \n", ix, d2.re, d2.im);
 
 		newW[ix].re = oldW1.re + dt * d2.re;
 		//newW[ix].re = oldW1.re + dt * H.re * oldW1.im;
 		qCheck(newW[ix]);
 	}
 	this->fixThoseBoundaries(newW);
-	printf("end of stepREal");
-	this->dumpThatWave(newW, true);
+	//printf("⚛️ end of stepReal:");
+	//this->dumpThatWave(newW, true);
 }
 
 // second step: advance the Imaginaries of ψ a dt, from dt/2 to 3dt/2
 // given the reals we just generated
 void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
 	qDimension *dims = this->dimensions;
-	printf("start of stepImaginary");
-	this->dumpThatWave(oldW, true);
-	printf("dt=%lf\n", dt);
+	//printf("⚛︎ start of stepImaginary(), oldWave=");
+	//this->dumpThatWave(oldW, true);
+	//printf("⚛︎ dt=%lf\n", dt);
 
-	printf("the hamiltonian ψ.im at ...\n");
+	//printf("⚛︎ the hamiltonian ψ.im at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx oldW1 = oldW[ix];
 
@@ -87,16 +87,16 @@ void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
 		// actually H times ψ
 		// qCx H = hamiltonian(oldW, ix);
 
-		printf("the hamiltonian ψ.im at x=%d  then dt=%lf d2x=%lf,%lf oldW1=%lf,%lf\n",
-			ix, dt, d2.re,d2.im, oldW1.re, oldW1.im);
+		//printf("⚛︎ the hamiltonian ψ.im at x=%d  then dt=%lf d2x=%lf,%lf oldW1=%lf,%lf\n",
+		//	ix, dt, d2.re,d2.im, oldW1.re, oldW1.im);
 
 		newW[ix].im = oldW1.im - dt * d2.im;
 		//newW[ix].im = oldW1.im - dt * H.im * newW[ix].re;
 		qCheck(newW[ix]);
 	}
 	this->fixThoseBoundaries(newW);
-	printf("end of stepImaginary ");
-	this->dumpThatWave(newW, true);
+	//printf("⚛️ end of stepImaginary - result wave:");
+	//this->dumpThatWave(newW, true);
 }
 
 // form the new wave from the old wave, in separate buffers, chosen by our caller.
