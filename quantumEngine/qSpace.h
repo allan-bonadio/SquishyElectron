@@ -71,20 +71,12 @@ public:
 	qSpace(int nDims);
 	~qSpace(void);
 
-	char label[LABEL_LEN];
-
 	// additional for space creation
 	void addDimension(int N, int continuum, const char *label);
-	void tallyDimensions(void);
-	//void allocWaves(void);
-	//void allocViewBuffer(void);
-
-	// number of  dimensions actually used, always <= MAX_DIMENSIONS
-	int32_t nDimensions;
-
-	// totals for all dimensions.  These numbers dominate lots of areas in the code.
-	int nStates;
-	int nPoints;
+	private:
+		void tallyDimensions(void);
+	public:
+	void initSpace(void);
 
 	// how much time we've iterated, from creation.  pseudo-seconds.  Since we've eliminated
 	// all the actual physical constants from the math, why not choose our own definition
@@ -94,6 +86,13 @@ public:
 	// total number of times thru the number cruncher. (should always be an integer;
 	// it's a double cuz I don't know how big it'll get)
 	double iterateSerial;
+
+	// number of  dimensions actually used, always <= MAX_DIMENSIONS
+	int32_t nDimensions;
+
+	// totals for all dimensions.  These numbers dominate lots of areas in the code.
+	int nStates;
+	int nPoints;
 
 	// the one that got the most recent integration step
 	struct qWave *latestQWave;
@@ -115,6 +114,8 @@ public:
 
 	// zero = off.  true to do it every iteration a little and use value as dilution factor
 	qReal continuousLowPass;
+
+	char label[LABEL_LEN];
 
 	/* *********************************************** Dimensions & other serious stuff */
 	// Dimensions are listed from outer to inner as with the resulting ψ array:

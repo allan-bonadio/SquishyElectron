@@ -20,14 +20,14 @@ qReal *thePotential = NULL;
 /* ********************************************************** qSpace construction */
 
 // note if you just use the constructor and these functions,
-// NO waves will be allocated for you
+// NO waves or buffers will be allocated for you
 qSpace::qSpace(int nDims) {
 	this->iterateSerial = 0;
 	this->elapsedTime = 0.;
 
 	// magic flags
-	this->doLowPass = true;
-	this->continuousLowPass = 0;
+	//this->doLowPass = true;
+	//this->continuousLowPass = 0;
 
 	this->elapsedTime = 0.;
 	this->iterateSerial = 0;
@@ -68,19 +68,35 @@ void qSpace::tallyDimensions(void) {
 	int ix;
 	// finish up all the dimensions now that we know them all
 	for (ix = this->nDimensions-1; ix >= 0; ix--) {
-		qDimension *dims = theSpace->dimensions + ix;
+		qDimension *dims = this->dimensions + ix;
 
 		nStates *= dims->N;
 		dims->nStates = nStates;
 		nPoints *= dims->start + dims->end;
 		dims->nPoints = nPoints;
 	}
-	theSpace->nStates = nStates;
-	theSpace->nPoints = nPoints;
+	this->nStates = nStates;
+	this->nPoints = nPoints;
 printf(" got past tallyDimensions; nStates=%d  nPoints=%d\n",
 	nStates, nPoints);
+}
 
+// call this After addDIMENSION calls to get it ready to go.
+// If this->nPoints is still zero, initSpace hasn't been called yet; failure
+void qSpace::initSpace() {
+	this->tallyDimensions();
 
+	// try out different formulas here
+	qReal dt = this->dt = 1. / (this->nStates * this->nStates);
+	//qReal dt = this->dt = nStates * 0.02;  // try out different factors here
+
+	// used only for the RKs
+	this->dtOverI = qCx(0., -dt);
+	this->halfDtOverI = qCx(0., -dt / 2.);
+
+	this->algorithm = algVISSCHER;  // also change on ControlPanel.js:48
+	//this->algorithm = algRK2;
+	this->bufferNum = 0;
 }
 
 // call this from JS to create/allocate the
@@ -110,7 +126,7 @@ void qSpace::dumpPotential(const char *title) {
 }
 
 void qSpace::setZeroPotential(void) {
-	qDimension *dims = theSpace->dimensions;
+	qDimension *dims = this->dimensions;
 	for (int ix = 0; ix < dims->nPoints; ix++)
 		thePotential[ix] = 0.;
 
@@ -118,7 +134,7 @@ void qSpace::setZeroPotential(void) {
 }
 
 void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset = 0) {
-	qDimension *dims = theSpace->dimensions;
+	qDimension *dims = this->dimensions;
 	qReal mid = floor(dims->nPoints / 2);
 	for (int ix = 0; ix < dims->nPoints; ix++) {
 		thePotential[ix] = pow(abs(ix - mid), power) * scale + offset;

@@ -12,7 +12,7 @@
 
 /* ********************************************************** wave stuff */
 
-// after the tallyDimensions call, allocate the buffers.
+// after the initSpace() call, allocate the buffers.
 // i'm not really using most of these...
 void allocWaves(void) {
 //printf(" got past sites & points\n");
@@ -160,19 +160,9 @@ qSpace *addSpaceDimension(int N, int continuum, const char *label) {
 qSpace *completeNewSpace(void) {
 	printf("completeNewSpace() starts\n");
 
-	theSpace->tallyDimensions();
-//	int ix;
-//	// finish up all the dimensions now that we know them all
-//	for (ix = this->nDimensions-1; ix >= 0; ix--) {
-//		qDimension *dims = theSpace->dimensions + ix;
-//
-//		nStates *= dims->N;
-//		dims->nStates = nStates;
-//		nPoints *= dims->start + dims->end;
-//		dims->nPoints = nPoints;
-//	}
-//	theSpace->nStates = nStates;
-//	theSpace->nPoints = nPoints;
+	// finish up all the dimensions now that we know them all
+	theSpace->initSpace();
+
 
 	allocWaves();
 
@@ -186,17 +176,6 @@ qSpace *completeNewSpace(void) {
 
 	theSpace->filterCount = theSpace->nStates;  // bad idea
 
-	// try out different formulas here
-	qReal dt = theSpace->dt = 1. / (theSpace->nStates * theSpace->nStates);
-	//qReal dt = theSpace->dt = nStates * 0.02;  // try out different factors here
-
-	// used only for the RKs
-	theSpace->dtOverI = qCx(0., -dt);
-	theSpace->halfDtOverI = qCx(0., -dt / 2.);
-
-	theSpace->algorithm = algVISSCHER;  // also change on ControlPanel.js:48
-	//theSpace->algorithm = algRK2;
-	theSpace->bufferNum = 0;
 
 //printf(" got past algorithm = algVISSCHER\n");
 	// a default.  must be done After viewBuffer and thePotential are in place.
