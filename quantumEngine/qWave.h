@@ -56,10 +56,11 @@ struct qFlick : public qWave {
 	~qFlick();
 
 	// dump
-	void dumpRow(char *buf, int doubleAge, int ix, double *pPrevPhase, bool withExtras);
+	qReal dumpRow(char *buf, int doubleAge, int ix, double *pPrevPhase, bool withExtras);
 	void dumpOneAge(const char *title, int doubleAge, bool withExtras);
 	void dumpLatest(const char *titleIn, bool withExtras);
 	void dumpAllWaves(const char *title);
+	void dumpOverview(const char *title);
 
 	// them, all dynamically allocated
 	qCx **waves;
@@ -67,12 +68,12 @@ struct qFlick : public qWave {
 	int nWaves;  // how many are actually in use (those behond should be null!)
 
 	// create and add a new buffer, zeroed, at the 0 position, pushing the others up
-	void pushWave(qCx *wave = NULL);
+	void pushWave(void);
 
 	// make a new wave, copy of wave (can't have duplicate waves in the
 	// flick or it'll be confusing deallocating?)
-	void pushCopy(qCx *wave);
-	void installWave(qCx *wave);
+	//void pushCopy(qCx *wave);
+	//void installWave(qCx *wave);
 
 	// the current one is === the one pointed to by buffer.  usually zero for the first one.
 	int currentIx;
@@ -86,6 +87,9 @@ struct qFlick : public qWave {
 	// retrieve properly interpolated values here
 	qReal magnitude(int doubleAge, int ix = 1);
 	qCx value(int doubleAge, int ix = 1);
+	qReal magnitude(int ix = 1) { return magnitude(1, ix); }
+	qCx value(int ix = 1) { return value(1, ix); }
+
 	void fixBoundaries(void);  // on latest two buffers
 };
 

@@ -63,9 +63,21 @@ void qWave::freeWave(qCx *wave) {
 }
 
 void qWave::copyThatWave(qCx *dest, qCx *src) {
+//	printf("qWave::copyThatWave(%d <== %d)\n", (int) dest, (int) src);
 	if (!dest) dest = this->buffer;
 	if (!src) src = this->buffer;
+//	printf("              sample ix=1 ==> (%lf, %lf) <== (%lf, %lf)  nPoints=%d\n",
+//		dest[1].re, dest[1].im, src[1].re, src[1].im, this->space->nPoints);
+
+//	printf("       before: dest, then src:\n");
+//	this->dumpThatWave(dest);
+//	this->dumpThatWave(src);
+
 	memcpy(dest, src, this->space->nPoints * sizeof(qCx));
+
+//	printf("       after: dest, then src:\n");
+//	this->dumpThatWave(dest);
+//	this->dumpThatWave(src);
 }
 
 /* never tested - might never work under visscher */
@@ -97,12 +109,15 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 
 // print one complex number, plus maybe some more, on a line in the dump on stdout.
 // if it overflows the buffer, it won't.  just dump a row for a cx datapoint.
-static void dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtras) {
+// returns the magnitude non-visscher, but only withExtras
+static qReal dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtras) {
 	qReal re = w.re;
 	qReal im = w.im;
+	qReal mag = 0;
 	if (withExtras) {
-		qReal mag = re * re + im * im;
-		qReal phase = atan2(im, re) * 180 / PI;  // pos or neg
+		mag = re * re + im * im;
+		qReal phase = 0.;
+		if (im || re) phase = atan2(im, re) * 180. / PI;  // pos or neg
 		qReal dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
 		while (dPhase >= 360.) dPhase -= 360.;
 
@@ -113,6 +128,7 @@ static void dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtra
 	else {
 		sprintf(buf,"[%d] (%8.4lf,%8.4lf)", ix, re, im);
 	}
+	return mag;
 }
 
 // this is wave-independent.  This prints N+2 lines:
@@ -120,10 +136,13 @@ static void dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtra
 // the complete set of states
 // one for the N+1 if continuum
 void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
+	if (this->nPoints <= 0) throw "qSpace::dumpThatWave() with zero points";
+
 	const qDimension *dims = this->dimensions;
 	int ix = 0;
 	char buf[200];
 	double prevPhase = 0.;
+	double innerProd = 0.;
 
 	// somehow, commenting out these lines fixes the nan problem.
 	// but the nan problem doesn't happen on flores?
@@ -134,7 +153,7 @@ void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
 	}
 
 	for (ix = dims->start; ix < dims->end; ix++) {
-		dumpRow(buf, ix, wave[ix], &prevPhase, withExtras);
+		innerProd += dumpRow(buf, ix, wave[ix], &prevPhase, withExtras);
 		printf("\n%s", buf);
 	}
 
@@ -143,7 +162,7 @@ void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
 		printf("\nend %s", buf);
 	}
 
-	printf("\n");
+	printf(" innerProd=%lf\n", innerProd);
 }
 
 // any wave
@@ -153,8 +172,9 @@ void qWave::dumpThatWave(qCx *wave, bool withExtras) {
 
 // this is the member function that dumps its own wave and space
 void qWave::dumpWave(const char *title, bool withExtras) {
-	printf("\n== Wave | %s", title);
+	printf("\n==== Wave | %s", title);
 	this->space->dumpThatWave(this->buffer, withExtras);
+	printf("\n==== end of Wave ====\n");
 }
 
 /* ************************************************************ arithmetic */
@@ -162,6 +182,8 @@ void qWave::dumpWave(const char *title, bool withExtras) {
 // refresh the wraparound points for ANY WAVE subscribing to this space
 // 'those' or 'that' means some wave other than this->buffer
 void qSpace::fixThoseBoundaries(qCx *wave) {
+	if (this->nPoints <= 0) throw "qSpace::fixThoseBoundaries() with zero points";
+
 	qDimension *dims = this->dimensions;
 	switch (dims->continuum) {
 	case contDISCRETE:
@@ -224,18 +246,11 @@ void qWave::normalize(void) {
 	qDimension *dims = this->space->dimensions;
 	qReal mag = this->innerProduct();
 	printf("normalizing qWave.  magnitude=%lf", mag);
-	tempQWave->dumpWave("The wave,before normalize", true);
+	//tempQWave->dumpWave("The wave,before normalize", true);
 
-	if (mag == 0.) {
+	if (mag == 0. || ! isfinite(mag)) {
 		// ALL ZEROES!??! this is bogus, shouldn't be happening
-		printf("ALL ZEROES ! ? ? ! set them all to a constant, normalized\n");
-		const qReal f = 1e-9;
-		for (int ix = dims->start; ix < dims->end; ix++)
-			tempWave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
-	}
-	else if (! isfinite(mag)) {
-		//
-		printf("not finite ! ? ? ! set them all to a constant, normalized\n");
+		printf("ALL ZEROES ! ? ? ! not finite ! ? ? !  set them all to a constant, normalized\n");
 		const qReal f = 1e-9;
 		for (int ix = dims->start; ix < dims->end; ix++)
 			tempWave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
@@ -247,12 +262,8 @@ void qWave::normalize(void) {
 			tempWave[ix] *= factor;
 	}
 	tempQWave->fixBoundaries();
-	tempQWave->dumpWave("qWave::normalize done", true);
+	//tempQWave->dumpWave("qWave::normalize done", true);
 	///tempQWave->space->visscherHalfStep(tempQWave, this);
-	//this->dumpWave("this wave,after visscher ½", true);
-	//this->fixBoundaries();
-	//printf("    normalizing.  new IP=%lf\n", this->space->innerProduct(wave));
-	//this->dumpWave("The wave,after normalize", true);
 }
 
 /* ********************************************************** bad ideas */
