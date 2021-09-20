@@ -55,3 +55,6 @@ exit 0
 # EXCEPTION_CATCHING_ALLOWED and NO_DISABLE_EXCEPTION_CATCHING can apparently
 # allow exception catching but there's overhead each throw.
 # in the short term i'm using -fexceptions
+
+# tried this in testing but I got all these alignment problems (or maybe just messages)
+# -fsanitize=undefined  \
