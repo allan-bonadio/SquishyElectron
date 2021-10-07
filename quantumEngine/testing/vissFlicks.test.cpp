@@ -11,8 +11,6 @@
 
 static void makeASpaceAndIterate(void) {
 
-
-
 	qSpace *space = makeBare1dSpace(8);
 	//qSpace *space = make1dSpace(8);
 
@@ -21,8 +19,9 @@ static void makeASpaceAndIterate(void) {
 
 	flick->setCircularWave(1.);
 	flick->dumpAllWaves("    after circular: should be normalized and duplicated");
-	flick->dumpWave("vissFlicks test circular\n", true);
+	flick->dumpWave("    vissFlicks test circular: should be clean circular wave\n", true);
 
+	printf("======================== Step Generations:\n");
 	const int dumpCycle = 10;
 	for (int k = 0; k < 100; k++) {
 		flick->pushWave();
