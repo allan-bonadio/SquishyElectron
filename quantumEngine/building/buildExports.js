@@ -69,6 +69,7 @@ let defineFuncBody = exportsSrc.map(funcDesc => {
 
 
 const code = `// this file generated ${new Date()}
+// by the file SquishyElectron/quantumEngine/building/buildExports.js
 let cwrap;
 export const qe = {};
 export function defineQEngineFuncs() {

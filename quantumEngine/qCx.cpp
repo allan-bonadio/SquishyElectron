@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** qCx -- complex arithmetic for Squishy Electron
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
@@ -35,13 +35,15 @@ qReal qCx::abs() {
 	return sqrt(this->norm());
 }
 
-// in real degrees!
+// in real degrees!  -180 thru +180
 qReal qCx::phase() {
 	return atan2(im, re) * 180 / PI;
 }
 
 void qCheck(qCx aCx) {
-	if (isnan(aCx.re) || isnan(aCx.im))
-		printf("complex number became NaN: (%lf,%lf)\n", aCx.re, aCx.im);
+	// this is exactly the test I want: not NAN, not ∞
+	if (isfinite(aCx.re) && isfinite(aCx.im))
+		return;
+	printf("complex number became non-finite: (%lf,%lf)\n", aCx.re, aCx.im);
 }
 

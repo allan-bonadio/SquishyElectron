@@ -24,13 +24,13 @@ function SetResolutionTab(props) {
 		<h3>Reconfigure the Universe</h3>
 
 		<p>
-			The actual universe is essentially infinite.
+			The actual universe is essentially infinite. &nbsp;
 			<small>(Well, actually it's probably finite, but so incredibly huge, you'll never notice the difference.)</small>
-			Nobody's computer has that much ram or power.
+			&nbsp; Nobody's computer has that much ram or power.
 			Squishy Electron's universe runs on this web page, much smaller,
-			but we can simulate the microscopic... no, the <u>nanoscopic </u>
+			but we can simulate the microscopic... no, the <u>picoscopic </u>
 			world of the squishy electron.
-			You can recreate this nanoscopic universe here, if you want, with different settings.
+			You can recreate this picoscopic universe here, if you want, with different settings.
 		</p>
 
 	</div>);

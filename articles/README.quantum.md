@@ -1,3 +1,13 @@
+
+Great discussion of how to integrate Schrodinger.
+https://physics.stackexchange.com/questions/259134/schrodinger-equation-for-a-hamiltonian-with-explicit-time-dependence
+
+
+
+====================================================== Mid-2021 notes
+
+v3 refers to this SquishyElectron project.
+
 ------------------------------------------------wish list for v3
 
 
@@ -80,7 +90,7 @@ Also must have in C++; not sure if JS cares:
 
 ------------------------------------------------ equations
 
-ih ∂ψ / ∂t  =  [V - (h^2/2m) (∂^2/∂x^2)] psi
+ih ∂ψ / ∂t  =  [V - (h^2/2m) (∂^2/∂x^2)] ψ
 
 
 ih ∂psi / ∂t  =  V psi - (h^2/2m) (∂^2/∂x^2) psi
@@ -88,7 +98,7 @@ ih ∂psi / ∂t  =  V psi - (h^2/2m) (∂^2/∂x^2) psi
 where t=time, x=location (potentially scalar, 2-vec or 3-vec)
 h=hbar ħ plank's constant / 2π   m=particle mass
 V=potential map, function of x and t
-psi
+psi ψ is the wave function itself, a complex function of x and t.  Both of those are discretized
 
 ------------------------------------------------ layman descriptions
 
@@ -141,3 +151,6 @@ get the installed version numbers:
 this is automatically done in the build scripts so you don't have to put them into your .profile or whatever files:
 
 . /dvl/emscripten/emsdk/emsdk_env.sh
+
+
+--------------------------------------------------
