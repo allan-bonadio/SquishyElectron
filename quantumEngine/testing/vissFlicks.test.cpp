@@ -11,9 +11,13 @@
 
 static void makeASpaceAndIterate(void) {
 
-	qSpace *space = makeBare1dSpace(8);
+	qSpace *space = makeBare1dSpace(64);
 	//qSpace *space = make1dSpace(8);
-
+	double dt = 0.001;
+	const int dumpCycle = 100;
+	const int nIterations = 1000;
+	printf("space space.nStates: %d, dt=%lf, nIterations=%d, dumpCycle=d\n",
+		space->nStates, dt, nIterations, dumpCycle);
 
 	qFlick *flick = new qFlick(space, 4);
 
@@ -21,18 +25,18 @@ static void makeASpaceAndIterate(void) {
 	flick->dumpAllWaves("    after circular: should be normalized and duplicated");
 	flick->dumpWave("    vissFlicks test circular: should be clean circular wave\n", true);
 
+
 	printf("======================== Step Generations:\n");
-	const int dumpCycle = 10;
-	for (int k = 0; k < 100; k++) {
+	for (int k = 0; k < nIterations; k++) {
 		flick->pushWave();
 
 		qCx *newWave = flick->waves[0];
 		qCx *oldWave = flick->waves[1];
 
-		space->stepReal(oldWave, newWave, .01);
+		space->stepReal(oldWave, newWave, dt);
 		//flick->dumpAllWaves("    after stepReal()");
 
-		space->stepImaginary(oldWave, newWave, .01);
+		space->stepImaginary(oldWave, newWave, dt);
 
 		//flick->dumpAllWaves("    after stepImaginary()");
 
