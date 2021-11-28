@@ -41,7 +41,7 @@ export class SquishView extends React.Component {
 		let iser = '0';
 		if (qe.getElapsedTime) {
 			// after qe has been initialized
-			et = thousands(qe.getElapsedTime().toFixed(2));
+			et = thousands(qe.getElapsedTime().toFixed(4));
 			iser = thousands(qe.qSpace_getIterateSerial());
 		}
 

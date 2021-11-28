@@ -121,7 +121,7 @@ static qReal dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtr
 		qReal dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
 		while (dPhase >= 360.) dPhase -= 360.;
 
-		sprintf(buf, "[%d] (%8.4lf,%8.4lf) | %8.2lf %8.2lf %8.4lf",
+		sprintf(buf, "[%d] (%8.4lf,%8.4lf) | %8.3lf %8.3lf %8.4lf",
 			ix, re, im, phase, dPhase, mag);
 		*pPrevPhase = phase;
 	}
@@ -162,7 +162,7 @@ void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
 		printf("\nend %s", buf);
 	}
 
-	printf(" innerProd=%lf\n", innerProd);
+	printf(" innerProd=%11.8lf\n", innerProd);
 }
 
 // any wave
@@ -174,7 +174,7 @@ void qWave::dumpThatWave(qCx *wave, bool withExtras) {
 void qWave::dumpWave(const char *title, bool withExtras) {
 	printf("\n==== Wave | %s", title);
 	this->space->dumpThatWave(this->buffer, withExtras);
-	printf("\n==== end of Wave ====\n");
+	printf("\n==== end of Wave ====\n\n");
 }
 
 /* ************************************************************ arithmetic */
