@@ -12,7 +12,9 @@
 static bool debug = true;
 //bool debug = false;
 
-static bool debugHalfway = false;  // confusing, not recc
+
+static bool debugVisscher = false;
+static bool debugHalfway = false;  // confusing, not reccommended
 
 /*
 A fast explicit algorithm for the time-dependent Schrodinger equation
@@ -70,12 +72,15 @@ void qSpace::stepReal(qCx *oldW, qCx *newW, double dt) {
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		///double oldWr = oldW[ix].re;
 
+		// note this is
 		double d2ψi = oldW[ix-1].im + oldW[ix+1].im - oldW[ix].im * 2;
 
 		//printf("⚛︎ x=%d  Hψ = %lf,%lf \n", ix, d2.re, d2.im);
 
 		double Hψ = d2ψi;   // + Vψ
-		newW[ix].re = oldW[ix].re + dt * Hψ;
+
+		// note subtraction
+		newW[ix].re = oldW[ix].re - dt * Hψ;
 		qCheck(newW[ix]);
 	}
 	this->fixThoseBoundaries(newW);
@@ -99,10 +104,12 @@ void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
 		//printf("⚛︎ the hamiltonian ψ.im at x=%d  then dt=%lf d2x=%lf,%lf oldW1=%lf,%lf\n",
 		//	ix, dt, d2.re,d2.im, oldW1.re, oldW1.im);
 
-		double Hψ = d2ψi;   // + Vψ
+		double Hψ = d2ψr;   // + Vψ
+
+		// note addition
 		newW[ix].im = oldW[ix].im + dt * Hψ;
 
-		newW[ix].im = oldW1.im - dt * d2.im;
+		//newW[ix].im = oldW1.im - dt * d2.im;
 		//newW[ix].im = oldW1.im - dt * H.im * newW[ix].re;
 		qCheck(newW[ix]);
 	}
@@ -120,7 +127,7 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 
 	qDimension *dims = this->dimensions;
 	oldQW->fixBoundaries();
-	oldQW->dumpWave("starting oneVisscherStep", true);
+	if (debugVisscher) oldQW->dumpWave("starting oneVisscherStep", true);
 
 	// see if this makes a diff
 //	for (int i = dims->start; i < dims->end; i++)
@@ -139,7 +146,7 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 	this->elapsedTime += dt;
 	this->iterateSerial++;
 
-	if (true) {
+	if (debugVisscher) {
 		char atVisscher[100];
 		sprintf(atVisscher, "at end of Visscher frame %1.0lf | ", this->iterateSerial);
 		newQW->dumpWave(atVisscher, true);
