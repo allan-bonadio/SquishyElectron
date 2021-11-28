@@ -72,10 +72,12 @@ qReal *getPotentialBuffer(void) {
 }
 
 qReal qSpace_getElapsedTime(void) {
+	if (!theSpace) throw "null space in getElapsedTime()";
 	return theSpace->elapsedTime;
 }
 
 qReal qSpace_getIterateSerial(void) {
+	if (!theSpace) throw "null space in getIterateSerial()";
 	return theSpace->iterateSerial;
 }
 
