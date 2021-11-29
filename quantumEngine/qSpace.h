@@ -14,7 +14,8 @@ extern class qSpace *theSpace;
 extern class qCx *theWave, *peruWave, *egyptWave, *laosWave;
 extern class qCx *k1Wave, *k2Wave, *k3Wave, *k4Wave;
 
-extern class qWave *theQWave, *peruQWave, *egyptQWave, *laosQWave;
+extern class qFlick *theQWave;
+extern class qWave *peruQWave, *egyptQWave, *laosQWave;
 extern class qWave *k1QWave, *k2QWave, *k3QWave, *k4QWave;
 
 extern qReal *thePotential;
@@ -61,11 +62,6 @@ const int contENDLESS = 2;
 
 /* ************************************************************ the space */
 
-// algorithm - keep in  sync with qEngine.js
-const int algRK2 = 2;
-const int algRK4 = 4;
-const int algVISSCHER = 7;
-
 struct qSpace {
 public:
 	qSpace(int nDims);
@@ -102,7 +98,6 @@ public:
 	qCx dtOverI;
 	qCx halfDtOverI;
 
-	int algorithm;
 	int bufferNum;
 
 	/* ****************************************** hacks that might go away */
@@ -143,7 +138,7 @@ public:
 	void stepImaginary(qCx *oldW, qCx *newW, double dt);
 };
 
-/* ************************************************************ the space */
+/* ************************************************************ JS interface */
 
 // for JS to call
 extern "C" {

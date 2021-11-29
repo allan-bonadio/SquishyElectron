@@ -5,7 +5,7 @@
 
 // right now, the JS can only access theSpace, theQWave, and the like - all 'the'
 // variables.  Other than that, you can have other qSpaces and other qWaves etc,
-// in C++, just no JS interface to them.
+// in C++, just no JS interface to them.  yet.
 
 #include "qSpace.h"
 #include "qWave.h"
@@ -63,8 +63,11 @@ static void freeWaves(void) {
 // these are for JS only; they're all extern "C"
 extern "C" {
 
+// return a pointer to just the zero-th buffer in here
 qCx *getWaveBuffer(void) {
-	return theWave;
+	//theQWave->dumpAllWaves("getWaveBuffer in qSpace.cpp");
+
+	return theSpace->latestQWave->buffer;
 }
 
 qReal *getPotentialBuffer(void) {
@@ -88,9 +91,6 @@ void qSpace_setValleyPotential(qReal power, qReal scale, qReal offset) {
 }
 
 void qSpace_oneIntegrationStep(void) { theSpace->oneIntegrationStep(); }
-
-// heh not so simple
-void qSpace_setAlgorithm(int newAlg) { theSpace->algorithm = newAlg; }
 
 
 /* ******************************************************** space creation from JS */
@@ -179,7 +179,6 @@ qSpace *completeNewSpace(void) {
 	theSpace->filterCount = theSpace->nStates;  // bad idea
 
 
-//printf(" got past algorithm = algVISSCHER\n");
 	// a default.  must be done After viewBuffer and thePotential are in place.
 	theQWave->setCircularWave(1);
 //printf(" got past setCircularWave\n");

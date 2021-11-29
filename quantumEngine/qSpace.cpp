@@ -94,8 +94,6 @@ void qSpace::initSpace() {
 	this->dtOverI = qCx(0., -dt);
 	this->halfDtOverI = qCx(0., -dt / 2.);
 
-	this->algorithm = algVISSCHER;  // also change on ControlPanel.js:48
-	//this->algorithm = algRK2;
 	this->bufferNum = 0;
 }
 
@@ -147,42 +145,40 @@ void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset =
 
 /* ********************************************************** integration */
 
-// does one visscher step, or an rk2 or rk4 iteration step
+#define REP_RATE   10
+
+// does several visscher steps, we'll call that one 'integration' step
 void qSpace::oneIntegrationStep() {
-	qWave *oldQWave, *newQWave;
+	int ix;
 
-	// each calculates the new wave into the opposite buffer
-	if (this->bufferNum) {
-		newQWave = theQWave;
-		oldQWave = peruQWave;
-		this->bufferNum = 0;
-	}
-	else {
-		oldQWave = theQWave;
-		newQWave = peruQWave;
-		this->bufferNum = 1;
+	for (ix = 0; ix < REP_RATE; ix++) {
+		this->oneVisscherStep(laosQWave, peruQWave);
+		this->oneVisscherStep(peruQWave, laosQWave);
 	}
 
-	switch (this->algorithm) {
-	case algRK2:
-		this->oneRk2Step(oldQWave, newQWave);
-		break;
-
-	case algRK4:
-		break;
-		this->oneRk4Step(oldQWave, newQWave);
-
-	case algVISSCHER:
-		this->oneVisscherStep(oldQWave, newQWave);
-		break;
-
-	default:
-		printf("*** unknown algorithm %d\n", this->algorithm);
-		return;
-	}
-
-	this->latestQWave = newQWave;
-	theQViewBuffer->loadViewBuffer(newQWave);
+	this->latestQWave = laosQWave;
+	theQViewBuffer->loadViewBuffer(laosQWave);
 }
+
+//void qSpace::oneIntegrationStep() {
+//	qWave *oldQWave, *newQWave;
+//
+//	// each calculates the new wave into the opposite buffer
+//	if (this->bufferNum) {
+//		newQWave = theQWave;
+//		oldQWave = peruQWave;
+//		this->bufferNum = 0;
+//	}
+//	else {
+//		oldQWave = theQWave;
+//		newQWave = peruQWave;
+//		this->bufferNum = 1;
+//	}
+//
+//	this->oneVisscherStep(oldQWave, newQWave);
+//
+//	this->latestQWave = newQWave;
+//	theQViewBuffer->loadViewBuffer(newQWave);
+//}
 
 

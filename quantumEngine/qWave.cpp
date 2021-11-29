@@ -20,8 +20,8 @@ not sure how much dt/2 is.
 #include "qWave.h"
 
 // a transitional kind of thing from raw wave arrays to the new qWave buffer obj
-class qWave *theQWave = NULL,
-	*k1QWave = NULL, *k2QWave = NULL, *k3QWave = NULL, *k4QWave = NULL,
+class qFlick *theQWave = NULL;
+class qWave *k1QWave = NULL, *k2QWave = NULL, *k3QWave = NULL, *k4QWave = NULL,
 	*egyptQWave = NULL, *laosQWave = NULL, *peruQWave = NULL;
 class qCx *theWave = NULL,
 	*k1Wave = NULL, *k2Wave = NULL, *k3Wave = NULL, *k4Wave = NULL,
@@ -354,9 +354,7 @@ printf(" got past dAngle\n");
 	// I have no idea.
 	qReal dt = this->space->dt;
 	qReal nN = n * dims->N;
-	qReal vGap = this->space->algorithm == algVISSCHER
-		? -nN * nN * dt / 2 * gapFactor
-		: 0;
+	qReal vGap = -nN * nN * dt / 2 * gapFactor;
 
 
 	vGap = 0;
@@ -376,17 +374,12 @@ printf(" got past dAngle\n");
 	printf(" got past wave fitting.  this->buffer=%d  tempQWave->buffer=%d  \n",
 			(int) this->buffer, (int) tempQWave->buffer);
 	// ?????!?!??!
-	if (this->space->algorithm == algVISSCHER) {
-		tempQWave->copyThatWave(this->buffer, tempQWave->buffer);
-	printf(" got past copy that wave\n");
-		//this->space->visscherHalfStep(tempQWave, this);
-		//this->dumpWave("after set sircular & normalize", true);
-		this->normalize();
-	}
-	else {
-		tempQWave->copyThatWave(this->buffer, tempQWave->buffer);
-		this->normalize();
-	}
+	tempQWave->copyThatWave(this->buffer, tempQWave->buffer);
+printf(" got past copy that wave\n");
+	//this->space->visscherHalfStep(tempQWave, this);
+	//this->dumpWave("after set sircular & normalize", true);
+	this->normalize();
+
 printf(" got past normalize here\n");
 	//	this->dumpWave("after set sircular & normalize", true);
 	this->fixBoundaries();

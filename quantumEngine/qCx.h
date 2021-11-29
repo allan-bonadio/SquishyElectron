@@ -96,4 +96,4 @@ public:
 
 typedef class qCx qCx;
 
-extern void qCheck(qCx aCx);
+extern void qCheck(const char *where, qCx aCx);

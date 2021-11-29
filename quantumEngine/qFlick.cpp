@@ -198,6 +198,7 @@ qReal qFlick::magnitude(int doubleAge, int ix) {
 // We also recycle blocks that roll off the end here.
 void qFlick::pushWave(void) {
 	//this->dumpAllWaves("qFlick::pushWave() Start");
+	printf("pushing a wave...\n");
 
 	// first we need a buffer.
 	qCx *newWave;
@@ -284,7 +285,7 @@ qReal qFlick::innerProduct(void) {
 // Normalize (should be) always idempotent;
 // anything else you wana do, make your own function
 void qFlick::normalize(void) {
-	this->dumpWave("qFlick::normalize starting", true);
+	//this->dumpWave("qFlick::normalize starting", true);
 
 	qDimension *dims = this->space->dimensions;
 	qReal innerProduct = this->innerProduct();
@@ -343,10 +344,7 @@ printf(" got past dAngle\n");
 	// I have no idea.
 	qReal dt = this->space->dt;
 	qReal nN = n * dims->N;
-	qReal vGap = this->space->algorithm == algVISSCHER
-		? -nN * nN * dt / 2 * gapFactor
-		: 0;
-
+	qReal vGap = -nN * nN * dt / 2 * gapFactor;
 
 	vGap = 0;
 
@@ -365,10 +363,6 @@ printf(" got past dAngle\n");
 //	printf("flick, freshly generated, 1 copy");
 	this->dumpThatWave(wave, true);
 
-//	printf("      this->buffer=%d  tempQWave->buffer=%d  \n",
-//			(int) this->buffer, (int) tempQWave->buffer);
-	// ?????!?!??!
-	if (this->space->algorithm == algVISSCHER) {
 		tempQWave->copyThatWave(this->waves[0], tempQWave->buffer);
 		tempQWave->copyThatWave(this->waves[1], tempQWave->buffer);
 		//printf("  copied that wave\n");
@@ -376,11 +370,6 @@ printf(" got past dAngle\n");
 		//this->space->visscherHalfStep(tempQWave, this);
 		//this->dumpWave("after set sircular & normalize", true);
 		this->normalize();
-	}
-	else {
-		tempQWave->copyThatWave(this->buffer, tempQWave->buffer);
-		this->normalize();
-	}
 printf(" got past normalize here\n");
 	//	this->dumpWave("after set sircular & normalize", true);
 	this->fixBoundaries();
