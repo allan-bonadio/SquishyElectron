@@ -45,7 +45,6 @@ exportsSrc  = [
 	{name: 'qWave_dumpWave', retType: 'number', args: ['string']},
 
 	{name: 'qSpace_oneIntegrationStep', retType: 'number', args: []},
-	{name: 'qSpace_setAlgorithm', retType: 'number', args: ['number']},
 
 	// views
 	// not any more, it's internal now {name: 'loadViewBuffer', retType: 'number', args: ['array']},

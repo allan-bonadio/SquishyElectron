@@ -31,7 +31,6 @@ static void twentyStates(void) {
 	printf("where it breaks: %d %d %d\n", sp->nStates, sp->nPoints, sp->algorithm);
 	qtVerify(sp->nStates, 20, "bad nStates");
 	qtVerify(sp->nPoints, 22, "bad Points");
-	qtVerify(sp->algorithm, algVISSCHER, "bad algorithm");
 	delete sp;
 }
 
@@ -42,7 +41,6 @@ static void twoByThree(void) {
 	qtVerify(sp->nDimensions, 2, "bad nDimensions23");
 	qtVerify(sp->nStates, 6, "bad nStates23");
 	qtVerify(sp->nPoints, 6, "bad Points23");
-	qtVerify(sp->algorithm, algVISSCHER, "bad algorithm23");
 	delete sp;
 
 }

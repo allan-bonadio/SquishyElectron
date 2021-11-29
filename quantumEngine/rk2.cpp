@@ -31,7 +31,7 @@ void qSpace::oneRk2Step(qWave *oldQWave, qWave *newQWave) {
 	// use laosWave for all the first-try ψ values
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		laosWave[ix] = oldW[ix] + hamiltonian(oldW, ix) * this->halfDtOverI;
-		qCheck(newW[ix]);
+		qCheck("oneRk2Step A", newW[ix]);
 	}
 	laosQWave->fixBoundaries();
 	//laosQWave->dumpWave("laos Q Wave", true);
@@ -45,7 +45,7 @@ void qSpace::oneRk2Step(qWave *oldQWave, qWave *newQWave) {
 	// then use laosWave as the input to a better rate and a better inc at newW.
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		newW[ix] = oldW[ix] + hamiltonian(laosWave, ix) * this->dtOverI;
-		qCheck(newW[ix]);
+		qCheck("oneRk2Step B", newW[ix]);
 	}
 	newQW->fixBoundaries();
 	//newQW->dumpWave("newW", true);

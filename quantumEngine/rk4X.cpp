@@ -31,7 +31,7 @@ void waveDDT(qDimension *dims,
 	dims->fixBoundaries(fromWave); // always before hamiltonian
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx dPsi = hamiltonian(fromWave, ix) * dtOverI * nextYFactor;
-		qCheck(dPsi);
+		qCheck("um", dPsi);
 
 		// we don't actually save the dPsi, we just pour it into where
 		// it needs to go for the next iteration

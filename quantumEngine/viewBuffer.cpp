@@ -43,7 +43,7 @@ float qViewBuffer::loadViewBuffer(qWave *latestQWave) {
 
 	//latestQWave->dumpWave("at start of loadViewBuffer()");
 
-	// this is index into the
+	// this is index into the complex point, which translates to 2 GL points
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
 		float *twoRowPtr = this->viewBuffer + pointNum * 8;
 		qCx *wavePtr = latestWave + pointNum;
@@ -72,8 +72,7 @@ float qViewBuffer::loadViewBuffer(qWave *latestQWave) {
 			highest = height;
 	}
 
-	// false of viewbuffer.  Was good until I realized latestWave itself was what to pay attention to.
-	if (false) {
+	if (true) {
 		printf("viewBuffer.cpp, as written to view buffer:\n");
 		dumpViewBuffer(nPoints);
 	}
@@ -90,77 +89,14 @@ float *getViewBuffer(void) {
 	return (float *) theQViewBuffer->viewBuffer;
 }
 
-//void qSpace::allocViewBuffer(void) {
-//WAS IST DAS?!?
-//	float *viewBuffer = new float[this->nPoints * 8];  // 4 floats per vertex, two verts per point
-//	printf("viewBuffer(): viewBuffer %ld \n",
-//		(long) viewBuffer);
-//}
-
-
-
-// obsolete i think
-// one row per vertex.
-// each row of 4 floats looks like this:
-//     real   imaginary    potential    serial
-// Two vertices per datapoint: bottom then top, same data.
-// also converts to doubles from floats.
-//float loadViewBuffer(qWave *latestQWave) {
-//	qCx *latestWave = latestQWave->buffer;
-//
-//	int nPoints = theSpace->nPoints;
-//	qReal highest = 0;
-//	qReal tiny = 1e-8;
-//
-//	//printf("loadViewBuffer(): latestQWave=%ld  thePotential=%ld\n",
-//	//(long) latestQWave, (long) thePotential);
-//	//printf("loadViewBuffer(): viewBuffer %ld and latestQWave->buffer=%ld\n",
-//	//(long) viewBuffer, (long) latestQWave->buffer);
-//	latestQWave->dumpWave("at start of loadViewBuffer()");
-//
-//	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
-//		float *twoRowPtr = viewBuffer + pointNum * 8;
-//		qCx *wavePtr = latestWave + pointNum;
-//
-//		printf("loadViewBuffer(%d): twoRowPtr %ld and wavePtr=%ld\n",
-//			pointNum, (long) twoRowPtr, (long) wavePtr);
-//
-//		qReal *potPtr = thePotential + pointNum;
-//		qReal re = wavePtr->re;
-//		qReal im = wavePtr->im;
-//
-////		twoRowPtr[0] = re * tiny;
-////		twoRowPtr[1] = im * tiny;
-////
-////		twoRowPtr[2] = potPtr[0];  // this isn't going to be used
-////		twoRowPtr[3] = pointNum * 2.;  // vertexSerial: at zero
-////
-////		twoRowPtr[4] = re;
-////		twoRowPtr[5] = im;
-////		twoRowPtr[6] = potPtr[0];
-////		twoRowPtr[7] = pointNum * 2. + 1.;  // at magnitude, top
-////
-////		// while we're here, collect the highest point
-////		qReal height = re * re + im * im;
-////		if (height > highest)
-////			highest = height;
-//	}
-//
-//	// false of viewbuffer.  Was good until I realized latestWave itself was what to pay attention to.
-//	if (false) {
-//		printf("viewBuffer.cpp, as written to view buffer:\n");
-//		dumpViewBuffer(nPoints);
-//	}
-//
-//	return highest;
-//}
-
 
 // dump the view buffer just before it heads off to webgl.
 int dumpViewBuffer(int nPoints) {
 	float *viewBuffer = theQViewBuffer->viewBuffer;
 	qReal prevRe = viewBuffer[0];
 	qReal prevIm = viewBuffer[1];
+
+	printf("==== dump ViewBuffer | \n");
 	printf("   ix  |    re      im     pot    serial  |   phase    magn\n");
 	for (int i = 0; i < nPoints*2; i++) {
 		qReal re = viewBuffer[i*4];

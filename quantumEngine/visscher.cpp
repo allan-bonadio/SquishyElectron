@@ -13,7 +13,7 @@ static bool debug = true;
 //bool debug = false;
 
 
-static bool debugVisscher = false;
+static bool debugVisscher = true;
 static bool debugHalfway = false;  // confusing, not reccommended
 
 /*
@@ -63,8 +63,8 @@ and for now omit the potential
 // the ψi values in buffer 0 are still uncalculated
 void qSpace::stepReal(qCx *oldW, qCx *newW, double dt) {
 	qDimension *dims = this->dimensions;
-	//printf("⚛️ start of stepReal");
-	//this->dumpThatWave(oldW, true);
+	printf("⚛️ start of stepReal");
+	this->dumpThatWave(oldW, true);
 	//printf("⚛︎ stepReal start N States=(%d), dt=%lf\n",
 	//	dims->nStates, dt);
 
@@ -81,7 +81,7 @@ void qSpace::stepReal(qCx *oldW, qCx *newW, double dt) {
 
 		// note subtraction
 		newW[ix].re = oldW[ix].re - dt * Hψ;
-		qCheck(newW[ix]);
+		qCheck("vischer stepReal", newW[ix]);
 	}
 	this->fixThoseBoundaries(newW);
 	//printf("⚛️ end of stepReal:");
@@ -111,7 +111,7 @@ void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
 
 		//newW[ix].im = oldW1.im - dt * d2.im;
 		//newW[ix].im = oldW1.im - dt * H.im * newW[ix].re;
-		qCheck(newW[ix]);
+		qCheck("vischer stepImaginary", newW[ix]);
 	}
 	this->fixThoseBoundaries(newW);
 	//printf("⚛️ end of stepImaginary - result wave:");
@@ -160,8 +160,6 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 // im component a half dt ahead.  This does it for newly created stuff, like set waves.
 // If not visscher, returns harmlessly.
 void qSpace::visscherHalfStep(qWave *oldQWave, qWave *newQWave) {
-	if (this->algorithm != algVISSCHER)
-		throw "qSpace::visscherHalfStep() shouldn't on non-Visscher";
 	qDimension *dims = this->dimensions;
 	qCx *oldW = oldQWave->buffer;
 	qCx *newW = newQWave->buffer;
@@ -178,15 +176,3 @@ void qSpace::visscherHalfStep(qWave *oldQWave, qWave *newQWave) {
 	this->fixThoseBoundaries(newW);
 }
 
-// If not visscher, returns harmlessly.
-//void qSpace::visscherHalfStep4(qWave *oldQWave, qWave *newQWave) {
-//	if (this->algorithm != algVISSCHER)
-//		return;
-//
-//	// let's try moving the real backward 1/4  dt and moving im forward 1/4
-//	qReal quarterDt = this->dt / 4;
-//
-//	stepReal(oldQWave, newQWave, this->dimensions, -quarterDt);
-//
-//	stepImaginary(oldQWave, newQWave, this->dimensions, quarterDt);
-//}
