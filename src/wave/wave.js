@@ -14,9 +14,7 @@
 // N is number of data points, including the boundaries
 
 import qCx from './qCx';
-//import iterate from './iterate';
-import {qeSpace} from './qEngine';
-//const isZero = c => (Math.abs(c.real) < 1e-10 && Math.abs(c.im) < 1e-10);
+import qeSpace from './qeSpace';
 
 export class jSpace {
 	constructor(N, continuum) {
