@@ -1,3 +1,4 @@
+// i don't think i'll continue my developpnment of this file 2021 dec 4
 /*
 ** blah blah -- like a source file for Squishy Electron
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
@@ -33,7 +34,7 @@ void waveDDT(qDimension *dims,
 	fromQWave->fixBoundaries(); // always before hamiltonian
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx dPsi = hamiltonian(fromWave, ix) * dtOverI * nextYFactor;
-		qCheck(dPsi);
+		qCheck("waveDD", dPsi);
 
 		// we don't actually save the dψ, we just pour it into where
 		// it needs to go for the next iteration
