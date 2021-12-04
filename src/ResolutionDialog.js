@@ -132,7 +132,7 @@ export default class ResolutionDialog extends React.Component {
 	renderSlider() {
 		const s = this.state;
 		return <>
-			Number of datapoints: {thousands(indexToPower(this.state.powerOf10))}
+			datapoints: <big>{thousands(indexToPower(this.state.powerOf10))}</big>
 			&nbsp; <small>(was {thousands(this.props.N)})</small>
 			<div style={{break: 'both', fontSize: 'smaller'}}>
 				<div style={{float: 'left'}}>faster</div>
