@@ -11,7 +11,8 @@ import ControlPanel from './controlPanel/ControlPanel';
 
 import {createSpaceNWave} from './wave/theWave';
 // eslint-disable-next-line no-unused-vars
-import {qeSpace, qeStartPromise, qeDefineAccess, algRK2, algRK4, algVISSCHER} from './wave/qEngine';
+import qeSpace from './wave/qeSpace';
+import {qeStartPromise, qeDefineAccess} from './wave/qEngine';
 import qe from './wave/qe';
 
 import SquishView from './view/SquishView';
@@ -44,9 +45,9 @@ const DEFAULT_VIEW_CLASS_NAME =
 //'flatViewDef';
 'flatDrawingViewDef';
 
-const DEFAULT_RESOLUTION = 12;
+//const DEFAULT_RESOLUTION = 100;
 //const DEFAULT_RESOLUTION = 5;
-//const DEFAULT_RESOLUTION = 25;
+const DEFAULT_RESOLUTION = 25;
 //const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 25;
 const DEFAULT_CONTINUUM = qeSpace.contENDLESS;
 
@@ -78,15 +79,18 @@ export class SquishPanel extends React.Component {
 			continuum: DEFAULT_CONTINUUM,
 			viewClassName: DEFAULT_VIEW_CLASS_NAME,
 
+			// the qeSpace
 			space: null,
+
+			// see the view dir
 			currentView: null,
 
 			// this is controlled by the user (start/stop/step buttons)
 			// does not really influence the rendering of the canvas... (other than running)
-			// but more the control panel
 			isTimeAdvancing: false,
 
 			// this is the actual 'frequency' in actual milliseconds, convert between like 1000/n
+			// eg the menu on the CPToolbar says 10/sec, so this becomes 100
 			iteratePeriod: 250,
 		};
 
@@ -105,6 +109,8 @@ export class SquishPanel extends React.Component {
 		this.prevStart  = now;
 		this.timeForNextTic = now + 10;  // default so we can get rolling
 		this.lastAniFrame = now;
+
+		this.animateHeartbeat = this.animateHeartbeat.bind(this);  // so we can pass it as a callback
 
 		console.log(`SquishPanel constructor done`);
 	}
@@ -181,12 +187,11 @@ export class SquishPanel extends React.Component {
 	crunchOneFrame() {
 		this.startIntegrate = performance.now();
 
+		// (actually many visscher steps)
 		qe.qSpace_oneIntegrationStep();
-		//qe.qSpace_oneVisscherStep();
-		//qe.qSpace_oneRk2Step();
 
 		this.startUpdate = performance.now();
-		qe.updateToLatestWaveBuffer();
+		qe.updateTheSpaceToLatestWaveBuffer();
 
 		// always done at end of integration qe.loadViewBuffer( ahem some qwave );
 		this.curView.reloadAllVariables();  // am i doing this twice?
@@ -203,9 +208,9 @@ export class SquishPanel extends React.Component {
 
 	}
 
-	// Integrate the ODEs by one dt, and display.  One step in Squishy, one trip thru the RK and variables and draw.
-	// called every so often in animateOneFrame() which goes like 1/60 sec
-	// this is called usually more like 5 or 20 times a second, whatever the user chooses.
+	// Integrate the ODEs by one 'step', or not.  and then display.
+	// called every so often in animateHeartbeat() so it's called as often as the menu setting says
+	// so if needsRepaint false or absent, it'll only repaint if an iteration has been done.
 	iterateOneFrame(isTimeAdvancing, needsRepaint) {
 		//console.log(`time since last tic: ${now - startFrame}ms`)
 		this.startIntegrate = this.startUpdate = this.startReload = this.startDraw = this.endFrame = 0;
@@ -224,7 +229,8 @@ export class SquishPanel extends React.Component {
 			this.startReload = performance.now();
 			this.curView.reloadAllVariables();  // am i doing this twice?
 
-			// am i missing a step in here?
+			// copy from latest wave to view buffer (c++)
+			qe.refreshViewBuffer();
 
 			// draw
 			this.startDraw = performance.now();
@@ -249,17 +255,18 @@ export class SquishPanel extends React.Component {
 		}
 	}
 
-	// This is responsible for getting called once each animation frame according to requestAnimationFrame,
-	// and maintaining that as long as the website is running.  requestAnimationFrame() will call this probably 60x/sec
-	// it will advance one 'frame' in animation time, which every so often calls iterateOneFrame()
-	animateOneFrame(now) {
+	// This gets called once each animation period according to requestAnimationFrame(), usually 60/sec
+	// and maintaining that as long as the website is running.  Even if there's no apparent motion.
+	// it will advance one heartbeat in animation time, which every so often calls iterateOneFrame()
+	animateHeartbeat(now) {
 		const s = this.state;
 
-		// nomatter how often animateOneFrame() is called, it'll only iterate once in the iteratePeriod
+		// no matter how often animateHeartbeat() is called, it'll only iterate once in the iteratePeriod
 		if (now >= this.timeForNextTic) {
-			this.iterateOneFrame(s.isTimeAdvancing);
+			this.iterateOneFrame(s.isTimeAdvancing, false);
 
-			// remember (now) is the one passed in, before iterateOneFrame(), not really 'now' anymore
+			// remember (now) is the one passed in, before iterateOneFrame(),
+			// so periods are exactly timed (unless it's so slow that we get behind)
 			this.timeForNextTic = now + s.iteratePeriod;
 		}
 
@@ -274,7 +281,7 @@ export class SquishPanel extends React.Component {
 		//console.info(` maintaining the ReqAniFra cycle: ${timeSince.toFixed(1)} ms`)
 		this.lastAniFrame = now;
 
-		requestAnimationFrame(now => this.animateOneFrame(now));
+		requestAnimationFrame(this.animateHeartbeat);
 	}
 
 	/* ******************************************************* UI & user actions */
@@ -303,8 +310,8 @@ export class SquishPanel extends React.Component {
 
 		this.setState({isTimeAdvancing: true});
 
-		this.animateOneFrame(performance.now());
-	//	requestAnimationFrame(animateOneFrame);
+		this.animateHeartbeat(performance.now());
+	//	requestAnimationFrame(animateHeartbeat);
 	}
 
 	// set the frequency of iteration frames.  Does not control whether iterating or not.
@@ -336,22 +343,24 @@ export class SquishPanel extends React.Component {
 
 	// completely wipe out the ψ wavefunction and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)
-	setWave(breed, freq) {
-		switch (breed) {
-		case 'standing':
-			qe.qWave_setStandingWave(freq);
+	setWave(args) {
+		qe.updateTheSpaceToLatestWaveBuffer();
+
+		switch (args.waveBreed) {
+		case 'circular':
+			qe.qewave.setCircularWave(args.circularFrequency);
 			break;
 
-		case 'circular':
-			qe.qWave_setCircularWave(freq);
+		case 'standing':
+			qe.qewave.setStandingWave(args.circularFrequency);
 			break;
 
 		case 'pulse':
-			qe.qWave_setPulseWave(10., 1.)
+			qe.qewave.setPulseWave(args.widthFactor, args.cycles)
 			break;
 
 		default:
-			throw `setWave: no wave breed '${breed}'`
+			throw `setWave: no waveBreed '${args.waveBreed}'`
 		}
 	}
 
@@ -371,6 +380,7 @@ export class SquishPanel extends React.Component {
 		this.iterateOneFrame(false, true);
 	}
 
+	// dump the view buffer, from the JS side
 	dumpViewBuffer() {
 		const s = this.state;
 		let nRows = s.space.nPoints * 2;
@@ -391,9 +401,9 @@ export class SquishPanel extends React.Component {
 			this.setNew1DResolution(
 				DEFAULT_RESOLUTION, DEFAULT_CONTINUUM, DEFAULT_VIEW_CLASS_NAME);
 
-			// this should be the only place animateOneFrame() should be called
+			// this should be the only place animateHeartbeat() should be called
 			// except for inside the function itself
-			this.animateOneFrame(performance.now());
+			this.animateHeartbeat(performance.now());
 
 			// use this.currentView rather than state.currentView - we just set it
 			// and it takes a while.
@@ -418,7 +428,7 @@ export class SquishPanel extends React.Component {
 					startIterating={() => this.startIterating()}
 					stopIterating={() => this.stopIterating()}
 					singleStep={() => this.singleStep()}
-					setWave={(breed, freq) => this.setWave(breed, freq)}
+					setWave={args => this.setWave(args)}
 					setPotential={(breed, power, scale, offset) => this.setPotential(breed, power, scale, offset)}
 					iterateFrequency={1000 / s.iteratePeriod}
 					setIterateFrequency={freq => this.setIterateFrequency(freq)}

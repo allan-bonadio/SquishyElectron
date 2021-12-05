@@ -44,6 +44,7 @@ class qeWave {
 	// pass negative to make it go backward.
 	// the first point here is like x=0 as far as the trig functions, and the last like x=-1
 	setCircularWave(n) {
+		console.info(`untested`)
 		const dAngle = 2 * Math.PI / this.space.nStates * +n;
 		const wave = this.wave;
 		const {start, end} = this.space.dimensions[0];
@@ -62,6 +63,9 @@ class qeWave {
 	// oh yeah, the walls on the sides are nodes in this case so we'll split by N+2 in that case.
 	// pass negative to make it upside down.
 	setStandingWave(n) {
+		console.info(`untested`)
+		debugger;
+
 		const dAngle = Math.PI / this.space.nStates * n;
 		const wave = this.wave;
 		let {start, end} = this.space.dimensions[0];
@@ -85,6 +89,9 @@ class qeWave {
 	// widthFactor is fraction of total width the packet it is, 0.0-1.0, for a fraction of N.
 	// Cycles is how many circles (360°) it goes thru in that width.
 	setPulseWave(widthFactor, cycles) {
+		console.info(`untested`)
+		debugger;
+
 		const wave = this.wave;
 		const {start, end, N} = this.space.dimensions[0];
 
