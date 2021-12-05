@@ -129,7 +129,7 @@ Follow the directions on this page to install it, into /dvl/emscripten:
 https://emscripten.org/docs/getting_started/downloads.html
 
 then from the top level run this:
-quantumEngine/building/buildExports.js
+quantumEngine/building/genExports.js
 
 go change that file as you add more C++ exports you want to call from JS.
 
