@@ -84,7 +84,7 @@ void qSpace::oneRk4Step(qWave *oldQWave, qWave *newQWave) {
 	// use egyptWave for all the first-try ψ values
 	// for (int ix = dims->start; ix < dims->end; ix++) {
 	// 	laosWave[ix] = theWave[ix] + hamiltonian(theWave, ix) * halfDtOverI;
-	// 	qCheck(peruWave[ix]);
+	// 	qCheck("um", peruWave[ix]);
 	// }
 	// dims->fixBoundaries(egyptWave);
 	//
@@ -94,7 +94,7 @@ void qSpace::oneRk4Step(qWave *oldQWave, qWave *newQWave) {
 	// // then use laosWave as the input to a better rate and a better inc at peruWave.
 	// for (int ix = dims->start; ix < dims->end; ix++) {
 	// 	peruWave[ix] = theWave[ix] + hamiltonian(egyptWave, ix) * dtOverI;
-	// 	qCheck(peruWave[ix]);
+	// 	qCheck("um", peruWave[ix]);
 	// }
 	//
 	// // now flip them around

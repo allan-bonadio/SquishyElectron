@@ -22,7 +22,7 @@ function setPT() {
 		pulseOffset: PropTypes.number.isRequired,
 		setPulseOffset: PropTypes.func.isRequired,
 
-		breed: PropTypes.string,
+		waveBreed: PropTypes.string,
 		setBreed: PropTypes.func.isRequired,
 
 		resetTime: PropTypes.func,
@@ -34,8 +34,9 @@ function SetWaveTab(props) {
 	const p = props;
 
 	// called for each x value to make graph
+	// obsolete, use qeWave s instead
 	function waveWaveFunc(x) {
-		switch (p.breed) {
+		switch (p.waveBreed) {
 		case 'circular':
 			return qCx(Math.cos(x * p.circularFrequency), Math.sin(x * p.circularFrequency));
 
@@ -53,12 +54,6 @@ function SetWaveTab(props) {
 		 return // something like (cos, sin)  // +p.valleyScale / 100 * (Math.abs(x - (+p.valleyOffset / 50 - 1))) ** +p.valleyPower
 	}
 
-	//function setWave(ev) {
-	//	p.setWave(p.breed, p.circularFrequency);
-	//	p.resetTime();
-	//
-	//}
-
 	//debugger;
 	return <div className='SetWaveTab'>
 
@@ -68,7 +63,7 @@ function SetWaveTab(props) {
 			<div  >
 				<span>frequency</span>
 				<input type='number' placeholder='frequency' className='numberInput frequency'
-						value={p.circularFrequency} min='0' max='100' step={'standing' == p.breed ? .5 : 1}
+						value={p.circularFrequency} min='0' max='100' step={'standing' == p.waveBreed ? .5 : 1}
 						onChange={ev => p.setCircularFrequency(ev.currentTarget.value)} />
 				<input type='range'
 					value={p.circularFrequency} min='0' max='100'
@@ -99,19 +94,19 @@ function SetWaveTab(props) {
 		<div className='waveTabCol middle'>
 			<label>
 				circular
-				<input type='radio' checked={'circular' == p.breed}
+				<input type='radio' checked={'circular' == p.waveBreed}
 					onChange={ev => p.setBreed('circular')} />
 			</label>
 
 			<label>
 				standing
-				<input type='radio'  checked={'standing' == p.breed}
+				<input type='radio'  checked={'standing' == p.waveBreed}
 					onChange={ev => p.setBreed('standing')} />
 			</label>
 
 			<label>
 				pulse
-				<input type='radio'  checked={'pulse' == p.breed}
+				<input type='radio'  checked={'pulse' == p.waveBreed}
 					onChange={ev => p.setBreed('pulse')} />
 			</label>
 		</div>
@@ -123,7 +118,7 @@ function SetWaveTab(props) {
 					width={200} height={100} complex={true} />
 			</div>
 			<button type='button' className='setWaveButton round'
-				onClick={ev => p.setWave(p.breed, p.circularFrequency)}>
+				onClick={ev => p.setWave()}>
 					Set Wave
 			</button>
 

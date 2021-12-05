@@ -22,7 +22,6 @@ extern qReal *thePotential;
 //extern float *viewBuffer;
 extern qReal elapsedTime;
 
-//extern float loadViewBuffer(qWave *);
 extern qCx hamiltonian(qCx *wave, int x);
 extern void qeStarted(void);
 
@@ -102,13 +101,13 @@ public:
 
 	/* ****************************************** hacks that might go away */
 	// set to N or whatever, count down, when you hhit zero, lowPass (sometimes)
-	int filterCount;
+	//int filterCount;
 
 	// true if you want rk to go through periodic lowpass or whatever filter
-	int doLowPass;
+	//int doLowPass;
 
 	// zero = off.  true to do it every iteration a little and use value as dilution factor
-	qReal continuousLowPass;
+	//qReal continuousLowPass;
 
 	char label[LABEL_LEN];
 
@@ -126,9 +125,9 @@ public:
 	void setValleyPotential(qReal power, qReal scale, qReal offset);
 
 	void oneIntegrationStep(void);
-	void oneRk2Step(qWave *oldQWave, qWave *newQWave);
-	void oneRk4Step(qWave *oldQWave, qWave *newQWave);
-	void oneVisscherStep(qWave *oldQWave, qWave *newQWave);
+	void oneRk2Step(qWave *oldQWave, qWave *newQWave);  // obsolete
+	void oneRk4Step(qWave *oldQWave, qWave *newQWave);  // obsolete
+	void oneVisscherStep(qWave *oldQWave, qWave *newQWave);  // obsolete
 
 	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);
 

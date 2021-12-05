@@ -61,23 +61,23 @@ oldW = newW;  // fix this someday!!!
 	oldQW->fixBoundaries();
 	//oldQW->dumpWave("almost done oldW", true);
 
-	if (this->continuousLowPass) {
- 		oldQW->lowPassFilter(this->continuousLowPass);
-	}
+//	if (this->continuousLowPass) {
+// 		oldQW->lowPassFilter(this->continuousLowPass);
+//	}
 
-	if (this->doLowPass && --this->filterCount <= 0) {
-		printf("\n@@@@@@ it's time for a filter %d %d  frame%1.0lf @@@@@@\n",
-			this->filterCount, this->nStates, this->iterateSerial);
-		//oldQW->dumpWave("filtering, starting", true);
- 		//oldQW->lowPassFilter();
-		//oldQW->dumpWave("filtering, after LP, before normalize", true);
- 		oldQW->normalize();
-		//oldQW->dumpWave("filtering, after normalize", true);
-
-		// just a guess but this should depend on how wayward the wave has gotten.
-		this->filterCount = 100;
-		//this->filterCount = this->nStates;
-	}
+//	if (this->doLowPass && --this->filterCount <= 0) {
+//		printf("\n@@@@@@ it's time for a filter %d %d  frame%1.0lf @@@@@@\n",
+//			this->filterCount, this->nStates, this->iterateSerial);
+//		//oldQW->dumpWave("filtering, starting", true);
+// 		//oldQW->lowPassFilter();
+//		//oldQW->dumpWave("filtering, after LP, before normalize", true);
+// 		oldQW->normalize();
+//		//oldQW->dumpWave("filtering, after normalize", true);
+//
+//		// just a guess but this should depend on how wayward the wave has gotten.
+//		this->filterCount = 100;
+//		//this->filterCount = this->nStates;
+//	}
 
 	this->elapsedTime += dt;
 	this->iterateSerial++;

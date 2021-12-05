@@ -4,7 +4,6 @@
 */
 
 import PropTypes from 'prop-types';
-import {algRK2, algRK4, algVISSCHER} from '../wave/qEngine';
 
 function setPT() {
 	CPToolbar.propTypes = {
@@ -15,16 +14,11 @@ function setPT() {
 
 		iterateFrequency: PropTypes.number.isRequired,
 		setIterateFrequency: PropTypes.func.isRequired,
-
-		algorithm: PropTypes.number.isRequired,
-		setAlgorithm: PropTypes.func.isRequired,
-
-
 	};
 }
 
 function CPToolbar(props) {
-	const {iterateFrequency, setIterateFrequency, algorithm, setAlgorithm,
+	const {iterateFrequency, setIterateFrequency,
 		isTimeAdvancing, startIterating, stopIterating, singleStep} = props;
 
 	const repRates = <>
@@ -81,15 +75,6 @@ function CPToolbar(props) {
 		</button>
 
 
-		<div className='algorithmBox'>
-			algorithm:
-			<select className='algorithmSelector' value={algorithm}
-					onChange={ev => setAlgorithm(ev.currentTarget.value)}>
-				<option value={algRK2}>RK2</option>
-				<option value={algRK4}>RK4</option>
-				<option value={algVISSCHER}>Visscher</option>
-			</select>
-		</div>
 
 
 	</div>;
@@ -98,3 +83,15 @@ function CPToolbar(props) {
 setPT();
 
 export default CPToolbar;
+
+
+//
+// 		<div className='algorithmBox'>
+// 			algorithm:
+// 			<select className='algorithmSelector' value={algorithm}
+// 					onChange={ev => setAlgorithm(ev.currentTarget.value)}>
+// 				<option value={algRK2}>RK2</option>
+// 				<option value={algRK4}>RK4</option>
+// 				<option value={algVISSCHER}>Visscher</option>
+// 			</select>
+// 		</div>

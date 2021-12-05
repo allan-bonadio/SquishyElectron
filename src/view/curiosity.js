@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** curiosity -- code to retrieve interesting info from WebGL
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 

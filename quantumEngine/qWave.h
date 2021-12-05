@@ -39,7 +39,7 @@ struct qWave {
 	void prune(void);
 	qReal innerProduct(void);
 	virtual void normalize(void);
-	void lowPassFilter(double dilution = 0.5);
+	//void lowPassFilter(double dilution = 0.5);
 
 	virtual void setCircularWave(qReal n);
 	void setStandingWave(qReal n);
@@ -108,9 +108,11 @@ struct qViewBuffer {
 
 	// copy the numbers in latestQWave into this->viewBuffer
 	// also converts from doubles to floats.
-	float loadViewBuffer(qWave *latestQWave);
+	float loadViewBuffer(void);
 };
 
 // 'the' being the only one sometimes
 extern qViewBuffer *theQViewBuffer;
 
+// JS interface to copy latest wave into vb
+extern "C" int refreshViewBuffer(void);

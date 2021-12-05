@@ -6,7 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {qeSpace} from './wave/qEngine';
+import qeSpace from './wave/qeSpace';
 import SquishPanel from './SquishPanel';
 import CommonDialog from './CommonDialog';
 

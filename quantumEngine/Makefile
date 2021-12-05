@@ -4,8 +4,8 @@ xxxSOURCES = $(shell echo *.h *.cpp) building/exports.json
 quantumEngine.js : *.h *.cpp building/exports.json building/buildDev.sh
 	building/buildDev.sh
 
-building/exports.json : building/buildExports.js
-	building/buildExports.js
+building/exports.json : building/genExports.js
+	building/genExports.js
 
 clean : quantumEngine.js quantumEngine.wasm
 	rm quantumEngine.js quantumEngine.wasm

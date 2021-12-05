@@ -12,9 +12,8 @@ import SetWaveTab from './SetWaveTab';
 import SetPotentialTab from './SetPotentialTab';
 import SetResolutionTab from './SetResolutionTab';
 // eslint-disable-next-line no-unused-vars
-import {algRK2, algRK4, algVISSCHER} from '../wave/qEngine';
 
-import qe from '../wave/qe';
+//import qe from '../wave/qe';
 
 //import {setWave, setPotential} from './wave/theWave';
 
@@ -36,8 +35,6 @@ export class ControlPanel extends React.Component {
 
 		iterateFrequency: PropTypes.number.isRequired,  // frames per second
 		setIterateFrequency: PropTypes.func.isRequired,
-
-		// algorithm is handled right here in the control panel
 	};
 
 	constructor(props) {
@@ -45,8 +42,6 @@ export class ControlPanel extends React.Component {
 
 		// most of the state is really kept in the SquishPanel
 		this.state = {
-			algorithm: algVISSCHER,  // also change in qSpace.cpp:160
-
 			// state for the wave resets - these are control-panel only.
 			// Only goes into effect if we call setWave()
 			waveBreed: 'circular',
@@ -84,11 +79,6 @@ export class ControlPanel extends React.Component {
 		this.setState(obj);
 	}
 
-	setAlgorithm(newAlg) {
-		this.setState({algorithm: newAlg});
-		qe.qSpace_setAlgorithm(newAlg);
-	}
-
 	/* ********************************************** render  pieces */
 
 	createShowingTab() {
@@ -97,23 +87,24 @@ export class ControlPanel extends React.Component {
 
 		switch (s.showingTab) {
 		case 'wave':
+			// setWave we're passed in takes an object with args.  We pass down a
+			// function with no args that'll call theother one
 			return <SetWaveTab
-				setWave={p.setWave}
-
+				setWave={() => p.setWave(s)}
 				circularFrequency={+s.circularFrequency}
 				setCircularFrequency={freq => this.setState({circularFrequency: freq})}
 				pulseWidth={+s.pulseWidth}
 				setPulseWidth={wid =>this.setState({pulseWidth: wid})}
 				pulseOffset={+s.pulseOffset}
 				setPulseOffset={off => this.setState({pulseOffset: off})}
-				breed={s.waveBreed}
+				waveBreed={s.waveBreed}
 				setBreed={br => this.setState({waveBreed: br})}
 			/>;
 
 		case 'potential':
 			return <SetPotentialTab setPotential={p.setPotential}
 				setCPState={obj => this.setState(obj)}
-				breed={s.potentialBreed}
+				waveBreed={s.potentialBreed}
 				valleyPower={s.valleyPower}
 				valleyScale={s.valleyScale}
 				valleyOffset={s.valleyOffset}
@@ -147,13 +138,13 @@ export class ControlPanel extends React.Component {
 // 				setPulseWidth={wid =>this.setState({pulseWidth: wid})}
 // 				pulseOffset={+s.pulseOffset}
 // 				setPulseOffset={off => this.setState({pulseOffset: off})}
-// 				breed={s.waveBreed}
+// 				waveBreed={s.waveBreed}
 // 				setBreed={br => this.setState({waveBreed: br})}
 // 			/>;
 // 		}
 // 		else if (s.showingTab == 'potential') {
 // 			showingTab = <SetPotentialTab setPotential={p.setPotential}
-// 					setCPState={obj => this.setState(obj)} breed={s.potentialBreed}
+// 					setCPState={obj => this.setState(obj)} waveBreed={s.potentialBreed}
 // 					valleyPower={s.valleyPower} valleyScale={s.valleyScale} valleyOffset={s.valleyOffset} />
 // 		}
 // 		else if (s.showingTab == 'resolution') {
@@ -168,8 +159,6 @@ export class ControlPanel extends React.Component {
 				singleStep={p.singleStep}
 				iterateFrequency={p.iterateFrequency}
 				setIterateFrequency={freq => this.setIterateFrequency(freq)}
-				algorithm={+s.algorithm}
-				setAlgorithm={alg => this.setAlgorithm(+alg)}
 			/>
 			<div className='cpSecondRow'>
 				<ul className='TabBar' >

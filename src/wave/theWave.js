@@ -5,8 +5,8 @@
 */
 
 // all of this is svg and d3, no react.
-import iterate from './iterate';
-import {qeSpace} from './qEngine';
+//import iterate from './iterate';
+import qeSpace from './qeSpace';
 import qe from './qe';
 
 // the (old js) jWave that we're displaying and animating
@@ -35,41 +35,41 @@ export function createSpaceNWave(N, continuum, callback) {
 
 /* ************************************************ iterateAnimate */
 
-let repeatId;
+//let repeatId;
 //const useQuantumEngine = true;
 
 // call this to start or stop animation/iteration.
 // rate = 1, 2, 4, 8, ... or zero/false to stop it
-export function oldIterateAnimate(useQuantumEngine, rate) {
-	useQuantumEngine = true;
-	// if user cicks Go twice, we lose the previous repeatId and can never clear it
-	if (! rate || repeatId) {
-		clearInterval(repeatId);
-		repeatId = null;
-		return;
-	}
-
-	repeatId = setInterval(() => {
-		console.time('one iteration & draw');
-		try {
-			if (useQuantumEngine) {
-				qe.qSpace_oneIntegrationStep();
-			}
-			else {
-				iterate(theJWave);
-			}
-			//theDraw.draw(useQuantumEngine);
-		} catch (ex) {
-			console.error(`Error during iterate/draw:`, ex)
-		}
-		//console.timeEnd('one iteration & draw');
-		let ip = theJWave.innerProduct();
-		//console.log(`${iterationSerial} inner product:  ${ip}`);
-		if (ip < .99 || ip > 1.01) {
-			theJWave.lowPassFilter()
-		}
-	}, 1000 / rate);
-}
+// export function oldIterateAnimate(useQuantumEngine, rate) {
+// 	useQuantumEngine = true;
+// 	// if user cicks Go twice, we lose the previous repeatId and can never clear it
+// 	if (! rate || repeatId) {
+// 		clearInterval(repeatId);
+// 		repeatId = null;
+// 		return;
+// 	}
+//
+// 	repeatId = setInterval(() => {
+// 		console.time('one iteration & draw');
+// 		try {
+// 			if (useQuantumEngine) {
+// 				qe.qSpace_oneIntegrationStep();
+// 			}
+// 			else {
+// 				iterate(theJWave);
+// 			}
+// 			//theDraw.draw(useQuantumEngine);
+// 		} catch (ex) {
+// 			console.error(`Error during iterate/draw:`, ex)
+// 		}
+// 		//console.timeEnd('one iteration & draw');
+// 		let ip = theJWave.innerProduct();
+// 		//console.log(`${iterationSerial} inner product:  ${ip}`);
+// 		if (ip < .99 || ip > 1.01) {
+// 			theJWave.lowPassFilter()
+// 		}
+// 	}, 1000 / rate);
+// }
 
 let isAnimating = false;
 
@@ -91,11 +91,11 @@ function animateOneFrame(now) {
 	// could be slow.  sometime in the future.
 	if (areBenchmarking) startRK = performance.now();
 	qe.qSpace_oneIntegrationStep();
-	qe.updateToLatestWaveBuffer();
+	qe.updateTheSpaceToLatestWaveBuffer();
 
 	if (areBenchmarking) startUpdate = performance.now();
 	//let highest =
-	qe.loadViewBuffer();
+	//qe.loadViewBuffer();
 	if (dumpTheViewBuffer) dumpViewBuffer();
 
 	if (areBenchmarking) startReload = performance.now();

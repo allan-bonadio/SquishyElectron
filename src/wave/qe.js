@@ -1,5 +1,3 @@
-// this file generated Sat Dec 04 2021 01:21:06 GMT-0800 (Pacific Standard Time)
-// by the file SquishyElectron/quantumEngine/building/buildExports.js
 let cwrap;
 export const qe = {};
 export function defineQEngineFuncs() {
@@ -22,6 +20,7 @@ export function defineQEngineFuncs() {
 	qe.qWave_setPulseWave = cwrap('qWave_setPulseWave', 'number', ['number','number','number']);
 	qe.qWave_dumpWave = cwrap('qWave_dumpWave', 'number', ['string']);
 	qe.qSpace_oneIntegrationStep = cwrap('qSpace_oneIntegrationStep', 'number', []);
+	qe.refreshViewBuffer = cwrap('refreshViewBuffer', 'number', []);
 }
 
 window.defineQEngineFuncs = defineQEngineFuncs;  // just in case

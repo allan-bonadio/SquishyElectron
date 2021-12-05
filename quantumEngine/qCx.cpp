@@ -5,6 +5,7 @@
 
 #include <math.h>
 #include "qCx.h"
+//#include <stacktrace/call_stack.hpp>
 
 qCx qCx::operator/(qCx b) {
 	qReal det = b.re * b.re + b.im * b.im;
@@ -40,10 +41,14 @@ qReal qCx::phase() {
 	return atan2(im, re) * 180 / PI;
 }
 
-void qCheck(qCx aCx) {
+// check to make sure real and imag are finite and nice; warn if not
+void qCheck(const char *where, qCx aCx) {
 	// this is exactly the test I want: not NAN, not ∞
 	if (isfinite(aCx.re) && isfinite(aCx.im))
 		return;
-	printf("complex number became non-finite: (%lf,%lf)\n", aCx.re, aCx.im);
+	printf("🚨 🚨 complex number became non-finite in %s: (%lf,%lf)\n",
+		where, aCx.re, aCx.im);
+//	call_stack st;
+//	printf(st.to_string());
 }
 
