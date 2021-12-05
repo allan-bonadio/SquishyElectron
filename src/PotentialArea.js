@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import qe from './wave/qe';
 import PropTypes from 'prop-types';
 
-import {qeSpace} from './wave/qEngine';
+import qeSpace from './wave/qeSpace';
 
 /* This draws the white potential line, and handels interaction
 

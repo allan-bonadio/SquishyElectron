@@ -128,7 +128,7 @@ void qSpace::setZeroPotential(void) {
 	for (int ix = 0; ix < dims->nPoints; ix++)
 		thePotential[ix] = 0.;
 
-	theQViewBuffer->loadViewBuffer(this->latestQWave);
+	//theQViewBuffer->loadViewBuffer(this->latestQWave);
 }
 
 void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset = 0) {
@@ -139,7 +139,7 @@ void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset =
 	}
 
 	// this is overkill but gotta update the Potential column in the view buffer
-	theQViewBuffer->loadViewBuffer(this->latestQWave);
+	//theQViewBuffer->loadViewBuffer(this->latestQWave);
 }
 
 
@@ -157,7 +157,7 @@ void qSpace::oneIntegrationStep() {
 	}
 
 	this->latestQWave = laosQWave;
-	theQViewBuffer->loadViewBuffer(laosQWave);
+	//theQViewBuffer->loadViewBuffer(laosQWave);
 }
 
 //void qSpace::oneIntegrationStep() {

@@ -33,7 +33,7 @@ void waveDDT(qDimension *dims,
 	fromQWave->fixBoundaries(); // always before hamiltonian
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx dPsi = hamiltonian(fromWave, ix) * dtOverI * nextYFactor;
-		qCheck(dPsi);
+		qCheck("um", dPsi);
 
 		// we don't actually save the dψ, we just pour it into where
 		// it needs to go for the next iteration
@@ -83,7 +83,7 @@ void qSpace::oneRk4Step(qWave *oldQWave, qWave *newQWave) {
 	// use egyptWave for all the first-try ψ values
 	// for (int ix = dims->start; ix < dims->end; ix++) {
 	// 	laosWave[ix] = theWave[ix] + hamiltonian(theWave, ix) * halfDtOverI;
-	// 	qCheck(peruWave[ix]);
+	// 	qCheck("um", peruWave[ix]);
 	// }
 	// dims->fixBoundaries(egyptWave);
 	//
@@ -93,7 +93,7 @@ void qSpace::oneRk4Step(qWave *oldQWave, qWave *newQWave) {
 	// // then use laosWave as the input to a better rate and a better inc at peruWave.
 	// for (int ix = dims->start; ix < dims->end; ix++) {
 	// 	peruWave[ix] = theWave[ix] + hamiltonian(egyptWave, ix) * dtOverI;
-	// 	qCheck(peruWave[ix]);
+	// 	qCheck("um", peruWave[ix]);
 	// }
 	//
 	// // now flip them around

@@ -166,6 +166,7 @@ qSpace *completeNewSpace(void) {
 	theSpace->initSpace();
 
 
+	/* ******************************************************** finish, like, everything */
 	allocWaves();
 
 //printf(" got past allocWaves()\n");
@@ -176,7 +177,7 @@ qSpace *completeNewSpace(void) {
 	thePotential = new qReal[theSpace->nPoints];  // slow down, we just made this wave, don't blow it
 	//theSpace->setValleyPotential(1., 1., 0.); // another default
 
-	theSpace->filterCount = theSpace->nStates;  // bad idea
+	//theSpace->filterCount = theSpace->nStates;  // bad idea
 
 
 	// a default.  must be done After viewBuffer and thePotential are in place.
