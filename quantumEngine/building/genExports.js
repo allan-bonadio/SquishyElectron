@@ -47,7 +47,7 @@ exportsSrc  = [
 	{name: 'qSpace_oneIntegrationStep', retType: 'number', args: []},
 
 	// views
-	// not any more, it's internal now {name: 'loadViewBuffer', retType: 'number', args: ['array']},
+	{name: 'refreshViewBuffer', retType: 'number', args: []},
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():
@@ -68,7 +68,7 @@ let defineFuncBody = exportsSrc.map(funcDesc => {
 
 
 const code = `// this file generated ${new Date()}
-// by the file SquishyElectron/quantumEngine/building/buildExports.js
+// by the file SquishyElectron/quantumEngine/building/genExports.js
 let cwrap;
 export const qe = {};
 export function defineQEngineFuncs() {
