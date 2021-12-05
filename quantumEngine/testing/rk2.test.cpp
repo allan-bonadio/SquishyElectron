@@ -51,7 +51,7 @@ static void firstRK2(void) {
 
 	makeNewSpace(5, contENDLESS, "x");
 	theSpace->dt = 0.1;  // to make the numbers come out right
-	theSpace->doLowPass = false;  // to make the numbers come out right
+	//theSpace->doLowPass = false;  // to make the numbers come out right
 	printf("First Test - &&&&& dt is %lf\n", theSpace->dt);
 	theQWave->dumpWave("before rk2 test", true);
 
