@@ -91,11 +91,11 @@ function animateOneFrame(now) {
 	// could be slow.  sometime in the future.
 	if (areBenchmarking) startRK = performance.now();
 	qe.qSpace_oneIntegrationStep();
-	qe.updateToLatestWaveBuffer();
+	qe.updateTheSpaceToLatestWaveBuffer();
 
 	if (areBenchmarking) startUpdate = performance.now();
 	//let highest =
-	qe.loadViewBuffer();
+	//qe.loadViewBuffer();
 	if (dumpTheViewBuffer) dumpViewBuffer();
 
 	if (areBenchmarking) startReload = performance.now();

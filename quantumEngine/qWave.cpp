@@ -297,33 +297,33 @@ void qWave::prune() {
 // dilution works like this: formerly 1/2, it's the fraction of the next point
 // that comes from the avg of the two neighboring points.
 // Changes the wave in-place
-void qWave::lowPassFilter(double dilution) {
-	printf("qWave::lowPassFilter(%5.3lf)\n", dilution);
-	qCx *wave = this->buffer;
-	qCx avg, d2prev = wave[0];
-	qDimension *dims = this->space->dimensions;
+//void qWave::lowPassFilter(double dilution) {
+//	printf("qWave::lowPassFilter(%5.3lf)\n", dilution);
+//	qCx *wave = this->buffer;
+//	qCx avg, d2prev = wave[0];
+//	qDimension *dims = this->space->dimensions;
+//
+//	// not sure we need this this->prune();
+//	this->fixBoundaries();
+//
+//	// average each point with the neighbors; ¼ for each neightbor, ½ for the point itself
+//	// drag your feet on setting the new value in so it doesn't interfere
+//	double concentration = 1. - dilution;
+//	for (int ix = dims->start; ix < dims->end; ix++) {
+//		avg = (wave[ix-1] + wave[ix+1]) * dilution +  wave[ix] * concentration;
+//		// printf("filtering %d  d2prev=(%lf,%lf)  avg=(%lf,%lf)",
+//		// 	ix, d2prev.re, d2prev.im, avg.re, avg.im);
+//
+//		// put new number back, etcept one point behind so you don't need a separate buffer
+//		wave[ix-1] = d2prev;
+//		d2prev = avg;
+//		//this->dumpWave("low pass filtering", true);
+//	}
+//	wave[dims->N] = d2prev;
+//}
 
-	// not sure we need this this->prune();
-	this->fixBoundaries();
 
-	// average each point with the neighbors; ¼ for each neightbor, ½ for the point itself
-	// drag your feet on setting the new value in so it doesn't interfere
-	double concentration = 1. - dilution;
-	for (int ix = dims->start; ix < dims->end; ix++) {
-		avg = (wave[ix-1] + wave[ix+1]) * dilution +  wave[ix] * concentration;
-		// printf("filtering %d  d2prev=(%lf,%lf)  avg=(%lf,%lf)",
-		// 	ix, d2prev.re, d2prev.im, avg.re, avg.im);
-
-		// put new number back, etcept one point behind so you don't need a separate buffer
-		wave[ix-1] = d2prev;
-		d2prev = avg;
-		//this->dumpWave("low pass filtering", true);
-	}
-	wave[dims->N] = d2prev;
-}
-
-
-/* ********************************************************** populate wave */
+/* ********************************************************** defunct: populate wave */
 
 // how big the delay between re and im, in radians kindof.  see code.
 // see also same thing in qFlick
@@ -383,7 +383,7 @@ printf(" got past copy that wave\n");
 printf(" got past normalize here\n");
 	//	this->dumpWave("after set sircular & normalize", true);
 	this->fixBoundaries();
-	theQViewBuffer->loadViewBuffer(this);
+//	theQViewBuffer->loadViewBuffer(this);
 printf(" got past loadViewBuffer\n");
 }
 
@@ -409,7 +409,7 @@ void qWave::setStandingWave(qReal n) {
 	this->normalize();
 	this->dumpWave("after set standing & normalize", true);
 
-	theQViewBuffer->loadViewBuffer(this);
+	//theQViewBuffer->loadViewBuffer(this);
 }
 
 // widthFactor is fraction of total width the packet it is, 0.0-1.0, for a fraction of N.
@@ -434,7 +434,7 @@ void qWave::setPulseWave(qReal widthFactor, qReal cycles) {
 	this->normalize();
 	theQWave->dumpWave("normalized PulseWave", true);
 
-	theQViewBuffer->loadViewBuffer(this);
+	//theQViewBuffer->loadViewBuffer(this);
 }
 
 

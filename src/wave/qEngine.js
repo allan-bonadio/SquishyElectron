@@ -89,12 +89,12 @@ export function qeDefineAccess() {
 	// what a disaster...
 
 	// tune into the most recently used wave buffer.  The iteration algorithm can sometimes leave the
-	// results in different buffers, depending.
-	qe.updateToLatestWaveBuffer = function updateToLatestWaveBuffer() {
+	// results in different buffers, depending.  No, not any more!
+	qe.updateTheSpaceToLatestWaveBuffer = function updateTheSpaceToLatestWaveBuffer() {
 		// make this thing which is the wave buffer, as a nice TypedArray of doubles (pairs making up cx numbers)
 		const wave = new Float64Array(window.Module.HEAPF64.buffer, qe.getWaveBuffer(), 2 * qe.space.nPoints);
 		qe.space.waveBuffer = qe.waveBuffer = wave;
-		console.info(`the wave we're updateToLatestWaveBuffer:`, wave);
+		console.info(`the wave we're updateTheSpaceToLatestWaveBuffer:`, wave);
 		qe.qewave = new qeWave(qe.space, wave);
 	}
 

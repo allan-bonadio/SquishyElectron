@@ -28,9 +28,9 @@ qViewBuffer::~qViewBuffer() {
 // each row of 4 floats looks like this:
 //     real   imaginary    potential    serial
 // Two vertices per datapoint: bottom then top, same data.
-// also converts from doubles to floats.
-float qViewBuffer::loadViewBuffer(qWave *latestQWave) {
-	qCx *latestWave = latestQWave->buffer;
+// also converts from doubles to floats for GL.
+float qViewBuffer::loadViewBuffer(void) {
+	qCx *latestWave = this->space->latestQWave->buffer;
 
 	int nPoints = this->space->nPoints;
 	qReal highest = 0;
@@ -89,6 +89,10 @@ float *getViewBuffer(void) {
 	return (float *) theQViewBuffer->viewBuffer;
 }
 
+int refreshViewBuffer(void) {
+	theQViewBuffer->loadViewBuffer();
+	return 0;
+}
 
 // dump the view buffer just before it heads off to webgl.
 int dumpViewBuffer(int nPoints) {
