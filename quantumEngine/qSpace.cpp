@@ -90,10 +90,9 @@ void qSpace::initSpace() {
 	qReal dt = this->dt = 1. / (this->nStates * this->nStates);
 	//qReal dt = this->dt = nStates * 0.02;  // try out different factors here
 
-	// used only for the RKs
+	// used only for the RKs - therefore obsolete
 	this->dtOverI = qCx(0., -dt);
 	this->halfDtOverI = qCx(0., -dt / 2.);
-
 	this->bufferNum = 0;
 }
 
@@ -156,6 +155,8 @@ void qSpace::oneIntegrationStep() {
 		this->oneVisscherStep(peruQWave, laosQWave);
 	}
 
+	// printf("qSpace::oneIntegrationStep(): viewBuffer %ld and latestWave=%ld\n",
+	// 	(long) viewBuffer, (long) latestWave);
 	this->latestQWave = laosQWave;
 	//theQViewBuffer->loadViewBuffer(laosQWave);
 }
