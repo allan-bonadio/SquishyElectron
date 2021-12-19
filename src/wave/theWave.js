@@ -9,14 +9,14 @@
 import qeSpace from './qeSpace';
 import qe from './qe';
 
-// the (old js) jWave that we're displaying and animating
-export let theJSpace;
-export let theJWave;  // deprecated, doesn't seem used much
-
-export let newWaveBuffer;
-
-// range of vertical inside coordinates in the svg?
-export const INNER_HEIGHT = 100;
+// // the (old js) jWave that we're displaying and animating
+// export let theJSpace;
+// export let theJWave;  // deprecated, doesn't seem used much
+//
+// export let newWaveBuffer;
+//
+// // range of vertical inside coordinates in the svg?
+// export const INNER_HEIGHT = 100;
 
 // call this when user changes number of datapoints.
 // Or at startup, so we have a wave to begin with.
@@ -28,7 +28,7 @@ export function createSpaceNWave(N, continuum, callback) {
 
 	// create the new C++ version & populate the buffer
 	qe.space = new qeSpace([{N, continuum, label: 'x'}]);
-	// done inside new space    qe.qWave_setCircularWave(1);
+	// done inside qeSpace    qe.qWave_setCircularWave(1);
 
 	callback(qe.space);
 }
@@ -71,56 +71,56 @@ export function createSpaceNWave(N, continuum, callback) {
 // 	}, 1000 / rate);
 // }
 
-let isAnimating = false;
-
-// runtime debugging flags
-const areBenchmarking = true;
-const dumpTheViewBuffer = true;
-let prevStart  = performance.now();
+// let isAnimating = false;
+//
+// // runtime debugging flags
+// const areBenchmarking = true;
+// const dumpTheViewBuffer = true;
+// let prevStart  = performance.now();
 
 // OLD
 // the name says it all.  requestAnimationFrame() will call this probably 60x/sec
 // it will advance one 'frame' in wave time, which i dunno what that is need to tihink about it more.
 // deprecated; see SquishPanel
-function animateOneFrame(now) {
-	debugger;
-	//throw "animateOneFrame is deprecated";
-	//console.log(`time since last tic: ${now - startFrame}ms`)
-	let startRK = 0, startUpdate = 0, startReload = 0, startDraw = 0, endFrame = 0;
-
-	// could be slow.  sometime in the future.
-	if (areBenchmarking) startRK = performance.now();
-	qe.qSpace_oneIntegrationStep();
-	qe.updateTheSpaceToLatestWaveBuffer();
-
-	if (areBenchmarking) startUpdate = performance.now();
-	//let highest =
-	//qe.loadViewBuffer();
-	if (dumpTheViewBuffer) dumpViewBuffer();
-
-	if (areBenchmarking) startReload = performance.now();
-	qe.theCurrentView.viewVariables.forEach(v => v.reloadVariable());
-	//qe.theCurrentView.viewVariables[0].reloadVariable();
-
-	if (areBenchmarking) startDraw = performance.now();
-	qe.theCurrentView.draw();
-
-	endFrame = performance.now();
-	if (areBenchmarking) {
-		console.log(`times:\n`+
-			`RK:     ${(startUpdate - startRK).toFixed(2)}ms\n`+
-			`up:     ${(startReload - startUpdate).toFixed(2)}ms\n`+
-			`reload: ${(startDraw - startReload).toFixed(2)}ms\n`+
-			`draw:   ${(endFrame - startDraw).toFixed(2)}ms\n`+
-			`total:  ${(endFrame - startRK).toFixed(2)}ms\n\n` +
-			`period:  ${(startRK - prevStart).toFixed(2)}ms\n`);
-		prevStart = startRK;
-	}
-
-	if (isAnimating) {
-		requestAnimationFrame(animateOneFrame);
-	}
-}
+// function animateOneFrame(now) {
+// 	debugger;
+// 	//throw "animateOneFrame is deprecated";
+// 	//console.log(`time since last tic: ${now - startFrame}ms`)
+// 	let startRK = 0, startUpdate = 0, startReload = 0, startDraw = 0, endFrame = 0;
+//
+// 	// could be slow.  sometime in the future.
+// 	if (areBenchmarking) startRK = performance.now();
+// 	qe.qSpace_oneIntegrationStep();
+// 	qe.updateTheSpaceToLatestWaveBuffer();
+//
+// 	if (areBenchmarking) startUpdate = performance.now();
+// 	//let highest =
+// 	//qe.loadViewBuffer();
+// 	if (dumpTheViewBuffer) dumpViewBuffer();
+//
+// 	if (areBenchmarking) startReload = performance.now();
+// 	qe.theCurrentView.viewVariables.forEach(v => v.reloadVariable());
+// 	//qe.theCurrentView.viewVariables[0].reloadVariable();
+//
+// 	if (areBenchmarking) startDraw = performance.now();
+// 	qe.theCurrentView.draw();
+//
+// 	endFrame = performance.now();
+// 	if (areBenchmarking) {
+// 		console.log(`times:\n`+
+// 			`RK:     ${(startUpdate - startRK).toFixed(2)}ms\n`+
+// 			`up:     ${(startReload - startUpdate).toFixed(2)}ms\n`+
+// 			`reload: ${(startDraw - startReload).toFixed(2)}ms\n`+
+// 			`draw:   ${(endFrame - startDraw).toFixed(2)}ms\n`+
+// 			`total:  ${(endFrame - startRK).toFixed(2)}ms\n\n` +
+// 			`period:  ${(startRK - prevStart).toFixed(2)}ms\n`);
+// 		prevStart = startRK;
+// 	}
+//
+// 	if (isAnimating) {
+// 		requestAnimationFrame(animateOneFrame);
+// 	}
+// }
 
 // deprecated
 // start/stop or single step the animation
@@ -128,34 +128,34 @@ function animateOneFrame(now) {
 // true = start it or continue it if running
 // rate is how fast it goes, or 'one' to single step.
 // I guess it's irrelevant now with requestAnimationFrame()
-export function iterateAnimate(shouldAnimate, rate) {
-	debugger;
-	//throw "animateOneFrame is deprecated";
+// export function iterateAnimate(shouldAnimate, rate) {
+// 	debugger;
+// 	//throw "animateOneFrame is deprecated";
+//
+// 	// hmmm i'm not using the Rate here...
+// 	if (! shouldAnimate || ! rate || !qe.theCurrentView) {
+// 		isAnimating = false;
+// 		return;
+// 	}
+// 	if (rate == 'one') {
+// 		isAnimating = false;
+// 		animateOneFrame(performance.now());
+// 		return;
+// 	}
+// 	isAnimating = true;
+//
+// 	animateOneFrame(performance.now());
+// //	requestAnimationFrame(animateOneFrame);
+// }
+//
+// // return true if animation in motion; false otherwise
+// export const isItAnimating = () => isAnimating;
 
-	// hmmm i'm not using the Rate here...
-	if (! shouldAnimate || ! rate || !qe.theCurrentView) {
-		isAnimating = false;
-		return;
-	}
-	if (rate == 'one') {
-		isAnimating = false;
-		animateOneFrame(performance.now());
-		return;
-	}
-	isAnimating = true;
-
-	animateOneFrame(performance.now());
-//	requestAnimationFrame(animateOneFrame);
-}
-
-// return true if animation in motion; false otherwise
-export const isItAnimating = () => isAnimating;
-
-function dumpViewBuffer() {
-	let nRows = qe.space.nPoints * 2;
-	let vb = qe.space.viewBuffer;
-	const _ = (f) => f.toFixed(3).padStart(6);
-	console.log(`dump of view buffer for ${qe.space.nPoints} points in ${nRows} rows`);
-	for (let i = 0; i < nRows; i++)
-		console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
-}
+// function dumpViewBuffer() {
+// 	let nRows = qe.space.nPoints * 2;
+// 	let vb = qe.space.viewBuffer;
+// 	const _ = (f) => f.toFixed(3).padStart(6);
+// 	console.log(`dump of view buffer for ${qe.space.nPoints} points in ${nRows} rows`);
+// 	for (let i = 0; i < nRows; i++)
+// 		console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
+// }

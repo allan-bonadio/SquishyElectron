@@ -99,18 +99,8 @@ export default class ResolutionDialog extends React.Component {
 				N={initialParams.N}
 				continuum={initialParams.continuum}
 				viewClassName={initialParams.viewClassName}
-			/>,
-
-			// close function
-			ResolutionDialog.closeDialog,
+			/>
 		);
-	}
-
-	// NEVER called by App when the dialog closes/hides, whether by OK or cancel
-	// deprecated
-	static closeDialog() {
-		debugger;
-
 	}
 
 	// called when user clicks OK, before dialog is hidden in App
@@ -119,12 +109,14 @@ export default class ResolutionDialog extends React.Component {
 		ResolutionDialog.okCallback(this.state);
 		CommonDialog.startClosingDialog();
 	}
+	OK = this.OK.bind(this);
 
 	// called when user clicks Cancel, before dialog is hidden in App
 	cancel(ev) {
 		ResolutionDialog.cancelCallback();
 		CommonDialog.startClosingDialog();
 	}
+	cancel = this.cancel.bind(this);
 
 
 	/* ******************************************************************* rendering */

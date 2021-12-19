@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** Common Dialog -- general dialog framework for Squishy Electron
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
@@ -12,12 +12,6 @@ export default class CommonDialog extends React.Component {
 
 	static propTypes = {
 		token: PropTypes.number,
-//		stateParams: PropTypes.shape({
-//			N: PropTypes.number.isRequired,
-//			continuum: PropTypes.number.isRequired,
-//			viewClassName: PropTypes.string.isRequired,
-//		}),
-//		closeResolutionDialog: PropTypes.func.isRequired,
 	};
 
 	state = {};

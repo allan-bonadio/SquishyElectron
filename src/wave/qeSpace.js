@@ -58,13 +58,6 @@ export class qeSpace {
 		//console.log(`qeSpace viewBuffer:`, this.viewBuffer);
 	}
 
-// 	get1DWave = function get1DWave(ixPoint) {
-// 		const ix = 2*ixPoint;
-// 		return qCx(
-// 			this.waveBuffer[ix],
-// 			this.waveBuffer[ix+1]
-// 		);
-// 	}
 }
 
 

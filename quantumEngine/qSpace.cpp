@@ -160,25 +160,3 @@ void qSpace::oneIntegrationStep() {
 	//theQViewBuffer->loadViewBuffer(laosQWave);
 }
 
-//void qSpace::oneIntegrationStep() {
-//	qWave *oldQWave, *newQWave;
-//
-//	// each calculates the new wave into the opposite buffer
-//	if (this->bufferNum) {
-//		newQWave = theQWave;
-//		oldQWave = peruQWave;
-//		this->bufferNum = 0;
-//	}
-//	else {
-//		oldQWave = theQWave;
-//		newQWave = peruQWave;
-//		this->bufferNum = 1;
-//	}
-//
-//	this->oneVisscherStep(oldQWave, newQWave);
-//
-//	this->latestQWave = newQWave;
-//	theQViewBuffer->loadViewBuffer(newQWave);
-//}
-
-

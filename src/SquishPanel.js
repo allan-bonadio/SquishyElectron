@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 
 import ControlPanel from './controlPanel/ControlPanel';
 
-import {createSpaceNWave} from './wave/theWave';
+//import {createSpaceNWave} from './wave/theWave';
 // eslint-disable-next-line no-unused-vars
 import qeSpace from './wave/qeSpace';
 import {qeStartPromise, qeDefineAccess} from './wave/qEngine';
@@ -132,26 +132,28 @@ export class SquishPanel extends React.Component {
 	// init or re-init the space and the panel
 	setNew1DResolution(N, continuum, viewClassName) {
 		qe.theCurrentView =  null;
-		createSpaceNWave(N, continuum, space => {
 
-			// now create the view class instance as described by the space
-			const vClass = listOfViewClassNames[viewClassName];
-			if (! vClass)
-				throw `no vClass! see for yerself! ${JSON.stringify(listOfViewClassNames)}`;
+		qe.space = new qeSpace([{N, continuum, label: 'x'}]);
+		//createSpaceNWave(N, continuum, space => {
 
-			const currentView = new vClass('main view', this.canvas, space);
-			currentView.completeView();
+		// now create the view class instance as described by the space
+		const vClass = listOfViewClassNames[viewClassName];
+		if (! vClass)
+			throw `no vClass! see for yerself! ${JSON.stringify(listOfViewClassNames)}`;
 
-			//this.elapsedTime = 0;
-			//this.iterateSerial = 0;
+		const currentView = new vClass('main view', this.canvas, qe.space);
+		currentView.completeView();
 
-			// we've now got a qeSpace etc all set up
-			this.setState({N, continuum, space, currentView});
-			this.currentView = currentView;  // this set before the setState finishes
+		//this.elapsedTime = 0;
+		//this.iterateSerial = 0;
 
-			// kinda paranoid?  this should be deprecated.
-			qe.theCurrentView = currentView;
-		});
+		// we've now got a qeSpace etc all set up
+		this.setState({N, continuum, space: qe.space, currentView});
+		this.currentView = currentView;  // this set before the setState finishes
+
+		// kinda paranoid?  this should be deprecated.
+		qe.theCurrentView = currentView;
+		// 		});
 	}
 
 	// puts up the resolution dialog, starting with the values from this.state
