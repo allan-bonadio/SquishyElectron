@@ -29,17 +29,22 @@ qViewBuffer::~qViewBuffer() {
 //     real   imaginary    potential    serial
 // Two vertices per datapoint: bottom then top, same data.
 // also converts from doubles to floats for GL.
-float qViewBuffer::loadViewBuffer(void) {
-	qCx *latestWave = this->space->latestQWave->buffer;
+float qViewBuffer::loadViewBuffer(qCx *latestWave) {
+	latestWave = this->space->latestQWave->buffer;
 
 	int nPoints = this->space->nPoints;
 	qReal highest = 0;
 	qReal tiny = 1e-8;
 
-	//printf("loadViewBuffer(): latestQWave=%ld  thePotential=%ld\n",
-	//(long) latestQWave, (long) thePotential);
-	//printf("loadViewBuffer(): viewBuffer %ld and latestQWave->buffer=%ld\n",
-	//(long) viewBuffer, (long) latestQWave->buffer);
+	printf("loadViewBuffer(P): thePotential=%ld\n",
+		(long) thePotential);
+	printf("loadViewBuffer(B): this->space->latestQWave->buffer=%ld->%ld->%ld->%ld\n",
+		(long) this,
+		(long) this->space,
+		(long) this->space->latestQWave,
+		(long) this->space->latestQWave->buffer);
+	printf("loadViewBuffer(vb,lqw): viewBuffer %ld and latestQWave->buffer=%ld\n",
+		(long) viewBuffer, (long) latestWave);
 
 	//latestQWave->dumpWave("at start of loadViewBuffer()");
 
@@ -48,17 +53,20 @@ float qViewBuffer::loadViewBuffer(void) {
 		float *twoRowPtr = this->viewBuffer + pointNum * 8;
 		qCx *wavePtr = latestWave + pointNum;
 
-	//printf("loadViewBuffer(%d): twoRowPtr %ld and wavePtr=%ld\n",
-	//	pointNum, (long) twoRowPtr, (long) wavePtr);
+		printf("loadViewBuffer(p %d): twoRowPtr %ld and wavePtr=%ld\n",
+		pointNum, (long) twoRowPtr, (long) wavePtr);
 
 		qReal *potPtr = thePotential + pointNum;
 		qReal re = wavePtr->re;
 		qReal im = wavePtr->im;
 
+		printf("loadViewBuffer(raw:%d): %lf %lf %lf\n",
+			pointNum, re, im, tiny);
+
 		twoRowPtr[0] = re * tiny;
 		twoRowPtr[1] = im * tiny;
 
-		twoRowPtr[2] = potPtr[0];  // this isn't going to be used
+		twoRowPtr[2] = potPtr[0];  // this isn't going to be used yet
 		twoRowPtr[3] = pointNum * 2.;  // vertexSerial: at zero
 
 		twoRowPtr[4] = re;
@@ -66,7 +74,11 @@ float qViewBuffer::loadViewBuffer(void) {
 		twoRowPtr[6] = potPtr[0];
 		twoRowPtr[7] = pointNum * 2. + 1.;  // at magnitude, top
 
-		// while we're here, collect the highest point
+		printf("loadViewBuffer(8:%d): %lf %lf %lf %lf %lf %lf %lf %lf\n",
+		pointNum, twoRowPtr[0], twoRowPtr[1], twoRowPtr[2], twoRowPtr[3],
+				twoRowPtr[4], twoRowPtr[5], twoRowPtr[6], twoRowPtr[7]);
+
+		// while we're here, collect the highest point (obsolete i think)
 		qReal height = re * re + im * im;
 		if (height > highest)
 			highest = height;
@@ -90,6 +102,7 @@ float *getViewBuffer(void) {
 }
 
 int refreshViewBuffer(void) {
+	printf("refreshViewBuffer... theQViewBuffer=%ld\n", (long) theQViewBuffer);
 	theQViewBuffer->loadViewBuffer();
 	return 0;
 }

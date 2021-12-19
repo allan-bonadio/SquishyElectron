@@ -265,7 +265,8 @@ export class SquishPanel extends React.Component {
 
 		// no matter how often animateHeartbeat() is called, it'll only iterate once in the iteratePeriod
 		if (now >= this.timeForNextTic) {
-			this.iterateOneFrame(s.isTimeAdvancing, false);
+			this.iterateOneFrame(s.isTimeAdvancing, s.isTimeAdvancing);
+			//this.iterateOneFrame(s.isTimeAdvancing, false);
 
 			// remember (now) is the one passed in, before iterateOneFrame(),
 			// so periods are exactly timed (unless it's so slow that we get behind)

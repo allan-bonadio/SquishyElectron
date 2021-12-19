@@ -332,13 +332,13 @@ const double gapFactor = .01;
 // n is  number of cycles all the way across N points.
 // n 'should' be an integer to make it meet up on ends if endless
 // pass negative to make it go backward.
-// the first point here is like x=0 as far as the trig functions, and the last like x=-1
+// the first point here is like x=0 as far as the trig functions, and the last like x=N-1
 void qWave::setCircularWave(qReal n) {
 	qCx tempWave[this->space->nPoints];
 	qWave tqWave(this->space, tempWave);
 	qWave *tempQWave = &tqWave;
 
-printf(" starting qWave::setCircularWave\n");
+printf(" starting qWave::setCircularWave %lf\n", n);
 	//this->dumpWave("before set sircular & normalize", true);
 	qCx *wave = tempWave;
 	//qCx *wave = this->buffer;
@@ -366,8 +366,8 @@ printf(" got past dAngle\n");
 		angle = dAngle * (ix - start);
 		wave[ix] = qCx(cos(angle), sin(angle + vGap));
 	}
-//	this->dumpThatWave(wave, true);
-	//printf("wave, freshly generated, before halfstep");
+	this->dumpWave("wave, freshly generated", true);
+	printf("wave, freshly generated, before halfstep");
 	this->fixBoundaries();
 	//this->dumpThatWave(wave, true);
 
@@ -377,14 +377,14 @@ printf(" got past dAngle\n");
 	tempQWave->copyThatWave(this->buffer, tempQWave->buffer);
 printf(" got past copy that wave\n");
 	//this->space->visscherHalfStep(tempQWave, this);
-	//this->dumpWave("after set sircular & normalize", true);
 	this->normalize();
+	this->dumpWave("after set sircular & copy & normalize", true);
 
-printf(" got past normalize here\n");
+//printf(" got past normalize here\n");
 	//	this->dumpWave("after set sircular & normalize", true);
-	this->fixBoundaries();
+	//this->fixBoundaries();
 //	theQViewBuffer->loadViewBuffer(this);
-printf(" got past loadViewBuffer\n");
+//printf(" got past loadViewBuffer\n");
 }
 
 // make a superposition of two waves in opposite directions.

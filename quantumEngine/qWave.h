@@ -106,9 +106,9 @@ struct qViewBuffer {
 
 	~qViewBuffer();
 
-	// copy the numbers in latestQWave into this->viewBuffer
+	// copy the numbers in wave or latestQWave into this->viewBuffer
 	// also converts from doubles to floats.
-	float loadViewBuffer(void);
+	float loadViewBuffer(qCx *wave = NULL);
 };
 
 // 'the' being the only one sometimes

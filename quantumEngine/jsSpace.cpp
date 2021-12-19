@@ -179,16 +179,21 @@ qSpace *completeNewSpace(void) {
 
 	//theSpace->filterCount = theSpace->nStates;  // bad idea
 
+	theSpace->latestQWave = laosQWave;
 
 	// a default.  must be done After viewBuffer and thePotential are in place.
-	theQWave->setCircularWave(1);
+	theSpace->latestQWave->setCircularWave(1);
 //printf(" got past setCircularWave\n");
 
-	//printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", theSpace->nStates, theSpace->nPoints);
+	printf("theQViewBuffer->loadViewBuffer... theQViewBuffer=%ld\n", (long) theQViewBuffer);
+	theQViewBuffer->loadViewBuffer();
+//printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", theSpace->nStates, theSpace->nPoints);
 	//printf("  dimension N=%d  continuum=%d  start=%d  end=%d  label=%s\n",
 //		theSpace->dimensions->N, theSpace->dimensions->continuum,
 //		theSpace->dimensions->start, theSpace->dimensions->end, theSpace->dimensions->label);
+	printf("qSpace::completeNewSpace(): done\n");
 	return theSpace;
 }
+
 
 }
