@@ -361,7 +361,7 @@ printf(" got past dAngle\n");
 //	printf("flick, before boundaries, 1 copy");
 	this->fixBoundaries();
 //	printf("flick, freshly generated, 1 copy");
-	this->dumpThatWave(wave, true);
+//	this->dumpThatWave(wave, true);
 
 		tempQWave->copyThatWave(this->waves[0], tempQWave->buffer);
 		tempQWave->copyThatWave(this->waves[1], tempQWave->buffer);
@@ -370,7 +370,7 @@ printf(" got past dAngle\n");
 		//this->space->visscherHalfStep(tempQWave, this);
 		//this->dumpWave("after set sircular & normalize", true);
 		this->normalize();
-printf(" got past normalize here\n");
+		//printf(" got past normalize here\n");
 	//	this->dumpWave("after set sircular & normalize", true);
 	this->fixBoundaries();
 	this->dumpAllWaves("qFlick::setCircularWave: normalize");

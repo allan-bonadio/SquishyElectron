@@ -77,8 +77,7 @@ void qSpace::tallyDimensions(void) {
 	}
 	this->nStates = nStates;
 	this->nPoints = nPoints;
-printf(" got past tallyDimensions; nStates=%d  nPoints=%d\n",
-	nStates, nPoints);
+	//printf(" got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
 }
 
 // call this After addDIMENSION calls to get it ready to go.

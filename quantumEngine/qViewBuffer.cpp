@@ -7,6 +7,8 @@
 #include "qSpace.h"
 #include "qWave.h"
 
+static const bool debugViewBuffer = false;
+
 
 // 'the' being the only one sometimes
 qViewBuffer *theQViewBuffer;
@@ -15,7 +17,7 @@ qViewBuffer::qViewBuffer(qSpace *space) {
 	// 4 floats per vertex, two verts per point
 	this->space = space;
 	this->viewBuffer = new float[space->nPoints * 8];
-	printf("viewBuffer(): viewBuffer %ld \n",
+	if (debugViewBuffer) printf("viewBuffer(): viewBuffer %ld \n",
 		(long) viewBuffer);
 }
 
@@ -36,16 +38,17 @@ float qViewBuffer::loadViewBuffer(qCx *latestWave) {
 	qReal highest = 0;
 	qReal tiny = 1e-8;
 
-	printf("loadViewBuffer(P): thePotential=%ld\n",
-		(long) thePotential);
-	printf("loadViewBuffer(B): this->space->latestQWave->buffer=%ld->%ld->%ld->%ld\n",
-		(long) this,
-		(long) this->space,
-		(long) this->space->latestQWave,
-		(long) this->space->latestQWave->buffer);
-	printf("loadViewBuffer(vb,lqw): viewBuffer %ld and latestQWave->buffer=%ld\n",
-		(long) viewBuffer, (long) latestWave);
-
+	if (debugViewBuffer) {
+		printf("loadViewBuffer(P): thePotential=%ld\n",
+			(long) thePotential);
+		printf("loadViewBuffer(B): this->space->latestQWave->buffer=%ld->%ld->%ld->%ld\n",
+			(long) this,
+			(long) this->space,
+			(long) this->space->latestQWave,
+			(long) this->space->latestQWave->buffer);
+		printf("loadViewBuffer(vb,lqw): viewBuffer %ld and latestQWave->buffer=%ld\n",
+			(long) viewBuffer, (long) latestWave);
+	}
 	//latestQWave->dumpWave("at start of loadViewBuffer()");
 
 	// this is index into the complex point, which translates to 2 GL points
@@ -53,14 +56,14 @@ float qViewBuffer::loadViewBuffer(qCx *latestWave) {
 		float *twoRowPtr = this->viewBuffer + pointNum * 8;
 		qCx *wavePtr = latestWave + pointNum;
 
-		printf("loadViewBuffer(p %d): twoRowPtr %ld and wavePtr=%ld\n",
+		if (debugViewBuffer) printf("loadViewBuffer(p %d): twoRowPtr %ld and wavePtr=%ld\n",
 		pointNum, (long) twoRowPtr, (long) wavePtr);
 
 		qReal *potPtr = thePotential + pointNum;
 		qReal re = wavePtr->re;
 		qReal im = wavePtr->im;
 
-		printf("loadViewBuffer(raw:%d): %lf %lf %lf\n",
+		if (debugViewBuffer) printf("loadViewBuffer(raw:%d): %lf %lf %lf\n",
 			pointNum, re, im, tiny);
 
 		twoRowPtr[0] = re * tiny;
@@ -74,7 +77,7 @@ float qViewBuffer::loadViewBuffer(qCx *latestWave) {
 		twoRowPtr[6] = potPtr[0];
 		twoRowPtr[7] = pointNum * 2. + 1.;  // at magnitude, top
 
-		printf("loadViewBuffer(8:%d): %lf %lf %lf %lf %lf %lf %lf %lf\n",
+		if (debugViewBuffer) printf("loadViewBuffer(8:%d): %lf %lf %lf %lf %lf %lf %lf %lf\n",
 		pointNum, twoRowPtr[0], twoRowPtr[1], twoRowPtr[2], twoRowPtr[3],
 				twoRowPtr[4], twoRowPtr[5], twoRowPtr[6], twoRowPtr[7]);
 
@@ -84,7 +87,7 @@ float qViewBuffer::loadViewBuffer(qCx *latestWave) {
 			highest = height;
 	}
 
-	if (true) {
+	if (debugViewBuffer) {
 		printf("viewBuffer.cpp, as written to view buffer:\n");
 		dumpViewBuffer(nPoints);
 	}
@@ -102,7 +105,7 @@ float *getViewBuffer(void) {
 }
 
 int refreshViewBuffer(void) {
-	printf("refreshViewBuffer... theQViewBuffer=%ld\n", (long) theQViewBuffer);
+	if (debugViewBuffer) printf("refreshViewBuffer... theQViewBuffer=%ld\n", (long) theQViewBuffer);
 	theQViewBuffer->loadViewBuffer();
 	return 0;
 }

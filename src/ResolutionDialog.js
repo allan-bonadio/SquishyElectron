@@ -10,6 +10,7 @@ import qeSpace from './wave/qeSpace';
 import SquishPanel from './SquishPanel';
 import CommonDialog from './CommonDialog';
 
+
 // had this been a real webiste, I would not have to copy/paste these here
 //export const listOfViewClasses = {
 //	abstractViewDef, manualViewDef, viewVariableViewDef,

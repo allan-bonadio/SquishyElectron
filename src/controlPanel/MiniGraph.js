@@ -177,15 +177,6 @@ function MiniGraph(props) {
 //
 
 
-
-
-
-
-
-
-
-
-
 	return <svg className={`MiniGraph ${p.className}`}
 						viewBox={viewBox}
 						width={p.width} height={p.height}
