@@ -79,6 +79,7 @@ function createGoodPowersOf10(spd, iMin, iMax) {
 
 // put spaces between triples of digits.  ALWAYS positive reals.
 function thousands(n) {
+	n = Math.round(n * 1e6) / 1e6;
 	let nInt = Math.floor(n);
 	let nFrac = (n) % 1;
 	//let nFrac = (n + 1e-13) % 1;
