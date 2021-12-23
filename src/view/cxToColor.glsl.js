@@ -22,10 +22,10 @@ vec3 cxToColor(vec2  psi) {
 		else {
 			//console.log('     line 14, psi.x=', psi.x);
 			if (psi.x > 0.) {
-				return vec3(1., 0., 0.);  // red
+				return vec3(1., 0., 0.);  // red +1
 			}
 			else {
-				return vec3(0., 1., 1.);  // cyan
+				return vec3(0., 1., 1.);  // cyan -1
 			}
 		}
 	}
@@ -91,13 +91,14 @@ export default cxToColorGlsl;
 
 /* ************************************************* testing */
 
-// you can test this in Node; just uncomment this section and run it alone.
+// you can test this in Node; just uncomment the bottom section and run it alone.
 
 // testing in JS/node.  so hokey.  This substitutes a few things to turn GLSL  into JS
 export function testCxToColorGlsl() {
+	// we use homogenous 2d coords so we can do infinity (?)
 	const vec3 = function vec3(xx, yy, zz) { return {x: xx, y: yy, z: zz}}
 	let jsCxToColor;
-	const notClose = (a, b) => (Math.abs(a-b) > 5e-5)
+	const notClose = (a, b) => (Math.abs(a-b) > 5e-5);  // remember this is single floats
 
 	// test just one angle
 	function test1cx(angle, expected, shouldBe) {
@@ -121,51 +122,52 @@ export function testCxToColorGlsl() {
 
 	// convert the code to JS, brutally
 	let jsCode = cxToColorGlsl.replace(/.*cxToColor.*$/m, '{');
-//	console.log(`=========== jsCode 1 ======\n${jsCode}\n=====\n`);
+	//	console.log(`=========== jsCode 1 ======\n${jsCode}\n=====\n`);
 	jsCode = jsCode.replace(/float/g, 'let');
 	//jsCode = jsCode.replace(/vec2/g, '').replace(/vec3/, 'function');  // just the first ones
-//	console.log(`=========== jsCode 2 =====\n${jsCode}\n======\n`);
+	//	console.log(`=========== jsCode 2 =====\n${jsCode}\n======\n`);
 	jsCxToColor = new Function('psi', jsCode);
 
 	// run some tests ... go around the circle, testing all crucial points
-	test1cx(0, vec3(1, 0, 0), 'Red 1 0 0');
-	test1cx(1, vec3(1, 0.0101, 0), 'Red -> Yellow');
+	test1cx(0, vec3(1, 0, 0), 'Red 1 0 0 == +1');
+	test1cx(1, vec3(1, 0.0101, 0), 'Red > Yellow');
 	test1cx(30, vec3(1, 0.3333, 0), 'Red + Yellow');
-	test1cx(59, vec3(1, 0.9609, 0), 'Yellow -> Red');
+	test1cx(59, vec3(1, 0.9609, 0), 'Red < Yellow');
 	console.log();
 
 	test1cx(60, vec3(1, 1, 0), 'Yellow 1 1 0');
-	test1cx(61, vec3(0.9800, 1, 0), 'Yellow -> Green');
-	test1cx(90, vec3(.5, 1, 0), 'Yellow + Green');
-	test1cx(119, vec3(0.0200, 1, 0), 'Green -> Yellow');
+	test1cx(61, vec3(0.9800, 1, 0), 'Yellow > Green');
+	test1cx(90, vec3(.5, 1, 0), 'Yellow + Green == i');
+	test1cx(119, vec3(0.0200, 1, 0), 'Yellow < Green');
 	console.log();
 
 	test1cx(120, vec3(0, 1, 0), 'Green 0 1 0');
-	test1cx(121, vec3(0, 1, 0.0391), 'Green -> Cyan');
+	test1cx(121, vec3(0, 1, 0.0391), 'Green > Cyan');
 	test1cx(150, vec3(0, 1, 0.6667), 'Green + Cyan');
-	test1cx(179, vec3(0, 1, 0.9899), 'Cyan -> Green');
+	test1cx(179, vec3(0, 1, 0.9899), 'Green < Cyan');
 	console.log();
 
-	test1cx(180, vec3(0, 1, 1), 'Cyan 0 1 1');
-	test1cx(181, vec3(0, 0.9899, 1), 'Cyan -> Blue');
+	test1cx(180, vec3(0, 1, 1), 'Cyan 0 1 1 == -1');
+	test1cx(181, vec3(0, 0.9899, 1), 'Cyan > Blue');
 	test1cx(210, vec3(0, 0.6667, 1), 'Cyan + Blue');
-	test1cx(239, vec3(0, 0.0391, 1), 'Blue -> Cyan');
+	test1cx(239, vec3(0, 0.0391, 1), 'Cyan < Blue');
 	console.log();
 
 	test1cx(240, vec3(0, 0, 1), 'Blue 0 0 1');
-	test1cx(241, vec3(0.0200, 0, 1), 'Blue -> Magenta');
-	test1cx(270, vec3(.5, 0, 1), 'Blue + Magenta');
-	test1cx(299, vec3(0.9800, 0, 1), 'Magenta -> Blue');
+	test1cx(241, vec3(0.0200, 0, 1), 'Blue > Magenta');
+	test1cx(270, vec3(.5, 0, 1), 'Blue + Magenta = -i');
+	test1cx(299, vec3(0.9800, 0, 1), 'Blue < Magenta');
 	console.log();
 
 	test1cx(300, vec3(1, 0, 1), 'Magenta 1 0 1');
-	test1cx(301, vec3(1, 0, 0.9609), 'Magenta -> Red');
+	test1cx(301, vec3(1, 0, 0.9609), 'Magenta > Red');
 	test1cx(330, vec3(1, 0, 0.3333), 'Magenta + Red');
-	test1cx(359, vec3(1, 0, 0.0101), 'Red -> Magenta');
+	test1cx(359, vec3(1, 0, 0.0101), 'Magenta < Red');
 	console.log();
 
 	test1cx(360, vec3(1, 0, 0), 'Red 1 0 0');
 }
 
-//if ( 'object' == typeof module)
-//	testCxToColorGlsl();
+// uncomment this to run test under node, then $ node cxToColor.glsl.mjs
+if ( 'object' == typeof module)
+	testCxToColorGlsl();

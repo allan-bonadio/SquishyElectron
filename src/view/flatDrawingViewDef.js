@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** flatDrawingViewDef -- Main drawer for 2d image of 1d space
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
