@@ -6,14 +6,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import './ControlPanel.css';
+import './ControlPanel.scss';
 import CPToolbar from './CPToolbar';
 import SetWaveTab from './SetWaveTab';
 import SetPotentialTab from './SetPotentialTab';
 import SetResolutionTab from './SetResolutionTab';
 // eslint-disable-next-line no-unused-vars
 
-//import qe from '../wave/qe';
+import qe from '../wave/qe';
 
 //import {setWave, setPotential} from './wave/theWave';
 
@@ -59,11 +59,15 @@ export class ControlPanel extends React.Component {
 
 			// slider for dt
 			dt: .001,
+			stepsPerIteration: 100,
 		};
+
+		this.setIterateFrequency = this.setIterateFrequency.bind(this);
+		this.setDt = this.setDt.bind(this);
+		this.setStepsPerIteration = this.setStepsPerIteration.bind(this);
 	}
 
-	/* *********************************** start and stop buttons */
-
+	/* *********************************** params */
 
 	// set rate, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
 	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
@@ -71,6 +75,16 @@ export class ControlPanel extends React.Component {
 		this.props.setIterateFrequency(freq);
 	}
 
+
+	setDt(dt) {
+		this.setState({dt});
+		qe.qSpace_setDt(dt);
+	}
+
+	setStepsPerIteration(stepsPerIteration) {
+		this.setState({stepsPerIteration});
+		qe.qSpace_setStepsPerIteration(stepsPerIteration);
+	}
 
 	/* ********************************************** wave & pot */
 
@@ -139,10 +153,12 @@ export class ControlPanel extends React.Component {
 				singleStep={p.singleStep}
 
 				iterateFrequency={p.iterateFrequency}
-				setIterateFrequency={freq => this.setIterateFrequency(freq)}
+				setIterateFrequency={this.setIterateFrequency}
 
 				dt={s.dt}
-				setDt={dt => this.setState({dt})}
+				setDt={this.setDt}
+				stepsPerIteration={s.stepsPerIteration}
+				setStepsPerIteration={this.setStepsPerIteration}
 			/>
 			<div className='cpSecondRow'>
 				<ul className='TabBar' >

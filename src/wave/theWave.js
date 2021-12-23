@@ -53,7 +53,7 @@ export function createSpaceNWave(N, continuum, callback) {
 // 		console.time('one iteration & draw');
 // 		try {
 // 			if (useQuantumEngine) {
-// 				qe.qSpace_oneIntegrationStep();
+// 				qe.qSpace_oneIterationStep();
 // 			}
 // 			else {
 // 				iterate(theJWave);
@@ -90,7 +90,7 @@ export function createSpaceNWave(N, continuum, callback) {
 //
 // 	// could be slow.  sometime in the future.
 // 	if (areBenchmarking) startRK = performance.now();
-// 	qe.qSpace_oneIntegrationStep();
+// 	qe.qSpace_oneIterationStep();
 // 	qe.updateTheSpaceToLatestWaveBuffer();
 //
 // 	if (areBenchmarking) startUpdate = performance.now();

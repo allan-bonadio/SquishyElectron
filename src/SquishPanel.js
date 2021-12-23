@@ -190,7 +190,7 @@ export class SquishPanel extends React.Component {
 		this.startIntegrate = performance.now();
 
 		// (actually many visscher steps)
-		qe.qSpace_oneIntegrationStep();
+		qe.qSpace_oneIterationStep();
 
 		this.startUpdate = performance.now();
 		qe.updateTheSpaceToLatestWaveBuffer();

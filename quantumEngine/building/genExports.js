@@ -38,16 +38,21 @@ exportsSrc  = [
 	{name: 'qSpace_setZeroPotential', retType: 'number', args: []},
 	{name: 'qSpace_setValleyPotential', retType: 'number', args: ['number', 'number', 'number']},
 
+	// params
+	{name: 'qSpace_setDt', retType: null, args: ['number']},
+	{name: 'qSpace_setStepsPerIteration', retType: null, args: ['number']},
+
 	// theWave and theQWave is what these act upon
 	{name: 'qWave_setCircularWave', retType: 'number', args: ['number']},
 	{name: 'qWave_setStandingWave', retType: 'number', args: ['number']},
 	{name: 'qWave_setPulseWave', retType: 'number', args: ['number', 'number', 'number']},
 	{name: 'qWave_dumpWave', retType: 'number', args: ['string']},
 
-	{name: 'qSpace_oneIntegrationStep', retType: 'number', args: []},
+	{name: 'qSpace_oneIterationStep', retType: 'number', args: []},
 
 	// views
 	{name: 'refreshViewBuffer', retType: 'number', args: []},
+
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():

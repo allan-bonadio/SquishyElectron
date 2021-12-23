@@ -90,7 +90,17 @@ void qSpace_setValleyPotential(qReal power, qReal scale, qReal offset) {
 	theSpace->setValleyPotential(power, scale, offset);
 }
 
-void qSpace_oneIntegrationStep(void) { theSpace->oneIntegrationStep(); }
+void qSpace_setDt(double dt) {
+	theSpace->dt = dt;
+}
+
+// iterations are what the user sees.  steps are what Visscher does repeatedly.
+void qSpace_setStepsPerIteration(double stepsPerIteration) {
+	theSpace->stepsPerIteration = stepsPerIteration;
+
+}
+
+void qSpace_oneIterationStep(void) { theSpace->oneIterationStep(); }
 
 
 /* ******************************************************** space creation from JS */
@@ -103,30 +113,6 @@ qSpace *startNewSpace(void) {
 
 	if (theSpace) {
 		freeWaves();
-//		printf("about to delete theQWave:\n");
-//		delete theQWave;
-//		printf("about to delete peruQWave:\n");
-//		delete peruQWave;
-//		printf("about to delete egyptQWave:\n");
-//		delete egyptQWave;
-//		printf("about to delete laosQWave:\n");
-//		delete laosQWave;
-//		printf("about to delete k1QWave:\n");
-//		delete k1QWave;
-//		printf("about to delete k2QWave:\n");
-//		delete k2QWave;
-//		printf("about to delete k3QWave:\n");
-//		delete k3QWave;
-//		printf("about to delete k4QWave:\n");
-//		delete k4QWave;
-//
-//		printf("about to delete thePotential:\n");
-//		delete[] thePotential;
-//		printf("about to delete viewBuffer:\n");
-//		delete theQViewBuffer;
-//		printf("about to delete theSpace:\n");
-//		delete theSpace;
-//		printf("done deleting.\n");
 	}
 	theSpace = new qSpace(1);
 	//printf("  done startNewSpace()\n");
