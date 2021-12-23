@@ -18,6 +18,8 @@ function setPT() {
 
 		dt: PropTypes.number.isRequired,
 		setDt: PropTypes.func.isRequired,
+		dt: PropTypes.number.isRequired,
+		setDt: PropTypes.func.isRequired,
 	};
 }
 
@@ -81,7 +83,6 @@ function CPToolbar(props) {
 
 		<LogSlider
 			className='dtSlider'
-			ctrlClassName='dtSlider'
 			label='dt'
 			minLabel='.0001'
 			maxLabel='1.0'
@@ -89,13 +90,30 @@ function CPToolbar(props) {
 			current={props.dt}
 			sliderMin={.0001}
 			sliderMax={1}
-			stepsPerDecade={2}
+			stepsPerDecade={6}
 
 			handleChange={(power, ix) => {
-				console.info(`handleChange::  ix=${ix}  power=${power}`);
+				console.info(`handleChange dt::  ix=${ix}  power=${power}`);
 				props.setDt(power);
 			}}
 		/>
+		<LogSlider
+			className='stepsPerIterationSlider'
+			label='stepsPerIteration'
+			minLabel='1'
+			maxLabel='1000'
+
+			current={props.stepsPerIteration}
+			sliderMin={1}
+			sliderMax={1000}
+			stepsPerDecade={3}
+
+			handleChange={(power, ix) => {
+				console.info(`handleChange stepsPerIteration::  ix=${ix}  power=${power}`);
+				props.setStepsPerIteration(power);
+			}}
+		/>
+
 
 
 	</div>;
