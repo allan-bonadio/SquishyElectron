@@ -4,6 +4,7 @@
 */
 
 import PropTypes from 'prop-types';
+import LogSlider from '../LogSlider';
 
 function setPT() {
 	CPToolbar.propTypes = {
@@ -14,6 +15,9 @@ function setPT() {
 
 		iterateFrequency: PropTypes.number.isRequired,
 		setIterateFrequency: PropTypes.func.isRequired,
+
+		dt: PropTypes.number.isRequired,
+		setDt: PropTypes.func.isRequired,
 	};
 }
 
@@ -26,8 +30,8 @@ function CPToolbar(props) {
 		<option key='30' value='30'>30 per sec</option>
 		<option key='20' value='20'>20 per sec</option>
 		<option key='10' value='10'>10 per sec</option>
-		<option key='7' value='7'>7 per sec</option>
-		<option key='5' value='5'>5 per sec</option>
+		<option key='8' value='8'>8 per sec</option>
+		<option key='6' value='6'>6 per sec</option>
 		<option key='4' value='4'>4 per sec</option>
 		<option key='3' value='3'>3 per sec</option>
 		<option key='2' value='2'>2 per sec</option>
@@ -75,6 +79,23 @@ function CPToolbar(props) {
 		</button>
 
 
+		<LogSlider
+			className='dtSlider'
+			ctrlClassName='dtSlider'
+			label='dt'
+			minLabel='.0001'
+			maxLabel='1.0'
+
+			current={props.dt}
+			sliderMin={.0001}
+			sliderMax={1}
+			stepsPerDecade={2}
+
+			handleChange={(power, ix) => {
+				console.info(`handleChange::  ix=${ix}  power=${power}`);
+				props.setDt(power);
+			}}
+		/>
 
 
 	</div>;

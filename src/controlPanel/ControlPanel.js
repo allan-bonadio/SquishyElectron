@@ -56,6 +56,9 @@ export class ControlPanel extends React.Component {
 			valleyOffset: 50,
 
 			showingTab: 'wave',
+
+			// slider for dt
+			dt: .001,
 		};
 	}
 
@@ -127,29 +130,6 @@ export class ControlPanel extends React.Component {
 		const s = this.state;
 
 		let showingTabHtml = this.createShowingTab();
-// 		let showingTab = '';
-// 		if (s.showingTab == 'wave') {
-// 			showingTab = <SetWaveTab
-// 				setWave={p.setWave}
-//
-// 				circularFrequency={+s.circularFrequency}
-// 				setCircularFrequency={freq => this.setState({circularFrequency: freq})}
-// 				pulseWidth={+s.pulseWidth}
-// 				setPulseWidth={wid =>this.setState({pulseWidth: wid})}
-// 				pulseOffset={+s.pulseOffset}
-// 				setPulseOffset={off => this.setState({pulseOffset: off})}
-// 				waveBreed={s.waveBreed}
-// 				setBreed={br => this.setState({waveBreed: br})}
-// 			/>;
-// 		}
-// 		else if (s.showingTab == 'potential') {
-// 			showingTab = <SetPotentialTab setPotential={p.setPotential}
-// 					setCPState={obj => this.setState(obj)} waveBreed={s.potentialBreed}
-// 					valleyPower={s.valleyPower} valleyScale={s.valleyScale} valleyOffset={s.valleyOffset} />
-// 		}
-// 		else if (s.showingTab == 'resolution') {
-// 			showingTab = <SetResolutionTab openResolutionDialog={p.openResolutionDialog} />
-// 		}
 
 		return <div className='ControlPanel'>
 			<CPToolbar
@@ -157,8 +137,12 @@ export class ControlPanel extends React.Component {
 				startIterating={p.startIterating}
 				stopIterating={p.stopIterating}
 				singleStep={p.singleStep}
+
 				iterateFrequency={p.iterateFrequency}
 				setIterateFrequency={freq => this.setIterateFrequency(freq)}
+
+				dt={s.dt}
+				setDt={dt => this.setState({dt})}
 			/>
 			<div className='cpSecondRow'>
 				<ul className='TabBar' >

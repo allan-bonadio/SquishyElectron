@@ -15,6 +15,23 @@
 	flex: 0 0 10em;
 }
 
+/* **************************************** all log sliders */
+
+/* make the overall any width you want. */
+.LogSlider {
+	padding: .2em;
+}
+
+.LogSlider aside {
+	display: flex;
+}
+
+.LogSlider input[type=range] {
+	background-color: #48f;
+	color: #fc4
+}
+
+
 /* **************************************** toolbar buttons */
 .CPToolbar {
 	float: none;
@@ -57,25 +74,6 @@
 	width: 4em;
 }
 
-/* **************************************** general controls */
-
-
-input {
-	background-color: #222;
-	color: #eee;
-}
-
-.MiniGraph {
-	border: 1px solid #888;
-}
-
-/* **************************************** run/stop buttons */
-
-.setRunningButtons {
-	width: 10em;
-	margin-top: 1em;
-	flex: 0 0 3em;
-}
 
 .goButton, .stopButton {
 	display: block;
@@ -119,6 +117,35 @@ button.stopButton.on {
 button.stopButton div {
 	position: relative;
 	top: .125em
+}
+
+/* **************************************** sliders */
+
+.CPToolbar .dtSlider {
+	width: 24em;
+	float: left;
+	padding: .2em .5em .2em 2em;
+}
+
+.CPToolbar .dtSlider input[type=range] {
+}
+
+/* **************************************** general controls */
+
+
+input {
+	background-color: #222;
+	color: #eee;
+}
+
+input[type=range] {
+	width: 12em;
+	background-color: #4cf;
+	color: #fc4
+}
+
+.MiniGraph {
+	border: 1px solid #888;
 }
 
 /* **************************************** Tab bar & Tabs */
