@@ -1,7 +1,7 @@
 # makefile for quantum engine
 xxxSOURCES = $(shell echo *.h *.cpp) building/exports.json
 
-quantumEngine.js : *.h *.cpp building/exports.json building/buildDev.sh
+quantumEngine.js : *.h *.cpp building/exports.json building/buildDev.sh building/allCpp.list
 	building/buildDev.sh
 
 building/exports.json : building/genExports.js
