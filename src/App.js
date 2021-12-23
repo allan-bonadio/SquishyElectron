@@ -4,7 +4,7 @@
 */
 
 import React from 'react';
-import './App.css';
+import './App.scss';
 
 import SquishPanel from './SquishPanel';
 import CommonDialog from './CommonDialog';

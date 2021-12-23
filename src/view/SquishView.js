@@ -7,7 +7,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {thousands} from '../utils';
 import qe from '../wave/qe';
-import './view.css';
+import './view.scss';
 //import abstractViewDef from './abstractViewDef';
 //import SquishPanel, {listOfViewClasses} from '../SquishPanel';
 

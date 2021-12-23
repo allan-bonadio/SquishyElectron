@@ -79,12 +79,12 @@
       "react-app/jest"
     ],
     "rules": {
-        "eqeqeq": 0,
-        "no-throw-literal": 0,
-        "default-case": 0,
-        "no-self-assign": 0,
-        "no-mixed-operators": 0,
-        "no-new-func": 0
+      "eqeqeq": 0,
+      "no-throw-literal": 0,
+      "default-case": 0,
+      "no-self-assign": 0,
+      "no-mixed-operators": 0,
+      "no-new-func": 0
     }
   },
   "browserslist": {
@@ -155,5 +155,8 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "sass": "^1.45.1"
   }
 }
