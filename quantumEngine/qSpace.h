@@ -96,6 +96,7 @@ public:
 	qReal dt;
 	qCx dtOverI;
 	qCx halfDtOverI;
+	qReal stepsPerIteration;
 
 	int bufferNum;
 
@@ -124,7 +125,7 @@ public:
 	void setZeroPotential(void);
 	void setValleyPotential(qReal power, qReal scale, qReal offset);
 
-	void oneIntegrationStep(void);
+	void oneIterationStep(void);
 	void oneRk2Step(qWave *oldQWave, qWave *newQWave);  // obsolete
 	void oneRk4Step(qWave *oldQWave, qWave *newQWave);  // obsolete
 	void oneVisscherStep(qWave *oldQWave, qWave *newQWave);  // obsolete
@@ -151,7 +152,7 @@ extern "C" {
 	qReal qSpace_getElapsedTime(void);
 	qReal qSpace_getIterateSerial(void);
 
-	void qSpace_oneIntegrationStep(void);
+	void qSpace_oneIterationStep(void);
 
 
 	int manyRk2Steps(void);

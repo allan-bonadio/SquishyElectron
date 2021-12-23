@@ -143,18 +143,19 @@ void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset =
 
 /* ********************************************************** integration */
 
-#define REP_RATE   10
-
-// does several visscher steps, we'll call that one 'integration' step
-void qSpace::oneIntegrationStep() {
+// does several visscher steps, we'll call that one 'iteration'
+void qSpace::oneIterationStep() {
 	int ix;
 
-	for (ix = 0; ix < REP_RATE; ix++) {
+	int steps = stepsPerIteration / 2;
+	for (ix = 0; ix < steps; ix++) {
 		this->oneVisscherStep(laosQWave, peruQWave);
 		this->oneVisscherStep(peruQWave, laosQWave);
 	}
 
-	// printf("qSpace::oneIntegrationStep(): viewBuffer %ld and latestWave=%ld\n",
+	this->iterateSerial++;
+
+	// printf("qSpace::oneIterationStep(): viewBuffer %ld and latestWave=%ld\n",
 	// 	(long) viewBuffer, (long) latestWave);
 	this->latestQWave = laosQWave;
 	//theQViewBuffer->loadViewBuffer(laosQWave);
