@@ -9,11 +9,8 @@
 #include "qSpace.h"
 #include "qWave.h"
 
-static bool debug = true;
-//bool debug = false;
 
-
-static bool debugVisscher = true;
+static bool debugVisscher = false;
 static bool debugHalfway = false;  // confusing, not reccommended
 
 /*
@@ -144,7 +141,6 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 	// imaginary is at elapsedTime + dt/2.  Yes the re and the im are not synchronized.
 	// it was Visscher's idea.  I think he got it from someone else.
 	this->elapsedTime += dt;
-	this->iterateSerial++;
 
 	if (debugVisscher) {
 		char atVisscher[100];
