@@ -64,17 +64,19 @@ function testPowers() {
 }
 testPowers();
 
+// save this for hwen i put ticks on the log slider
 // give me an array of JUST the even powers of 10 between the min and max, inclusive
 // The indices.  wait, this doesn't work... trana get where the tic marks are
-function createGoodPowersOf10(spd, iMin, iMax) {
-	let po10 = [];
-	for (let p = iMin; p <= iMax; p += spd) {
-		po10.push(<option key={p}>{p}</option>);
-//		po10.push(<option>{p + 3}</option>);
-//		po10.push(<option>{p + 7}</option>);
-	}
-	return po10;
-}
+// function createGoodPowersOf10(spd, iMin, iMax) {
+// 	let po10 = [];
+//		// no this is wrong it'll make factors of 10 starting at the min; should start at a power of 10
+// 	for (let p = iMin; p <= iMax; p += spd) {
+// 		po10.push(<option key={p}>{p}</option>);
+// //		po10.push(<option>{p + 3}</option>);
+// //		po10.push(<option>{p + 7}</option>);
+// 	}
+// 	return po10;
+// }
 
 
 // put spaces between triples of digits.  ALWAYS positive reals.
@@ -112,8 +114,7 @@ function thousands(n) {
 }
 
 function testThousands() {
-	let n, digz;
-	const digitz = 1.111111111**2;
+	let n;
 	for (n = 1e-6; n < 1e6; n *= 10) {
 		for (let f = 1; f < 10; f *= 1.4)
 			console.info(`  testThousands, progressive fractions: ${n*f} =>`, thousands(n * f));
