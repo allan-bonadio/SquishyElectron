@@ -4,7 +4,7 @@
 */
 
 import abstractViewDef from './abstractViewDef';
-import {cxToColorGlsl} from './cxToColor.glsl';
+import cxToColorGlsl from './cxToColor.glsl';
 import qe from '../wave/qe';
 import {viewUniform, viewAttribute} from './viewVariable';
 

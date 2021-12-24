@@ -4,7 +4,7 @@
 */
 
 // line numbers should correspond!  Be careful how many lines this is!
-export const cxToColorGlsl = `
+const cxToColorGlsl = `
 float sqrtOneThird = sqrt(1. / 3.);  // 0.57735..
 float sqrtThreeOver2 = sqrt(3.) / 2.;  // .8660...
 
@@ -91,41 +91,50 @@ export default cxToColorGlsl;
 
 /* ************************************************* testing */
 
+const vec3 = function vec3(xx, yy, zz) { return {x: xx, y: yy, z: zz}}
+
 // you can test this in Node; just uncomment the bottom section and run it alone.
 
 // testing in JS/node.  so hokey.  This substitutes a few things to turn GLSL  into JS
-export function testCxToColorGlsl() {
+function testCxToColorGlsl() {
 	// we use homogenous 2d coords so we can do infinity (?)
-	const vec3 = function vec3(xx, yy, zz) { return {x: xx, y: yy, z: zz}}
 	let jsCxToColor;
 	const notClose = (a, b) => (Math.abs(a-b) > 5e-5);  // remember this is single floats
 
+	console.log(`                input         =  [re,im]      =>     (red, green, blue)\n`)
+
 	// test just one angle
-	function test1cx(angle, expected, shouldBe) {
+	function test1cx(angle, expected, label) {
 		let cx = {
 			x: Math.cos(angle * Math.PI / 180),
 			y: Math.sin(angle * Math.PI / 180),
 		}
 		const actual = jsCxToColor(cx);
-		console.log(`CxToColor(${angle} ${shouldBe})`+
+		console.log(`CxToColor: ${angle}° ${label})`+
 			` = [${cx.x.toFixed(4)},${cx.y.toFixed(4)}]`+
 			` => (${actual.x.toFixed(4)}, ${actual.y.toFixed(4)}, ${actual.z.toFixed(4)})`);
 		if (notClose(actual.x, expected.x)
 				|| notClose(actual.y, expected.y)
 				|| notClose(actual.z, expected.z)) {
-			console.error(`**** error in '${shouldBe}': `+
+			console.error(`**** error in '${label}': `+
 				`(${actual.x},${actual.y},${actual.z}) ≠ `+
 				`(${expected.x},${expected.y},${expected.z})`)
 		}
-		console.log();
+		//console.log();
 	}
 
 	// convert the code to JS, brutally
 	let jsCode = cxToColorGlsl.replace(/.*cxToColor.*$/m, '{');
 	//	console.log(`=========== jsCode 1 ======\n${jsCode}\n=====\n`);
+
 	jsCode = jsCode.replace(/float/g, 'let');
 	//jsCode = jsCode.replace(/vec2/g, '').replace(/vec3/, 'function');  // just the first ones
-	//	console.log(`=========== jsCode 2 =====\n${jsCode}\n======\n`);
+	//	console.log(`=========== jsCode float =====\n${jsCode}\n======\n`);
+
+	jsCode = jsCode.replace(/sqrt\(/g, 'Math.sqrt(');
+	//jsCode = jsCode.replace(/vec2/g, '').replace(/vec3/, 'function');  // just the first ones
+	//	console.log(`=========== jsCode Math.sqrt =====\n${jsCode}\n======\n`);
+
 	jsCxToColor = new Function('psi', jsCode);
 
 	// run some tests ... go around the circle, testing all crucial points
@@ -168,6 +177,7 @@ export function testCxToColorGlsl() {
 	test1cx(360, vec3(1, 0, 0), 'Red 1 0 0');
 }
 
-// uncomment this to run test under node, then $ node cxToColor.glsl.mjs
+// uncomment this to run test under node, then run like this:
+// $ sed s/export.*$// cxToColor.glsl.js | node
 if ( 'object' == typeof module)
 	testCxToColorGlsl();
