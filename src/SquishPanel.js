@@ -80,7 +80,12 @@ export class SquishPanel extends React.Component {
 			viewClassName: DEFAULT_VIEW_CLASS_NAME,
 
 			// the qeSpace
-			space: null,
+			space: null,  // set in setNew1DResolution()
+			// space: new qeSpace([{
+			// 	N: DEFAULT_RESOLUTION,
+			// 	continuum: qeSpace.contENDLESS,
+			// 	label: 'x', coord: 'x'
+			// }]),
 
 			// see the view dir
 			currentView: null,
@@ -112,6 +117,12 @@ export class SquishPanel extends React.Component {
 
 		this.animateHeartbeat = this.animateHeartbeat.bind(this);  // so we can pass it as a callback
 
+		this.setWave = this.setWave.bind(this);
+		this.setPotential = this.setPotential.bind(this);
+		this.startIterating = this.startIterating.bind(this);
+		this.stopIterating = this.stopIterating.bind(this);
+		this.singleStep = this.singleStep.bind(this);
+
 		console.log(`SquishPanel constructor done`);
 	}
 
@@ -134,7 +145,6 @@ export class SquishPanel extends React.Component {
 		qe.theCurrentView =  null;
 
 		qe.space = new qeSpace([{N, continuum, label: 'x'}]);
-		//createSpaceNWave(N, continuum, space => {
 
 		// now create the view class instance as described by the space
 		const vClass = listOfViewClassNames[viewClassName];
@@ -144,16 +154,12 @@ export class SquishPanel extends React.Component {
 		const currentView = new vClass('main view', this.canvas, qe.space);
 		currentView.completeView();
 
-		//this.elapsedTime = 0;
-		//this.iterateSerial = 0;
-
 		// we've now got a qeSpace etc all set up
 		this.setState({N, continuum, space: qe.space, currentView});
 		this.currentView = currentView;  // this set before the setState finishes
 
 		// kinda paranoid?  this should be deprecated.
 		qe.theCurrentView = currentView;
-		// 		});
 	}
 
 	// puts up the resolution dialog, starting with the values from this.state
@@ -345,28 +351,31 @@ export class SquishPanel extends React.Component {
 	}
 
 	// completely wipe out the ψ wavefunction and replace it with one of our canned waveforms.
-	// (but do not change N or anything in the state)
-	setWave(args) {
+	// (but do not change N or anything in the state)  Called upon setWave in wave tab
+	setWave(waveParams) {
 		qe.updateTheSpaceToLatestWaveBuffer();
+		qe.qewave.setFamiliarWave(waveParams);
 
-		switch (args.waveBreed) {
-		case 'circular':
-			qe.qewave.setCircularWave(args.circularFrequency);
-			break;
-
-		case 'standing':
-			qe.qewave.setStandingWave(args.circularFrequency);
-			break;
-
-		case 'pulse':
-			qe.qewave.setPulseWave(args.widthFactor, args.cycles)
-			break;
-
-		default:
-			throw `setWave: no waveBreed '${args.waveBreed}'`
-		}
+// 		switch (familiarParams.waveBreed) {
+// 		case 'circular':
+// 			qe.qewave.setCircularWave(familiarParams.frequency);
+// 			break;
+//
+// 		case 'standing':
+// 			qe.qewave.setStandingWave(familiarParams.frequency);
+// 			break;
+//
+// 		case 'pulse':
+// 			qe.qewave.setPulseWave(familiarParams.widthFactor, familiarParams.cycles)
+// 			break;
+//
+// 		default:
+// 			throw `setWave: no waveBreed '${args.waveBreed}'`
+// 		}
 	}
 
+	// completely wipe out the quantum potential and replace it with one of our canned waveforms.
+	// (but do not change N or anything in the state)  Called upon set potential in potential tab
 	setPotential(breed, arg1 = 1, arg2 = 1, arg3 = 0) {
 		switch (breed) {
 		case 'zero':
@@ -399,7 +408,7 @@ export class SquishPanel extends React.Component {
 	componentDidMount() {
 		// upon startup, after C++ says it's ready, but remember constructor runs twice
 		qeStartPromise.then((arg) => {
-			qeDefineAccess();
+			// done in qEngine qeDefineAccess();
 
 			this.setNew1DResolution(
 				DEFAULT_RESOLUTION, DEFAULT_CONTINUUM, DEFAULT_VIEW_CLASS_NAME);
@@ -421,6 +430,7 @@ export class SquishPanel extends React.Component {
 
 	render() {
 		const s = this.state;
+
 		return (
 			<div className="SquishPanel">
 				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
@@ -431,11 +441,12 @@ export class SquishPanel extends React.Component {
 					startIterating={() => this.startIterating()}
 					stopIterating={() => this.stopIterating()}
 					singleStep={() => this.singleStep()}
-					setWave={args => this.setWave(args)}
-					setPotential={(breed, power, scale, offset) => this.setPotential(breed, power, scale, offset)}
+					setWave={this.setWave}
+					setPotential={this.setPotential}
 					iterateFrequency={1000 / s.iteratePeriod}
 					setIterateFrequency={freq => this.setIterateFrequency(freq)}
 					openResolutionDialog={() => this.openResolutionDialog()}
+					space={s.space}
 				/>
 			</div>
 		);

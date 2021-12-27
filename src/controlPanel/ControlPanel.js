@@ -11,7 +11,7 @@ import CPToolbar from './CPToolbar';
 import SetWaveTab from './SetWaveTab';
 import SetPotentialTab from './SetPotentialTab';
 import SetResolutionTab from './SetResolutionTab';
-// eslint-disable-next-line no-unused-vars
+import qeSpace from '../wave/qeSpace';
 
 import qe from '../wave/qe';
 
@@ -35,6 +35,9 @@ export class ControlPanel extends React.Component {
 
 		iterateFrequency: PropTypes.number.isRequired,  // frames per second
 		setIterateFrequency: PropTypes.func.isRequired,
+
+		// early on, there's no space.  Must have SquishPanel mounted first.
+		space: PropTypes.instanceOf(qeSpace),
 	};
 
 	constructor(props) {
@@ -43,11 +46,11 @@ export class ControlPanel extends React.Component {
 		// most of the state is really kept in the SquishPanel
 		this.state = {
 			// state for the wave resets - these are control-panel only.
-			// Only goes into effect if we call setWave()
+			// waveParams - Only goes into effect if we call setWave()
 			waveBreed: 'circular',
-			circularFrequency: 1,
-			pulseWidth: .05,
-			pulseOffset: .05,
+			waveFrequency: 1,
+			stdDev: 10,
+			pulseOffset: 20,
 
 			// state for potential resets - control panel only, setPotential()
 			potentialBreed: 'flat',
@@ -65,6 +68,7 @@ export class ControlPanel extends React.Component {
 		this.setIterateFrequency = this.setIterateFrequency.bind(this);
 		this.setDt = this.setDt.bind(this);
 		this.setStepsPerIteration = this.setStepsPerIteration.bind(this);
+		this.setCPState = this.setCPState.bind(this);
 	}
 
 	/* *********************************** params */
@@ -92,12 +96,14 @@ export class ControlPanel extends React.Component {
 		this.setState({pulseOffset});
 	}
 
+	// used to set any familiarParam value, pass eg {stdDev: 40}
 	setCPState(obj) {
 		this.setState(obj);
 	}
 
 	/* ********************************************** render  pieces */
 
+	// whichever tab is showing right now
 	createShowingTab() {
 		const p = this.props;
 		const s = this.state;
@@ -108,23 +114,21 @@ export class ControlPanel extends React.Component {
 			// function with no args that'll call theother one
 			return <SetWaveTab
 				setWave={() => p.setWave(s)}
-				circularFrequency={+s.circularFrequency}
-				setCircularFrequency={freq => this.setState({circularFrequency: freq})}
-				pulseWidth={+s.pulseWidth}
-				setPulseWidth={wid =>this.setState({pulseWidth: wid})}
-				pulseOffset={+s.pulseOffset}
-				setPulseOffset={off => this.setState({pulseOffset: off})}
-				waveBreed={s.waveBreed}
-				setBreed={br => this.setState({waveBreed: br})}
+				waveParams={{waveBreed: s.waveBreed, waveFrequency: s.waveFrequency,
+					stdDev: s.stdDev, pulseOffset: s.pulseOffset,}}
+
+				setCPState={this.setCPState}
+				space={p.space}
 			/>;
 
 		case 'potential':
 			return <SetPotentialTab setPotential={p.setPotential}
-				setCPState={obj => this.setState(obj)}
+				setCPState={this.setCPState}
 				waveBreed={s.potentialBreed}
 				valleyPower={s.valleyPower}
 				valleyScale={s.valleyScale}
 				valleyOffset={s.valleyOffset}
+				space={s.space}
 			/>;
 
 
@@ -142,6 +146,9 @@ export class ControlPanel extends React.Component {
 	render() {
 		const p = this.props;
 		const s = this.state;
+
+		// before the mount event on SquishPanel
+		if (!p.space) return '';
 
 		let showingTabHtml = this.createShowingTab();
 
@@ -162,11 +169,11 @@ export class ControlPanel extends React.Component {
 			/>
 			<div className='cpSecondRow'>
 				<ul className='TabBar' >
-					<li className={s.showingTab == 'wave' ? 'selected' : ''}
+					<li className={s.showingTab == 'wave' ? 'selected' : ''} key='wave'
 						onClick={ev => this.setState({showingTab: 'wave'})}>Wave</li>
-					<li  className={s.showingTab == 'potential' ? 'selected' : ''}
+					<li  className={s.showingTab == 'potential' ? 'selected' : ''} key='potential'
 						onClick={ev => this.setState({showingTab: 'potential'})}>Potential</li>
-					<li  className={s.showingTab == 'resolution' ? 'selected' : ''}
+					<li  className={s.showingTab == 'resolution' ? 'selected' : ''} key='resolution'
 						onClick={ev => this.setState({showingTab: 'resolution'})}>Universe</li>
 				</ul>
 				<div className='tabFrame'>
