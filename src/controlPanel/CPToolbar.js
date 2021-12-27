@@ -18,8 +18,8 @@ function setPT() {
 
 		dt: PropTypes.number.isRequired,
 		setDt: PropTypes.func.isRequired,
-		dt: PropTypes.number.isRequired,
-		setDt: PropTypes.func.isRequired,
+		stepsPerIteration: PropTypes.number.isRequired,
+		setStepsPerIteration: PropTypes.func.isRequired,
 	};
 }
 
