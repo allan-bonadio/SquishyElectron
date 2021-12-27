@@ -141,35 +141,37 @@
 
 /* **************************************** Tab bar & Tabs */
 
-/* the bar */
+/* the vertical bar on the left */
 ul.TabBar {
 	margin: 0;
 	padding: 0;
 	position: absolute;
 	z-index: 10;
 	position: relative;
+	cursor: pointer;
+
+	/* a tab button */
+	li {
+		list-style: none;
+		display: block;
+		border: outset #abc 2px;
+		border-radius: .5em 0 0 .5em;
+		padding: .2em .5em .2em 2em;
+		width: 7em;
+		margin: 0 0 .2em .5em;
+		text-align: right;
+	}
+
+	li.selected {
+		background-color: #eef;
+		color: #222;
+		border-style: inset;
+		border-color: #abc;
+		border-right: solid #eef 2px;
+		width: 7.2em;
+	}
 }
 
-/* a tab button */
-ul.TabBar li {
-	list-style: none;
-	display: block;
-	border: outset #abc 2px;
-	border-radius: .5em 0 0 .5em;
-	padding: .2em .5em .2em 2em;
-	width: 7em;
-	margin: 0 0 .2em .5em;
-	text-align: right;
-}
-
-ul.TabBar li.selected {
-	background-color: #eef;
-	color: #222;
-	border-style: inset;
-	border-color: #abc;
-	border-right: solid #eef 2px;
-	width: 7.2em;
-}
 
 .tabFrame {
 	border: inset #abc 2px;
