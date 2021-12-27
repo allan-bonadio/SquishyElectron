@@ -7,7 +7,8 @@ import qe from './qe';
 
 // call like this:
 // new qeSpace([{N: 100, continuum: qeSpace.contENDLESS, label: 'x', coord: 'x'}])
-// labels must be unique.
+// labels must be unique.  Modeled after qSpace in C++,
+// does all dimensions in constructor, at least.
 // Coords are the same if two dims are parallel, eg two particles with x coords.
 // Not the same if one particle with x and y coords; eg you could have an endless canal.
 export class qeSpace {
@@ -58,6 +59,22 @@ export class qeSpace {
 		//console.log(`qeSpace viewBuffer:`, this.viewBuffer);
 	}
 
+	// call it like this: const {start, end, N, continuum} = space.startEnd;
+	get startEnd() {
+		const dim = this.dimensions[0];
+		return {start: dim.start, end: dim.end, N: dim.N, nPoints: this.nPoints,
+			continuum: dim.continuum};
+	}
+
+	// this will return the DOUBLE of start and end so you can just loop thru += 2
+	// but NOT N, it passes thru
+	get startEnd2() {
+		const dim = this.dimensions[0];
+		return {start: dim.start*2, end: dim.end*2, N: dim.N, nPoints: this.nPoints * 2,
+			continuum: dim.continuum};
+	}
+
+	// see also dumpThatWave() method defined in qeWave
 }
 
 
