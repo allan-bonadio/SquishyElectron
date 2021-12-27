@@ -20,7 +20,7 @@ export class abstractViewDef {
 		this.viewVariables = [];
 
 		this.viewName = viewName;
-		if (! canvas) throw `abstractViewDef: being created without canvas`;
+		if (! canvas) throw new Error(`abstractViewDef: being created without canvas`);
 		this.canvas = canvas;
 		this.initCanvas();
 

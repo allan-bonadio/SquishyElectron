@@ -42,27 +42,27 @@ function powerToIndex(spd, power) {
 	return Math.round(Math.log10(power) * spd);
 }
 
-function testPowers() {
-	for (let spdStr in stepsPerDecadeFactors) {
-		const spd = +spdStr;
-		let factors = stepsPerDecadeFactors[spd];
-		console.info(`spd: ${spd}  factors:`, factors.map(f => f.toFixed(2)).join(', ') );
-
-		for (let offset = -6; offset < 6; offset += spd) {
-			let totalOffset = spd*offset;
-			factors.forEach((factor, ixNear) => {
-				let ix = ixNear + totalOffset;
-				let power = indexToPower(false, factors, spd, ix);
-				let ixBack = powerToIndex(spd, power);
-				console.info(`   ${ix} ➡︎ ${power} ➡ ${ixBack}`);
-				if (ix != ixBack)
-					console.error(`  ix:${ix} ≠ ixBack:${ixBack}`);
-			})
-		}
-
-	}
-}
-testPowers();
+// function testPowers() {
+// 	for (let spdStr in stepsPerDecadeFactors) {
+// 		const spd = +spdStr;
+// 		let factors = stepsPerDecadeFactors[spd];
+// 		console.info(`spd: ${spd}  factors:`, factors.map(f => f.toFixed(2)).join(', ') );
+//
+// 		for (let offset = -6; offset < 6; offset += spd) {
+// 			let totalOffset = spd*offset;
+// 			factors.forEach((factor, ixNear) => {
+// 				let ix = ixNear + totalOffset;
+// 				let power = indexToPower(false, factors, spd, ix);
+// 				let ixBack = powerToIndex(spd, power);
+// 				console.info(`   ${ix} ➡︎ ${power} ➡ ${ixBack}`);
+// 				if (ix != ixBack)
+// 					console.error(`  ix:${ix} ≠ ixBack:${ixBack}`);
+// 			})
+// 		}
+//
+// 	}
+// }
+//testPowers();
 
 // save this for hwen i put ticks on the log slider
 // give me an array of JUST the even powers of 10 between the min and max, inclusive
@@ -113,15 +113,15 @@ function thousands(n) {
 	return intPart + fracPart;
 }
 
-function testThousands() {
-	let n;
-	for (n = 1e-6; n < 1e6; n *= 10) {
-		for (let f = 1; f < 10; f *= 1.4)
-			console.info(`  testThousands, progressive fractions: ${n*f} =>`, thousands(n * f));
-		console.log();
-	}
-}
-testThousands();
+// function testThousands() {
+// 	let n;
+// 	for (n = 1e-6; n < 1e6; n *= 10) {
+// 		for (let f = 1; f < 10; f *= 1.4)
+// 			console.info(`  testThousands, progressive fractions: ${n*f} =>`, thousands(n * f));
+// 		console.log();
+// 	}
+// }
+//testThousands();
 
 /* ****************************************************************** component */
 function setPT() {

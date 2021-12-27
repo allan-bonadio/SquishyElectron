@@ -6,6 +6,7 @@
 import PropTypes from 'prop-types';
 
 import MiniGraph from './MiniGraph';
+import qeSpace from '../wave/qeSpace';
 
 function setPT() {
 	SetPotentialTab.propTypes = {

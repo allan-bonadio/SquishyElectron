@@ -150,10 +150,12 @@ qSpace *completeNewSpace(void) {
 
 	// finish up all the dimensions now that we know them all
 	theSpace->initSpace();
+	printf("did initSpace\n");
 
 
 	/* ******************************************************** finish, like, everything */
 	allocWaves();
+	printf("did allocWaves\n");
 
 //printf(" got past allocWaves()\n");
 	theQViewBuffer = new qViewBuffer(theSpace);

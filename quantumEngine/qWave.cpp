@@ -370,7 +370,7 @@ void qWave::setCircularWave(qReal n) {
 		angle = dAngle * (ix - start);
 		wave[ix] = qCx(cos(angle), sin(angle + vGap));
 	}
-	this->space->dumpThatWave(wave, true);
+	//this->space->dumpThatWave(wave, true);
 	//printf("wave, freshly generated, before halfstep");
 	this->fixBoundaries();
 	//this->dumpThatWave(wave, true);

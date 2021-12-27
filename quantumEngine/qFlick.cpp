@@ -117,8 +117,8 @@ void qFlick::dumpLatest(const char *titleIn, bool withExtras) {
 void qFlick::dumpAllWaves(const char *title) {
 	printf("==== FlickAll | %s\n", title);
 	for (int i = 0; i < this->nWaves; i++) {
-		printf("wave %d -- ", i);
-		this->dumpThatWave(this->waves[i], true);
+		//printf("wave %d -- ", i);
+		//this->dumpThatWave(this->waves[i], true);
 		//printf("      inner products: %lf\n", );
 	}
 	printf("==== FlickAll End ====\n");

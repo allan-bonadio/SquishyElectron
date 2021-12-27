@@ -61,7 +61,7 @@ and for now omit the potential
 void qSpace::stepReal(qCx *oldW, qCx *newW, double dt) {
 	qDimension *dims = this->dimensions;
 	printf("⚛️ start of stepReal");
-	this->dumpThatWave(oldW, true);
+	//this->dumpThatWave(oldW, true);
 	//printf("⚛︎ stepReal start N States=(%d), dt=%lf\n",
 	//	dims->nStates, dt);
 
