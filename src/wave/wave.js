@@ -78,7 +78,7 @@ export class jWave {
 
 	dump(title = 'a jWave') {
 		console.info(`${title} ==> ⟨ψ | ψ⟩ = `, this.innerProduct());
-		this.psi.forEach((p, ix) => console.info(`   ψ[${ix}]: ${p.real.toFixed(6)}\t${p.im.toFixed(6)}`));
+		this.psi.forEach((p, ix) => console.info(`   ψ[${ix}]: ${p.re.toFixed(6)}\t${p.im.toFixed(6)}`));
 	}
 
 	// just iterate over all.  ψ must be created already
@@ -129,7 +129,7 @@ export class jWave {
 	innerProduct() {
 		let tot = 0;  // always real
 		this.forEach(p => {
-			tot += p.real ** 2 + p.im ** 2;
+			tot += p.re ** 2 + p.im ** 2;
 		})
 		return tot;
 	}

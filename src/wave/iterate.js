@@ -15,7 +15,7 @@ const h2_2m = 1;
 //const dx = 1;
 
 function check(aCx) {
-		if (isNaN(aCx.real) || isNaN(aCx.im)) debugger;
+		if (isNaN(aCx.re) || isNaN(aCx.im)) debugger;
 }
 
 export function iterate(wave, dt = DEFAULT_DT) {
@@ -39,13 +39,13 @@ export function iterate(wave, dt = DEFAULT_DT) {
 			//its always 1 .multBy(1 / (dx * dx));
 		check(d2Psi_dx2_t0);
 
-		//console.log(`js ${ix}first d2=${d2Psi_dx2_t0.real.toFixed(6)}`+
+		//console.log(`js ${ix}first d2=${d2Psi_dx2_t0.re.toFixed(6)}`+
 		//` ${d2Psi_dx2_t0.im.toFixed(6)}`);////
 
 		// dPsi_dt_t0 = V[ix] * mainWave[ix] - h2_2m * d2Psi_dt2_t0_t0[ix];
 		let VPsi = mainWave[ix].multBy(V[ix]);
 		let dPsi_dt_t0 = VPsi.addTo(d2Psi_dx2_t0, -h2_2m);
-		//console.log(`js ${ix}first hamiltonian=${dPsi_dt_t0.real.toFixed(6)}`+
+		//console.log(`js ${ix}first hamiltonian=${dPsi_dt_t0.re.toFixed(6)}`+
 		//` ${dPsi_dt_t0.im.toFixed(6)}`);////
 		dPsi_dt_t0 = dPsi_dt_t0.multBy(qCx(0,-1));
 		check(dPsi_dt_t0);
@@ -60,7 +60,7 @@ export function iterate(wave, dt = DEFAULT_DT) {
 		//	console.info(`d𝜓/dt(t_0): `, dPsi_dt_t0);
 		//console.info(`𝜓(t_half): `, jWaveBuffers.alt);
 		//for (let ix = 0; ix <= N+1; ix++)
-		//console.log(`iterate ${ix}\t${jWaveBuffers.alt[ix].real.toFixed(6)}`+
+		//console.log(`iterate ${ix}\t${jWaveBuffers.alt[ix].re.toFixed(6)}`+
 		//`\t${jWaveBuffers.alt[ix].im.toFixed(6)}`);
 
 
@@ -72,14 +72,14 @@ export function iterate(wave, dt = DEFAULT_DT) {
 			.addTo(jWaveBuffers.alt[ix], -2)
 			// always 1 .multBy(1 / (dx * dx));
 		check(d2Psi_dx2_tHalf);
-		//console.log(`js ${ix}second d2=${d2Psi_dx2_tHalf.real.toFixed(6)}`+
+		//console.log(`js ${ix}second d2=${d2Psi_dx2_tHalf.re.toFixed(6)}`+
 		//` ${d2Psi_dx2_tHalf.im.toFixed(6)}`);////
 
 		// now calculate dPsi_dt_tHalf, the actual derivative halfway thru
 		let VPsi_half = jWaveBuffers.alt[ix].multBy(V[ix]);
 		let dPsi_dt_tHalf = VPsi_half.addTo(d2Psi_dx2_tHalf, -h2_2m);
 		check(dPsi_dt_tHalf);
-		//console.log(`js ${ix}second hamiltonian=${dPsi_dt_tHalf.real.toFixed(6)}`+
+		//console.log(`js ${ix}second hamiltonian=${dPsi_dt_tHalf.re.toFixed(6)}`+
 		//` ${dPsi_dt_tHalf.im.toFixed(6)}`);////
 		dPsi_dt_tHalf = dPsi_dt_tHalf.multBy(qCx(0,-1));
 		check(dPsi_dt_tHalf);
