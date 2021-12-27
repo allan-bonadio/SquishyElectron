@@ -5,7 +5,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {thousands} from '../utils';
+import {thousands} from '../widgets/utils';
 import qe from '../wave/qe';
 import './view.scss';
 //import abstractViewDef from './abstractViewDef';

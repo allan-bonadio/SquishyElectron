@@ -4,7 +4,7 @@
 */
 
 import PropTypes from 'prop-types';
-import LogSlider from '../LogSlider';
+import LogSlider from '../widgets/LogSlider';
 
 function setPT() {
 	CPToolbar.propTypes = {
