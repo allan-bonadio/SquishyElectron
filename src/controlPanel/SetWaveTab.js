@@ -5,7 +5,6 @@
 
 import PropTypes from 'prop-types';
 
-import qCx from '../wave/qCx';
 import MiniGraph from './MiniGraph';
 import qeSpace from '../wave/qeSpace';
 

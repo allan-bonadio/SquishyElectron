@@ -12,7 +12,7 @@ import ControlPanel from './controlPanel/ControlPanel';
 //import {createSpaceNWave} from './wave/theWave';
 // eslint-disable-next-line no-unused-vars
 import qeSpace from './wave/qeSpace';
-import {qeStartPromise, qeDefineAccess} from './wave/qEngine';
+import {qeStartPromise} from './wave/qEngine';
 import qe from './wave/qe';
 
 import SquishView from './view/SquishView';
@@ -46,8 +46,8 @@ const DEFAULT_VIEW_CLASS_NAME =
 'flatDrawingViewDef';
 
 //const DEFAULT_RESOLUTION = 100;
-const DEFAULT_RESOLUTION = 5;
-//const DEFAULT_RESOLUTION = 25;
+//const DEFAULT_RESOLUTION = 5;
+const DEFAULT_RESOLUTION = 25;
 //const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 25;
 const DEFAULT_CONTINUUM = qeSpace.contENDLESS;
 
