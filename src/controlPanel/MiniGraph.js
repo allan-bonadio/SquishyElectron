@@ -174,11 +174,6 @@ export class MiniGraph extends React.Component {
 		// these never change for the life of the component (?)
 		this.viewBox = `0 0 ${+p.width} ${+p.height * 0.9}`;
 
-		if (p.isWave)
-			this.waveRecipe(p.familiarParams);
-		else
-			this.potentialRecipe(p.familiarParams);
-
 	}
 
 
@@ -264,6 +259,11 @@ export class MiniGraph extends React.Component {
 		const {N} = this.space.startEnd;
 
 		// um... do something with maxY...
+
+		if (p.isWave)
+			this.waveRecipe(p.familiarParams);
+		else
+			this.potentialRecipe(p.familiarParams);
 
 		return <svg className={`MiniGraph ${p.className}`}
 							viewBox={this.viewBox}
