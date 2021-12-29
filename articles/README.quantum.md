@@ -166,10 +166,23 @@ logo|𝒆⟩2.png - original image, pink but darker
 logo|𝒆⟩3.png - latest, white
 
 
-next time, try 200px so there's more padding space
+next time, try 200px text so there's more padding space
 
 
---------------------------------------------------
+-------------------------------------------------- benchmarks
+
+---------------------- with 25 points, on firefox:
+stepsPerIteraction: 1000
+iteration calc time:     23.00ms
+update GL variables:     15.00ms
+total for iteration:  38.00ms
+
+stepsPerIteraction: 500
+iteration calc time:     41.00ms
+updateCounts:   0.00ms
+total for iteration:  41.00ms
+
+period:  67.00ms
 --------------------------------------------------
 --------------------------------------------------
 --------------------------------------------------
