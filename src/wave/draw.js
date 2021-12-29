@@ -79,7 +79,7 @@ class draw {
 	}
 
 	qeWellBars() {
-		qe.updateTheSpaceToLatestWaveBuffer();
+		qe.createQEWaveFromCBuf();
 
 		const N = qe.space.dimensions[0].N;
 		const bars = new Array(N);
