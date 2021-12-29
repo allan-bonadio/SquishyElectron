@@ -119,20 +119,6 @@ export class SquishPanel extends React.Component {
 		this.timeForNextTic = now + 10;  // default so we can get rolling
 		this.lastAniFrame = now;
 
-		this.animateHeartbeat = this.animateHeartbeat.bind(this);  // so we can pass it as a callback
-
-		this.setWave = this.setWave.bind(this);
-		this.setPotential = this.setPotential.bind(this);
-		this.startIterating = this.startIterating.bind(this);
-		this.stopIterating = this.stopIterating.bind(this);
-		this.singleStep = this.singleStep.bind(this);
-
-		this.setDt = this.setDt.bind(this);
-		this.setStepsPerIteration = this.setStepsPerIteration.bind(this);
-
-		this.startRunningOneCycle = this.startRunningOneCycle.bind(this);
-
-
 		console.log(`SquishPanel constructor done`);
 	}
 
@@ -299,36 +285,9 @@ export class SquishPanel extends React.Component {
 
 		requestAnimationFrame(this.animateHeartbeat);
 	}
+	animateHeartbeat = this.animateHeartbeat.bind(this);  // so we can pass it as a callback
 
 	/* ******************************************************* iterating & animating */
-
-	// start/stop or single step the animation (obsolete?)
-	// shouldAnimate falsy = stop it if running
-	// true = start it or continue it if running
-	// freq is how fast it goes, or 'one' to single step.
-	// I guess it's irrelevant now with requestAnimationFrame()
-// 	iterateAnimate(shouldAnimate, freq) {
-// 		debugger;  // see i tol ja
-// 		if (! shouldAnimate || ! freq || !qe.theCurrentView) {
-// 			//this.onceMore = false;
-// 			this.setState({isTimeAdvancing: false});
-// 			return;
-// 		}
-// 		if (freq == 'one') {
-// 			//this.onceMore = true;
-// 			this.setState({isTimeAdvancing: true});
-// 			return;
-// 		}
-//
-// 		//this.onceMore = false;
-// 		if (this.state.isTimeAdvancing)
-// 			return;  // its already doing it
-//
-// 		this.setState({isTimeAdvancing: true});
-//
-// 		this.animateHeartbeat(performance.now());
-// 	//	requestAnimationFrame(animateHeartbeat);
-// 	}
 
 	// set the frequency of iteration frames.  Does not control whether iterating or not.
 	setIterateFrequency(newFreq) {
@@ -342,6 +301,7 @@ export class SquishPanel extends React.Component {
 		//this.onceMore = false;
 		this.setState({isTimeAdvancing: true});
 	}
+	startIterating = this.startIterating.bind(this);
 
 	stopIterating() {
 		if (!this.state.isTimeAdvancing)
@@ -350,12 +310,14 @@ export class SquishPanel extends React.Component {
 		//this.onceMore = false;
 		this.setState({isTimeAdvancing: false});
 	}
+	stopIterating = this.stopIterating.bind(this);
 
 	singleStep(dt, stepsPerIteration) {
 		this.iterateOneFrame(true);
 		//this.onceMore = true;  // will stop iterating after next frame
 		//this.setState({isTimeAdvancing: true});
 	}
+	singleStep = this.singleStep.bind(this);
 
 	/* ******************************************************* runningOneCycle */
 
@@ -369,6 +331,7 @@ export class SquishPanel extends React.Component {
 		this.runningCycleStartingSerial = qe.qSpace_getIterateSerial();
 		this.startIterating();
 	}
+	startRunningOneCycle = this.startRunningOneCycle.bind(this);
 
 	// manage runningOneCycle - called each iteration
 	continueRunningOneCycle() {
@@ -425,36 +388,22 @@ export class SquishPanel extends React.Component {
 		this.setState({dt});
 		qe.qSpace_setDt(dt);
 	}
+	setDt = this.setDt.bind(this);
 
 	setStepsPerIteration(stepsPerIteration) {
 		console.info(`js setStepsPerIteration(${stepsPerIteration})`)
 		this.setState({stepsPerIteration});
 		qe.qSpace_setStepsPerIteration(stepsPerIteration);
 	}
+	setStepsPerIteration = this.setStepsPerIteration.bind(this);
 
 	// completely wipe out the ψ wavefunction and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon setWave in wave tab
 	setWave(waveParams) {
 		qe.createQEWaveFromCBuf();
 		qe.qewave.setFamiliarWave(waveParams);
-
-// 		switch (familiarParams.waveBreed) {
-// 		case 'circular':
-// 			qe.qewave.setCircularWave(familiarParams.frequency);
-// 			break;
-//
-// 		case 'standing':
-// 			qe.qewave.setStandingWave(familiarParams.frequency);
-// 			break;
-//
-// 		case 'pulse':
-// 			qe.qewave.setPulseWave(familiarParams.widthFactor, familiarParams.cycles)
-// 			break;
-//
-// 		default:
-// 			throw `setWave: no waveBreed '${args.waveBreed}'`
-// 		}
 	}
+	setWave = this.setWave.bind(this);
 
 	// completely wipe out the quantum potential and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon set potential in potential tab
@@ -473,6 +422,7 @@ export class SquishPanel extends React.Component {
 		}
 		this.iterateOneFrame(false, true);
 	}
+	setPotential = this.setPotential.bind(this);
 
 	// dump the view buffer, from the JS side
 	dumpViewBuffer() {

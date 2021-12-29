@@ -58,9 +58,6 @@ export class ControlPanel extends React.Component {
 
 			showingTab: 'wave',
 		};
-
-		this.setIterateFrequency = this.setIterateFrequency.bind(this);
-		this.setCPState = this.setCPState.bind(this);
 	}
 
 	/* *********************************** params */
@@ -70,6 +67,7 @@ export class ControlPanel extends React.Component {
 	setIterateFrequency(freq) {
 		this.props.setIterateFrequency(freq);
 	}
+	setIterateFrequency = this.setIterateFrequency.bind(this);
 
 
 	/* ********************************************** wave & pot */
@@ -82,6 +80,7 @@ export class ControlPanel extends React.Component {
 	setCPState(obj) {
 		this.setState(obj);
 	}
+	setCPState = this.setCPState.bind(this);
 
 	/* ********************************************** render  pieces */
 
