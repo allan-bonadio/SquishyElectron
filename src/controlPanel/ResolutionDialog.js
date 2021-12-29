@@ -1,14 +1,15 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** resolution dialog -- what you get from the resolution tab in CP
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {qeBasicSpace} from './wave/qeSpace';
-import SquishPanel from './SquishPanel';
-import CommonDialog from './widgets/CommonDialog';
+import {qeBasicSpace} from '../wave/qeSpace';
+import SquishPanel from '../SquishPanel';
+import CommonDialog from '../widgets/CommonDialog';
+import {thousands} from '../widgets/utils';
 
 
 // had this been a real webiste, I would not have to copy/paste these here
@@ -54,10 +55,6 @@ function indexToPower(ix) {
 // convert eg 100, 125, 300, 1000 into 20, 21, 25, 30
 function powerToIndex(p) {
 	return Math.round(Math.log10(p) * 10);
-}
-
-function thousands(n) {
-	return String(n).replace(/(\d\d\d)$/, ' $1').replace(/(\d\d\d) /, ' $1 ')
 }
 
 export default class ResolutionDialog extends React.Component {

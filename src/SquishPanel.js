@@ -15,7 +15,7 @@ import {qeStartPromise} from './wave/qEngine';
 import qe from './wave/qe';
 
 import SquishView from './view/SquishView';
-import ResolutionDialog from './ResolutionDialog';
+import ResolutionDialog from './controlPanel/ResolutionDialog';
 
 // must make sure somebody imports all of them
 import abstractViewDef from './view/abstractViewDef';

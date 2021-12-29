@@ -24,28 +24,6 @@ class App extends React.Component {
 		console.log(`App constructor`);
 	}
 
-	/* ************************************************ dialog */
-
-	// deprecated
-	// stateParams is {N, continuum, viewClassName}
-	// this is kindof what you need to start up a dialog: the input arguments.
-	// I guess we use a default if its null?  No, this function not meant for anybody but
-	// SquishPanel, just pass it the arguments and walk away
-//	showResolutionDialog(stateParams, callback) {
-//		this.dialogCallback = callback;
-//		debugger;
-//
-//
-//			// now create the view class instance as described by the space
-////			const vClass = listOfViewClassNames[currentQESpace.viewClassName];
-//
-//		// really we have no business messing around with the SquishyPanel's business
-//		// state params = the input arguments to dialog; otherwise
-//		// a general dialog system would just pass in some object
-//		this.setState({isDialogShowing: true, stateParams});
-//		this.stateParams = stateParams;
-//	}
-
 
 	// this is called before the ResolutionDialog has been instantiated
 	static showDialog() {
@@ -90,16 +68,7 @@ class App extends React.Component {
 				{sqDialog}
 			</div>
 		);
-
-//		showResolutionDialog={stateParams => this.showResolutionDialog(stateParams)}
-//		stateParams={sParams}
 	}
 }
 
 export default App;
-
-
-//				<SquishView setGLCanvas={canvas => this.setGLCanvas(canvas)} />
-//				<ControlPanel
-//					showResolutionDialog={() => this.showResolutionDialog(true)}
-//				/>

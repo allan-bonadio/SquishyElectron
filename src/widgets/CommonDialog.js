@@ -6,7 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import App from './App';
+import App from '../App';
 
 export default class CommonDialog extends React.Component {
 
