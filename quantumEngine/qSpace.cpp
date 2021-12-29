@@ -1,10 +1,11 @@
 /*
 ** quantum Space -- where an electron (or whatever) lives and moves around
-**        and the forces that impact it's motion and time evolution
+**		and the forces that impact it's motion and time evolution
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
 #include <cmath>
+#include <chrono>
 #include "qSpace.h"
 #include "qWave.h"
 
@@ -13,24 +14,22 @@ class qSpace *theSpace = NULL;
 
 qReal *thePotential = NULL;
 
+static bool debugIteration = false;
 
 // someday I need an C++ error handling layer.  See
 // https://emscripten.org/docs/porting/Debugging.html?highlight=assertions#handling-c-exceptions-from-javascript
 
 /* ********************************************************** qSpace construction */
 
+// resetCounts
+void qSpace::resetCounts(void) {
+	this->elapsedTime = 0.;
+	this->iterateSerial = 0;
+}
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
 qSpace::qSpace(int nDims) {
-	this->iterateSerial = 0;
-	this->elapsedTime = 0.;
-
-	// magic flags
-	//this->doLowPass = true;
-	//this->continuousLowPass = 0;
-
-	this->elapsedTime = 0.;
-	this->iterateSerial = 0;
+	this->resetCounts();
 	this->nDimensions = 0;
 }
 
@@ -40,8 +39,10 @@ qSpace::~qSpace(void) {
 
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
 void qSpace::addDimension(int N, int continuum, const char *label) {
-	if (this->nDimensions >= MAX_DIMENSIONS)
+	if (this->nDimensions >= MAX_DIMENSIONS) {
+		printf("Error dimensions: %d\n", this->nDimensions);
 		throw "too many dimensions";
+	}
 
 	qDimension *dims = this->dimensions + this->nDimensions;
 	dims->N = N;
@@ -85,7 +86,7 @@ void qSpace::tallyDimensions(void) {
 void qSpace::initSpace() {
 	this->tallyDimensions();
 
-	// try out different formulas here
+	// try out different formulas here.  Um, this is actually reset based on slider in CPToolbar
 	qReal dt = this->dt = 1. / (this->nStates * this->nStates);
 	//qReal dt = this->dt = nStates * 0.02;  // try out different factors here
 
@@ -144,20 +145,42 @@ void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset =
 /* ********************************************************** integration */
 
 // does several visscher steps, we'll call that one 'iteration'
-void qSpace::oneIterationStep() {
+void qSpace::oneIteration() {
 	int ix;
 
-	int steps = stepsPerIteration / 2;
+	if (this->stepsPerIteration < 1 || this->stepsPerIteration > 1e8) {
+		char buf[100];
+		sprintf(buf, "this->stepsPerIteration, %d, is unreasonable size, in space %d",
+			this->stepsPerIteration, (int) this);
+		printf("Error: %s\n", buf);
+		throw buf;
+	}
+	if (debugIteration)
+		printf("qSpace::oneIteration() - dt=%lf   stepsPerIteration=%d\n", this->dt, this->stepsPerIteration);
+
+	int steps = this->stepsPerIteration / 2;
+	if (debugIteration)
+		printf("qSpace::oneIteration() - steps=%d   stepsPerIteration=%d\n", steps, this->stepsPerIteration);
 	for (ix = 0; ix < steps; ix++) {
+		// this seems to have a resolution of 100µs on Panama
+		//auto start = std::chrono::steady_clock::now();////
+
 		this->oneVisscherStep(laosQWave, peruQWave);
 		this->oneVisscherStep(peruQWave, laosQWave);
+		if (debugIteration && 0 == ix % 100)
+			printf("200 step, step %d\n", ix * 2);
+
+		//auto end = std::chrono::steady_clock::now();////
+		//std::chrono::duration<double> elapsed_seconds = end-start;////
+		//printf("elapsed time: %lf \n", elapsed_seconds.count());////
 	}
 
 	this->iterateSerial++;
 
-	// printf("qSpace::oneIterationStep(): viewBuffer %ld and latestWave=%ld\n",
+	// printf("qSpace::oneIteration(): viewBuffer %ld and latestWave=%ld\n",
 	// 	(long) viewBuffer, (long) latestWave);
 	this->latestQWave = laosQWave;
-	//theQViewBuffer->loadViewBuffer(laosQWave);
+	theQViewBuffer->loadViewBuffer();
+
 }
 
