@@ -4,21 +4,45 @@
 */
 import qe from './qe';
 
+let debugSpace = true;
 
-// call like this:
-// new qeSpace([{N: 100, continuum: qeSpace.contENDLESS, label: 'x', coord: 'x'}])
-// labels must be unique.  Modeled after qSpace in C++,
-// does all dimensions in constructor, at least.
-// Coords are the same if two dims are parallel, eg two particles with x coords.
-// Not the same if one particle with x and y coords; eg you could have an endless canal.
-export class qeSpace {
+
+const _ = num => num.toFixed(4).padStart(9);
+
+// generate string for this one cx value, w, at location ix
+// rewritten from the c++ version in qWave, dumpRow()
+// pls keep in sync!
+function dumpRow(ix, re, im, prev, isBorder) {
+	const mag = re * re + im * im;
+
+	let phase = 0;
+	if (im || re) phase = Math.atan2(im, re) * 180 / Math.PI;  // pos or neg
+	let dPhase = phase - prev.phase + 360;  // so now its positive, right?
+	while (dPhase >= 360) dPhase -= 360;
+	prev.phase = phase;
+
+	if (!isBorder) prev.innerProd += mag;
+
+	return`[${ix}] (${_(re)} , ${_(im)}) | `+
+		`${_(phase)} ${_(dPhase)}} ${_(mag)}\n` ;
+}
+
+
+/* **************************************************************** Basic Space */
+// the dimensions part of the space
+// this is enough to contruct a qeWave with, so MiniGraph can use it
+// pat of qeSpace but also want to use independently
+export class qeBasicSpace {
+	// note in c++ these are on qSpace; there is no qBasicSpace
 	static contDISCRETE = 0;
 	static contWELL = 1;
 	static contENDLESS = 2;
 
-	static contCodeToText = code => ['discrete', 'Well', 'Endless'][code];
-
+	// dims is the raw minimal definition of the dimensions for the space to be contructed.
+	// here we fill in the details.
 	constructor(dims) {
+		// this has SIDE EFFECTS!
+		let nPoints = 1, nStates = 1;
 		this.dimensions = dims.map(dim => {
 			let d = {...dim};
 			if (d.continuum != 'discrete') {
@@ -29,34 +53,15 @@ export class qeSpace {
 				d.start = 0;
 				d.end = d.N;
 			}
-			d.nStates = d.N;
-			d.nPoints = d.start + d.end;
+			nStates *= d.nStates = d.N;
+			nPoints *= d.nPoints = d.start + d.end;
 
 			return d;
 		});
-
-		// this actually does it over on the C++ side
-		let nPoints = 1, nStates = 1;
-		qe.startNewSpace();
-		dims.forEach(dim => {
-			qe.addSpaceDimension(dim.N, dim.continuum, dim.label);
-			nPoints *= dim.N + (dim.continuum ? 2 : 0);
-			nStates *= dim.N;
-		});
-		qe.completeNewSpace();
 		this.nPoints = nPoints;
 		this.nStates = nStates;
 
-		// qeDefineAccess() will set this
-		this.waveBuffer = null;
-
-		// this will be good after completeNewSpace() is called
-		this.potentialBuffer = qe.getPotentialBuffer();
-
-		// a nice TypedArray of floats (4 for each row; 8 for each datapoint)
-		this.viewBuffer = qe.viewBuffer =
-			new Float32Array(window.Module.HEAPF32.buffer, qe.getViewBuffer(), nPoints*8);
-		//console.log(`qeSpace viewBuffer:`, this.viewBuffer);
+		if (debugSpace) console.log(`the resulting qeBasicSpace: `, this);
 	}
 
 	// call it like this: const {start, end, N, continuum} = space.startEnd;
@@ -72,6 +77,93 @@ export class qeSpace {
 		const dim = this.dimensions[0];
 		return {start: dim.start*2, end: dim.end*2, N: dim.N, nPoints: this.nPoints * 2,
 			continuum: dim.continuum};
+	}
+
+	// a qeSpace method to dump any wave buffer according to that space.
+	// RETURNS A STRING of the wave.
+	// modeled after qSpace::dumpThatWave() pls keep in sync!
+	dumpThatWave(wave) {
+		if (this.nPoints <= 0) throw "qeBasicSpace::dumpThatWave() with zero points";
+
+		const {start, end, continuum} = this.startEnd2;
+		let ix = 0;
+		let prev = {phase: 0, innerProd: 0};
+		let output = '';
+
+		if (continuum)
+			output += dumpRow(ix, wave[0], wave[1], prev, true);
+
+		for (ix = start; ix < end; ix += 2)
+			output += dumpRow(ix/2, wave[ix], wave[ix+1], prev);
+
+
+		if (continuum)
+			output += 'end '+ dumpRow(ix/2, wave[end], wave[end+1], prev, true);
+
+		return output.slice(0, -1) + ' innerProd=' + _(prev.innerProd) +'\n';
+	}
+
+	// refresh the wraparound points for ANY WAVE subscribing to this space
+	// 'those' or 'that' means some wave other than this.wave
+	// modeled after qSpace::fixThoseBoundaries() pls keep in sync!
+	fixThoseBoundaries(wave) {
+		if (this.nPoints <= 0) throw "qSpace::fixThoseBoundaries() with zero points";
+		const {end, continuum} = this.startEnd2;
+
+		switch (continuum) {
+		case qeBasicSpace.contDISCRETE:
+			break;
+
+		case qeBasicSpace.contWELL:
+			// the points on the end are ∞ potential, but the arithmetic goes bonkers
+			// if I actually set the voltage to ∞
+			wave[0] = wave[1] = wave[end] = wave[end+1] = 0;
+			break;
+
+		case qeBasicSpace.contENDLESS:
+			// the points on the end get set to the opposite side
+			wave[0] = wave[end-2];
+			wave[1]  = wave[end-1];
+			wave[end] = wave[2];
+			wave[end+1] = wave[3];
+			break;
+		}
+	}
+}
+
+
+/* **************************************************************** Space */
+// call like this:
+// new qeSpace([{N: 100, continuum: qeBasicSpace.contENDLESS, label: 'x', coord: 'x'}])
+// labels must be unique.  Modeled after qSpace in C++,
+// does all dimensions in constructor, at least.
+// Coords are the same if two dims are parallel, eg two particles with x coords.
+// Not the same if one particle with x and y coords; eg you could have an endless canal.
+export class qeSpace extends qeBasicSpace {
+	static contCodeToText = code => ['Discrete', 'Well', 'Endless'][code];
+
+	constructor(dims) {
+		super(dims);
+		//constructDimensions(this, dims);
+
+		// this actually does it over on the C++ side
+		qe.startNewSpace();
+		dims.forEach(dim => {
+			qe.addSpaceDimension(dim.N, dim.continuum, dim.label);
+		});
+		qe.completeNewSpace();
+
+		// qeDefineAccess() will set this
+		this.waveBuffer = null;
+
+		// this will be good after completeNewSpace() is called
+		this.potentialBuffer = qe.getPotentialBuffer();
+
+		// a nice TypedArray of floats (4 for each row; 8 for each datapoint)
+		this.viewBuffer = qe.viewBuffer =
+			new Float32Array(window.Module.HEAPF32.buffer, qe.getViewBuffer(), this.nPoints*8);
+
+		if (debugSpace) console.log(`the resulting qeSpace:`, this);
 	}
 
 	// see also dumpThatWave() method defined in qeWave

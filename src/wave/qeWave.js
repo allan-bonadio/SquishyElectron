@@ -3,80 +3,10 @@
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
-import qeSpace from './qeSpace';
+import {qeBasicSpace} from './qeSpace';
 
 /* **************************************************************** dumping */
 
-const _ = num => num.toFixed(4).padStart(9);
-
-// generate string for this one cx value, w, at location ix
-// rewritten from the c++ version in qWave, dumpRow()
-// pls keep in sync!
-function dumpRow(ix, re, im, prev, isBorder) {
-	const mag = re * re + im * im;
-
-	let phase = 0;
-	if (im || re) phase = Math.atan2(im, re) * 180 / Math.PI;  // pos or neg
-	let dPhase = phase - prev.phase + 360;  // so now its positive, right?
-	while (dPhase >= 360) dPhase -= 360;
-	prev.phase = phase;
-
-	if (!isBorder) prev.innerProd += mag;
-
-	return`[${ix}] (${_(re)} , ${_(im)}) | `+
-		`${_(phase)} ${_(dPhase)}} ${_(mag)}\n` ;
-}
-
-// a qeSpace method to dump any wave buffer according to that space.
-// RETURNS A STRING of the wave.
-// modeled after qSpace::dumpThatWave() pls keep in sync!
-qeSpace.prototype.dumpThatWave = function dumpThatWave(wave) {
-	if (this.nPoints <= 0) throw "qeSpace::dumpThatWave() with zero points";
-
-	const {start, end, continuum} = this.startEnd2;
-	let ix = 0;
-	let prev = {phase: 0, innerProd: 0};
-	let output = '';
-
-	if (continuum)
-		output += dumpRow(ix, wave[0], wave[1], prev, true);
-
-	for (ix = start; ix < end; ix += 2)
-		output += dumpRow(ix/2, wave[ix], wave[ix+1], prev);
-
-
-	if (continuum)
-		output += 'end '+ dumpRow(ix/2, wave[end], wave[end+1], prev, true);
-
-	return output.slice(0, -1) + ' innerProd=' + _(prev.innerProd) +'\n';
-}
-
-// refresh the wraparound points for ANY WAVE subscribing to this space
-// 'those' or 'that' means some wave other than this.wave
-// modeled after qSpace::fixThoseBoundaries() pls keep in sync!
-qeSpace.prototype.fixThoseBoundaries = function fixThoseBoundaries(wave) {
-	if (this.nPoints <= 0) throw "qSpace::fixThoseBoundaries() with zero points";
-	const {end, continuum} = this.startEnd2;
-
-	switch (continuum) {
-	case qeSpace.contDISCRETE:
-		break;
-
-	case qeSpace.contWELL:
-		// the points on the end are ∞ potential, but the arithmetic goes bonkers
-		// if I actually set the voltage to ∞
-		wave[0] = wave[1] = wave[end] = wave[end+1] = 0;
-		break;
-
-	case qeSpace.contENDLESS:
-		// the points on the end get set to the opposite side
-		wave[0] = wave[end-2];
-		wave[1]  = wave[end-1];
-		wave[end] = wave[2];
-		wave[end+1] = wave[3];
-		break;
-	}
-}
 
 // this is just a 1D wave.  someday...
 class qeWave {
@@ -132,13 +62,13 @@ class qeWave {
 	// pass negative to make it go backward.
 	// the first point here is like x=0 as far as the trig functions, and the last like x=-1
 	setCircularWave(n) {
-		console.info(`setCircularWave(${n})`);
+		//console.info(`setCircularWave(${n})`);
 		const {start, end, N} = this.space.startEnd2;
-		const dAngle = 2 * Math.PI / N * (+n);
+		const dAngle = Math.PI / N * (+n) * 2;
 		const wave = this.wave;
 
 		for (let ix = start; ix < end; ix += 2) {
-			const angle = dAngle * (ix - start);
+			const angle = dAngle * (ix - start) / 2;
 			wave[ix] = Math.cos(angle);
 			wave[ix + 1] = Math.sin(angle);
 		}
@@ -154,15 +84,12 @@ class qeWave {
 	// oh yeah, the walls on the sides are nodes in this case so we'll split by N+2 in that case.
 	// pass negative to make it upside down.
 	setStandingWave(n) {
-		console.info(`untested`)
-		debugger;
-
 		const {start, end, N} = this.space.startEnd2;
 		const dAngle = Math.PI / N * (+n);
 		const wave = this.wave;
 
 		// good idea or bad?
-// 		if (this.space.continuum == qeSpace.contWELL) {
+// 		if (this.space.continuum == qeBasicSpace.contWELL) {
 // 			start--;
 // 			end++;
 // 		}
@@ -179,20 +106,21 @@ class qeWave {
 	}
 
 	// freq is just like circular, although as a fraction of the stdDev instead of N
-	// 2𝛔 is width of the packet, as percentage of N (0%...100%).
+	// 2stdDev is width of the packet, as percentage of N (0%...100%).
 	// offset is how far along is the peak, as an integer X value (0...N).
-	setPulseWave(freq, 𝛔, offset) {
-		console.info(`untested`)
-		debugger;
-
+	setPulseWave(freqUi, stdDev, offsetUi) {
 		const wave = this.wave;
 		const {start, end, N} = this.space.startEnd;
+		const offset = offsetUi * N / 100;
+		const freq = freqUi * 2*stdDev/100 * N;
+		console.log(`setPulseWave freq=${freqUi} = ${freq} `+
+			`  stdDev=${stdDev}, 95%=${stdDev*4}   offset=${offsetUi}% = ${offset}`)
 
-		// start with a circular wave
-		this.setCircularWave(freq * 2*𝛔/100 * N);
+		// start with a circular wave, freq WITHIN the pulse width
+		this.setCircularWave(freq);
 
 		// modulate with a gaussian, centered at the offset, with stdDev
-		const s2 = 1 / (𝛔 * 2);
+		const s2 = 1 / (stdDev * 2);
 		for (let ix = start; ix < end; ix++) {
 			const 𝜟 = ix - offset;
 			const stretch = Math.exp(-𝜟 * 𝜟 * s2);

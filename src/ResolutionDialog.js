@@ -6,7 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import qeSpace from './wave/qeSpace';
+import {qeBasicSpace} from './wave/qeSpace';
 import SquishPanel from './SquishPanel';
 import CommonDialog from './CommonDialog';
 
@@ -147,27 +147,27 @@ export default class ResolutionDialog extends React.Component {
 		const onChange = ev => this.setState({continuum: ev.target.value});
 		return <>
 			what kind of universe:
-			<label><input type='radio' name='continuum'  value={qeSpace.contENDLESS}
-					checked={s.continuum == qeSpace.contENDLESS}
+			<label><input type='radio' name='continuum'  value={qeBasicSpace.contENDLESS}
+					checked={s.continuum == qeBasicSpace.contENDLESS}
 					onChange={onChange}
 					style={{fontWeight:
-						(this.props.continuum == qeSpace.contENDLESS)
+						(this.props.continuum == qeBasicSpace.contENDLESS)
 						? 'bold'
 						: 'normal'}}/>
 				Endless, repeating left-right</label>
-			<label><input type='radio' name='continuum'  value={qeSpace.contWELL}
-					checked={s.continuum == qeSpace.contWELL}
+			<label><input type='radio' name='continuum'  value={qeBasicSpace.contWELL}
+					checked={s.continuum == qeBasicSpace.contWELL}
 					onChange={onChange}
 					style={{fontWeight:
-						(this.props.continuum == qeSpace.contWELL)
+						(this.props.continuum == qeBasicSpace.contWELL)
 						? 'bold'
 						: 'normal'}}/>
 				Well with Walls</label>
-			<label><input type='radio' name='continuum'  value={qeSpace.contDISCRETE}
-					checked={s.continuum == qeSpace.contDISCRETE}
+			<label><input type='radio' name='continuum'  value={qeBasicSpace.contDISCRETE}
+					checked={s.continuum == qeBasicSpace.contDISCRETE}
 					onChange={onChange}
 					style={{fontWeight:
-						(this.props.continuum == qeSpace.contDISCRETE)
+						(this.props.continuum == qeBasicSpace.contDISCRETE)
 						? 'bold'
 						: 'normal'}}/>
 				Discreet Quanta (not recommended)</label>

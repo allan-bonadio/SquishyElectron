@@ -11,7 +11,7 @@ import {path as d3path} from 'd3-path';
 //import cxToRgb from '../view/cxToRgb';
 import cxToRgb from '../view/cxToRgb';
 import qCx from '../wave/qCx';
-import qeSpace from '../wave/qeSpace';
+import {qeSpace, qeBasicSpace} from '../wave/qeSpace';
 import qeWave from '../wave/qeWave';
 
 //const π = Math.PI;
@@ -47,6 +47,7 @@ function setPT() {
 			waveBreed: PropTypes.oneOf(['circular', 'standing', 'pulse',]),
 		}).isRequired,
 
+		// the space that the mainstream is using - MiniGraph uses an adaptation of this one
 		space: PropTypes.instanceOf(qeSpace).isRequired,
 	};
 	MiniGraph.defaultProps = {};
@@ -166,12 +167,18 @@ export class MiniGraph extends React.Component {
 		const p = props;
 
 		// construct a copy of the space, but with no more resolution than the minigraph
-		const proxyDims = [{...p.space.dimensions[0]}];
-		proxyDims.N = Math.min(proxyDims.N, p.width);
-		this.space = new qeSpace(proxyDims);
+		const proxyDim = {...p.space.dimensions[0]};
+		proxyDim.N = Math.min(proxyDim.N, p.width);
+		this.space = new qeBasicSpace([proxyDim]);
 
-		// these never change for the life of the component
-		this.viewBox = `0 0 ${+p.width} ${+p.height}`;
+		// these never change for the life of the component (?)
+		this.viewBox = `0 0 ${+p.width} ${+p.height * 0.9}`;
+
+		if (p.isWave)
+			this.waveRecipe(p.familiarParams);
+		else
+			this.potentialRecipe(p.familiarParams);
+
 	}
 
 
@@ -204,7 +211,7 @@ export class MiniGraph extends React.Component {
 				`miniGraph magn = '${magn}'   color = ${color}`);
 
 			this.elements[ix] = <path  d={`M${ix},0V${magn}`}
-				stroke={color} fill='none' key={val.x}/>
+				stroke={color} fill='none' key={ix}/>
 		}
 		this.maxY = maxY;
 	}
@@ -255,11 +262,6 @@ export class MiniGraph extends React.Component {
 	render() {
 		const p = this.props;
 		const {N} = this.space.startEnd;
-
-		if (p.isWave)
-			this.waveRecipe(p.familiarParams);
-		else
-			this.potentialRecipe(p.familiarParams);
 
 		// um... do something with maxY...
 

@@ -29,7 +29,7 @@ export class jSpace {
 		this.setZeroVoltage();
 
 		this.continuum = continuum;
-		if (qeSpace.contDISCRETE == continuum)
+		if (qeBasicSpace.contDISCRETE == continuum)
 			throw `Cannot do contDISCRETE in JS`;
 
 		//console.info(`JS jSpace constructed: `, this)
@@ -45,7 +45,7 @@ export class jSpace {
 	setZeroVoltage() {
 		let V = this.V;
 		V.fill(0);
-		this.continuum = qeSpace.contENDLESS;
+		this.continuum = qeBasicSpace.contENDLESS;
 	}
 
 	// infinite walled well at  ends
@@ -55,7 +55,7 @@ export class jSpace {
 //
 //		// tried Infinity; i get NaNs and I can't do anything with them..
 //		// tried 10, just doesn't cut it.
-//		this.continuum = qeSpace.contWELL;
+//		this.continuum = qeBasicSpace.contWELL;
 //		//V[1] = V[N] = 10;
 //		//V[1] = V[N] = Infinity;
 //	}
@@ -106,18 +106,18 @@ export class jWave {
 	fixBoundaries(psiAr = this.psi) {
 		let {N, continuum} = this.space;
 		switch (continuum) {
-		case qeSpace.contDISCRETE:
+		case qeBasicSpace.contDISCRETE:
 			// ain't no points on the end
 			break;
 
-		case qeSpace.contWELL:
+		case qeBasicSpace.contWELL:
 			// the points on the end are ∞ potential, but the arithmetic
 			// goes bonkers if I actually set the voltage to ∞
 			psiAr[0] = qCx(0);
 			psiAr[N+1] = qCx(0);
 			break;
 
-		case qeSpace.contENDLESS:
+		case qeBasicSpace.contENDLESS:
 			// the points on the end get set to the opposite side
 			psiAr[0] = psiAr[N];
 			psiAr[N+1] = psiAr[1];
