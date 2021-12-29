@@ -9,9 +9,8 @@ import PropTypes from 'prop-types';
 
 import ControlPanel from './controlPanel/ControlPanel';
 
-//import {createSpaceNWave} from './wave/theWave';
 // eslint-disable-next-line no-unused-vars
-import qeSpace from './wave/qeSpace';
+import {qeBasicSpace, qeSpace} from './wave/qeSpace';
 import {qeStartPromise} from './wave/qEngine';
 import qe from './wave/qe';
 
@@ -25,6 +24,11 @@ import viewVariableViewDef from './view/viewVariableViewDef';
 import flatViewDef from './view/flatViewDef';
 import flatDrawingViewDef from './view/flatDrawingViewDef';
 import drawingViewDef from './view/drawingViewDef';
+
+// runtime debugging flags - you can change in the debugger or here
+let areBenchmarking = false;
+let dumpingTheViewBuffer = false;
+
 
 
 // unfortunately, we hafe to have a list of all the view types.  here.
@@ -49,7 +53,7 @@ const DEFAULT_VIEW_CLASS_NAME =
 //const DEFAULT_RESOLUTION = 5;
 const DEFAULT_RESOLUTION = 25;
 //const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 25;
-const DEFAULT_CONTINUUM = qeSpace.contENDLESS;
+const DEFAULT_CONTINUUM = qeBasicSpace.contENDLESS;
 
 
 
@@ -83,7 +87,7 @@ export class SquishPanel extends React.Component {
 			space: null,  // set in setNew1DResolution()
 			// space: new qeSpace([{
 			// 	N: DEFAULT_RESOLUTION,
-			// 	continuum: qeSpace.contENDLESS,
+			// 	continuum: qeBasicSpace.contENDLESS,
 			// 	label: 'x', coord: 'x'
 			// }]),
 
@@ -96,18 +100,18 @@ export class SquishPanel extends React.Component {
 
 			// this is the actual 'frequency' in actual milliseconds, convert between like 1000/n
 			// eg the menu on the CPToolbar says 10/sec, so this becomes 100
-			iteratePeriod: 250,
-		};
+			iteratePeriod: 50,
 
-		//this.elapsedTime = 0;
-		//this.iterateSerial = 0;
+			// sliders for dt & spi
+			dt: .001,
+			stepsPerIteration: 1000,
+
+			runningCycleElapsedTime: 0,
+			runningCycleElapsedSerial: 0,
+		};
 
 		// never changes once set
 		this.canvas = null;
-
-		// runtime debugging flags
-		this.areBenchmarking = false;
-		this.dumpingTheViewBuffer = false;
 
 		// ticks and benchmarks
 		const now = performance.now();
@@ -122,6 +126,12 @@ export class SquishPanel extends React.Component {
 		this.startIterating = this.startIterating.bind(this);
 		this.stopIterating = this.stopIterating.bind(this);
 		this.singleStep = this.singleStep.bind(this);
+
+		this.setDt = this.setDt.bind(this);
+		this.setStepsPerIteration = this.setStepsPerIteration.bind(this);
+
+		this.startRunningOneCycle = this.startRunningOneCycle.bind(this);
+
 
 		console.log(`SquishPanel constructor done`);
 	}
@@ -191,29 +201,18 @@ export class SquishPanel extends React.Component {
 	/* ******************************************************* iteration & animation */
 
 
-	// take one integration step
+	// take one integration iteration
 	crunchOneFrame() {
-		this.startIntegrate = performance.now();
-
 		// (actually many visscher steps)
-		qe.qSpace_oneIterationStep();
+		qe.qSpace_oneIteration();
 
-		this.startUpdate = performance.now();
-		qe.updateTheSpaceToLatestWaveBuffer();
+		//qe.createQEWaveFromCBuf();
 
 		// always done at end of integration qe.loadViewBuffer( ahem some qwave );
-		this.curView.reloadAllVariables();  // am i doing this twice?
+		//this.curView.reloadAllVariables();  // am i doing this twice?
 
-		if (this.dumpingTheViewBuffer)
+		if (dumpingTheViewBuffer)
 			this.dumpViewBuffer();
-
-		// adjust our unit height?
-		//const highestHeight = highest * this.targetUnitHeight;
-		//if (highestHeight > 1.)
-		//	this.targetUnitHeight /= 2;
-		//else if (highestHeight < .25)
-		//	this.targetUnitHeight *= 2;
-
 	}
 
 	// Integrate the ODEs by one 'step', or not.  and then display.
@@ -221,47 +220,53 @@ export class SquishPanel extends React.Component {
 	// so if needsRepaint false or absent, it'll only repaint if an iteration has been done.
 	iterateOneFrame(isTimeAdvancing, needsRepaint) {
 		//console.log(`time since last tic: ${now - startFrame}ms`)
-		this.startIntegrate = this.startUpdate = this.startReload = this.startDraw = this.endFrame = 0;
-		const areBenchmarking = this.areBenchmarking;
-
+// 		this.endCalc = this.startReloadVarsBuffers = this.endReloadVarsBuffers =
+// 			this.endIteration = 0;
+		this.startIteration = performance.now();  // absolute beginning of integrate iteration
 		// could be slow.
 		if (isTimeAdvancing) {
 			this.crunchOneFrame();
 			needsRepaint = true;
 		}
+		this.endCalc = performance.now();
 
 		// if we need to repaint... if we're iterating, if the view says we have to,
 		// or if this is a one shot step
+		this.startReloadVarsBuffers = performance.now();
 		if (needsRepaint) {
 			// reload all variables
-			this.startReload = performance.now();
-			this.curView.reloadAllVariables();  // am i doing this twice?
+			this.curView.reloadAllVariables();
 
 			// copy from latest wave to view buffer (c++)
 			qe.refreshViewBuffer();
+			this.endReloadVarsBuffers = performance.now();
 
 			// draw
-			this.startDraw = performance.now();
 			qe.theCurrentView.draw();
 
 			// populate the on-screen numbers
 			document.querySelector('.voNorthWest').innerHTML = qe.qSpace_getElapsedTime().toFixed(2);
 			document.querySelector('.voNorthEast').innerHTML = qe.qSpace_getIterateSerial();
-
-			// print out benchmarks
-			this.endFrame = performance.now();
-			if (areBenchmarking) {
-				console.log(`times:\n`+
-					`RK:     ${(this.startUpdate - this.startIntegrate).toFixed(2)}ms\n`+
-					`up:     ${(this.startReload - this.startUpdate).toFixed(2)}ms\n`+
-					`reload: ${(this.startDraw - this.startReload).toFixed(2)}ms\n`+
-					`draw:   ${(this.endFrame - this.startDraw).toFixed(2)}ms\n\n`+
-					`total:  ${(this.endFrame - this.startIntegrate).toFixed(2)}ms\n\n` +
-					`period:  ${(this.startIntegrate - this.prevStart).toFixed(2)}ms\n`);
-				this.prevStart = this.startIntegrate;
-			}
 		}
+		else {
+			this.endReloadVarsBuffers = this.startReloadVarsBuffers;
+		}
+
+		// print out per-iteration benchmarks
+		this.endIteration = performance.now();
+		if (areBenchmarking) {
+			console.log(`times:\n`+
+				`iteration calc time:     ${(this.endCalc - this.startIteration).toFixed(2)}ms\n`+
+				`reload GL variables:     ${(this.endReloadVarsBuffers - this.startReloadVarsBuffers).toFixed(2)}ms\n`+
+				`draw:   ${(this.endIteration - this.endReloadVarsBuffers).toFixed(2)}ms\n`+
+				`total for iteration:  ${(this.endIteration - this.startIteration).toFixed(2)}ms\n` +
+				`period since last:  ${(this.startIteration - this.prevStart).toFixed(2)}ms\n`);
+			this.prevStart = this.startIteration;
+		}
+
+		this.continueRunningOneCycle();
 	}
+
 
 	// This gets called once each animation period according to requestAnimationFrame(), usually 60/sec
 	// and maintaining that as long as the website is running.  Even if there's no apparent motion.
@@ -271,7 +276,9 @@ export class SquishPanel extends React.Component {
 
 		// no matter how often animateHeartbeat() is called, it'll only iterate once in the iteratePeriod
 		if (now >= this.timeForNextTic) {
-			this.iterateOneFrame(s.isTimeAdvancing, s.isTimeAdvancing);
+			// no point in calling it continuously if it's not doing anything
+			if (s.isTimeAdvancing)
+				this.iterateOneFrame(true, true);
 			//this.iterateOneFrame(s.isTimeAdvancing, false);
 
 			// remember (now) is the one passed in, before iterateOneFrame(),
@@ -293,35 +300,35 @@ export class SquishPanel extends React.Component {
 		requestAnimationFrame(this.animateHeartbeat);
 	}
 
-	/* ******************************************************* UI & user actions */
+	/* ******************************************************* iterating & animating */
 
 	// start/stop or single step the animation (obsolete?)
 	// shouldAnimate falsy = stop it if running
 	// true = start it or continue it if running
 	// freq is how fast it goes, or 'one' to single step.
 	// I guess it's irrelevant now with requestAnimationFrame()
-	iterateAnimate(shouldAnimate, freq) {
-		debugger;  // see i tol ja
-		if (! shouldAnimate || ! freq || !qe.theCurrentView) {
-			//this.onceMore = false;
-			this.setState({isTimeAdvancing: false});
-			return;
-		}
-		if (freq == 'one') {
-			//this.onceMore = true;
-			this.setState({isTimeAdvancing: true});
-			return;
-		}
-
-		//this.onceMore = false;
-		if (this.state.isTimeAdvancing)
-			return;  // its already doing it
-
-		this.setState({isTimeAdvancing: true});
-
-		this.animateHeartbeat(performance.now());
-	//	requestAnimationFrame(animateHeartbeat);
-	}
+// 	iterateAnimate(shouldAnimate, freq) {
+// 		debugger;  // see i tol ja
+// 		if (! shouldAnimate || ! freq || !qe.theCurrentView) {
+// 			//this.onceMore = false;
+// 			this.setState({isTimeAdvancing: false});
+// 			return;
+// 		}
+// 		if (freq == 'one') {
+// 			//this.onceMore = true;
+// 			this.setState({isTimeAdvancing: true});
+// 			return;
+// 		}
+//
+// 		//this.onceMore = false;
+// 		if (this.state.isTimeAdvancing)
+// 			return;  // its already doing it
+//
+// 		this.setState({isTimeAdvancing: true});
+//
+// 		this.animateHeartbeat(performance.now());
+// 	//	requestAnimationFrame(animateHeartbeat);
+// 	}
 
 	// set the frequency of iteration frames.  Does not control whether iterating or not.
 	setIterateFrequency(newFreq) {
@@ -344,16 +351,91 @@ export class SquishPanel extends React.Component {
 		this.setState({isTimeAdvancing: false});
 	}
 
-	singleStep() {
+	singleStep(dt, stepsPerIteration) {
 		this.iterateOneFrame(true);
 		//this.onceMore = true;  // will stop iterating after next frame
 		//this.setState({isTimeAdvancing: true});
 	}
 
+	/* ******************************************************* runningOneCycle */
+
+	// use for benchmarking with a circular wave.  Will start iteration, and stop after
+	// the leftmost state is at its peak.  Then display stats.
+
+	// button handler
+	startRunningOneCycle() {
+		this.runningOneCycle = true;
+		this.runningCycleStartingTime = qe.qSpace_getElapsedTime();
+		this.runningCycleStartingSerial = qe.qSpace_getIterateSerial();
+		this.startIterating();
+	}
+
+	// manage runningOneCycle - called each iteration
+	continueRunningOneCycle() {
+		//debugger;
+		if (this.runningOneCycle) {
+			// get the real compoment of the first (#1) value of the wave
+			const real0 = this.state.space.waveBuffer[2];
+
+			if (real0 < this.prevReal0) {
+				// we're going down - first half of the cycle
+				if (this.goingUp) {
+					// if we were going up, we've gone just 1 dt past the peak.  Good time to stop.
+					this.runningOneCycle = false;
+
+					this.stopIterating();
+
+					this.setState({
+						runningCycleElapsedTime: qe.qSpace_getElapsedTime() - this.runningCycleStartingTime,
+						runningCycleElapsedSerial: qe.qSpace_getIterateSerial() - this.runningCycleStartingSerial,
+					});
+
+					this.goingDown = false;
+					this.goingUp = false;
+				}
+				else {
+					this.goingDown = true;
+					this.goingUp = false;
+				}
+			}
+			else {
+				// we're going up - second half.  Watch out for the switchover
+				this.goingDown = false;
+				this.goingUp = true;
+			}
+
+			this.prevReal0 = real0;
+		}
+	}
+
+	renderRunningOneCycle() {
+		const s = this.state;
+
+		// you can turn this on in the debugger anytime
+		return <div className='runningOneCycle' style={{display: 'block'}}>
+			<span>total iterations: {s.runningCycleElapsedSerial.toFixed(0)} &nbsp;
+				elapsed vtime: {s.runningCycleElapsedTime.toFixed(3)} &nbsp;</span>
+			<button onClick={this.startRunningOneCycle}>start running 1 cycle</button>
+		</div>
+	}
+
+	/* ******************************************************* user settings */
+
+	setDt(dt) {
+		this.setState({dt});
+		qe.qSpace_setDt(dt);
+	}
+
+	setStepsPerIteration(stepsPerIteration) {
+		console.info(`js setStepsPerIteration(${stepsPerIteration})`)
+		this.setState({stepsPerIteration});
+		qe.qSpace_setStepsPerIteration(stepsPerIteration);
+	}
+
 	// completely wipe out the ψ wavefunction and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon setWave in wave tab
 	setWave(waveParams) {
-		qe.updateTheSpaceToLatestWaveBuffer();
+		qe.createQEWaveFromCBuf();
 		qe.qewave.setFamiliarWave(waveParams);
 
 // 		switch (familiarParams.waveBreed) {
@@ -403,7 +485,7 @@ export class SquishPanel extends React.Component {
 			console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
 	}
 
-	/* ******************************************************* rendering etc */
+	/* ******************************************************* space & wave creation */
 	// constructor runs twice, so do this once here
 	componentDidMount() {
 		// upon startup, after C++ says it's ready, but remember constructor runs twice
@@ -412,6 +494,10 @@ export class SquishPanel extends React.Component {
 
 			this.setNew1DResolution(
 				DEFAULT_RESOLUTION, DEFAULT_CONTINUUM, DEFAULT_VIEW_CLASS_NAME);
+
+			// vital properties of the space
+			qe.qSpace_setDt(this.state.dt);
+			qe.qSpace_setStepsPerIteration(this.state.stepsPerIteration);
 
 			// this should be the only place animateHeartbeat() should be called
 			// except for inside the function itself
@@ -428,6 +514,8 @@ export class SquishPanel extends React.Component {
 
 	}
 
+	/* ******************************************************* rendering */
+
 	render() {
 		const s = this.state;
 
@@ -441,17 +529,23 @@ export class SquishPanel extends React.Component {
 					startIterating={() => this.startIterating()}
 					stopIterating={() => this.stopIterating()}
 					singleStep={() => this.singleStep()}
+
 					setWave={this.setWave}
 					setPotential={this.setPotential}
+
 					iterateFrequency={1000 / s.iteratePeriod}
 					setIterateFrequency={freq => this.setIterateFrequency(freq)}
 					openResolutionDialog={() => this.openResolutionDialog()}
 					space={s.space}
+
+					dt={s.dt}
+					setDt={this.setDt}
+					stepsPerIteration={s.stepsPerIteration}
+					setStepsPerIteration={this.setStepsPerIteration}
 				/>
+				{this.renderRunningOneCycle()}
 			</div>
 		);
-
-		/* 					elapsedTime={this.elapsedTime} iterateSerial={this.iterateSerial} */
 	}
 }
 

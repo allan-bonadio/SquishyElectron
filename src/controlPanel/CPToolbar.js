@@ -5,6 +5,7 @@
 
 import PropTypes from 'prop-types';
 import LogSlider from '../widgets/LogSlider';
+import qe from '../wave/qe';
 
 function setPT() {
 	CPToolbar.propTypes = {
@@ -25,6 +26,7 @@ function setPT() {
 
 function CPToolbar(props) {
 	const {iterateFrequency, setIterateFrequency,
+		dt, stepsPerIteration,
 		isTimeAdvancing, startIterating, stopIterating, singleStep} = props;
 
 	const repRates = <>
@@ -64,7 +66,7 @@ function CPToolbar(props) {
 		<button type='button' className={`startStopToggle toolbarButton toolbarGradient`}
 			onClick={ev => {
 				if (isTimeAdvancing)
-					stopIterating();
+					stopIterating(dt, stepsPerIteration);
 				else
 					startIterating();
 			}}>
@@ -76,7 +78,7 @@ function CPToolbar(props) {
 
 
 		<button type='button' className={`stepButton toolbarButton toolbarGradient `}
-			onClick={ev => singleStep()}>
+			onClick={ev => singleStep(dt, stepsPerIteration)}>
 			<big>►</big> ▌
 		</button>
 
@@ -99,13 +101,13 @@ function CPToolbar(props) {
 		/>
 		<LogSlider
 			className='stepsPerIterationSlider'
-			label='stepsPerIteration'
-			minLabel='1'
-			maxLabel='1000'
+			label='steps Per Iteration'
+			minLabel='100'
+			maxLabel='10,000'
 
 			current={props.stepsPerIteration}
-			sliderMin={1}
-			sliderMax={1000}
+			sliderMin={100}
+			sliderMax={10000}
 			stepsPerDecade={3}
 
 			handleChange={(power, ix) => {
@@ -114,7 +116,7 @@ function CPToolbar(props) {
 			}}
 		/>
 
-
+		<button onClick={qe.qSpace_resetCounts()}>Reset Counters</button>
 
 	</div>;
 }

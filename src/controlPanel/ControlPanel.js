@@ -12,10 +12,8 @@ import SetWaveTab from './SetWaveTab';
 import SetPotentialTab from './SetPotentialTab';
 import SetResolutionTab from './SetResolutionTab';
 import qeSpace from '../wave/qeSpace';
-
+import {qeStartPromise} from '../wave/qEngine';
 import qe from '../wave/qe';
-
-//import {setWave, setPotential} from './wave/theWave';
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
@@ -59,15 +57,9 @@ export class ControlPanel extends React.Component {
 			valleyOffset: 50,
 
 			showingTab: 'wave',
-
-			// slider for dt
-			dt: .001,
-			stepsPerIteration: 100,
 		};
 
 		this.setIterateFrequency = this.setIterateFrequency.bind(this);
-		this.setDt = this.setDt.bind(this);
-		this.setStepsPerIteration = this.setStepsPerIteration.bind(this);
 		this.setCPState = this.setCPState.bind(this);
 	}
 
@@ -80,21 +72,11 @@ export class ControlPanel extends React.Component {
 	}
 
 
-	setDt(dt) {
-		this.setState({dt});
-		qe.qSpace_setDt(dt);
-	}
-
-	setStepsPerIteration(stepsPerIteration) {
-		this.setState({stepsPerIteration});
-		qe.qSpace_setStepsPerIteration(stepsPerIteration);
-	}
-
 	/* ********************************************** wave & pot */
 
-	setPulseOffset(pulseOffset) {
-		this.setState({pulseOffset});
-	}
+// 	setPulseOffset(pulseOffset) {
+// 		this.setState({pulseOffset});
+// 	}
 
 	// used to set any familiarParam value, pass eg {stdDev: 40}
 	setCPState(obj) {
@@ -162,10 +144,10 @@ export class ControlPanel extends React.Component {
 				iterateFrequency={p.iterateFrequency}
 				setIterateFrequency={this.setIterateFrequency}
 
-				dt={s.dt}
-				setDt={this.setDt}
-				stepsPerIteration={s.stepsPerIteration}
-				setStepsPerIteration={this.setStepsPerIteration}
+				dt={p.dt}
+				setDt={p.setDt}
+				stepsPerIteration={p.stepsPerIteration}
+				setStepsPerIteration={p.setStepsPerIteration}
 			/>
 			<div className='cpSecondRow'>
 				<ul className='TabBar' >
