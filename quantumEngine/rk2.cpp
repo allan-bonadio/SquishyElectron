@@ -20,9 +20,9 @@
 // crawl along x to find the next version of the Wave, after dt, and store it there.
 void qSpace::oneRk2Step(qWave *oldQWave, qWave *newQWave) {
 	qWave *oldQW = oldQWave;
-	qCx *oldW = oldQW->buffer;
+	qCx *oldW = oldQW->wave;
 	qWave *newQW = newQWave;
-	qCx *newW = newQW->buffer;
+	qCx *newW = newQW->wave;
 
 
 	qDimension *dims = this->dimensions;
@@ -54,9 +54,9 @@ void qSpace::oneRk2Step(qWave *oldQWave, qWave *newQWave) {
 	// now flip them around.  This type of surgery; not sure about it...
 	qCx *t = newW;
 	// 	newW = oldW;
-	// 	newQW->buffer = oldW;
+	// 	newQW->wave = oldW;
 	// 	oldW = t;
-	// 	oldQW->buffer = t;
+	// 	oldQW->wave = t;
 oldW = newW;  // fix this someday!!!
 	oldQW->fixBoundaries();
 	//oldQW->dumpWave("almost done oldW", true);
