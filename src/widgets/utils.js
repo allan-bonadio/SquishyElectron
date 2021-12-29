@@ -41,8 +41,19 @@ export function toSiPrefix(f, nDigits) {
 
 /* ********************************** thousands() */
 
-// put spaces between triples of digits.  ALWAYS positive reals.
+const doesLocaleStuff = !!(window.Intl && Intl.NumberFormat);
+
 export function thousands(n) {
+
+	if (doesLocaleStuff) {
+		return n.toLocaleString();
+		// num.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+	}
+	return thousandsBackup(n);
+}
+
+// // put spaces between triples of digits.  ALWAYS positive reals.
+export function thousandsBackup(n) {
 	n = Math.round(n * 1e6) / 1e6;
 	let nInt = Math.floor(n);
 	let nFrac = (n) % 1;
