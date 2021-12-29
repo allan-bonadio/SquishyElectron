@@ -7,7 +7,7 @@ import React from 'react';
 import './App.scss';
 
 import SquishPanel from './SquishPanel';
-import CommonDialog from './CommonDialog';
+import CommonDialog from './widgets/CommonDialog';
 
 class App extends React.Component {
 	constructor(props) {

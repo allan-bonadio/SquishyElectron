@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 
 import {qeBasicSpace} from './wave/qeSpace';
 import SquishPanel from './SquishPanel';
-import CommonDialog from './CommonDialog';
+import CommonDialog from './widgets/CommonDialog';
 
 
 // had this been a real webiste, I would not have to copy/paste these here
