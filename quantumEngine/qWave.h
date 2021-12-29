@@ -12,7 +12,7 @@ struct qWave {
 
 	// create a qWave, dynamically allocated or hand in a buffer to use
 	qWave(qSpace *space);
-	qWave(qSpace *space, qCx *buffer);
+	qWave(qSpace *space, qCx *wave);
 	~qWave();
 
 	// for a naked wave, and for a qWave.  dumpThatWave same as in qSpace::
@@ -23,7 +23,7 @@ struct qWave {
 	qSpace *space;
 
 	// the actual data, hopefully in the right size allocated block, space->nPoints
-	qCx *buffer;
+	qCx *wave;
 
 	// if it used the first constructor
 	int dynamicallyAllocated: 1;
@@ -108,7 +108,7 @@ struct qViewBuffer {
 
 	// copy the numbers in wave or latestQWave into this->viewBuffer
 	// also converts from doubles to floats.
-	float loadViewBuffer(qCx *wave = NULL);
+	float loadViewBuffer(void);
 };
 
 // 'the' being the only one sometimes

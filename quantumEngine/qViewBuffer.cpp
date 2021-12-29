@@ -25,14 +25,14 @@ qViewBuffer::~qViewBuffer() {
 	delete this->viewBuffer;
 }
 
-// copy the numbers in latestQWave into this->viewBuffer
+// copy the numbers in our space's qWave into this->viewBuffer
 // one row per vertex, two rows per wave datapoint.
 // each row of 4 floats looks like this:
 //     real   imaginary    potential    serial
 // Two vertices per datapoint: bottom then top, same data.
 // also converts from doubles to floats for GL.
-float qViewBuffer::loadViewBuffer(qCx *latestWave) {
-	latestWave = this->space->latestQWave->buffer;
+float qViewBuffer::loadViewBuffer(void) {
+	qCx *latestWave = this->space->latestQWave->wave;
 
 	int nPoints = this->space->nPoints;
 	qReal highest = 0;
@@ -41,12 +41,12 @@ float qViewBuffer::loadViewBuffer(qCx *latestWave) {
 	if (debugViewBuffer) {
 		printf("loadViewBuffer(P): thePotential=%ld\n",
 			(long) thePotential);
-		printf("loadViewBuffer(B): this->space->latestQWave->buffer=%ld->%ld->%ld->%ld\n",
+		printf("loadViewBuffer(B): this->space->latestQWave->wave=%ld->%ld->%ld->%ld\n",
 			(long) this,
 			(long) this->space,
 			(long) this->space->latestQWave,
-			(long) this->space->latestQWave->buffer);
-		printf("loadViewBuffer(vb,lqw): viewBuffer %ld and latestQWave->buffer=%ld\n",
+			(long) this->space->latestQWave->wave);
+		printf("loadViewBuffer(vb,lqw): viewBuffer %ld and latestQWave->wave=%ld\n",
 			(long) viewBuffer, (long) latestWave);
 	}
 	//latestQWave->dumpWave("at start of loadViewBuffer()");
@@ -105,7 +105,8 @@ float *getViewBuffer(void) {
 }
 
 int refreshViewBuffer(void) {
-	if (debugViewBuffer) printf("refreshViewBuffer... theQViewBuffer=%ld\n", (long) theQViewBuffer);
+	if (debugViewBuffer)
+		printf("refreshViewBuffer... theQViewBuffer=%ld\n", (long) theQViewBuffer);
 	theQViewBuffer->loadViewBuffer();
 	return 0;
 }

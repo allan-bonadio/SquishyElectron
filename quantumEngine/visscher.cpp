@@ -60,7 +60,7 @@ and for now omit the potential
 // the ψi values in buffer 0 are still uncalculated
 void qSpace::stepReal(qCx *oldW, qCx *newW, double dt) {
 	qDimension *dims = this->dimensions;
-	printf("⚛️ start of stepReal");
+	//printf("⚛️ start of stepReal");
 	//this->dumpThatWave(oldW, true);
 	//printf("⚛︎ stepReal start N States=(%d), dt=%lf\n",
 	//	dims->nStates, dt);
@@ -118,9 +118,9 @@ void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
 // form the new wave from the old wave, in separate buffers, chosen by our caller.
 void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 	qWave *oldQW = oldQWave;
-	qCx *oldW = oldQWave->buffer;
+	qCx *oldW = oldQWave->wave;
 	qWave *newQW = newQWave;
-	qCx *newW = newQWave->buffer;
+	qCx *newW = newQWave->wave;
 
 	qDimension *dims = this->dimensions;
 	oldQW->fixBoundaries();
@@ -157,8 +157,8 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 // If not visscher, returns harmlessly.
 void qSpace::visscherHalfStep(qWave *oldQWave, qWave *newQWave) {
 	qDimension *dims = this->dimensions;
-	qCx *oldW = oldQWave->buffer;
-	qCx *newW = newQWave->buffer;
+	qCx *oldW = oldQWave->wave;
+	qCx *newW = newQWave->wave;
 
 	// let's try moving the im forward dt/2 for the next wave.
 	// the current wave here is corrupt (being at the same time re/im) so add new one
@@ -168,7 +168,7 @@ void qSpace::visscherHalfStep(qWave *oldQWave, qWave *newQWave) {
 	for (int ix = dims->start; ix < dims->end; ix++)
 		newW[ix].re = oldW[ix].re;
 
-	stepImaginary(oldQWave->buffer, newQWave->buffer, halfDt);
+	stepImaginary(oldQWave->wave, newQWave->wave, halfDt);
 	this->fixThoseBoundaries(newW);
 }
 

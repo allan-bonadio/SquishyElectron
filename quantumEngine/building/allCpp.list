@@ -1,11 +1,8 @@
 hamiltonian.cpp
 jsSpace.cpp
 qCx.cpp
-qFlick.cpp
 qSpace.cpp
-qStepper.cpp
 qWave.cpp
-rk2.cpp
-rk4.cpp
+qFlick.cpp
 qViewBuffer.cpp
 visscher.cpp

@@ -11,16 +11,12 @@
 #define MAX_DIMENSIONS  2
 
 extern class qSpace *theSpace;
-extern class qCx *theWave, *peruWave, *egyptWave, *laosWave;
-extern class qCx *k1Wave, *k2Wave, *k3Wave, *k4Wave;
+extern class qCx *peruWave, *laosWave;
 
-extern class qFlick *theQWave;
-extern class qWave *peruQWave, *egyptQWave, *laosQWave;
-extern class qWave *k1QWave, *k2QWave, *k3QWave, *k4QWave;
+extern class qWave *peruQWave, *laosQWave;
 
 extern qReal *thePotential;
 //extern float *viewBuffer;
-extern qReal elapsedTime;
 
 extern qCx hamiltonian(qCx *wave, int x);
 extern void qeStarted(void);
@@ -54,7 +50,7 @@ public:
 
 };
 
-// continuum values - same as in qDimension in qEngine.js; pls synchronize them
+// continuum values - same as in qeBasicSpace in qeSpace.js; pls synchronize them
 const int contDISCRETE = 0;
 const int contWELL = 1;
 const int contENDLESS = 2;
@@ -82,6 +78,9 @@ public:
 	// it's a double cuz I don't know how big it'll get)
 	double iterateSerial;
 
+	// set the elapsedTime and iterateSerial to zero
+	void resetCounts(void);
+
 	// number of  dimensions actually used, always <= MAX_DIMENSIONS
 	int32_t nDimensions;
 
@@ -89,14 +88,15 @@ public:
 	int nStates;
 	int nPoints;
 
-	// the one that got the most recent integration step
+	// our main qWave housing our main wave, doing iterations and being displayed.
+	// Technically, the one that got the most recent integration iteration
 	struct qWave *latestQWave;
 
 	// time increment used in schrodinger's, plus constants handy in intgration
 	qReal dt;
 	qCx dtOverI;
 	qCx halfDtOverI;
-	qReal stepsPerIteration;
+	int stepsPerIteration;
 
 	int bufferNum;
 
@@ -125,7 +125,7 @@ public:
 	void setZeroPotential(void);
 	void setValleyPotential(qReal power, qReal scale, qReal offset);
 
-	void oneIterationStep(void);
+	void oneIteration(void);
 	void oneRk2Step(qWave *oldQWave, qWave *newQWave);  // obsolete
 	void oneRk4Step(qWave *oldQWave, qWave *newQWave);  // obsolete
 	void oneVisscherStep(qWave *oldQWave, qWave *newQWave);  // obsolete
@@ -152,16 +152,11 @@ extern "C" {
 	qReal qSpace_getElapsedTime(void);
 	qReal qSpace_getIterateSerial(void);
 
-	void qSpace_oneIterationStep(void);
+	void qSpace_oneIteration(void);
 
 
 	int manyRk2Steps(void);
 
 	int dumpViewBuffer(int nPoints);
-
-	void qWave_dumpWave(char *title);
-	void qWave_setCircularWave(qReal n);
-	void qWave_setStandingWave(qReal n);
-	void qWave_setPulseWave(qReal widthFactor, qReal cycles);
 }
 

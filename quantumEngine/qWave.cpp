@@ -20,25 +20,21 @@ not sure how much dt/2 is.
 #include "qWave.h"
 
 // a transitional kind of thing from raw wave arrays to the new qWave buffer obj
-class qFlick *theQWave = NULL;
-class qWave *k1QWave = NULL, *k2QWave = NULL, *k3QWave = NULL, *k4QWave = NULL,
-	*egyptQWave = NULL, *laosQWave = NULL, *peruQWave = NULL;
-class qCx *theWave = NULL,
-	*k1Wave = NULL, *k2Wave = NULL, *k3Wave = NULL, *k4Wave = NULL,
-	*egyptWave = NULL, *laosWave = NULL, *peruWave = NULL;
+class qWave *laosQWave = NULL, *peruQWave = NULL;
+class qCx *laosWave = NULL, *peruWave = NULL;
 
 /* ************************************************************ birth & death & basics */
 
 // buffer is initialized to zero bytes therefore 0.0 everywhere
 qWave::qWave(qSpace *space) {
 	this->space = space;
-	this->buffer = this->allocateWave();
+	this->wave = this->allocateWave();
 	this->dynamicallyAllocated = 1;
 }
 
 qWave::qWave(qSpace *space, qCx *buffer) {
 	this->space = space;
-	this->buffer = buffer;
+	this->wave = buffer;
 	this->dynamicallyAllocated = 0;
 }
 
@@ -48,7 +44,7 @@ qWave::~qWave() {
 	//printf("    set space to null...\n");
 
 	if (this->dynamicallyAllocated)
-		this->freeWave(this->buffer);
+		this->freeWave(this->wave);
 	//printf("    freed buffer...\n");
 
 	//printf("setted buffer to null; done with qWave destructor.\n");
@@ -64,8 +60,8 @@ void qWave::freeWave(qCx *wave) {
 
 void qWave::copyThatWave(qCx *dest, qCx *src) {
 //	printf("qWave::copyThatWave(%d <== %d)\n", (int) dest, (int) src);
-	if (!dest) dest = this->buffer;
-	if (!src) src = this->buffer;
+	if (!dest) dest = this->wave;
+	if (!src) src = this->wave;
 //	printf("              sample ix=1 ==> (%lf, %lf) <== (%lf, %lf)  nPoints=%d\n",
 //		dest[1].re, dest[1].im, src[1].re, src[1].im, this->space->nPoints);
 
@@ -83,7 +79,7 @@ void qWave::copyThatWave(qCx *dest, qCx *src) {
 /* never tested - might never work under visscher */
 void qWave::forEachPoint(void (*callback)(qCx, int) ) {
 	qDimension *dims = this->space->dimensions;
-	qCx *wave = this->buffer;
+	qCx *wave = this->wave;
 	int end = dims->end + dims->start;
 	for (int ix = 0; ix < end; ix++) {
 		//printf("\n[%d] ", ix);
@@ -96,7 +92,7 @@ void qWave::forEachPoint(void (*callback)(qCx, int) ) {
 void qWave::forEachState(void (*callback)(qCx, int) ) {
 	qDimension *dims = this->space->dimensions;
 	int end = dims->end;
-	qCx *wave = this->buffer;
+	qCx *wave = this->wave;
 	for (int ix = dims->start; ix < end; ix++) {
 		//printf("\n[%d] ", ix);
 		//printf("(%lf,%lf) ", wave[ix].re, wave[ix].im);
@@ -174,14 +170,14 @@ void qWave::dumpThatWave(qCx *wave, bool withExtras) {
 // this is the member function that dumps its own wave and space
 void qWave::dumpWave(const char *title, bool withExtras) {
 	printf("\n==== Wave | %s", title);
-	this->space->dumpThatWave(this->buffer, withExtras);
+	this->space->dumpThatWave(this->wave, withExtras);
 	printf("\n==== end of Wave ====\n\n");
 }
 
 /* ************************************************************ arithmetic */
 
 // refresh the wraparound points for ANY WAVE subscribing to this space
-// 'those' or 'that' means some wave other than this->buffer
+// 'those' or 'that' means some wave other than this->wave
 void qSpace::fixThoseBoundaries(qCx *wave) {
 	if (this->nPoints <= 0) throw "qSpace::fixThoseBoundaries() with zero points";
 
@@ -212,14 +208,14 @@ void qSpace::fixThoseBoundaries(qCx *wave) {
 
 // refresh the wraparound points on the ends of continuum dimensions
 // from their counterpoints or zerro or whatever they get set to.
-// 'those' or 'that' means some wave other than this->buffer
+// 'those' or 'that' means some wave other than this->wave
 void qWave::fixBoundaries(void) {
-	this->space->fixThoseBoundaries(this->buffer);
+	this->space->fixThoseBoundaries(this->wave);
 }
 
 // calculate ⟨ψ | ψ⟩  'inner product'.  Non-visscher.
 qReal qWave::innerProduct(void) {
-	qCx *wave = this->buffer;
+	qCx *wave = this->wave;
 	qDimension *dims = this->space->dimensions;
 	qReal sum = 0.;
 
@@ -245,7 +241,7 @@ void qWave::normalize(void) {
 
 	//qCx *wave = tempWave;
 	//qWave *tempQWave = new qWave(this->space, tempWave);
-	qCx *wave = this->buffer;
+	qCx *wave = this->wave;
 	qDimension *dims = this->space->dimensions;
 	qReal mag = this->innerProduct();
 	//printf("normalizing qWave.  magnitude=%lf", mag);
@@ -286,7 +282,7 @@ void qWave::prune() {
 	printf("Do we really have to do this?  let's stop.\n");
 
 	qDimension *dims = this->space->dimensions;
-	qCx *wave = this->buffer;
+	qCx *wave = this->wave;
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		wave[ix].re = cleanOneNumber(wave[ix].re, ix, ix & 1);
 		wave[ix].im = cleanOneNumber(wave[ix].im, ix, ix & 2);
@@ -302,7 +298,7 @@ void qWave::prune() {
 // Changes the wave in-place
 //void qWave::lowPassFilter(double dilution) {
 //	printf("qWave::lowPassFilter(%5.3lf)\n", dilution);
-//	qCx *wave = this->buffer;
+//	qCx *wave = this->wave;
 //	qCx avg, d2prev = wave[0];
 //	qDimension *dims = this->space->dimensions;
 //
@@ -345,7 +341,7 @@ void qWave::setCircularWave(qReal n) {
 	if (circularDebug) printf(" starting qWave::setCircularWave %lf\n", n);
 	//this->dumpWave("before set sircular & normalize", true);
 	qCx *wave = tempWave;
-	//qCx *wave = this->buffer;
+	//qCx *wave = this->wave;
 	qDimension *dims = this->space->dimensions;
 	int start = dims->start;
 	int end = dims->end;
@@ -375,10 +371,10 @@ void qWave::setCircularWave(qReal n) {
 	this->fixBoundaries();
 	//this->dumpThatWave(wave, true);
 
-	if (circularDebug) printf(" got past wave fitting.  this->buffer=%d  tempQWave->buffer=%d  \n",
-			(int) this->buffer, (int) tempQWave->buffer);
+	if (circularDebug) printf(" got past wave fitting.  this->wave=%d  tempQWave->wave=%d  \n",
+			(int) this->wave, (int) tempQWave->wave);
 	// ?????!?!??!
-	tempQWave->copyThatWave(this->buffer, tempQWave->buffer);
+	tempQWave->copyThatWave(this->wave, tempQWave->wave);
 	if (circularDebug) printf(" got past copy that wave\n");
 	//this->space->visscherHalfStep(tempQWave, this);
 	this->normalize();
@@ -390,63 +386,4 @@ void qWave::setCircularWave(qReal n) {
 //	theQViewBuffer->loadViewBuffer(this);
 //printf(" got past loadViewBuffer\n");
 }
-
-// obsolete; use JS for this
-// make a superposition of two waves in opposite directions.
-// n 'should' be an integer to make it meet up on ends if wraparound
-// oh yeah, the walls on the sides are nodes in this case so we'll split by N+2 in that case.
-// pass negative to make it upside down.
-void qWave::setStandingWave(qReal n) {
-	qCx *wave = this->buffer;
-	qDimension *dims = this->space->dimensions;
-
-	int start = dims->start, end = dims->end, N = dims->N;
-	if (dims->continuum == contWELL) {
-		start--;
-		end++;
-		N += 2;
-	}
-
-	qReal dAngle = PI / N * n;
-	for (int ix = start; ix < end; ix++) {
-		wave[ix] = qCx(sin(dAngle * (ix - start)));
-	}
-	this->normalize();
-	this->dumpWave("after set standing & normalize", true);
-
-	//theQViewBuffer->loadViewBuffer(this);
-}
-
-// obsolete: use JS for this
-// widthFactor is fraction of total width the packet it is, 0.0-1.0, for a fraction of N.
-// Cycles is how many circles (360°) it goes thru in that width.
-void qWave::setPulseWave(qReal widthFactor, qReal cycles) {
-	qCx *wave = this->buffer;
-	qDimension *dims = this->space->dimensions;
-
-	// start with a real wave
-	this->setCircularWave(cycles / widthFactor);
-
-	// modulate with a gaussian, centered at the peak, with stdDev
-	// like the real one within some factor
-	int peak = lround(dims->N * widthFactor) % dims->N;  // ?? i dunno
-	qReal stdDev = dims->N * widthFactor / 2.;  // ?? i'm making this up
-	for (int ix = dims->start; ix < dims->end; ix++) {
-		int del = ix - peak;
-		wave[ix] *= exp(-del * del / stdDev);
-	}
-
-	theQWave->dumpWave("just did PulseWave", true);
-	this->normalize();
-	theQWave->dumpWave("normalized PulseWave", true);
-
-	//theQViewBuffer->loadViewBuffer(this);
-}
-
-
-/* ************************************************** exports to JS */
-void qWave_dumpWave(char *title) { theQWave->dumpWave(title); }
-void qWave_setCircularWave(qReal n) { theQWave->setCircularWave(n); }
-void qWave_setStandingWave(qReal n) { theQWave->setStandingWave(n); }
-void qWave_setPulseWave(qReal widthFactor, qReal cycles) { theQWave->setPulseWave(widthFactor, cycles);}
 

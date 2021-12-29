@@ -1,4 +1,4 @@
-// this file generated Thu Dec 23 2021 13:57:19 GMT-0800 (Pacific Standard Time)
+// this file generated Wed Dec 29 2021 07:11:19 GMT-0800 (Pacific Standard Time)
 // by the file SquishyElectron/quantumEngine/building/genExports.js
 let cwrap;
 export const qe = {};
@@ -19,11 +19,8 @@ export function defineQEngineFuncs() {
 	qe.qSpace_setValleyPotential = cwrap('qSpace_setValleyPotential', 'number', ['number','number','number']);
 	qe.qSpace_setDt = cwrap('qSpace_setDt', null, ['number']);
 	qe.qSpace_setStepsPerIteration = cwrap('qSpace_setStepsPerIteration', null, ['number']);
-	qe.qWave_setCircularWave = cwrap('qWave_setCircularWave', 'number', ['number']);
-	qe.qWave_setStandingWave = cwrap('qWave_setStandingWave', 'number', ['number']);
-	qe.qWave_setPulseWave = cwrap('qWave_setPulseWave', 'number', ['number','number','number']);
-	qe.qWave_dumpWave = cwrap('qWave_dumpWave', 'number', ['string']);
-	qe.qSpace_oneIterationStep = cwrap('qSpace_oneIterationStep', 'number', []);
+	qe.qSpace_oneIteration = cwrap('qSpace_oneIteration', 'number', []);
+	qe.qSpace_resetCounts = cwrap('qSpace_resetCounts', null, []);
 	qe.refreshViewBuffer = cwrap('refreshViewBuffer', 'number', []);
 }
 

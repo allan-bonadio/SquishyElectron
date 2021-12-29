@@ -26,7 +26,7 @@ qFlick::qFlick(qSpace *space, int maxWaves) :
 	this->waves = (qCx **) malloc(maxWaves * sizeof(int *));
 
 	// being a qWave, we already have one, just need the other
-	this->waves[0] = this->buffer;
+	this->waves[0] = this->wave;
 	this->waves[1] = allocateWave();
 }
 
@@ -233,12 +233,12 @@ void qFlick::pushWave(void) {
 
 // set which one is 'current', so if someone uses this as a qWave,
 // that's what they see, that's what gets 'normalized' or whatever
-// to 'getCurrent' wave, just get qfk->buffer;
+// to 'getCurrent' wave, just get qfk->wave;
 void qFlick::setCurrent(int newIx) {
 	if (newIx < 0 || newIx >= this->nWaves)
 		printf("qFlick::setCurrent() bad index: %d\n", newIx);
 	this->currentIx = newIx;
-	this->buffer = this->waves[newIx];
+	this->wave = this->waves[newIx];
 }
 
 
@@ -331,7 +331,7 @@ void qFlick::setCircularWave(qReal n) {
 		n, this->space->nPoints);
 	//this->dumpWave("before set sircular & normalize", true);
 	qCx *wave = tempWave;
-	//qCx *wave = this->buffer;
+	//qCx *wave = this->wave;
 	qDimension *dims = this->space->dimensions;
 	int start = dims->start;
 	int end = dims->end;
@@ -363,8 +363,8 @@ printf(" got past dAngle\n");
 //	printf("flick, freshly generated, 1 copy");
 //	this->dumpThatWave(wave, true);
 
-		tempQWave->copyThatWave(this->waves[0], tempQWave->buffer);
-		tempQWave->copyThatWave(this->waves[1], tempQWave->buffer);
+		tempQWave->copyThatWave(this->waves[0], tempQWave->wave);
+		tempQWave->copyThatWave(this->waves[1], tempQWave->wave);
 		//printf("  copied that wave\n");
 		//this->dumpAllWaves("qFlick::setCircularWave: copied wave 2ice; about to normalize");
 		//this->space->visscherHalfStep(tempQWave, this);

@@ -42,13 +42,10 @@ exportsSrc  = [
 	{name: 'qSpace_setDt', retType: null, args: ['number']},
 	{name: 'qSpace_setStepsPerIteration', retType: null, args: ['number']},
 
-	// theWave and theQWave is what these act upon
-	{name: 'qWave_setCircularWave', retType: 'number', args: ['number']},
-	{name: 'qWave_setStandingWave', retType: 'number', args: ['number']},
-	{name: 'qWave_setPulseWave', retType: 'number', args: ['number', 'number', 'number']},
-	{name: 'qWave_dumpWave', retType: 'number', args: ['string']},
+	{name: 'qSpace_oneIteration', retType: 'number', args: []},
+	{name: 'qSpace_resetCounts', retType: null, args: []},
 
-	{name: 'qSpace_oneIterationStep', retType: 'number', args: []},
+
 
 	// views
 	{name: 'refreshViewBuffer', retType: 'number', args: []},

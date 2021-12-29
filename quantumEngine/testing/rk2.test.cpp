@@ -60,7 +60,7 @@ static void firstRK2(void) {
 	otherQWave->dumpWave("after rk2 test", true);
 
 	for (int ix = 0; ix < 7; ix++) {
-		qCx act = otherQWave->buffer[ix];
+		qCx act = otherQWave->wave[ix];
 		qCx xpct = firstExpected[ix];
 		if (act.re != xpct.re || act.im != xpct.im) {
 			printf("%srk2 %d:actual=(%lf, %lf) vs firstExpected=(%lf, %lf) %s\n",
@@ -70,7 +70,7 @@ static void firstRK2(void) {
 
 	// in case you need to regenerate firstExpected from Actual
 	for (int ix = 0; ix < 7; ix++) printf("\tqCx(%20.18lf, %20.18lf),\n",
-		otherQWave->buffer[ix].re, otherQWave->buffer[ix].im);
+		otherQWave->wave[ix].re, otherQWave->wave[ix].im);
 
 
 	delete otherQWave;

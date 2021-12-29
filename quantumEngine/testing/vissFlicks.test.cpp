@@ -48,9 +48,9 @@ static void makeASpaceAndIterate(void) {
 	}
 
 
-//	flick->buffer = flick->waves[1];
+//	flick->wave = flick->waves[1];
 //	flick->setCircularWave(1.);
-//	flick->buffer = flick->waves[1];
+//	flick->wave = flick->waves[1];
 //
 //
 //	flick->dumpAllWaves("full qFlick dump");

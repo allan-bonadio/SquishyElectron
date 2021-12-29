@@ -3,10 +3,6 @@
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
-// right now, the JS can only access theSpace, theQWave, and the like - all 'the'
-// variables.  Other than that, you can have other qSpaces and other qWaves etc,
-// in C++, just no JS interface to them.  yet.
-
 #include "qSpace.h"
 #include "qWave.h"
 
@@ -15,46 +11,23 @@
 // after the initSpace() call, allocate the buffers.
 // i'm not really using most of these...
 void allocWaves(void) {
-//printf(" got past sites & points\n");
-	//  allocate the buffers.  theQWave's special
-	theQWave = new qFlick(theSpace, 4);
 
 //printf(" got past new qFlick\n");
 	// the other buffers...
 	peruQWave = new qWave(theSpace);
-	egyptQWave = new qWave(theSpace);
 	laosQWave = new qWave(theSpace);
-	k1QWave = new qWave(theSpace);
-	k2QWave = new qWave(theSpace);
-	k3QWave = new qWave(theSpace);
-	k4QWave = new qWave(theSpace);
 
-//printf(" got past k4QWave\n");
-	theWave = theQWave->buffer;
-	peruWave = peruQWave->buffer;
-	k1Wave = k1QWave->buffer;
-	k2Wave = k2QWave->buffer;
-	k3Wave = k3QWave->buffer;
-	k4Wave = k4QWave->buffer;
-	egyptWave = egyptQWave->buffer;
-	laosWave = laosQWave->buffer;
-//printf(" got past egypt & laos\n");
+	peruWave = peruQWave->wave;
+	laosWave = laosQWave->wave;
 }
 
 static void freeWaves(void) {
 	printf("about to delete qWaves:\n");
-	delete theQWave;
 	delete peruQWave;
-	delete egyptQWave;
 	delete laosQWave;
-	delete k1QWave;
-	delete k2QWave;
-	delete k3QWave;
-	delete k4QWave;
 
 	delete[] thePotential;
 	delete theQViewBuffer;
-	delete theSpace;
 	printf("done deleting.\n");
 }
 
@@ -63,11 +36,9 @@ static void freeWaves(void) {
 // these are for JS only; they're all extern "C"
 extern "C" {
 
-// return a pointer to just the zero-th buffer in here
+// return a pointer to just the main wave for theSpace
 qCx *getWaveBuffer(void) {
-	//theQWave->dumpAllWaves("getWaveBuffer in qSpace.cpp");
-
-	return theSpace->latestQWave->buffer;
+	return theSpace->latestQWave->wave;
 }
 
 qReal *getPotentialBuffer(void) {
@@ -95,12 +66,22 @@ void qSpace_setDt(double dt) {
 }
 
 // iterations are what the user sees.  steps are what Visscher does repeatedly.
-void qSpace_setStepsPerIteration(double stepsPerIteration) {
+void qSpace_setStepsPerIteration(int stepsPerIteration) {
+	printf("qSpace_setStepsPerIteration(%d)\n", stepsPerIteration);
+	if (stepsPerIteration < 1 || stepsPerIteration > 1e8) {
+		char buf[100];
+		sprintf(buf, "qSpace_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
+		throw buf;
+	}
 	theSpace->stepsPerIteration = stepsPerIteration;
-
+	printf("qSpace_setStepsPerIteration result %d in theSpace=%d\n",
+		theSpace->stepsPerIteration, (int) theSpace);
 }
 
-void qSpace_oneIterationStep(void) { theSpace->oneIterationStep(); }
+void qSpace_oneIteration(void) { theSpace->oneIteration(); }
+void qSpace_resetCounts(void) { theSpace->resetCounts(); }
+
+
 
 
 /* ******************************************************** space creation from JS */
@@ -113,6 +94,7 @@ qSpace *startNewSpace(void) {
 
 	if (theSpace) {
 		freeWaves();
+		delete theSpace;
 	}
 	theSpace = new qSpace(1);
 	//printf("  done startNewSpace()\n");
@@ -146,40 +128,25 @@ qSpace *addSpaceDimension(int N, int continuum, const char *label) {
 
 // call this from JS to finish the process
 qSpace *completeNewSpace(void) {
-	printf("completeNewSpace() starts\n");
+	//printf("completeNewSpace() starts\n");
 
 	// finish up all the dimensions now that we know them all
 	theSpace->initSpace();
-	printf("did initSpace\n");
+	//printf("did initSpace\n");
 
 
 	/* ******************************************************** finish, like, everything */
 	allocWaves();
-	printf("did allocWaves\n");
 
-//printf(" got past allocWaves()\n");
 	theQViewBuffer = new qViewBuffer(theSpace);
-	//theSpace->allocViewBuffer();
-	//theQWave->dumpWave("freshly created");
 
 	thePotential = new qReal[theSpace->nPoints];  // slow down, we just made this wave, don't blow it
-	//theSpace->setValleyPotential(1., 1., 0.); // another default
-
-	//theSpace->filterCount = theSpace->nStates;  // bad idea
-
 	theSpace->latestQWave = laosQWave;
 
 	// a default.  must be done After viewBuffer and thePotential are in place.
 	theSpace->latestQWave->setCircularWave(1);
-//printf(" got past setCircularWave\n");
-
-	printf("theQViewBuffer->loadViewBuffer... theQViewBuffer=%ld\n", (long) theQViewBuffer);
 	theQViewBuffer->loadViewBuffer();
-//printf("  done completeNewSpace(), nStates=%d, nPoints=%d\n", theSpace->nStates, theSpace->nPoints);
-	//printf("  dimension N=%d  continuum=%d  start=%d  end=%d  label=%s\n",
-//		theSpace->dimensions->N, theSpace->dimensions->continuum,
-//		theSpace->dimensions->start, theSpace->dimensions->end, theSpace->dimensions->label);
-	printf("qSpace::completeNewSpace(): done\n");
+	//printf("qSpace::completeNewSpace(): done\n");
 	return theSpace;
 }
 

@@ -28,9 +28,9 @@ static const qCx halfDtOverI = qCx(0., -dt / 2.);
 void waveDDT(qDimension *dims,
 			qWave *origQWave, qWave *fromQWave, qWave *nextYQWave,
 			qReal nextYFactor, qReal sumFactor) {
-	qCx *origWave = origQWave->buffer;
-	qCx *fromWave = fromQWave->buffer;
-	qCx *nextYWave = nextYQWave->buffer;
+	qCx *origWave = origQWave->wave;
+	qCx *fromWave = fromQWave->wave;
+	qCx *nextYWave = nextYQWave->wave;
 	fromQWave->fixBoundaries(); // always before hamiltonian
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx dPsi = hamiltonian(fromWave, ix) * dtOverI * nextYFactor;
