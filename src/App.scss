@@ -42,9 +42,9 @@ input {
 }
 
 input[type=range] {
-	height: 4em;
-	background-color: #4cf;
-	color: #fc4
+	//height: 4em;
+// 	background-color: #4cf;
+// 	color: #fc4
 }
 
 .LogSlider {
@@ -78,6 +78,28 @@ input[type=range] {
 		accent-color: lime;
 	}
 }
+
+.TextNSlider {
+	span {
+		line-height: 2em;
+	}
+	input[type=number] {
+		background-color: #222;
+		height: 2em;
+	// 	background-color: #4cf;
+		color: #fc4;
+		margin: 0 .5em;
+		text-align: right;
+	}
+	input[type=range] {
+		margin-bottom: -.5em;
+		accent-color: #f80;
+		height: 2em;
+	// 	background-color: #4cf;
+	// 	color: #fc4
+	}
+}
+
 
 button.round {
 	font-size: 100%;
@@ -150,5 +172,14 @@ button.round {
 	}
 
 }
+.runningOneCycle {
+	float: right;
+	margin: 1em;
+	border: outset 3px #ca8;
+	background-color: #468;
+	padding: .5em;
+}
+
+
 
 

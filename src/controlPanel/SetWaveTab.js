@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 
 import MiniGraph from './MiniGraph';
 import qeSpace from '../wave/qeSpace';
+import TextNSlider from '../widgets/TextNSlider';
 
 function setPT() {
 	// variables from on high, and the funcs needed to change them
@@ -69,36 +70,61 @@ function SetWaveTab(props) {
 
 
 
+// <div  >
+// 	<span>frequency</span>
+// 	<input type='number' placeholder='frequency' className='numberInput frequency'
+// 			value={p.frequency} min='0' max='100' step={'standing' == p.waveBreed ? .5 : 1}
+// 			onChange={ev => p.setCPState} />
+// 	<input type='range'
+// 		value={p.waveParams.frequency} min='0' max='20'
+// 		onChange={ev => p.setCPState({frequency: ev.currentTarget.value})} />
+// </div>
+
+
+		// <div  >
+// 			<span>pulse width, %</span>
+// 			<input type='number' placeholder='pulse width' className='numberInput pulseWidth'
+// 					value={p.pulseWidth} min='0' max='10' step={.01}
+// 					onChange={ev => p.setPulseWidth(ev.currentTarget.value)} />
+// 			<input type='range'
+// 				value={p.pulseWidth} min='0' max='1.0' step='.01'
+// 				onChange={ev => p.setCPState({stdDev: ev.currentTarget.value})} />
+// 		</div>
+//
+// 		<div  >
+// 			<span>pulse offset</span>
+// 			<input type='number' placeholder='pulse offset' className='numberInput pulseOffset'
+// 					value={p.pulseOffset} min='0' max='1' step={.01}
+// 					onChange={ev => p.setPulseOffset(ev.currentTarget.value)} />
+// 			<input type='range'
+// 				value={p.pulseOffset} min='0' max='1.0' step='.01'
+// 				onChange={ev => p.setCPState({pulseOffset: ev.currentTarget.value})} />
+// 		</div>
+
+
 	const sliders = <>
-		<div  >
-			<span>frequency</span>
-			<input type='number' placeholder='frequency' className='numberInput frequency'
-					value={p.frequency} min='0' max='100' step={'standing' == p.waveBreed ? .5 : 1}
-					onChange={ev => p.setCPState} />
-			<input type='range'
-				value={p.waveParams.frequency} min='0' max='20'
-				onChange={ev => p.setCPState({frequency: ev.currentTarget.value})} />
-		</div>
 
-		<div  >
-			<span>pulse width</span>
-			<input type='number' placeholder='pulse width' className='numberInput pulseWidth'
-					value={p.pulseWidth} min='0' max='10' step={.01}
-					onChange={ev => p.setPulseWidth(ev.currentTarget.value)} />
-			<input type='range'
-				value={p.pulseWidth} min='0' max='1.0' step='.01'
-				onChange={ev => p.setCPState({stdDev: ev.currentTarget.value})} />
-		</div>
 
-		<div  >
-			<span>pulse offset</span>
-			<input type='number' placeholder='pulse offset' className='numberInput pulseOffset'
-					value={p.pulseOffset} min='0' max='1' step={.01}
-					onChange={ev => p.setPulseOffset(ev.currentTarget.value)} />
-			<input type='range'
-				value={p.pulseOffset} min='0' max='1.0' step='.01'
-				onChange={ev => p.setCPState({pulseOffset: ev.currentTarget.value})} />
-		</div>
+		<TextNSlider className='frequency' label='frequency'
+			current={+p.waveParams.waveFrequency}
+			min={-10} max={10} step={'circular' != p.waveParams.waveBreed ? .5 : 1}
+			handleChange={waveFrequency => p.setCPState({waveFrequency})}
+		/>
+
+		<TextNSlider className='pulseWidth' label='pulse width, %'
+			style={{display: 'pulse' == p.waveParams.waveBreed ? 'block' :  'none'}}
+			current={+p.waveParams.stdDev}
+			min={1} max={10} step={.1}
+			handleChange={stdDev => p.setCPState({stdDev})}
+		/>
+
+		<TextNSlider className='offset' label='offset, %'
+			style={{display: 'pulse' == p.waveParams.waveBreed ? 'block' :  'none'}}
+			current={+p.waveParams.pulseOffset}
+			min={0} max={100} step={2}
+			handleChange={pulseOffset => p.setCPState({pulseOffset})}
+		/>
+
 	</>;
 
 
