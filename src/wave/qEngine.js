@@ -51,7 +51,7 @@ export const qeStartPromise = new Promise((succeed, fail) => {
 //function qeDefineAccess() {
 //	// tune into the most recently used wave and potential buffers
 //	qe.latestWave = function latestWave() {
-//		qe.latestWaveBuffer = qe.getWaveBuffer();
+//		qe.latestWaveBuffer = qe.qSpace_getWaveBuffer();
 //	}
 //
 //	// get the complex wave value at this point
@@ -71,7 +71,7 @@ export const qeStartPromise = new Promise((succeed, fail) => {
 //
 //	// tune into the most recently used wave and potential buffers
 //	qe.latestPotential = function latestPotential() {
-//		qe.latestPotentialBuffer = qe.getPotentialBuffer();
+//		qe.latestPotentialBuffer = qe.qSpace_getPotentialBuffer();
 //	}
 //
 //	// get the real potential value at this point
@@ -92,7 +92,7 @@ export function qeDefineAccess() {
 	// results in different buffers, depending.  No, not any more!
 	qe.createQEWaveFromCBuf = function createQEWaveFromCBuf() {
 		// make this thing which is the wave buffer, as a nice TypedArray of doubles (pairs making up cx numbers)
-		const wave = new Float64Array(window.Module.HEAPF64.buffer, qe.getWaveBuffer(), 2 * qe.space.nPoints);
+		const wave = new Float64Array(window.Module.HEAPF64.buffer, qe.qSpace_getWaveBuffer(), 2 * qe.space.nPoints);
 		qe.space.waveBuffer = qe.waveBuffer = wave;
 		//console.info(`the wave we're createQEWaveFromCBuf():`, wave);
 		qe.qewave = new qeWave(qe.space, wave);

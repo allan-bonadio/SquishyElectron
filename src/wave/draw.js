@@ -21,7 +21,7 @@ const colorNodes = [
 //let cppWave;
 //
 //function latestWave() {
-//	cppWave = qe.getWaveBuffer();
+//	cppWave = qe.qSpace_getWaveBuffer();
 //}
 //
 //// get the complex value from this one point, by index
@@ -110,7 +110,7 @@ class draw {
 
 //	drawFromCpp() {
 ////		;
-////		var cppPot = qe.getPotentialBuffer();
+////		var cppPot = qe.qSpace_getPotentialBuffer();
 ////		console.log(`cppWave=${cppWave}  cppPot=${cppPot}`);
 ////		//var cppWave = cppWave >> 3;
 ////

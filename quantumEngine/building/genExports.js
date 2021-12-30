@@ -25,9 +25,8 @@ exportsSrc  = [
 	{name: 'completeNewSpace', retType: 'number', args: []},
 
 	// gets
-	{name: 'getWaveBuffer', retType: 'number', args: []},
-	{name: 'getPotentialBuffer', retType: 'number', args: []},
-	{name: 'getViewBuffer', retType: 'number', args: []},
+	{name: 'qSpace_getWaveBuffer', retType: 'number', args: []},
+	{name: 'qSpace_getPotentialBuffer', retType: 'number', args: []},
 
 	// the qSpace ones act on theSpace in the c++ code
 	{name: 'qSpace_getElapsedTime', retType: 'number', args: []},
@@ -48,7 +47,10 @@ exportsSrc  = [
 
 
 	// views
-	{name: 'refreshViewBuffer', retType: 'number', args: []},
+	{name: 'qViewBuffer_getViewBuffer', retType: 'number', args: []},
+	{name: 'qViewBuffer_loadViewBuffer', retType: null, args: []},
+	{name: 'qViewBuffer_dumpViewBuffer', retType: null, args: []},
+
 
 ];
 

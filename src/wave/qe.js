@@ -1,4 +1,4 @@
-// this file generated Wed Dec 29 2021 07:11:19 GMT-0800 (Pacific Standard Time)
+// this file generated Thu Dec 30 2021 13:49:16 GMT-0800 (Pacific Standard Time)
 // by the file SquishyElectron/quantumEngine/building/genExports.js
 let cwrap;
 export const qe = {};
@@ -9,9 +9,8 @@ export function defineQEngineFuncs() {
 	qe.startNewSpace = cwrap('startNewSpace', 'number', []);
 	qe.addSpaceDimension = cwrap('addSpaceDimension', 'number', ['number','number','string']);
 	qe.completeNewSpace = cwrap('completeNewSpace', 'number', []);
-	qe.getWaveBuffer = cwrap('getWaveBuffer', 'number', []);
-	qe.getPotentialBuffer = cwrap('getPotentialBuffer', 'number', []);
-	qe.getViewBuffer = cwrap('getViewBuffer', 'number', []);
+	qe.qSpace_getWaveBuffer = cwrap('qSpace_getWaveBuffer', 'number', []);
+	qe.qSpace_getPotentialBuffer = cwrap('qSpace_getPotentialBuffer', 'number', []);
 	qe.qSpace_getElapsedTime = cwrap('qSpace_getElapsedTime', 'number', []);
 	qe.qSpace_getIterateSerial = cwrap('qSpace_getIterateSerial', 'number', []);
 	qe.qSpace_dumpPotential = cwrap('qSpace_dumpPotential', 'number', ['string']);
@@ -21,7 +20,9 @@ export function defineQEngineFuncs() {
 	qe.qSpace_setStepsPerIteration = cwrap('qSpace_setStepsPerIteration', null, ['number']);
 	qe.qSpace_oneIteration = cwrap('qSpace_oneIteration', 'number', []);
 	qe.qSpace_resetCounts = cwrap('qSpace_resetCounts', null, []);
-	qe.refreshViewBuffer = cwrap('refreshViewBuffer', 'number', []);
+	qe.qViewBuffer_getViewBuffer = cwrap('qViewBuffer_getViewBuffer', 'number', []);
+	qe.qViewBuffer_loadViewBuffer = cwrap('qViewBuffer_loadViewBuffer', null, []);
+	qe.qViewBuffer_dumpViewBuffer = cwrap('qViewBuffer_dumpViewBuffer', null, []);
 }
 
 window.defineQEngineFuncs = defineQEngineFuncs;  // just in case
