@@ -138,15 +138,15 @@ class qeWave {
 		// should the boundaries, normalize and dump be moved to the end of here?
 		switch (waveParams.waveBreed) {
 		case 'circular':
-			this.setCircularWave(waveParams.waveFrequency);
+			this.setCircularWave(+waveParams.waveFrequency);
 			break;
 
 		case 'standing':
-			this.setStandingWave(waveParams.waveFrequency);
+			this.setStandingWave(+waveParams.waveFrequency);
 			break;
 
 		case 'pulse':
-			this.setPulseWave(waveParams.waveFrequency, waveParams.stdDev, waveParams.pulseOffset);
+			this.setPulseWave(+waveParams.waveFrequency, +waveParams.stdDev, +waveParams.pulseOffset);
 			break;
 		}
 	}

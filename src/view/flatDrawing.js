@@ -49,6 +49,7 @@ export function coastUnitHeight() {
 ** or zero
 */
 
+// diagnostic purposes
 let alsoDrawPoints = false, alsoDrawLines = false;
 //alsoDrawLines =0;
 
@@ -135,6 +136,8 @@ class flatDrawing extends abstractDrawing {
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
 		this.rowAttr.attachArray(qe.space.viewBuffer, this.rowFloats);
+
+		console.info(`just set inputs in flatDrawing.js.  Attached viewBuffer:`, qe.space.viewBuffer)
 	}
 
 
@@ -156,6 +159,9 @@ class flatDrawing extends abstractDrawing {
 
 		if (alsoDrawPoints)
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
+
+		console.info(`finished drawing in flatDrawing.js; drew buf:`);
+		qe.qViewBuffer_dumpViewBuffer();
 	}
 
 
