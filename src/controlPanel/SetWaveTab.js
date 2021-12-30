@@ -13,7 +13,7 @@ function setPT() {
 	// variables from on high, and the funcs needed to change them
 	SetWaveTab.propTypes = {
 		// sets it in C++
-		setWave: PropTypes.func.isRequired,
+		setWaveHandler: PropTypes.func.isRequired,
 
 		waveParams: PropTypes.shape({
 			frequency: PropTypes.number,
@@ -166,7 +166,7 @@ function SetWaveTab(props) {
 						familiarParams={p.waveParams} space={p.space}/>
 			</div>
 			<button type='button' className='setWaveButton round'
-				onClick={ev => p.setWave()}>
+				onClick={p.setWaveHandler}>
 					Set Wave
 			</button>
 
