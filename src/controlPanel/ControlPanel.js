@@ -36,19 +36,26 @@ export class ControlPanel extends React.Component {
 
 		// early on, there's no space.  Must have SquishPanel mounted first.
 		space: PropTypes.instanceOf(qeSpace),
+		waveParams: PropTypes.shape({
+			waveBreed: PropTypes.string.isRequired,
+			waveFrequency: PropTypes.number.isRequired,
+			stdDev: PropTypes.number.isRequired,
+			pulseOffset: PropTypes.number.isRequired,
+		}).isRequired,
 	};
 
 	constructor(props) {
 		super(props);
+		const wp = props.waveParams;
 
 		// most of the state is really kept in the SquishPanel
 		this.state = {
 			// state for the wave resets - these are control-panel only.
 			// waveParams - Only goes into effect if we call setWave()
-			waveBreed: 'circular',
-			waveFrequency: 1,
-			stdDev: 10,
-			pulseOffset: 20,
+			waveBreed: wp.waveBreed,
+			waveFrequency: wp.waveFrequency,
+			stdDev: wp.stdDev,
+			pulseOffset: wp.pulseOffset,
 
 			// state for potential resets - control panel only, setPotential()
 			potentialBreed: 'flat',
@@ -82,6 +89,14 @@ export class ControlPanel extends React.Component {
 	}
 	setCPState = this.setCPState.bind(this);
 
+	// this one is an event handler in the wave tab for the SetWave button
+	// but squishpanel hands us a more refined function.
+	setWaveHandler(ev) {
+		const {waveBreed, waveFrequency, stdDev, pulseOffset} = this.state;
+		this.props.setWave({waveBreed, waveFrequency, stdDev, pulseOffset});
+	}
+	setWaveHandler = this.setWaveHandler.bind(this);
+
 	/* ********************************************** render  pieces */
 
 	// whichever tab is showing right now
@@ -94,7 +109,7 @@ export class ControlPanel extends React.Component {
 			// setWave we're passed in takes an object with args.  We pass down a
 			// function with no args that'll call theother one
 			return <SetWaveTab
-				setWave={() => p.setWave(s)}
+				setWaveHandler={this.setWaveHandler}
 				waveParams={{waveBreed: s.waveBreed, waveFrequency: s.waveFrequency,
 					stdDev: s.stdDev, pulseOffset: s.pulseOffset,}}
 

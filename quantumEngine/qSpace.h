@@ -92,13 +92,16 @@ public:
 	// Technically, the one that got the most recent integration iteration
 	struct qWave *latestQWave;
 
+	struct qViewBuffer *qViewBuffer;
+	qReal *potential;
+
 	// time increment used in schrodinger's, plus constants handy in intgration
 	qReal dt;
-	qCx dtOverI;
-	qCx halfDtOverI;
+	qCx dtOverI;  // get rid of this
+	qCx halfDtOverI;  // get rid of this
 	int stepsPerIteration;
 
-	int bufferNum;
+	int bufferNum;  // get rid of this
 
 	/* ****************************************** hacks that might go away */
 	// set to N or whatever, count down, when you hhit zero, lowPass (sometimes)
@@ -146,9 +149,9 @@ extern "C" {
 	qSpace *addSpaceDimension(int32_t N, int32_t continuum, const char *label);
 	qSpace *completeNewSpace(void);
 
-	qCx *getWaveBuffer(void);
-	qReal *getPotentialBuffer(void);
-	float *getViewBuffer();
+	qCx *qSpace_getWaveBuffer(void);
+	qReal *qSpace_getPotentialBuffer(void);
+	float *qViewBuffer_getViewBuffer();
 	qReal qSpace_getElapsedTime(void);
 	qReal qSpace_getIterateSerial(void);
 
@@ -157,6 +160,6 @@ extern "C" {
 
 	int manyRk2Steps(void);
 
-	int dumpViewBuffer(int nPoints);
+	void dumpViewBuffer(void);
 }
 

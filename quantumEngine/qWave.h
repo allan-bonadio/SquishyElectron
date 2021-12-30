@@ -1,13 +1,15 @@
 /*
 ** q Wave -- an organized wave and space pointer &tc
-**            This also has qFlick and view buffers in it
+**            This file also has qFlick and view buffers in it
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
 
 // a 'wave' is a straight array of qCx, of length space->nPoints.
-// a 'qWave' is an object with cool methods for the wave it encloses.
+// a 'qWave' is an object with cool methods for the wave it encloses, plus a qSpace pointer.
 // a 'qFlick' (see below) is a sequence of waves
+// a 'qViewBuffer' is specifically to send coordinates to WebGL for display; very different
+
 struct qWave {
 
 	// create a qWave, dynamically allocated or hand in a buffer to use
@@ -114,5 +116,10 @@ struct qViewBuffer {
 // 'the' being the only one sometimes
 extern qViewBuffer *theQViewBuffer;
 
-// JS interface to copy latest wave into vb
-extern "C" int refreshViewBuffer(void);
+// JS interface
+extern "C" {
+	void qViewBuffer_dumpViewBuffer(void);
+	float *qViewBuffer_getViewBuffer(void);
+	void qViewBuffer_loadViewBuffer(void);
+}
+

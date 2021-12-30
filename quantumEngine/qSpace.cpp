@@ -180,6 +180,8 @@ void qSpace::oneIteration() {
 	// printf("qSpace::oneIteration(): viewBuffer %ld and latestWave=%ld\n",
 	// 	(long) viewBuffer, (long) latestWave);
 	this->latestQWave = laosQWave;
+
+	// need it; somehow? not done in JS
 	theQViewBuffer->loadViewBuffer();
 
 }

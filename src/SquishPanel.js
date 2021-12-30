@@ -11,6 +11,7 @@ import ControlPanel from './controlPanel/ControlPanel';
 
 // eslint-disable-next-line no-unused-vars
 import {qeBasicSpace, qeSpace} from './wave/qeSpace';
+import qeWave from './wave/qeWave';
 import {qeStartPromise} from './wave/qEngine';
 import qe from './wave/qe';
 
@@ -50,12 +51,17 @@ const DEFAULT_VIEW_CLASS_NAME =
 'flatDrawingViewDef';
 
 //const DEFAULT_RESOLUTION = 100;
-//const DEFAULT_RESOLUTION = 5;
-const DEFAULT_RESOLUTION = 25;
+const DEFAULT_RESOLUTION = 5;
+//const DEFAULT_RESOLUTION = 25;
 //const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 25;
 const DEFAULT_CONTINUUM = qeBasicSpace.contENDLESS;
 
-
+const defaultWaveParams = {
+	waveBreed: 'circular',
+	waveFrequency: 1,
+	stdDev: 8,
+	pulseOffset: 30,
+};
 
 export class SquishPanel extends React.Component {
 	static propTypes = {
@@ -140,7 +146,7 @@ export class SquishPanel extends React.Component {
 	setNew1DResolution(N, continuum, viewClassName) {
 		qe.theCurrentView =  null;
 
-		qe.space = new qeSpace([{N, continuum, label: 'x'}]);
+		qe.space = new qeSpace([{N, continuum, label: 'x'}], defaultWaveParams);
 
 		// now create the view class instance as described by the space
 		const vClass = listOfViewClassNames[viewClassName];
@@ -194,9 +200,6 @@ export class SquishPanel extends React.Component {
 
 		//qe.createQEWaveFromCBuf();
 
-		// always done at end of integration qe.loadViewBuffer( ahem some qwave );
-		//this.curView.reloadAllVariables();  // am i doing this twice?
-
 		if (dumpingTheViewBuffer)
 			this.dumpViewBuffer();
 	}
@@ -224,7 +227,7 @@ export class SquishPanel extends React.Component {
 			this.curView.reloadAllVariables();
 
 			// copy from latest wave to view buffer (c++)
-			qe.refreshViewBuffer();
+			qe.qViewBuffer_getViewBuffer();
 			this.endReloadVarsBuffers = performance.now();
 
 			// draw
@@ -287,7 +290,7 @@ export class SquishPanel extends React.Component {
 	}
 	animateHeartbeat = this.animateHeartbeat.bind(this);  // so we can pass it as a callback
 
-	/* ******************************************************* iterating & animating */
+	/* ******************************************************* control panel settings */
 
 	// set the frequency of iteration frames.  Does not control whether iterating or not.
 	setIterateFrequency(newFreq) {
@@ -400,8 +403,13 @@ export class SquishPanel extends React.Component {
 	// completely wipe out the ψ wavefunction and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon setWave in wave tab
 	setWave(waveParams) {
-		qe.createQEWaveFromCBuf();
-		qe.qewave.setFamiliarWave(waveParams);
+// 		const wave = qe.qSpace_getWaveBuffer();
+		const qewave = this.state.space.qewave;
+		qewave.setFamiliarWave(waveParams);
+		this.iterateOneFrame(true, true);
+		//this.iterateOneFrame(false, true);
+		//qe.qViewBuffer_getViewBuffer();
+		//qe.createQEWaveFromCBuf();
 	}
 	setWave = this.setWave.bind(this);
 
@@ -424,7 +432,7 @@ export class SquishPanel extends React.Component {
 	}
 	setPotential = this.setPotential.bind(this);
 
-	// dump the view buffer, from the JS side
+	// dump the view buffer, from the JS side.  Why not use the C++ version?
 	dumpViewBuffer() {
 		const s = this.state;
 		let nRows = s.space.nPoints * 2;
@@ -487,6 +495,8 @@ export class SquishPanel extends React.Component {
 					setIterateFrequency={freq => this.setIterateFrequency(freq)}
 					openResolutionDialog={() => this.openResolutionDialog()}
 					space={s.space}
+
+					waveParams={defaultWaveParams}
 
 					dt={s.dt}
 					setDt={this.setDt}

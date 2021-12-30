@@ -3,6 +3,7 @@
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 import qe from './qe';
+import qeWave from './qeWave';
 
 let debugSpace = true;
 
@@ -142,7 +143,7 @@ export class qeBasicSpace {
 export class qeSpace extends qeBasicSpace {
 	static contCodeToText = code => ['Discrete', 'Well', 'Endless'][code];
 
-	constructor(dims) {
+	constructor(dims, waveParams) {
 		super(dims);
 		//constructDimensions(this, dims);
 
@@ -153,20 +154,28 @@ export class qeSpace extends qeBasicSpace {
 		});
 		qe.completeNewSpace();
 
-		// qeDefineAccess() will set this
-		this.waveBuffer = null;
+		// the qSpace already has allocated a wave, wrap as a nice TypedArray of doubles (pairs making up cx numbers)
+		this.wave = new Float64Array(window.Module.HEAPF64.buffer, qe.qSpace_getWaveBuffer(), 2 * this.nPoints);
+
+		//qe.space.waveBuffer = qe.waveBuffer = wave;
+		//console.info(`the wave we're createQEWaveFromCBuf():`, wave);
+		this.qewave = new qeWave(this, this.wave);
+
+		// by default it's set to 1s
+		this.qewave.setFamiliarWave(waveParams);
+
 
 		// this will be good after completeNewSpace() is called
-		this.potentialBuffer = qe.getPotentialBuffer();
+		this.potentialBuffer = qe.qSpace_getPotentialBuffer();
 
-		// a nice TypedArray of floats (4 for each row; 8 for each datapoint)
+		// wrap viewbuffer as a nice TypedArray of floats (4 for each row; 8 for each datapoint)
 		this.viewBuffer = qe.viewBuffer =
-			new Float32Array(window.Module.HEAPF32.buffer, qe.getViewBuffer(), this.nPoints*8);
+			new Float32Array(window.Module.HEAPF32.buffer, qe.qViewBuffer_getViewBuffer(), this.nPoints*8);
+		qe.qViewBuffer_loadViewBuffer();
 
-		if (debugSpace) console.log(`the resulting qeSpace:`, this);
+		if (debugSpace) console.log(`done with the resulting qeSpace:`, this);
 	}
 
-	// see also dumpThatWave() method defined in qeWave
 }
 
 

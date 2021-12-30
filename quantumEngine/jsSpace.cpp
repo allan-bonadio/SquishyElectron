@@ -37,11 +37,11 @@ static void freeWaves(void) {
 extern "C" {
 
 // return a pointer to just the main wave for theSpace
-qCx *getWaveBuffer(void) {
+qCx *qSpace_getWaveBuffer(void) {
 	return theSpace->latestQWave->wave;
 }
 
-qReal *getPotentialBuffer(void) {
+qReal *qSpace_getPotentialBuffer(void) {
 	return thePotential;
 }
 
@@ -135,18 +135,44 @@ qSpace *completeNewSpace(void) {
 	//printf("did initSpace\n");
 
 
-	/* ******************************************************** finish, like, everything */
+	/* *********************************** allocate waves */
 	allocWaves();
 
-	theQViewBuffer = new qViewBuffer(theSpace);
-
-	thePotential = new qReal[theSpace->nPoints];  // slow down, we just made this wave, don't blow it
+	// we make our own wave - static
 	theSpace->latestQWave = laosQWave;
+	qCx *wave = theSpace->latestQWave->wave;
 
-	// a default.  must be done After viewBuffer and thePotential are in place.
-	theSpace->latestQWave->setCircularWave(1);
-	theQViewBuffer->loadViewBuffer();
-	//printf("qSpace::completeNewSpace(): done\n");
+	// a dopey default.  JS fills in the actual default.
+	qDimension *dims = theSpace->dimensions;
+	for (int ix = 0; ix < dims->start + dims->end; ix++)
+		wave[ix] = qCx(1., 0.);
+
+	printf(" newly created wave, before norm:\n");
+	theSpace->dumpThatWave(wave, true);
+
+	theSpace->latestQWave->normalize();
+	printf(" newly created wave, AFTER norm:\n");
+	theSpace->dumpThatWave(wave, true);
+
+	/* *********************************** allocate other buffers */
+
+	// we make our own potential
+	theSpace->potential = thePotential = new qReal[theSpace->nPoints];
+
+	// we make our own view buffer - needs potential to be in place
+	theSpace->qViewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
+	dumpViewBuffer();
+
+	theQViewBuffer->loadViewBuffer();  // just so i can see the default if needed
+
+
+
+	// obsolete: a default.  must be done After viewBuffer and thePotential are in place.
+//	theSpace->latestQWave->setCircularWave(1);
+//	theQViewBuffer->loadViewBuffer();
+
+
+	printf("qSpace::completeNewSpace(): done\n");
 	return theSpace;
 }
 
