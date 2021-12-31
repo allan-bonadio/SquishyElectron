@@ -58,7 +58,7 @@ export class SquishView extends React.Component {
 					<span className='voNorthWest'>{et}</span> ps
 				</div>
 				<div className='northEastWrapper'>
-					frame <span className='voNorthEast'>{iser}</span>
+					iteration <span className='voNorthEast'>{iser}</span>
 				</div>
 
 				{spinner}
