@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** abstract Drawing -- superclass for drawing classes in webgl
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 

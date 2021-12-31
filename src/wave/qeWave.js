@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
-import {qeBasicSpace} from './qeSpace';
+// import {qeBasicSpace} from './qeSpace';
 
 /* **************************************************************** dumping */
 

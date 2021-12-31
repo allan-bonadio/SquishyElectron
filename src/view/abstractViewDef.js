@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** abstract View Def -- superclass for all the views, which live inside the SquishView
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 

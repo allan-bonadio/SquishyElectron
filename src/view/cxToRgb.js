@@ -1,5 +1,5 @@
 /*
-** comples To RGB -- convert a complex value to a CSS RGB string
+** complex To RGB -- convert a complex value to a CSS RGB string
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 

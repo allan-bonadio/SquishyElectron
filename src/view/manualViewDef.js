@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** Manual View Def -- an old prototype used to develop the ViewDef system
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 

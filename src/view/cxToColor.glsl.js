@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** cxToColorGlsl -- GLSL code for mapping cx numbers to rainbow colors
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
