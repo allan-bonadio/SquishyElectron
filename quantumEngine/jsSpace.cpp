@@ -79,7 +79,7 @@ void qSpace_setStepsPerIteration(int stepsPerIteration) {
 }
 
 void qSpace_oneIteration(void) { theSpace->oneIteration(); }
-void qSpace_resetCounts(void) { theSpace->resetCounts(); }
+void qSpace_resetCounters(void) { theSpace->resetCounters(); }
 
 
 

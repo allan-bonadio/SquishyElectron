@@ -21,15 +21,15 @@ static bool debugIteration = false;
 
 /* ********************************************************** qSpace construction */
 
-// resetCounts
-void qSpace::resetCounts(void) {
+// resetCounters
+void qSpace::resetCounters(void) {
 	this->elapsedTime = 0.;
 	this->iterateSerial = 0;
 }
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
 qSpace::qSpace(int nDims) {
-	this->resetCounts();
+	this->resetCounters();
 	this->nDimensions = 0;
 }
 

@@ -79,7 +79,7 @@ public:
 	double iterateSerial;
 
 	// set the elapsedTime and iterateSerial to zero
-	void resetCounts(void);
+	void resetCounters(void);
 
 	// number of  dimensions actually used, always <= MAX_DIMENSIONS
 	int32_t nDimensions;

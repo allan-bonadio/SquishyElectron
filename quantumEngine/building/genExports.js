@@ -42,7 +42,7 @@ exportsSrc  = [
 	{name: 'qSpace_setStepsPerIteration', retType: null, args: ['number']},
 
 	{name: 'qSpace_oneIteration', retType: 'number', args: []},
-	{name: 'qSpace_resetCounts', retType: null, args: []},
+	{name: 'qSpace_resetCounters', retType: null, args: []},
 
 
 
