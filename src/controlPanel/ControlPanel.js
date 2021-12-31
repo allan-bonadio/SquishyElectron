@@ -12,8 +12,8 @@ import SetWaveTab from './SetWaveTab';
 import SetPotentialTab from './SetPotentialTab';
 import SetResolutionTab from './SetResolutionTab';
 import qeSpace from '../wave/qeSpace';
-import {qeStartPromise} from '../wave/qEngine';
-import qe from '../wave/qe';
+// import {qeStartPromise} from '../wave/qEngine';
+// import qe from '../wave/qe';
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
@@ -21,9 +21,9 @@ export class ControlPanel extends React.Component {
 		openResolutionDialog: PropTypes.func.isRequired,
 
 		iterateAnimate: PropTypes.func.isRequired,
-		startIterating: PropTypes.func.isRequired,
-		stopIterating: PropTypes.func.isRequired,
+		startStop: PropTypes.func.isRequired,
 		singleStep: PropTypes.func.isRequired,
+		resetCounters: PropTypes.func.isRequired,
 
 		// these are the actual functions that change the SquishView on the screen
 		setWave: PropTypes.func.isRequired,
@@ -78,10 +78,6 @@ export class ControlPanel extends React.Component {
 
 
 	/* ********************************************** wave & pot */
-
-// 	setPulseOffset(pulseOffset) {
-// 		this.setState({pulseOffset});
-// 	}
 
 	// used to set any familiarParam value, pass eg {stdDev: 40}
 	setCPState(obj) {
@@ -151,9 +147,9 @@ export class ControlPanel extends React.Component {
 		return <div className='ControlPanel'>
 			<CPToolbar
 				isTimeAdvancing={p.isTimeAdvancing}
-				startIterating={p.startIterating}
-				stopIterating={p.stopIterating}
+				startStop={p.startStop}
 				singleStep={p.singleStep}
+				resetCounters={p.resetCounters}
 
 				iterateFrequency={p.iterateFrequency}
 				setIterateFrequency={this.setIterateFrequency}

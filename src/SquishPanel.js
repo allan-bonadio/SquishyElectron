@@ -11,7 +11,7 @@ import ControlPanel from './controlPanel/ControlPanel';
 
 // eslint-disable-next-line no-unused-vars
 import {qeBasicSpace, qeSpace} from './wave/qeSpace';
-import qeWave from './wave/qeWave';
+// import qeWave from './wave/qeWave';
 import {qeStartPromise} from './wave/qEngine';
 import qe from './wave/qe';
 
@@ -62,6 +62,8 @@ const defaultWaveParams = {
 	stdDev: 8,
 	pulseOffset: 30,
 };
+
+
 
 export class SquishPanel extends React.Component {
 	static propTypes = {
@@ -192,6 +194,11 @@ export class SquishPanel extends React.Component {
 
 	/* ******************************************************* iteration & animation */
 
+	showTimeNIteration() {
+		// need them instantaneously - react is too slow
+		document.querySelector('.voNorthWest').innerHTML = qe.qSpace_getElapsedTime().toFixed(2);
+		document.querySelector('.voNorthEast').innerHTML = qe.qSpace_getIterateSerial();
+	}
 
 	// take one integration iteration
 	crunchOneFrame() {
@@ -234,8 +241,7 @@ export class SquishPanel extends React.Component {
 			qe.theCurrentView.draw();
 
 			// populate the on-screen numbers
-			document.querySelector('.voNorthWest').innerHTML = qe.qSpace_getElapsedTime().toFixed(2);
-			document.querySelector('.voNorthEast').innerHTML = qe.qSpace_getIterateSerial();
+			this.showTimeNIteration();
 		}
 		else {
 			this.endReloadVarsBuffers = this.startReloadVarsBuffers;
@@ -304,7 +310,6 @@ export class SquishPanel extends React.Component {
 		//this.onceMore = false;
 		this.setState({isTimeAdvancing: true});
 	}
-	startIterating = this.startIterating.bind(this);
 
 	stopIterating() {
 		if (!this.state.isTimeAdvancing)
@@ -313,14 +318,25 @@ export class SquishPanel extends React.Component {
 		//this.onceMore = false;
 		this.setState({isTimeAdvancing: false});
 	}
-	stopIterating = this.stopIterating.bind(this);
 
-	singleStep(dt, stepsPerIteration) {
+	startStop() {
+		if (this.state.isTimeAdvancing)
+			this.stopIterating();
+		else
+			this.startIterating();
+	}
+	startStop = this.startStop.bind(this);
+
+	singleStep() {
 		this.iterateOneFrame(true);
-		//this.onceMore = true;  // will stop iterating after next frame
-		//this.setState({isTimeAdvancing: true});
 	}
 	singleStep = this.singleStep.bind(this);
+
+	resetCounters(ev) {
+		qe.qSpace_resetCounters();
+		this.showTimeNIteration();
+	}
+	resetCounters = this.resetCounters.bind(this);
 
 	/* ******************************************************* runningOneCycle */
 
@@ -443,6 +459,8 @@ export class SquishPanel extends React.Component {
 			console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
 	}
 
+
+
 	/* ******************************************************* space & wave creation */
 	// constructor runs twice, so do this once here
 	componentDidMount() {
@@ -484,9 +502,9 @@ export class SquishPanel extends React.Component {
 				<ControlPanel
 					iterateAnimate={(shouldAnimate, freq) => this.iterateAnimate(shouldAnimate, freq)}
 					isTimeAdvancing={s.isTimeAdvancing}
-					startIterating={() => this.startIterating()}
-					stopIterating={() => this.stopIterating()}
-					singleStep={() => this.singleStep()}
+					startStop={this.startStop}
+					singleStep={this.singleStep}
+					resetCounters={this.resetCounters}
 
 					setWave={this.setWave}
 					setPotential={this.setPotential}

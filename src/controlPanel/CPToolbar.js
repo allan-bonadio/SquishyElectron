@@ -5,14 +5,14 @@
 
 import PropTypes from 'prop-types';
 import LogSlider from '../widgets/LogSlider';
-import qe from '../wave/qe';
+// import qe from '../wave/qe';
 
 function setPT() {
 	CPToolbar.propTypes = {
-		startIterating: PropTypes.func.isRequired,
-		stopIterating: PropTypes.func.isRequired,
+		startStop: PropTypes.func.isRequired,
 		singleStep: PropTypes.func.isRequired,
 		isTimeAdvancing: PropTypes.bool.isRequired,
+		resetCounters: PropTypes.func.isRequired,
 
 		iterateFrequency: PropTypes.number.isRequired,
 		setIterateFrequency: PropTypes.func.isRequired,
@@ -26,8 +26,7 @@ function setPT() {
 
 function CPToolbar(props) {
 	const {iterateFrequency, setIterateFrequency,
-		dt, stepsPerIteration,
-		isTimeAdvancing, startIterating, stopIterating, singleStep} = props;
+		isTimeAdvancing} = props;
 
 	const repRates = <>
 		<option key='60' value='60'>60 per sec</option>
@@ -64,12 +63,7 @@ function CPToolbar(props) {
 
 
 		<button type='button' className={`startStopToggle toolbarButton toolbarGradient`}
-			onClick={ev => {
-				if (isTimeAdvancing)
-					stopIterating(dt, stepsPerIteration);
-				else
-					startIterating();
-			}}>
+			onClick={props.startStop}>
 			{ isTimeAdvancing
 				? <span><big>&nbsp;</big>▐▐ <big>&nbsp;</big></span>
 				: <big>►</big> }
@@ -78,7 +72,7 @@ function CPToolbar(props) {
 
 
 		<button type='button' className={`stepButton toolbarButton toolbarGradient `}
-			onClick={ev => singleStep(dt, stepsPerIteration)}>
+			onClick={props.singleStep}>
 			<big>►</big> ▌
 		</button>
 
@@ -116,7 +110,7 @@ function CPToolbar(props) {
 			}}
 		/>
 
-		<button onClick={qe.qSpace_resetCounts()}>Reset Counters</button>
+		<button onClick={props.resetCounters}>Reset Counters</button>
 
 	</div>;
 }
