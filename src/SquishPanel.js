@@ -137,6 +137,35 @@ export class SquishPanel extends React.Component {
 		console.log(`SquishPanel constructor done`);
 	}
 
+	/* ******************************************************* space & wave creation */
+	// constructor runs twice, so do this once here
+	componentDidMount() {
+		// upon startup, after C++ says it's ready, but remember constructor runs twice
+		qeStartPromise.then((arg) => {
+			// done in qEngine qeDefineAccess();
+
+			this.setNew1DResolution(
+				DEFAULT_RESOLUTION, DEFAULT_CONTINUUM, DEFAULT_VIEW_CLASS_NAME);
+
+			// vital properties of the space
+			qe.qSpace_setDt(this.state.dt);
+			qe.qSpace_setStepsPerIteration(this.state.stepsPerIteration);
+
+			// this should be the only place animateHeartbeat() should be called
+			// except for inside the function itself
+			this.animateHeartbeat(performance.now());
+
+			// use this.currentView rather than state.currentView - we just set it
+			// and it takes a while.
+			// Make sure you call the new view's domSetup method.
+			this.currentView.domSetup(this.canvas);
+		}).catch(ex => {
+			console.error(`error in SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
+			debugger;
+		});
+
+	}
+
 	// this is kinda cheating, but the currentView in the state takes some time to
 	// get set; but we need it immediately.  So we also set it as a variable on this.
 	get curView() {
@@ -303,48 +332,6 @@ export class SquishPanel extends React.Component {
 	}
 	animateHeartbeat = this.animateHeartbeat.bind(this);  // so we can pass it as a callback
 
-	/* ******************************************************* control panel settings */
-
-	// set the frequency of iteration frames.  Does not control whether iterating or not.
-	setIterateFrequency(newFreq) {
-		this.setState({iteratePeriod: 1000. / +newFreq});
-	}
-
-	startIterating() {
-		if (this.state.isTimeAdvancing)
-			return;
-
-		//this.onceMore = false;
-		this.setState({isTimeAdvancing: true});
-	}
-
-	stopIterating() {
-		if (!this.state.isTimeAdvancing)
-			return;
-
-		//this.onceMore = false;
-		this.setState({isTimeAdvancing: false});
-	}
-
-	startStop() {
-		if (this.state.isTimeAdvancing)
-			this.stopIterating();
-		else
-			this.startIterating();
-	}
-	startStop = this.startStop.bind(this);
-
-	singleStep() {
-		this.iterateOneFrame(true);
-	}
-	singleStep = this.singleStep.bind(this);
-
-	resetCounters(ev) {
-		qe.qSpace_resetCounters();
-		this.showTimeNIteration();
-	}
-	resetCounters = this.resetCounters.bind(this);
-
 	/* ******************************************************* runningOneCycle */
 
 	// use for benchmarking with a circular wave.  Will start iteration, and stop after
@@ -408,6 +395,48 @@ export class SquishPanel extends React.Component {
 		</div>
 	}
 
+	/* ******************************************************* control panel settings */
+
+	// set the frequency of iteration frames.  Does not control whether iterating or not.
+	setIterateFrequency(newFreq) {
+		this.setState({iteratePeriod: 1000. / +newFreq});
+	}
+
+	startIterating() {
+		if (this.state.isTimeAdvancing)
+			return;
+
+		//this.onceMore = false;
+		this.setState({isTimeAdvancing: true});
+	}
+
+	stopIterating() {
+		if (!this.state.isTimeAdvancing)
+			return;
+
+		//this.onceMore = false;
+		this.setState({isTimeAdvancing: false});
+	}
+
+	startStop() {
+		if (this.state.isTimeAdvancing)
+			this.stopIterating();
+		else
+			this.startIterating();
+	}
+	startStop = this.startStop.bind(this);
+
+	singleStep() {
+		this.iterateOneFrame(true);
+	}
+	singleStep = this.singleStep.bind(this);
+
+	resetCounters(ev) {
+		qe.qSpace_resetCounters();
+		this.showTimeNIteration();
+	}
+	resetCounters = this.resetCounters.bind(this);
+
 	/* ******************************************************* user settings */
 
 	setDt(dt) {
@@ -469,35 +498,6 @@ export class SquishPanel extends React.Component {
 	}
 
 
-
-	/* ******************************************************* space & wave creation */
-	// constructor runs twice, so do this once here
-	componentDidMount() {
-		// upon startup, after C++ says it's ready, but remember constructor runs twice
-		qeStartPromise.then((arg) => {
-			// done in qEngine qeDefineAccess();
-
-			this.setNew1DResolution(
-				DEFAULT_RESOLUTION, DEFAULT_CONTINUUM, DEFAULT_VIEW_CLASS_NAME);
-
-			// vital properties of the space
-			qe.qSpace_setDt(this.state.dt);
-			qe.qSpace_setStepsPerIteration(this.state.stepsPerIteration);
-
-			// this should be the only place animateHeartbeat() should be called
-			// except for inside the function itself
-			this.animateHeartbeat(performance.now());
-
-			// use this.currentView rather than state.currentView - we just set it
-			// and it takes a while.
-			// Make sure you call the new view's domSetup method.
-			this.currentView.domSetup(this.canvas);
-		}).catch(ex => {
-			console.error(`error in SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
-			debugger;
-		});
-
-	}
 
 	/* ******************************************************* rendering */
 
