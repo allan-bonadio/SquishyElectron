@@ -247,11 +247,11 @@ export default class ResolutionDialog extends React.Component {
 
 				<section className='dialogSection'
 					style={{padding: '1em', margin: '1em', textAlign: 'right'}}>
-					<button type='button' className='cancelButton'
+					<button className='cancelButton'
 						onClick={ev => this.cancel(ev)}>
 							Cancel
 					</button>
-					<button type='button' className='setResolutionOKButton'
+					<button className='setResolutionOKButton'
 						onClick={ev => this.OK(ev)}>
 							Recreate Universe
 					</button>

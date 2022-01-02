@@ -62,7 +62,7 @@ function CPToolbar(props) {
 		</div>
 
 
-		<button type='button' className={`startStopToggle toolbarButton toolbarGradient`}
+		<button className={`startStopToggle toolbarButton toolbarGradient`}
 			onClick={props.startStop}>
 			{ isTimeAdvancing
 				? <span><big>&nbsp;</big>▐▐ <big>&nbsp;</big></span>
@@ -71,7 +71,7 @@ function CPToolbar(props) {
 
 
 
-		<button type='button' className={`stepButton toolbarButton toolbarGradient `}
+		<button className={`stepButton toolbarButton toolbarGradient `}
 			onClick={props.singleStep}>
 			<big>►</big> ▌
 		</button>

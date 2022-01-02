@@ -44,7 +44,7 @@ class ErrorBoundary extends React.Component {
 				<p style={{backgroundColor: '#804', color: '#fde'}}>
 					Info: {JSON.stringify(this.info)}</p>
 				<p style={{backgroundColor: '#fee', color: '#000'}}>
-					<button type='button' onClick={() => this.recover()}>
+					<button onClick={() => this.recover()}>
 						try to restart</button></p>
 			</main>;
 		}
