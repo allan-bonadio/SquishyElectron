@@ -4,6 +4,7 @@
 */
 import qe from './qe';
 import qeWave from './qeWave';
+import {setFamiliarPotential, getWrappedPotential} from '../widgets/utils';
 
 let debugSpace = true;
 
@@ -122,12 +123,14 @@ export class qeBasicSpace {
 			break;
 
 		case qeBasicSpace.contENDLESS:
-			// the points on the end get set to the opposite side
+			// the points on the end get set to the opposite side.  Remember this is for complex, 2x
 			wave[0] = wave[end-2];
 			wave[1]  = wave[end-1];
 			wave[end] = wave[2];
 			wave[end+1] = wave[3];
 			break;
+
+		default: throw `bad continuum '${continuum}' in  qeSpace.fixThoseBoundaries()`;
 		}
 	}
 }
@@ -143,7 +146,7 @@ export class qeBasicSpace {
 export class qeSpace extends qeBasicSpace {
 	static contCodeToText = code => ['Discrete', 'Well', 'Endless'][code];
 
-	constructor(dims, waveParams) {
+	constructor(dims, waveParams, potentialParams) {
 		super(dims);
 		//constructDimensions(this, dims);
 
@@ -161,12 +164,13 @@ export class qeSpace extends qeBasicSpace {
 		//console.info(`the wave we're createQEWaveFromCBuf():`, wave);
 		this.qewave = new qeWave(this, this.wave);
 
-		// by default it's set to 1s
+		// by default it's set to 1s, but we want something good.
 		this.qewave.setFamiliarWave(waveParams);
 
 
 		// this will be good after completeNewSpace() is called
-		this.potentialBuffer = qe.qSpace_getPotentialBuffer();
+		this.potentialBuffer = getWrappedPotential(this);
+		setFamiliarPotential(this, this.potentialBuffer, potentialParams);
 
 		// wrap viewbuffer as a nice TypedArray of floats (4 for each row; 8 for each datapoint)
 		this.viewBuffer = qe.viewBuffer =

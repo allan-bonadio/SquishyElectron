@@ -26,6 +26,8 @@ import flatViewDef from './view/flatViewDef';
 import flatDrawingViewDef from './view/flatDrawingViewDef';
 import drawingViewDef from './view/drawingViewDef';
 
+import {setFamiliarPotential} from './widgets/utils';
+
 // runtime debugging flags - you can change in the debugger or here
 let areBenchmarking = false;
 let dumpingTheViewBuffer = false;
@@ -63,7 +65,12 @@ const defaultWaveParams = {
 	pulseOffset: 30,
 };
 
-
+const defaultPotentialParams = {
+	potentialBreed: 'flat',
+	valleyPower: 1,
+	valleyScale: 1,
+	valleyOffset: 50,
+};
 
 export class SquishPanel extends React.Component {
 	static propTypes = {
@@ -148,7 +155,7 @@ export class SquishPanel extends React.Component {
 	setNew1DResolution(N, continuum, viewClassName) {
 		qe.theCurrentView =  null;
 
-		qe.space = new qeSpace([{N, continuum, label: 'x'}], defaultWaveParams);
+		qe.space = new qeSpace([{N, continuum, label: 'x'}], defaultWaveParams, defaultPotentialParams);
 
 		// now create the view class instance as described by the space
 		const vClass = listOfViewClassNames[viewClassName];
@@ -431,20 +438,22 @@ export class SquishPanel extends React.Component {
 
 	// completely wipe out the quantum potential and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon set potential in potential tab
-	setPotential(breed, arg1 = 1, arg2 = 1, arg3 = 0) {
-		switch (breed) {
-		case 'zero':
-			qe.qSpace_setZeroPotential()
-			break;
+	setPotential(potentialParams) {
+		setFamiliarPotential(this.state.space, this.state.space.potentialBuffer, potentialParams);
+		this.iterateOneFrame(true, true);  // ???
 
-		case 'valley':
-			qe.qSpace_setValleyPotential(+arg1, +arg2, +arg3);
-			break;
-
-		default:
-			throw `setPotential: no voltage breed '${breed}'`
-		}
-		this.iterateOneFrame(false, true);
+// 		switch (breed) {
+// 		case 'zero':
+// 			qe.qSpace_setZeroPotential()
+// 			break;
+//
+// 		case 'valley':
+// 			qe.qSpace_setValleyPotential(+arg1, +arg2, +arg3);
+// 			break;
+//
+// 		default:
+// 			throw `setPotential: no voltage breed '${breed}'`
+// 		}
 	}
 	setPotential = this.setPotential.bind(this);
 
@@ -506,15 +515,16 @@ export class SquishPanel extends React.Component {
 					singleStep={this.singleStep}
 					resetCounters={this.resetCounters}
 
+					waveParams={defaultWaveParams}
 					setWave={this.setWave}
+
+					potentialParams={defaultPotentialParams}
 					setPotential={this.setPotential}
 
 					iterateFrequency={1000 / s.iteratePeriod}
 					setIterateFrequency={freq => this.setIterateFrequency(freq)}
 					openResolutionDialog={() => this.openResolutionDialog()}
 					space={s.space}
-
-					waveParams={defaultWaveParams}
 
 					dt={s.dt}
 					setDt={this.setDt}

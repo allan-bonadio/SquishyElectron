@@ -17,7 +17,6 @@ import qeSpace from '../wave/qeSpace';
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
-		//innerActiveWidth: PropTypes.number,
 		openResolutionDialog: PropTypes.func.isRequired,
 
 		iterateAnimate: PropTypes.func.isRequired,
@@ -36,19 +35,28 @@ export class ControlPanel extends React.Component {
 
 		// early on, there's no space.  Must have SquishPanel mounted first.
 		space: PropTypes.instanceOf(qeSpace),
+
 		waveParams: PropTypes.shape({
 			waveBreed: PropTypes.string.isRequired,
 			waveFrequency: PropTypes.number.isRequired,
 			stdDev: PropTypes.number.isRequired,
 			pulseOffset: PropTypes.number.isRequired,
 		}).isRequired,
-	};
+
+		potentialParams: PropTypes.shape({
+			potentialBreed: PropTypes.string.isRequired,
+			valleyPower: PropTypes.number.isRequired,
+			valleyScale: PropTypes.number.isRequired,
+			valleyOffset: PropTypes.number.isRequired,
+		}),
+	}
 
 	constructor(props) {
 		super(props);
 		const wp = props.waveParams;
+		const pp = props.potentialParams;
 
-		// most of the state is really kept in the SquishPanel
+		// most of the state is kept here.  But, the defaults are from the SquishPanel
 		this.state = {
 			// state for the wave resets - these are control-panel only.
 			// waveParams - Only goes into effect if we call setWave()
@@ -58,13 +66,13 @@ export class ControlPanel extends React.Component {
 			pulseOffset: wp.pulseOffset,
 
 			// state for potential resets - control panel only, setPotential()
-			potentialBreed: 'flat',
-			valleyPower: 1,
-			valleyScale: 1,
-			valleyOffset: 50,
+			potentialBreed: pp.potentialBreed,
+			valleyPower: pp.valleyPower,
+			valleyScale: pp.valleyScale,
+			valleyOffset: pp.valleyOffset,
 
 			showingTab: 'wave',
-		};
+		}
 	}
 
 	/* *********************************** params */
@@ -93,6 +101,21 @@ export class ControlPanel extends React.Component {
 	}
 	setWaveHandler = this.setWaveHandler.bind(this);
 
+	setFlatPotentialHandler(ev) {
+		const {valleyPower, valleyScale, valleyOffset} = this.state;
+		this.props.setPotential({potentialBreed: 'flat', valleyPower, valleyScale, valleyOffset});
+	}
+	setFlatPotentialHandler = this.setFlatPotentialHandler.bind(this);
+
+	setValleyPotentialHandler(ev) {
+		const {valleyPower, valleyScale, valleyOffset} = this.state;
+		this.props.setPotential({potentialBreed: 'valley', valleyPower, valleyScale, valleyOffset});
+	}
+	setValleyPotentialHandler = this.setValleyPotentialHandler.bind(this);
+
+
+
+
 	/* ********************************************** render  pieces */
 
 	// whichever tab is showing right now
@@ -110,17 +133,22 @@ export class ControlPanel extends React.Component {
 					stdDev: s.stdDev, pulseOffset: s.pulseOffset,}}
 
 				setCPState={this.setCPState}
-				space={p.space}
+				origSpace={p.space}
 			/>;
 
 		case 'potential':
-			return <SetPotentialTab setPotential={p.setPotential}
+			return <SetPotentialTab
+				setFlatPotentialHandler={this.setFlatPotentialHandler}
+				setValleyPotentialHandler={this.setValleyPotentialHandler}
+				potentialParams={{
+					potentialBreed: s.potentialBreed,
+					valleyPower: +s.valleyPower,
+					valleyScale: +s.valleyScale,
+					valleyOffset: +s.valleyOffset,
+				}}
+
 				setCPState={this.setCPState}
-				waveBreed={s.potentialBreed}
-				valleyPower={s.valleyPower}
-				valleyScale={s.valleyScale}
-				valleyOffset={s.valleyOffset}
-				space={s.space}
+				origSpace={p.space}
 			/>;
 
 
