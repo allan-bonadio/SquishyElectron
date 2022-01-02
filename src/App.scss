@@ -96,6 +96,7 @@ button {
 		text-align: right;
 	}
 	input[type=range] {
+		display: block;
 		margin-bottom: -.5em;
 		accent-color: #f80;
 		height: 2em;
