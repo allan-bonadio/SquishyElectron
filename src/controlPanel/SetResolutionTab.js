@@ -15,7 +15,7 @@ function SetResolutionTab(props) {
 	const p = props;
 
 	return (<div className='SetResolutionTab'>
-		<button type='button' className='setResolutionButton  round'
+		<button className='setResolutionButton  round'
 			onClick={ev => p.openResolutionDialog()}>
 				Change Resolution
 				<div style={{fontSize: '.7em'}}>
