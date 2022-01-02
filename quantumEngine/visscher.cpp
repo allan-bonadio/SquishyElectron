@@ -93,6 +93,7 @@ void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
 	//this->dumpThatWave(oldW, true);
 	//printf("⚛︎ dt=%lf\n", dt);
 
+	double *potential = this->potential;
 	//printf("⚛︎ the hamiltonian ψ.im at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
 
@@ -101,7 +102,8 @@ void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
 		//printf("⚛︎ the hamiltonian ψ.im at x=%d  then dt=%lf d2x=%lf,%lf oldW1=%lf,%lf\n",
 		//	ix, dt, d2.re,d2.im, oldW1.re, oldW1.im);
 
-		double Hψ = d2ψr;   // + Vψ
+		double Hψ = d2ψr + potential[ix];
+		//double Hψ = d2ψr;  // without potential
 
 		// note addition
 		newW[ix].im = oldW[ix].im + dt * Hψ;
