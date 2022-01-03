@@ -30,7 +30,7 @@ import {setFamiliarPotential} from './widgets/utils';
 
 // runtime debugging flags - you can change in the debugger or here
 let areBenchmarking = false;
-let dumpingTheViewBuffer = false;
+let dumpingTheViewBuffer = true;
 
 
 
@@ -53,8 +53,9 @@ const DEFAULT_VIEW_CLASS_NAME =
 'flatDrawingViewDef';
 
 //const DEFAULT_RESOLUTION = 100;
-const DEFAULT_RESOLUTION = 5;
+const DEFAULT_RESOLUTION = 60;
 //const DEFAULT_RESOLUTION = 25;
+//const DEFAULT_RESOLUTION = 5;
 //const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 25;
 const DEFAULT_CONTINUUM = qeBasicSpace.contENDLESS;
 
@@ -244,7 +245,7 @@ export class SquishPanel extends React.Component {
 		//qe.createQEWaveFromCBuf();
 
 		if (dumpingTheViewBuffer)
-			this.dumpViewBuffer();
+			this.dumpViewBuffer('crunchOneFrame()');
 	}
 
 	// Integrate the ODEs by one 'step', or not.  and then display.
@@ -470,6 +471,8 @@ export class SquishPanel extends React.Component {
 	setPotential(potentialParams) {
 		setFamiliarPotential(this.state.space, this.state.space.potentialBuffer, potentialParams);
 		this.iterateOneFrame(true, true);  // ???
+		if (dumpingTheViewBuffer)
+			qe.qViewBuffer_getViewBuffer();
 
 // 		switch (breed) {
 // 		case 'zero':
@@ -487,12 +490,12 @@ export class SquishPanel extends React.Component {
 	setPotential = this.setPotential.bind(this);
 
 	// dump the view buffer, from the JS side.  Why not use the C++ version?
-	dumpViewBuffer() {
+	dumpViewBuffer(title = '') {
 		const s = this.state;
 		let nRows = s.space.nPoints * 2;
 		let vb = s.space.viewBuffer;
 		const _ = (f) => f.toFixed(3).padStart(6);
-		console.log(`dump of view buffer for ${s.space.nPoints} points in ${nRows} rows`);
+		console.log(`dump of view buffer '${title}' for ${s.space.nPoints} points in ${nRows} rows`);
 		for (let i = 0; i < nRows; i++)
 			console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
 	}

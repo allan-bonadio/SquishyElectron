@@ -16,12 +16,14 @@ import qCx from '../wave/qCx';
 import cxToRgb from '../view/cxToRgb';
 import TextNSlider from '../widgets/TextNSlider';
 
-let debugWaveTab = true;
+let debugWaveTab = false;
 
 function setPT() {
 	// variables from on high, and the funcs needed to change them
 	SetWaveTab.propTypes = {
-		// sets it in C++
+		origSpace: PropTypes.instanceOf(qeSpace),
+
+		// actually sets the one in use by the algorithm
 		setWaveHandler: PropTypes.func.isRequired,
 
 		waveParams: PropTypes.shape({
@@ -32,8 +34,6 @@ function setPT() {
 
 		// sets it only in the ControlPanel state for subsequent SetWave click
 		setCPState: PropTypes.func,
-
-		origSpace: PropTypes.instanceOf(qeSpace),
 
 	};
 }
@@ -70,7 +70,7 @@ class SetWaveTab extends React.Component {
 			maxY = Math.max(maxY, magn);
 
 			if (debugWaveTab) console.log(
-				`miniGraph magn = '${magn}' `);
+				`miniGraph magn${ix} = '${magn}' `);
 		}
 
 		// a bit tighter so we can fit in all the bar widths

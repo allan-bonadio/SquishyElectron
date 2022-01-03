@@ -10,6 +10,7 @@ import {viewUniform, viewAttribute} from './viewVariable';
 //import SquishPanel from '../SquishPanel';
 //import {qeStartPromise} from '../wave/qEngine';
 
+let debug = false;
 
 /* ******************************************************* unit height management */
 
@@ -137,7 +138,7 @@ class flatDrawing extends abstractDrawing {
 		this.rowFloats = 4;
 		this.rowAttr.attachArray(qe.space.viewBuffer, this.rowFloats);
 
-		console.info(`just set inputs in flatDrawing.js.  Attached viewBuffer:`, qe.space.viewBuffer)
+		console.log(`just set inputs in flatDrawing.js.  :`);
 	}
 
 
@@ -160,8 +161,8 @@ class flatDrawing extends abstractDrawing {
 		if (alsoDrawPoints)
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 
-		console.info(`finished drawing in flatDrawing.js; drew buf:`);
-		qe.qViewBuffer_dumpViewBuffer();
+		if (debug)
+			qe.qViewBuffer_dumpViewBuffer(`finished drawing in flatDrawing.js; drew buf:`);
 	}
 
 

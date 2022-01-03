@@ -169,7 +169,7 @@ void qWave::dumpThatWave(qCx *wave, bool withExtras) {
 
 // this is the member function that dumps its own wave and space
 void qWave::dumpWave(const char *title, bool withExtras) {
-	printf("\n==== Wave | %s", title);
+	printf("\n==== Wave | %s ", title);
 	this->space->dumpThatWave(this->wave, withExtras);
 	printf("\n==== end of Wave ====\n\n");
 }
@@ -265,7 +265,7 @@ void qWave::normalize(void) {
 	///this->space->visscherHalfStep(wave, this);
 }
 
-/* ********************************************************** bad ideas */
+/* ************************************************* bad ideas I might revisit?  */
 
 qReal cleanOneNumber(qReal u, int ix, int sense) {
 	if (!isfinite(u)) {
@@ -323,6 +323,8 @@ void qWave::prune() {
 
 
 /* ********************************************************** populate wave */
+
+// obsolete?  I think so
 
 // how big the delay between re and im, in radians kindof.  see code.
 // see also same thing in qFlick

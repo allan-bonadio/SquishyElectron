@@ -147,12 +147,12 @@ qSpace *completeNewSpace(void) {
 	for (int ix = 0; ix < dims->start + dims->end; ix++)
 		wave[ix] = qCx(1., 0.);
 
-	printf(" newly created wave, before norm:\n");
-	theSpace->dumpThatWave(wave, true);
+	//printf(" newly created wave, before norm:\n");
+	//theSpace->dumpThatWave(wave, true);
 
 	theSpace->latestQWave->normalize();
-	printf(" newly created wave, AFTER norm:\n");
-	theSpace->dumpThatWave(wave, true);
+	//printf(" newly created wave, AFTER norm:\n");
+	//theSpace->dumpThatWave(wave, true);
 
 	/* *********************************** allocate other buffers */
 
@@ -161,7 +161,7 @@ qSpace *completeNewSpace(void) {
 
 	// we make our own view buffer - needs potential to be in place
 	theSpace->qViewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
-	dumpViewBuffer();
+	dumpViewBuffer("newly created");
 
 	theQViewBuffer->loadViewBuffer();  // just so i can see the default if needed
 

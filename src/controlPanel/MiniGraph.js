@@ -17,7 +17,7 @@ import {qeSpace, qeBasicSpace} from '../wave/qeSpace';
 //const π = Math.PI;
 //const radsPerDeg = π / 180;
 
-let miniDebug = true;
+let miniDebug = false;
 
 function setPT() {
 	MiniGraph.propTypes = {

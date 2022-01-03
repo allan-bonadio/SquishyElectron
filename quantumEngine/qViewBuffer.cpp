@@ -7,7 +7,7 @@
 #include "qSpace.h"
 #include "qWave.h"
 
-static const bool debugViewBuffer = true;
+static const bool debugViewBuffer = false;
 static const bool debugInDetail = false;
 
 
@@ -33,32 +33,32 @@ qViewBuffer::~qViewBuffer() {
 // Two vertices per datapoint: bottom then top, same data.
 // also converts from doubles to floats for GL.
 float qViewBuffer::loadViewBuffer(void) {
-	printf("qViewBuffer::loadViewBuffer space ptr %ld\n", (long) this->space);
-	printf("qViewBuffer::loadViewBuffer latestQWave ptr %ld\n", (long) this->space->latestQWave);
+//	printf("qViewBuffer::loadViewBuffer space ptr %ld\n", (long) this->space);
+//	printf("qViewBuffer::loadViewBuffer latestQWave ptr %ld\n", (long) this->space->latestQWave);
 	qWave *latestQWave = this->space->latestQWave;
-	printf("qViewBuffer::loadViewBuffer latestWave ptr %ld\n", (long) latestQWave->wave);
+//	printf("qViewBuffer::loadViewBuffer latestWave ptr %ld\n", (long) latestQWave->wave);
 	qCx *latestWave = latestQWave->wave;
 
-	printf("qViewBuffer::loadViewBuffer this->space->nPoints %ld\n", (long) this->space->nPoints);
+//	printf("qViewBuffer::loadViewBuffer this->space->nPoints %ld\n", (long) this->space->nPoints);
 	int nPoints = this->space->nPoints;
 	qReal highest = 0;
 	qReal tiny = 1e-8;
 
 	if (debugInDetail) {
-		printf("loadViewBuffer(P): thePotential=%ld\n",
-			(long) thePotential);
-		printf("loadViewBuffer(B): this->space->latestQWave->wave=%ld->%ld->%ld->%ld\n",
-			(long) this,
-			(long) this->space,
-			(long) this->space->latestQWave,
-			(long) this->space->latestQWave->wave);
-		printf("loadViewBuffer(vb,lqw): viewBuffer %ld and latestQWave->wave=%ld\n",
-			(long) viewBuffer, (long) latestWave);
+//		printf("loadViewBuffer(P): thePotential=%ld\n",
+//			(long) thePotential);
+//		printf("loadViewBuffer(B): this->space->latestQWave->wave=%ld->%ld->%ld->%ld\n",
+//			(long) this,
+//			(long) this->space,
+//			(long) this->space->latestQWave,
+//			(long) this->space->latestQWave->wave);
+//		printf("loadViewBuffer(vb,lqw): viewBuffer %ld and latestQWave->wave=%ld\n",
+//			(long) viewBuffer, (long) latestWave);
 		latestQWave->dumpWave("at start of loadViewBuffer()");
 	}
 
 	// this is index into the complex point, which translates to 2 GL points
-	printf("qViewBuffer::loadViewBuffer about to do all the pts\n");
+//	printf("qViewBuffer::loadViewBuffer about to do all the pts\n");
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
 		if (debugInDetail) {
 			printf("qViewBuffer::loadViewBuffer this->viewBuffer %ld\n", (long) this->viewBuffer);
@@ -109,7 +109,7 @@ float qViewBuffer::loadViewBuffer(void) {
 
 	if (debugViewBuffer) {
 		printf("  ===  💅 viewBuffer.cpp done, as written to view buffer:\n");
-		dumpViewBuffer();
+		dumpViewBuffer("loadViewBuffer done");
 	}
 
 	return highest;
@@ -120,15 +120,16 @@ float qViewBuffer::loadViewBuffer(void) {
 //float *viewBuffer;
 
 // dump the view buffer just before it heads off to webgl.
-void dumpViewBuffer(void) {
-	printf("dumpViewBuffer theSpace %ld\n", (long) theSpace);
-	printf("dumpViewBuffer qViewBuffer ptr %ld\n", (long) theSpace->qViewBuffer);
-	printf("dumpViewBuffer viewBuffer %ld\n", (long) theSpace->qViewBuffer->viewBuffer);
+void dumpViewBuffer(const char *title) {
+//	printf("dumpViewBuffer theSpace %ld\n", (long) theSpace);
+//	printf("dumpViewBuffer qViewBuffer ptr %ld\n", (long) theSpace->qViewBuffer);
+//	printf("dumpViewBuffer viewBuffer %ld\n", (long) theSpace->qViewBuffer->viewBuffer);
 	float *viewBuffer = theSpace->qViewBuffer->viewBuffer;
 	qReal prevRe = viewBuffer[0];
 	qReal prevIm = viewBuffer[1];
 
-	printf("==== dump ViewBuffer | \n");
+	if (!title) title = "";
+	printf("==== dump ViewBuffer | %s\n", title);
 	printf("   ix  |    re      im     pot    serial  |   phase    magn\n");
 	for (int i = 0; i < theSpace->nPoints*2; i++) {
 		qReal re = viewBuffer[i*4];
@@ -159,8 +160,8 @@ void dumpViewBuffer(void) {
 
 // for the JS side
 extern "C" {
-	void qViewBuffer_dumpViewBuffer(void) {
-		dumpViewBuffer();
+	void qViewBuffer_dumpViewBuffer(const char *title) {
+		dumpViewBuffer(title);
 	}
 
 	float *qViewBuffer_getViewBuffer(void) {
