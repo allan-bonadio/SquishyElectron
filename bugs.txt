@@ -23,13 +23,18 @@ Multiprocessing must be done with pThreads and/or web workers, it seems.
 ------------------------------------------- to do - small
 - after setting wave or potential, redraw!
 - small key image indicating phase-color correspondence. ?? does it  really matter?  Maybe just an explanation.
-- should detect off-the-rails situations and stop iteration
 
+- should detect off-the-rails situations and stop iteration.
+	any NaNs, Infinity, or consecutive ix values that differ greatly.  Maybe calculate sum of abs of differences between consecutive psi values - and figure how whatthreshold to use.
 
+- sliders for potential don't quite work the way i want - I think they need log and negative versions but log slider isn't ste up for that yet.
+
+- I think it doesn't converve energy - gotta check this out
+- the potential stuff really needs a wrapper object like qWaves.  It's time.
 
 ------------------------------------------- to do - big
 
-- potential!  and ability to change by hand
+- potential: ability to change by hand
 
 - UI ability to set n of dimensions, and to specify angular momentum, and any energy/potential differences therein.  Two particles in the same space should have the same X coordinates; one in 2-d space should have X  and Y coords.  The V potential would be 1-dimensional or 2 dimensional, depending.
 Any number of dimensions, eg x and s, the spin, becomes ψ[1...N][-½, ½]
