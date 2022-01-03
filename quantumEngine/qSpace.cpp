@@ -15,6 +15,8 @@ class qSpace *theSpace = NULL;
 qReal *thePotential = NULL;
 
 static bool debugIteration = false;
+static bool debugJustWave = true;
+static bool debugJustInnerProduct = false;
 
 // someday I need an C++ error handling layer.  See
 // https://emscripten.org/docs/porting/Debugging.html?highlight=assertions#handling-c-exceptions-from-javascript
@@ -181,8 +183,22 @@ void qSpace::oneIteration() {
 	// 	(long) viewBuffer, (long) latestWave);
 	this->latestQWave = laosQWave;
 
+	// ok this algorithm tends to diverge after thousands of iterations.  Hose it down.
+	this->latestQWave->normalize();
+
+
 	// need it; somehow? not done in JS
 	theQViewBuffer->loadViewBuffer();
 
+	if (debugJustWave) {
+		char buf[100];
+		sprintf(buf, "finished one iteration (%d steps, N=%d), inner product: %lf",
+			this->stepsPerIteration, this->dimensions->N, this->latestQWave->innerProduct());
+		this->latestQWave->dumpWave(buf, true);
+	}
+	if (debugJustInnerProduct) {
+		printf("finished one iteration (%d steps, N=%d), inner product: %lf\n",
+			this->stepsPerIteration, this->dimensions->N, this->latestQWave->innerProduct());
+	}
 }
 
