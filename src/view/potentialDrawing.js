@@ -89,7 +89,7 @@ class potentialDrawing extends abstractDrawing {
 
 		// note unit height for potential is different from unit potential for wave!
 		let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
-		this.unitHeight = .125;
+		this.unitHeight = .0125;
 		unitHeightUniform.setValue(this.unitHeight, '1f');
 
 		// this shares the view buf with wave, [re, im, potential, serial]

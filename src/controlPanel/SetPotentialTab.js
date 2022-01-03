@@ -9,14 +9,20 @@ import PropTypes from 'prop-types';
 import {scaleLinear} from 'd3-scale';
 import {path as d3path} from 'd3-path';
 
-import {setFamiliarPotential} from '../widgets/utils';
+import {setFamiliarPotential, dumpPotential} from '../widgets/utils';
 import MiniGraph from './MiniGraph';
-//import qeSpace from '../wave/qeSpace';
+import qeSpace from '../wave/qeSpace';
 import TextNSlider from '../widgets/TextNSlider';
+
+// some typical potential value, so we can get an idea of how to scale in the graph
+let SOME_POTENTIAL = 0.01;
 
 // set prop types
 function setPT() {
 	SetPotentialTab.propTypes = {
+		origSpace: PropTypes.instanceOf(qeSpace),
+
+		// actually sets the one in use by the algorithm
 		setFlatPotentialHandler: PropTypes.func.isRequired,
 		setValleyPotentialHandler: PropTypes.func.isRequired,
 
@@ -52,11 +58,16 @@ class SetPotentialTab extends React.Component {
 		setFamiliarPotential(miniSpace, potentialArray, potentialParams);
 
 		// calc domain
-		let maxY = 1, minY = -1;  // in case all the other values are zero, which is the default
+		let maxY = 0;
+		let minY = 0;  // in case all the other values are zero, which is the default
 		for (let ix = start; ix < end; ix++) {
 			minY = Math.min(minY, potentialArray[ix]);
 			maxY = Math.max(maxY, potentialArray[ix]);
 		}
+
+		// make some room in case it's small or zero
+		minY -= SOME_POTENTIAL;
+		maxY += SOME_POTENTIAL;
 
 		this.xScale.domain([1, N]);
 		this.yScale.domain([maxY, minY]);
@@ -69,7 +80,8 @@ class SetPotentialTab extends React.Component {
 			pathObj.lineTo(this.xScale(ix), this.yScale(potentialArray[ix]).toFixed(2));
 		}
 		const d = pathObj.toString();
-		console.info(`d = ${d}`)
+		//console.info(`d = ${d}`)
+		dumpPotential(miniSpace, potentialArray);
 
 		return <g className='linePaths' >
 			<path d={d} stroke='#fff' fill='none'  key='only' strokeWidth={3} />
@@ -104,7 +116,7 @@ class SetPotentialTab extends React.Component {
 		const sliders = 	<>
 				<TextNSlider className='powerSlider'  label='Power'
 					value={+pp.valleyPower}
-					min={-3} max={10} step={.1}
+					min={-2} max={2} step={.01}
 					style={{width: '8em'}}
 					handleChange={this.setValleyPower}
 				/>
@@ -112,7 +124,7 @@ class SetPotentialTab extends React.Component {
 				<br/>
 				<TextNSlider className='scaleSlider'  label='Scale'
 					value={+pp.valleyScale}
-					min={-10} max={10} step={.1}
+					min={-5} max={5} step={.01}
 					style={{width: '8em'}}
 					handleChange={this.setValleyScale}
 				/>
@@ -120,14 +132,14 @@ class SetPotentialTab extends React.Component {
 				<br/>
 				<TextNSlider className='offsetSlider'  label='Offset %'
 					value={+pp.valleyOffset}
-					min={0} max={100} step={1}
+					min={0} max={100} step={.1}
 					style={{width: '8em'}}
 					handleChange={this.setValleyOffset}
 				/>
 				<br/>
 			</>;
 
-		// remember that setPotentialHandler is an event handler that gets the params from ControlPanel state
+		// remember that set*PotentialHandler is an event handler that gets the params from ControlPanel state
 		return <div className='setPotentialTab'>
 			<div className='potentialTitlePanel'>
 				<h3>Set Potential</h3>

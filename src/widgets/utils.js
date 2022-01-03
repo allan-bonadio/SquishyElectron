@@ -90,15 +90,15 @@ export function thousandsBackup(n) {
 	return intPart + fracPart;
 }
 
-// function testThousands() {
-// 	let n;
-// 	for (n = 1e-6; n < 1e6; n *= 10) {
-// 		for (let f = 1; f < 10; f *= 1.4)
-// 			console.info(`  testThousands, progressive fractions: ${n*f} =>`, thousands(n * f));
-// 		console.log();
-// 	}
-// }
-//testThousands();
+//😇 function testThousands() {
+//😇 	let n;
+//😇 	for (n = 1e-6; n < 1e6; n *= 10) {
+//😇 		for (let f = 1; f < 10; f *= 1.4)
+//😇 			console.info(`  testThousands, progressive fractions: ${n*f} =>`, thousands(n * f));
+//😇 		console.log();
+//😇 	}
+//😇 }
+//😇testThousands();
 
 
 
@@ -155,33 +155,36 @@ export function powerToIndex(spd, power) {
 	return Math.round(Math.log10(power) * spd);
 }
 
-// function testPowers() {
-// 	for (let spdStr in stepsPerDecadeFactors) {
-// 		const spd = +spdStr;
-// 		let factors = stepsPerDecadeFactors[spd];
-// 		console.info(`spd: ${spd}  factors:`, factors.map(f => f.toFixed(2)).join(', ') );
-//
-// 		for (let offset = -6; offset < 6; offset += spd) {
-// 			let totalOffset = spd*offset;
-// 			factors.forEach((factor, ixNear) => {
-// 				let ix = ixNear + totalOffset;
-// 				let power = indexToPower(false, factors, spd, ix);
-// 				let ixBack = powerToIndex(spd, power);
-// 				console.info(`   ${ix} ➡︎ ${power} ➡ ${ixBack}`);
-// 				if (ix != ixBack)
-// 					console.error(`  ix:${ix} ≠ ixBack:${ixBack}`);
-// 			})
-// 		}
-//
-// 	}
-// }
-//testPowers();
+// keep this!!
+//😇 function testPowers() {
+//😇 	for (let spdStr in stepsPerDecadeFactors) {
+//😇 		const spd = +spdStr;
+//😇 		let factors = stepsPerDecadeFactors[spd];
+//😇 		console.info(`spd: ${spd}  factors:`, factors.map(f => f.toFixed(2)).join(', ') );
+//😇
+//😇 		for (let offset = -6; offset < 6; offset += spd) {
+//😇 			let totalOffset = spd*offset;
+//😇 			factors.forEach((factor, ixNear) => {
+//😇 				let ix = ixNear + totalOffset;
+//😇 				let power = indexToPower(false, factors, spd, ix);
+//😇 				let ixBack = powerToIndex(spd, power);
+//😇 				console.info(`   ${ix} ➡︎ ${power} ➡ ${ixBack}`);
+//😇 				if (ix != ixBack)
+//😇 					console.error(`  ix:${ix} ≠ ixBack:${ixBack}`);
+//😇 			})
+//😇 		}
+//😇
+//😇 	}
+//😇 }
+//😇testPowers();
 
 
 /* **************************************************************** potentials */
 
-// these are simple arrays.  No wrapper object needed (not yet)
+// raw numbers ~ 1 are way too big and throw it all into chaos
+const VALLEY_FACTOR = .001;
 
+// these are simple arrays.  No wrapper object needed (not yet)  Just make a typed array from what C++ created
 export function getWrappedPotential(space) {
 	return new Float64Array(window.Module.HEAPF64.buffer, qe.qSpace_getPotentialBuffer(), space.nPoints);
 }
@@ -220,7 +223,7 @@ export function setFamiliarPotential(space, potentialArray, potentialParams) {
 			break;
 
 		case 'valley':
-			pot = Math.pow(Math.abs(ix - valleyOffset * N / 100), +valleyPower) * +valleyScale ;
+			pot = Math.pow(Math.abs(ix - valleyOffset * N / 100), +valleyPower) * +valleyScale * VALLEY_FACTOR;
 			if (! isFinite(pot)) {
 				console.warn(`potential ${pot} screwed up at x=${ix}`, JSON.stringify(potentialParams));
 				console.warn(`   ix - valleyOffset * N / 100=${ix - valleyOffset * N / 100}`);
@@ -238,3 +241,21 @@ export function setFamiliarPotential(space, potentialArray, potentialParams) {
 	// fix boundaries
 	fixPotentialBoundaries(space, potentialArray);
 }
+
+export function dumpPotential(space, potentialArray, nPerRow = 1, skipAllButEvery = 1) {
+	const {start, end, N} = space.startEnd;
+	if (! skipAllButEvery)
+		skipAllButEvery = Math.ceil(N / 40);
+	if (! nPerRow)
+		nPerRow =  Math.ceil(N / 10);
+
+	let txt = '';
+	for (let ix = start; ix < end; ix++) {
+		txt += potentialArray[ix].toFixed(6).padStart(10);
+		if (ix % skipAllButEvery == 0)
+			txt += '\n';
+	}
+	console.log(`${txt}\n`);
+}
+
+
