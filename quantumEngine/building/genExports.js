@@ -49,7 +49,7 @@ exportsSrc  = [
 	// views
 	{name: 'qViewBuffer_getViewBuffer', retType: 'number', args: []},
 	{name: 'qViewBuffer_loadViewBuffer', retType: null, args: []},
-	{name: 'qViewBuffer_dumpViewBuffer', retType: null, args: []},
+	{name: 'qViewBuffer_dumpViewBuffer', retType: null, args: ['string']},
 
 
 ];

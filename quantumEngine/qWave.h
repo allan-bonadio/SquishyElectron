@@ -116,9 +116,11 @@ struct qViewBuffer {
 // 'the' being the only one sometimes
 extern qViewBuffer *theQViewBuffer;
 
+void dumpViewBuffer(const char *title = NULL);
+
 // JS interface
 extern "C" {
-	void qViewBuffer_dumpViewBuffer(void);
+	void qViewBuffer_dumpViewBuffer(const char *title = NULL);
 	float *qViewBuffer_getViewBuffer(void);
 	void qViewBuffer_loadViewBuffer(void);
 }

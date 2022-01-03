@@ -160,6 +160,5 @@ extern "C" {
 
 	int manyRk2Steps(void);
 
-	void dumpViewBuffer(void);
 }
 

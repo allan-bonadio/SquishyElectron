@@ -1,4 +1,4 @@
-// this file generated Thu Dec 30 2021 21:49:23 GMT-0800 (Pacific Standard Time)
+// this file generated Sun Jan 02 2022 15:51:35 GMT-0800 (Pacific Standard Time)
 // by the file SquishyElectron/quantumEngine/building/genExports.js
 let cwrap;
 export const qe = {};
@@ -22,7 +22,7 @@ export function defineQEngineFuncs() {
 	qe.qSpace_resetCounters = cwrap('qSpace_resetCounters', null, []);
 	qe.qViewBuffer_getViewBuffer = cwrap('qViewBuffer_getViewBuffer', 'number', []);
 	qe.qViewBuffer_loadViewBuffer = cwrap('qViewBuffer_loadViewBuffer', null, []);
-	qe.qViewBuffer_dumpViewBuffer = cwrap('qViewBuffer_dumpViewBuffer', null, []);
+	qe.qViewBuffer_dumpViewBuffer = cwrap('qViewBuffer_dumpViewBuffer', null, ['string']);
 }
 
 window.defineQEngineFuncs = defineQEngineFuncs;  // just in case
