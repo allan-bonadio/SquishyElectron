@@ -78,6 +78,19 @@ void qSpace_setStepsPerIteration(int stepsPerIteration) {
 		theSpace->stepsPerIteration, (int) theSpace);
 }
 
+// low pass filter.
+void qSpace_setLowPassDilution(double dilution) {
+	printf("qSpace_setLowPassDilution(%lf)\n", dilution);
+	if (dilution >= 1. || dilution <= 0.) {
+		char buf[100];
+		sprintf(buf, "qSpace_setLowPassDilution, %lf, must be between 0 and 1\n", dilution);
+		throw buf;
+	}
+	theSpace->lowPassDilution = dilution;
+	printf("qSpace_setLowPassDilution result %lf in theSpace=%d\n",
+		theSpace->lowPassDilution, (int) theSpace);
+}
+
 void qSpace_oneIteration(void) { theSpace->oneIteration(); }
 void qSpace_resetCounters(void) { theSpace->resetCounters(); }
 
@@ -161,7 +174,7 @@ qSpace *completeNewSpace(void) {
 
 	// we make our own view buffer - needs potential to be in place
 	theSpace->qViewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
-	dumpViewBuffer("newly created");
+	//dumpViewBuffer("newly created");
 
 	theQViewBuffer->loadViewBuffer();  // just so i can see the default if needed
 
@@ -178,3 +191,4 @@ qSpace *completeNewSpace(void) {
 
 
 }
+

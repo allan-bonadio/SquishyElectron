@@ -8,14 +8,18 @@
 #include <chrono>
 #include "qSpace.h"
 #include "qWave.h"
+#include "fft/fftDefs.h"
+
 
 class qSpace *theSpace = NULL;
 
 
 qReal *thePotential = NULL;
 
+
+static bool debugIterSummary = true;
 static bool debugIteration = false;
-static bool debugJustWave = true;
+static bool debugJustWave = false;
 static bool debugJustInnerProduct = false;
 
 // someday I need an C++ error handling layer.  See
@@ -33,6 +37,8 @@ void qSpace::resetCounters(void) {
 qSpace::qSpace(int nDims) {
 	this->resetCounters();
 	this->nDimensions = 0;
+	this->lowPassDilution = 0.5;
+	this->pleaseFFT = false;
 }
 
 qSpace::~qSpace(void) {
@@ -93,18 +99,10 @@ void qSpace::initSpace() {
 	//qReal dt = this->dt = nStates * 0.02;  // try out different factors here
 
 	// used only for the RKs - therefore obsolete
-	this->dtOverI = qCx(0., -dt);
-	this->halfDtOverI = qCx(0., -dt / 2.);
-	this->bufferNum = 0;
+//	this->dtOverI = qCx(0., -dt);
+//	this->halfDtOverI = qCx(0., -dt / 2.);
+//	this->bufferNum = 0;
 }
-
-// call this from JS to create/allocate the
-//void qSpace::allocViewBuffer(void) {
-//NYET!
-//	float *viewBuffer = new float[this->nPoints * 8];  // 4 floats per vertex, two verts per point
-//	printf("viewBuffer(): viewBuffer %ld \n",
-//		(long) theQViewBuffer->viewBuffer);
-//}
 
 /* ********************************************************** potential */
 
@@ -150,13 +148,6 @@ void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset =
 void qSpace::oneIteration() {
 	int ix;
 
-	if (this->stepsPerIteration < 1 || this->stepsPerIteration > 1e8) {
-		char buf[100];
-		sprintf(buf, "this->stepsPerIteration, %d, is unreasonable size, in space %d",
-			this->stepsPerIteration, (int) this);
-		printf("Error: %s\n", buf);
-		throw buf;
-	}
 	if (debugIteration)
 		printf("qSpace::oneIteration() - dt=%lf   stepsPerIteration=%d\n", this->dt, this->stepsPerIteration);
 
@@ -183,22 +174,40 @@ void qSpace::oneIteration() {
 	// 	(long) viewBuffer, (long) latestWave);
 	this->latestQWave = laosQWave;
 
-	// ok this algorithm tends to diverge after thousands of iterations.  Hose it down.
+	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
+	//this->latestQWave->lowPassFilter(this->lowPassDilution);
+	this->latestQWave->nyquistFilter();
 	this->latestQWave->normalize();
 
 
 	// need it; somehow? not done in JS
 	theQViewBuffer->loadViewBuffer();
 
-	if (debugJustWave) {
+	if (debugIterSummary) {
 		char buf[100];
 		sprintf(buf, "finished one iteration (%d steps, N=%d), inner product: %lf",
 			this->stepsPerIteration, this->dimensions->N, this->latestQWave->innerProduct());
+	}
+
+	if (debugJustWave) {
+		char buf[100];
 		this->latestQWave->dumpWave(buf, true);
 	}
 	if (debugJustInnerProduct) {
-		printf("finished one iteration (%d steps, N=%d), inner product: %lf\n",
+		printf("finished one integration iteration (%d steps, N=%d), inner product: %lf\n",
 			this->stepsPerIteration, this->dimensions->N, this->latestQWave->innerProduct());
 	}
+
+	if (this->pleaseFFT) {
+
+		dumpFFT(this->latestQWave);
+
+		this->pleaseFFT = false;
+	}
+
 }
 
+// user button to print it out at end of the next iteration
+void askForFFT(void) {
+	theSpace->pleaseFFT = true;
+}

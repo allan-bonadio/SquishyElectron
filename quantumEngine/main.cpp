@@ -7,6 +7,7 @@
 #include <cmath>
 
 #include "qSpace.h"
+#include "fft/fftDefs.h"
 
 
 

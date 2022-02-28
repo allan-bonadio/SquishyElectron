@@ -50,7 +50,7 @@ const doesLocaleStuff = !!(window.Intl && Intl.NumberFormat);
 export function thousands(n) {
 
 	if (doesLocaleStuff) {
-		return n.toLocaleString();
+		return Number(n).toLocaleString();
 		// num.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
 	}
 	return thousandsBackup(n);
@@ -134,7 +134,7 @@ export const stepsPerDecadeFactors = {
 	3: [1, 2, 5],
 	// 4: [1, 2, 3, 6],
 	// 5: [1, 1.5, 2.5, 4, 6],
-	6: [1, 1.5, 2, 3, 5, 7],
+	6: [1, 1.5, 2, 3, 5, 8],
 	// 8: [1, 1.3, 2.4, 3.2, 4.2, 5.6, 7.5]
 	10: [1, 1.25, 1.5,     2, 2.50, 3,     4, 5, 6,     8],
 };

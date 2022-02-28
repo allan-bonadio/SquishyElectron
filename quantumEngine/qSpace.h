@@ -82,6 +82,7 @@ public:
 	void resetCounters(void);
 
 	// number of  dimensions actually used, always <= MAX_DIMENSIONS
+	// do not confuse with nStates or nPoints
 	int32_t nDimensions;
 
 	// totals for all dimensions.  These numbers dominate lots of areas in the code.
@@ -100,6 +101,7 @@ public:
 	qCx dtOverI;  // get rid of this
 	qCx halfDtOverI;  // get rid of this
 	int stepsPerIteration;
+	double lowPassDilution;
 
 	int bufferNum;  // get rid of this
 
@@ -114,6 +116,7 @@ public:
 	//qReal continuousLowPass;
 
 	char label[LABEL_LEN];
+	char pleaseFFT;
 
 	/* *********************************************** Dimensions & other serious stuff */
 	// Dimensions are listed from outer to inner as with the resulting ψ array:
@@ -137,6 +140,7 @@ public:
 
 	void fixThoseBoundaries(qCx *wave);  // like for qWave but on any wave
 
+	// visscher
 	void stepReal(qCx *oldW, qCx *newW, double dt);
 	void stepImaginary(qCx *oldW, qCx *newW, double dt);
 };
