@@ -75,7 +75,7 @@ class qeWave {
 
 		this.space.fixThoseBoundaries(wave);
 		this.normalize();
-		this.dumpWave('qeWave.setCircularWave() done');
+		//this.dumpWave('qeWave.setCircularWave() done');
 	}
 
 
@@ -102,7 +102,7 @@ class qeWave {
 
 		this.space.fixThoseBoundaries(wave);
 		this.normalize();
-		this.dumpWave('qeWave.setStandingWave() done');
+		//this.dumpWave('qeWave.setStandingWave() done');
 	}
 
 	// freq is just like circular, although as a fraction of the stdDev instead of N
@@ -110,27 +110,54 @@ class qeWave {
 	// offset is how far along is the peak, as an integer X value (0...N).
 	setPulseWave(freqUi, stdDev, offsetUi) {
 		const wave = this.wave;
-		const {start, end, N} = this.space.startEnd;
-		const offset = offsetUi * N / 100;
-		const freq = freqUi * 2*stdDev/100 * N;
-		console.log(`setPulseWave freq=${freqUi} = ${freq} `+
-			`  stdDev=${stdDev}, 95%=${stdDev*4}   offset=${offsetUi}% = ${offset}`)
+		const {start, end, N} = this.space.startEnd2;
+		let offset = offsetUi * N / 100;  // now in units of X
+		const freq = Math.round(freqUi);
+		console.log(`setPulseWave freq=${freqUi} => ${freq} `+
+			`  offset=${offsetUi}% => ${offset}`)
 
-		// start with a circular wave, freq WITHIN the pulse width
-		this.setCircularWave(freq);
+		//const dAngle = 4 * Math.PI / N;
+		const dAngle = 1.0 * Math.PI / N;
+		let freqLow = freq - 1.;  // could be zero!  but still works.
+		let freqLowLow = freqLow - 1.;  // could be zero!  but still works.
+		let freqHigh = freq + 1.;
+		let freqHighHigh = freqHigh + 1.;
 
-		// modulate with a gaussian, centered at the offset, with stdDev
-		const s2 = 1 / (stdDev * 2);
-		for (let ix = start; ix < end; ix++) {
-			const 𝜟 = ix - offset;
-			const stretch = Math.exp(-𝜟 * 𝜟 * s2);
-			wave[2*ix] *= stretch;
-			wave[2*ix + 1] *= stretch;
+		// weighting
+		let weightOne = 0.5;
+		let weightTwo = .0333
+
+		for (let ix = start; ix < end; ix += 2) {
+			const angle = dAngle * (ix - start - offset);
+
+
+			wave[ix] = Math.cos(freqLowLow*angle) * weightTwo + Math.cos(freqLow*angle) * weightOne +
+				Math.cos(freq*angle) +
+				Math.cos(freqHigh*angle) * weightOne + Math.cos(freqHighHigh*angle) * weightTwo;
+			wave[ix+1] = Math.sin(freqLowLow*angle) * weightTwo +Math.sin(freqLow*angle) * weightOne +
+				Math.sin(freq*angle) +
+				Math.sin(freqHigh*angle) * weightOne + Math.sin(freqHighHigh*angle) * weightTwo;
+
+
+
+
+// the old alg - I need frequencies that fit in the finite universe
+// 		// start with a circular wave, freq WITHIN the pulse width
+// 		this.setCircularWave(freq);
+//
+// 		// modulate with a gaussian, centered at the offset, with stdDev
+// 		const s2 = 1 / (stdDev * 2);
+// 		for (let ix = start; ix < end; ix++) {
+// 			const 𝜟 = ix - offset;
+// 			const stretch = Math.exp(-𝜟 * 𝜟 * s2);
+// 			wave[2*ix] *= stretch;
+// 			wave[2*ix + 1] *= stretch;
+// 		}
 		}
 
 		this.space.fixThoseBoundaries(wave);
 		this.normalize();
-		this.dumpWave('qeWave.setPulseWave() done');
+		//this.dumpWave('qeWave.setPulseWave() done');
 	}
 
 	// set one of the above canned waveforms, according to the waveParams object's values
