@@ -6,3 +6,4 @@ qWave.cpp
 qFlick.cpp
 qViewBuffer.cpp
 visscher.cpp
+fft/cooleyTukeyFFT.cpp

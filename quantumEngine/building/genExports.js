@@ -40,18 +40,19 @@ exportsSrc  = [
 	// params
 	{name: 'qSpace_setDt', retType: null, args: ['number']},
 	{name: 'qSpace_setStepsPerIteration', retType: null, args: ['number']},
+	{name: 'qSpace_setLowPassDilution', retType: null, args: ['number']},
 
 	{name: 'qSpace_oneIteration', retType: 'number', args: []},
 	{name: 'qSpace_resetCounters', retType: null, args: []},
-
-
 
 	// views
 	{name: 'qViewBuffer_getViewBuffer', retType: 'number', args: []},
 	{name: 'qViewBuffer_loadViewBuffer', retType: null, args: []},
 	{name: 'qViewBuffer_dumpViewBuffer', retType: null, args: ['string']},
 
-
+	// FFT
+	{name: 'testFFT', retType: null, args: []},
+	{name: 'askForFFT', retType: null, args: []},
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():
