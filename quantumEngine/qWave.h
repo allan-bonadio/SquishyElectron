@@ -18,14 +18,19 @@ struct qWave {
 	~qWave();
 
 	// for a naked wave, and for a qWave.  dumpThatWave same as in qSpace::
+	// so the length of each buffer is nPoints from the wave's space.
 	void dumpThatWave(qCx *wave, bool withExtras = false);
 	void dumpWave(const char *title, bool withExtras = false);
 	void copyThatWave(qCx *dest, qCx *src);
 
+	// this has, among other things, the count of points and states in all qWave buffers
 	qSpace *space;
 
 	// the actual data, hopefully in the right size allocated block, space->nPoints
 	qCx *wave;
+
+	// used for low pass; need general buffer for arithmetic
+	qCx *scratchBuffer;
 
 	// if it used the first constructor
 	int dynamicallyAllocated: 1;
@@ -41,11 +46,12 @@ struct qWave {
 	void prune(void);
 	qReal innerProduct(void);
 	virtual void normalize(void);
-	//void lowPassFilter(double dilution = 0.5);
+	void lowPassFilter(double dilution = 0.01);
+	void nyquistFilter(void);
 
-	virtual void setCircularWave(qReal n);
-	void setStandingWave(qReal n);
-	void setPulseWave(qReal widthFactor, qReal cycles);
+	////virtual void setCircularWave(qReal n);
+	//void setStandingWave(qReal n);
+	//void setPulseWave(qReal widthFactor, qReal cycles, qReal offset);
 };
 
 
@@ -84,7 +90,7 @@ struct qFlick : public qWave {
 	// for vischer
 	qReal innerProduct(void);
 	void normalize(void);
-	void setCircularWave(qReal n);
+	//void setCircularWave(qReal n);
 
 	// retrieve properly interpolated values here
 	qReal magnitude(int doubleAge, int ix = 1);
@@ -117,6 +123,9 @@ struct qViewBuffer {
 extern qViewBuffer *theQViewBuffer;
 
 void dumpViewBuffer(const char *title = NULL);
+
+void dumpWaveSegment(qCx *wave, int start, int end, int continuum, bool withExtras);
+
 
 // JS interface
 extern "C" {

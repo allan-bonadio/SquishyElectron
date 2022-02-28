@@ -23,6 +23,8 @@ not sure how much dt/2 is.
 class qWave *laosQWave = NULL, *peruQWave = NULL;
 class qCx *laosWave = NULL, *peruWave = NULL;
 
+int traceLowPassFilter = false;
+
 /* ************************************************************ birth & death & basics */
 
 // buffer is initialized to zero bytes therefore 0.0 everywhere
@@ -62,18 +64,7 @@ void qWave::copyThatWave(qCx *dest, qCx *src) {
 //	printf("qWave::copyThatWave(%d <== %d)\n", (int) dest, (int) src);
 	if (!dest) dest = this->wave;
 	if (!src) src = this->wave;
-//	printf("              sample ix=1 ==> (%lf, %lf) <== (%lf, %lf)  nPoints=%d\n",
-//		dest[1].re, dest[1].im, src[1].re, src[1].im, this->space->nPoints);
-
-//	printf("       before: dest, then src:\n");
-//	this->dumpThatWave(dest);
-//	this->dumpThatWave(src);
-
 	memcpy(dest, src, this->space->nPoints * sizeof(qCx));
-
-//	printf("       after: dest, then src:\n");
-//	this->dumpThatWave(dest);
-//	this->dumpThatWave(src);
 }
 
 /* never tested - might never work under visscher */
@@ -127,14 +118,8 @@ static qReal dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtr
 	return mag;
 }
 
-// this is wave-independent.  This prints N+2 lines:
-// one for the 0 element if it's a continuum
-// the complete set of states
-// one for the N+1 if continuum
-void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
-	if (this->nPoints <= 0) throw "qSpace::dumpThatWave() with zero points";
+void dumpWaveSegment(qCx *wave, int start, int end, int continuum, bool withExtras) {
 
-	const qDimension *dims = this->dimensions;
 	int ix = 0;
 	char buf[200];
 	double prevPhase = 0.;
@@ -143,22 +128,33 @@ void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
 	// somehow, commenting out these lines fixes the nan problem.
 	// but the nan problem doesn't happen on flores?
 	// i haven't seen the nan problem since like a month ago.  ab 2021-08-25
-	if (dims->continuum) {
+	if (continuum) {
 		dumpRow(buf, ix, wave[0], &prevPhase, withExtras);
 		printf("%s", buf);
 	}
 
-	for (ix = dims->start; ix < dims->end; ix++) {
+	for (ix = start; ix < end; ix++) {
 		innerProd += dumpRow(buf, ix, wave[ix], &prevPhase, withExtras);
 		printf("\n%s", buf);
 	}
 
-	if (dims->continuum) {
-		dumpRow(buf, ix, wave[dims->end], &prevPhase, withExtras);
+	if (continuum) {
+		dumpRow(buf, ix, wave[end], &prevPhase, withExtras);
 		printf("\nend %s", buf);
 	}
 
 	printf(" innerProd=%11.8lf\n", innerProd);
+}
+
+// this is wave-independent.  This prints N+2 lines:
+// one for the 0 element if it's a continuum
+// the complete set of states
+// one for the N+1 if continuum
+void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
+	if (this->nPoints <= 0) throw "qSpace::dumpThatWave() with zero points";
+
+	const qDimension *dims = this->dimensions;
+	dumpWaveSegment(wave, dims->start, dims->end, dims->continuum, withExtras);
 }
 
 // any wave, probably shouldn't call this
@@ -289,103 +285,97 @@ void qWave::prune() {
 	}
 }
 
-// possibly obsolete if we use visscher
-// average the wave's points with the two closest neighbors to fix the divergence
+#define LOW_PASS_WARMUP	20
+
+// these have to be in C++ cuz they're called during iteration
+
+// average the wave's points with the closest neighbors to fix the divergence
 // along the x axis I always see.  Since the density of our mesh is finite,
-// you can't expect noise at or near the frequency of the mesh to be meaningful.
+// you can't expect noise at or near the nyquist frequency to be meaningful.
 // dilution works like this: formerly 1/2, it's the fraction of the next point
-// that comes from the avg of the two neighboring points.
+// that comes from the avg of prevous points
 // Changes the wave in-place
-//void qWave::lowPassFilter(double dilution) {
-//	printf("qWave::lowPassFilter(%5.3lf)\n", dilution);
-//	qCx *wave = this->wave;
-//	qCx avg, d2prev = wave[0];
-//	qDimension *dims = this->space->dimensions;
-//
-//	// not sure we need this this->prune();
-//	this->fixBoundaries();
-//
-//	// average each point with the neighbors; ¼ for each neightbor, ½ for the point itself
-//	// drag your feet on setting the new value in so it doesn't interfere
-//	double concentration = 1. - dilution;
-//	for (int ix = dims->start; ix < dims->end; ix++) {
-//		avg = (wave[ix-1] + wave[ix+1]) * dilution +  wave[ix] * concentration;
-//		// printf("filtering %d  d2prev=(%lf,%lf)  avg=(%lf,%lf)",
-//		// 	ix, d2prev.re, d2prev.im, avg.re, avg.im);
-//
-//		// put new number back, etcept one point behind so you don't need a separate buffer
-//		wave[ix-1] = d2prev;
-//		d2prev = avg;
-//		//this->dumpWave("low pass filtering", true);
-//	}
-//	wave[dims->N] = d2prev;
-//}
+void qWave::lowPassFilter(double dilution) {
+	double concentration = 1. - dilution;
+	if (traceLowPassFilter) printf("qWave::lowPassFilter(%2.6lf)\n", dilution);
 
 
-/* ********************************************************** populate wave */
-
-// obsolete?  I think so
-
-// how big the delay between re and im, in radians kindof.  see code.
-// see also same thing in qFlick
-const double gapFactor = .01;
-static const bool circularDebug = false;
-
-// n is  number of cycles all the way across N points.
-// n 'should' be an integer to make it meet up on ends if endless
-// pass negative to make it go backward.
-// the first point here is like x=0 as far as the trig functions, and the last like x=N-1
-void qWave::setCircularWave(qReal n) {
-	qCx tempWave[this->space->nPoints];
-	qWave tqWave(this->space, tempWave);
-	qWave *tempQWave = &tqWave;
-
-	if (circularDebug) printf(" starting qWave::setCircularWave %lf\n", n);
-	//this->dumpWave("before set sircular & normalize", true);
-	qCx *wave = tempWave;
-	//qCx *wave = this->wave;
+	if (!this->scratchBuffer)
+		this->scratchBuffer = allocateWave();
+	qCx *wave = this->wave;
 	qDimension *dims = this->space->dimensions;
-	int start = dims->start;
-	int end = dims->end;
 
-	// dAngle is change in phase per x point
-	qReal angle, dAngle = 2. * PI / dims->N * n;
-
-	if (circularDebug) printf(" got past dAngle\n");
-	// visscher gap. How much angle would the Im component go in dt/2?
-	// I have no idea.
-	qReal dt = this->space->dt;
-	qReal nN = n * dims->N;
-	qReal vGap = -nN * nN * dt / 2 * gapFactor;
-
-
-	vGap = 0;
-
-
-	if (circularDebug) printf("Set circular wave:  n=%lf  nN=%lf  dt=%lf vGap=%lf or %lf * π\n",
-			n, nN, dt, vGap, vGap/PI);
-	for (int ix = start; ix < end; ix++) {
-		angle = dAngle * (ix - start);
-		wave[ix] = qCx(cos(angle), sin(angle + vGap));
-	}
-	//this->space->dumpThatWave(wave, true);
-	//printf("wave, freshly generated, before halfstep");
-	this->fixBoundaries();
-	//this->dumpThatWave(wave, true);
-
-	if (circularDebug) printf(" got past wave fitting.  this->wave=%d  tempQWave->wave=%d  \n",
-			(int) this->wave, (int) tempQWave->wave);
-	// ?????!?!??!
-	tempQWave->copyThatWave(this->wave, tempQWave->wave);
-	if (circularDebug) printf(" got past copy that wave\n");
-	//this->space->visscherHalfStep(tempQWave, this);
-	this->normalize();
-	if (circularDebug) this->dumpWave("after set sircular & copy & normalize", true);
-
-//printf(" got past normalize here\n");
-	//	this->dumpWave("after set sircular & normalize", true);
+	// not sure we need this this->prune();
 	//this->fixBoundaries();
-//	theQViewBuffer->loadViewBuffer(this);
-//printf(" got past loadViewBuffer\n");
+
+	qCx average;
+	qCx temp;
+
+	// warm it up, get the average like the end if wraps around
+	average = qCx(0);
+	if (dims->continuum) {
+		for (int ix = dims->end - LOW_PASS_WARMUP; ix < dims->end; ix++)
+			average = wave[ix] * dilution + average * concentration;
+		if (traceLowPassFilter) printf("    quick prep for forward average: %lf %lf\n", average.re, average.im);
+
+		////average /= concentration;  // do I need this?  not if normalized after this
+	}
+
+	// the length proper
+	for (int ix = dims->start; ix < dims->end; ix++) {
+		temp = wave[ix] * concentration + average * dilution;
+		average = wave[ix] * dilution + average * concentration;
+
+		if (traceLowPassFilter) printf("    lowPassBuffer %d forward run: %lf %lf\n", ix, temp.re, temp.im);
+		this->scratchBuffer[ix] = temp;
+	}
+
+	// now in the other direction - reversed
+	average = 0;
+	// the first few points at the start
+	if (dims->continuum) {
+		for (int ix = dims->start + LOW_PASS_WARMUP; ix >= dims->start; ix--)
+			average = wave[ix] * dilution + average * concentration;
+		if (traceLowPassFilter) printf("    quick prep for reverse average: %lf %lf\n", average.re, average.im);
+
+		////average /= concentration;  // do I need this?
+	}
+
+	// the length proper - remove the /2 if we normalize after this
+	for (int ix = dims->end-1; ix >= dims->start; ix--) {
+		temp = wave[ix] * concentration + average * dilution;
+		average = wave[ix] * dilution + average * concentration;
+		wave[ix] = (this->scratchBuffer[ix] + temp) / 2;
+		if (traceLowPassFilter) printf("    lowPassBuffer %d reverse run: (%lf %lf)\n", ix, temp.re, temp.im);
+	}
+
+}
+
+// this is kindof a notch filter for frequency N/2
+void qWave::nyquistFilter(void) {
+	if (traceLowPassFilter) printf("qWave::nyquistFilter()\n");
+
+	if (!this->scratchBuffer)
+		this->scratchBuffer = allocateWave();
+
+	qCx *wave = this->wave;
+	qDimension *dims = this->space->dimensions;
+
+	// not sure we need this this->prune();
+	this->fixBoundaries();
+
+	// this should zero out the nyquist frequency exactly
+	for (int ix = dims->start; ix < dims->end; ix++) {
+		this->scratchBuffer[ix] = (wave[ix] + wave[ix] - wave[ix-1] - wave[ix+1]) / 4.;
+//		printf("%d scratchBuf=(%lf %lf) wave-1=(%lf %lf) wave0=(%lf %lf) wave+1=(%lf %lf)\n",
+//		ix,
+//		this->scratchBuffer[ix].re, this->scratchBuffer[ix].im,
+//		wave[ix-1].re, wave[ix-1].im, wave[ix].re, wave[ix].im, wave[ix+1].re, wave[ix+1].im);
+	}
+
+
+	this->copyThatWave(this->wave, this->scratchBuffer);
+
+//	this->dumpWave("after nyquist filter");
 }
 

@@ -22,7 +22,7 @@ void run_wave_tests(void) {
 	completeNewSpace();
 
 	qWave  *qw = new qWave(theSpace);
-	qw->setCircularWave(1.);
+	//qw->setCircularWave(1.);
 
 	// dumpWave
 	qw->dumpWave("unit test");
