@@ -320,65 +320,65 @@ void qFlick::normalize(void) {
 // n 'should' be an integer to make it meet up on ends if endless
 // pass negative to make it go backward.
 // the first point here is like x=0 as far as the trig functions, and the last like x=-1
-void qFlick::setCircularWave(qReal n) {
-	if (this->space->nPoints <= 0) throw "qFlick::setCircularWave() with zero points";
-
-	qCx tempWave[this->space->nPoints];
-	qWave tqWave(this->space, tempWave);
-	qWave *tempQWave = &tqWave;
-
-	printf(" starting qFlick::setCircularWave(%3.2lf) with points=%d\n",
-		n, this->space->nPoints);
-	//this->dumpWave("before set sircular & normalize", true);
-	qCx *wave = tempWave;
-	//qCx *wave = this->wave;
-	qDimension *dims = this->space->dimensions;
-	int start = dims->start;
-	int end = dims->end;
-
-	// dAngle is change in phase per x point
-	qReal angle, dAngle = 2. * PI / dims->N * n;
-
-printf(" got past dAngle\n");
-	// visscher gap. How much angle would the Im component go in dt/2?
-	// I have no idea.
-	qReal dt = this->space->dt;
-	qReal nN = n * dims->N;
-	qReal vGap = -nN * nN * dt / 2 * gapFactor;
-
-	vGap = 0;
-
-
-	//printf("Set circular flick:  n=%lf  nN=%lf  dt=%lf vGap=%lf or %lf * π   dAngle=%lf\n",
-	//	n, nN, dt, vGap, vGap/PI, dAngle);
-	for (int ix = start; ix < end; ix++) {
-//		printf("    doin ix=%d\n", ix);
-		angle = dAngle * (ix - start);
-//		printf("       [%d] angle=%lf°\n", ix, angle / PI * 180.);
-		wave[ix] = qCx(cos(angle), sin(angle + vGap));
-//		printf("        wave[%d] =%lf, %lf\n", ix, wave[ix].re, wave[ix].im);
-	}
-//	printf("flick, before boundaries, 1 copy");
-	this->fixBoundaries();
-//	printf("flick, freshly generated, 1 copy");
-//	this->dumpThatWave(wave, true);
-
-		tempQWave->copyThatWave(this->waves[0], tempQWave->wave);
-		tempQWave->copyThatWave(this->waves[1], tempQWave->wave);
-		//printf("  copied that wave\n");
-		//this->dumpAllWaves("qFlick::setCircularWave: copied wave 2ice; about to normalize");
-		//this->space->visscherHalfStep(tempQWave, this);
-		//this->dumpWave("after set sircular & normalize", true);
-		this->normalize();
-		//printf(" got past normalize here\n");
-	//	this->dumpWave("after set sircular & normalize", true);
-	this->fixBoundaries();
-	this->dumpAllWaves("qFlick::setCircularWave: normalize");
-
-	// the interactive code should do this
-//	theQViewBuffer->loadViewBuffer(this);
-//printf(" got past loadViewBuffer\n");
-}
+//void qFlick::setCircularWave(qReal n) {
+//	if (this->space->nPoints <= 0) throw "qFlick::setCircularWave() with zero points";
+//
+//	qCx tempWave[this->space->nPoints];
+//	qWave tqWave(this->space, tempWave);
+//	qWave *tempQWave = &tqWave;
+//
+//	printf(" starting qFlick::setCircularWave(%3.2lf) with points=%d\n",
+//		n, this->space->nPoints);
+//	//this->dumpWave("before set sircular & normalize", true);
+//	qCx *wave = tempWave;
+//	//qCx *wave = this->wave;
+//	qDimension *dims = this->space->dimensions;
+//	int start = dims->start;
+//	int end = dims->end;
+//
+//	// dAngle is change in phase per x point
+//	qReal angle, dAngle = 2. * PI / dims->N * n;
+//
+//printf(" got past dAngle\n");
+//	// visscher gap. How much angle would the Im component go in dt/2?
+//	// I have no idea.
+//	qReal dt = this->space->dt;
+//	qReal nN = n * dims->N;
+//	qReal vGap = -nN * nN * dt / 2 * gapFactor;
+//
+//	vGap = 0;
+//
+//
+//	//printf("Set circular flick:  n=%lf  nN=%lf  dt=%lf vGap=%lf or %lf * π   dAngle=%lf\n",
+//	//	n, nN, dt, vGap, vGap/PI, dAngle);
+//	for (int ix = start; ix < end; ix++) {
+////		printf("    doin ix=%d\n", ix);
+//		angle = dAngle * (ix - start);
+////		printf("       [%d] angle=%lf°\n", ix, angle / PI * 180.);
+//		wave[ix] = qCx(cos(angle), sin(angle + vGap));
+////		printf("        wave[%d] =%lf, %lf\n", ix, wave[ix].re, wave[ix].im);
+//	}
+////	printf("flick, before boundaries, 1 copy");
+//	this->fixBoundaries();
+////	printf("flick, freshly generated, 1 copy");
+////	this->dumpThatWave(wave, true);
+//
+//		tempQWave->copyThatWave(this->waves[0], tempQWave->wave);
+//		tempQWave->copyThatWave(this->waves[1], tempQWave->wave);
+//		//printf("  copied that wave\n");
+//		//this->dumpAllWaves("qFlick::setCircularWave: copied wave 2ice; about to normalize");
+//		//this->space->visscherHalfStep(tempQWave, this);
+//		//this->dumpWave("after set sircular & normalize", true);
+//		this->normalize();
+//		//printf(" got past normalize here\n");
+//	//	this->dumpWave("after set sircular & normalize", true);
+//	this->fixBoundaries();
+//	//this->dumpAllWaves("qFlick::setCircularWave: normalize");
+//
+//	// the interactive code should do this
+////	theQViewBuffer->loadViewBuffer(this);
+////printf(" got past loadViewBuffer\n");
+//}
 
 
 /* ************************************************************ visscher */
