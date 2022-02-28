@@ -28,7 +28,7 @@ export function createSpaceNWave(N, continuum, callback) {
 
 	// create the new C++ version & populate the buffer
 	qe.space = new qeSpace([{N, continuum, label: 'x'}]);
-	// done inside qeSpace    qe.qWave_setCircularWave(1);
+	// done inside JS    qe.qWave_setCircularWave(1);
 
 	callback(qe.space);
 }

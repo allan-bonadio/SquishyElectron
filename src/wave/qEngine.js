@@ -32,7 +32,6 @@ function quantumEngineHasStarted(mDimensions, mLabel) {
 
 	//console.log(`quantumEngineHasStarted:  resolving qeStartPromise`);
 	qeStartPromiseSucceed({mDimensions, mLabel});
-
 };
 window.quantumEngineHasStarted = quantumEngineHasStarted;
 
@@ -109,4 +108,11 @@ export function qeDefineAccess() {
 
 
 
+	//qe.testFFT();
+
 }
+
+
+
+
+

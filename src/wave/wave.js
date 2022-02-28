@@ -151,14 +151,15 @@ export class jWave {
 	// this difeq tends to diverge with freq=2, alternating points.
 	// Filter out that junk. (also normalize)
 	lowPassFilter() {
+		console.warn(`is this code used anymore?`)
 		let {space: {N}, psi} = this;
-		let newPsi = new Array(N+2);
+		let newPsi = new Array(N+2);// check continuum!
 		for (let ix = 1; ix <= N; ix++) {
 			newPsi[ix] = psi[ix-1].addTo(psi[ix], 2).addTo(psi[ix+1]);
 		}
 		this.psi = newPsi;
 		this.normalize();
-		console.log(`============================== did low pass filter`);
+		console.log(`============================== did old JS low pass filter`);
 	}
 
 	/* *************************************** set jWave */

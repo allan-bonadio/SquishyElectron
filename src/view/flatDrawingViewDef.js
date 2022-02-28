@@ -25,7 +25,6 @@ class flatDrawingViewDef extends drawingViewDef {
 		// these changing should trigger a redrawing of its contents (ie webgl)
 		this.curUnitHeight = 1;  // always what's displayed
 		this.targetUnitHeight = 1;  // always a power of 2; only changes cuz highest
-
 	}
 
 	// this is called 60x per second or whatever requestAnimationFrame() does.

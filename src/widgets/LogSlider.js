@@ -99,12 +99,3 @@ setPT();
 
 export default LogSlider;
 
-
-
-// 		<input className='LogSlider' type="range"
-// 			min={p.sliderMin} max={p.sliderMax}
-// 			value={p.current}
-// 			list='nerfgod'
-// 			style={{width: '100%'}}
-// 			onInput={ev => p.handleChange(ev)}
-// 		/>
