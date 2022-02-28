@@ -37,8 +37,8 @@ public:
 	qReal im;
 
 	// informal constructors
-	qCx(qReal real, qReal imag) {re = real; im = imag;}
-	qCx(qReal real) {re = real; im = 0;}
+	qCx(qReal real, qReal imag = 0.) {re = real; im = imag;}
+	//qCx(qReal real) {re = real; im = 0;}
 	qCx(void) {re = im = 0;}
 
 	// // // // // // // // // // // // // addition
