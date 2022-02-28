@@ -186,6 +186,8 @@ export class ControlPanel extends React.Component {
 				setDt={p.setDt}
 				stepsPerIteration={p.stepsPerIteration}
 				setStepsPerIteration={p.setStepsPerIteration}
+				lowPassDilution={p.lowPassDilution}
+				setLowPassDilution={p.setLowPassDilution}
 			/>
 			<div className='cpSecondRow'>
 				<ul className='TabBar' >

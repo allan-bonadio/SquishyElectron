@@ -5,7 +5,7 @@
 
 import PropTypes from 'prop-types';
 import LogSlider from '../widgets/LogSlider';
-// import qe from '../wave/qe';
+import qe from '../wave/qe';
 
 function setPT() {
 	CPToolbar.propTypes = {
@@ -21,8 +21,16 @@ function setPT() {
 		setDt: PropTypes.func.isRequired,
 		stepsPerIteration: PropTypes.number.isRequired,
 		setStepsPerIteration: PropTypes.func.isRequired,
+		lowPassDilution: PropTypes.number.isRequired,
+		setLowPassDilution: PropTypes.func.isRequired,
 	};
 }
+
+function clickOnFFR()
+{
+	qe.askForFFT()
+}
+
 
 function CPToolbar(props) {
 	const {iterateFrequency, setIterateFrequency,
@@ -94,7 +102,7 @@ function CPToolbar(props) {
 			}}
 		/>
 		<LogSlider
-			className='stepsPerIterationSlider'
+			className='stepsPerIterationSlider dtSlider'
 			label='steps Per Iteration'
 			minLabel='100'
 			maxLabel='10,000'
@@ -109,6 +117,27 @@ function CPToolbar(props) {
 				props.setStepsPerIteration(power);
 			}}
 		/>
+		<LogSlider
+			className='lowPassDilutionSlider dtSlider'
+			label='Low Pass Dilution'
+			minLabel='0.001'
+			maxLabel='.999'
+
+			current={props.lowPassDilution}
+			sliderMin={0.001}
+			sliderMax={.999}
+			stepsPerDecade={6}
+
+			handleChange={(power, ix) => {
+				console.info(`handleChange Low Pass Dilution::  ix=${ix}  `, power);
+				props.setLowPassDilution(power);
+			}}
+		/>
+		<button onClick={clickOnFFR}>
+			FFT
+		</button>
+
+
 
 		<button onClick={props.resetCounters}>Reset Counters</button>
 

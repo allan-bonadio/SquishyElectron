@@ -30,7 +30,7 @@ import {setFamiliarPotential} from './widgets/utils';
 
 // runtime debugging flags - you can change in the debugger or here
 let areBenchmarking = false;
-let dumpingTheViewBuffer = true;
+let dumpingTheViewBuffer = false;
 
 
 
@@ -53,16 +53,17 @@ const DEFAULT_VIEW_CLASS_NAME =
 'flatDrawingViewDef';
 
 //const DEFAULT_RESOLUTION = 100;
-const DEFAULT_RESOLUTION = 60;
+//const DEFAULT_RESOLUTION = 60;
 //const DEFAULT_RESOLUTION = 25;
+const DEFAULT_RESOLUTION = 32;
 //const DEFAULT_RESOLUTION = 5;
 //const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 25;
 const DEFAULT_CONTINUUM = qeBasicSpace.contENDLESS;
 
 const defaultWaveParams = {
-	waveBreed: 'circular',
-	waveFrequency: 1,
-	stdDev: 8,
+	waveBreed: 'pulse',
+	waveFrequency: 4,
+	stdDev: 20,
 	pulseOffset: 30,
 };
 
@@ -118,9 +119,10 @@ export class SquishPanel extends React.Component {
 			// eg the menu on the CPToolbar says 10/sec, so this becomes 100
 			iteratePeriod: 50,
 
-			// sliders for dt & spi
+			// defaults for sliders for dt & spi
 			dt: .001,
 			stepsPerIteration: 1000,
+			lowPassDilution: .02,
 
 			runningCycleElapsedTime: 0,
 			runningCycleElapsedSerial: 0,
@@ -151,6 +153,7 @@ export class SquishPanel extends React.Component {
 			// vital properties of the space
 			qe.qSpace_setDt(this.state.dt);
 			qe.qSpace_setStepsPerIteration(this.state.stepsPerIteration);
+			qe.qSpace_setLowPassDilution(this.state.lowPassDilution);
 
 			// this should be the only place animateHeartbeat() should be called
 			// except for inside the function itself
@@ -453,6 +456,13 @@ export class SquishPanel extends React.Component {
 	}
 	setStepsPerIteration = this.setStepsPerIteration.bind(this);
 
+	setLowPassDilution(lowPassDilution) {
+		console.info(`js setLowPassDilution(${lowPassDilution})`)
+		this.setState({lowPassDilution});
+		qe.qSpace_setLowPassDilution(lowPassDilution);
+	}
+	setLowPassDilution = this.setLowPassDilution.bind(this);
+
 	// completely wipe out the ψ wavefunction and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon setWave in wave tab
 	setWave(waveParams) {
@@ -533,6 +543,8 @@ export class SquishPanel extends React.Component {
 					setDt={this.setDt}
 					stepsPerIteration={s.stepsPerIteration}
 					setStepsPerIteration={this.setStepsPerIteration}
+					lowPassDilution={s.lowPassDilution}
+					setLowPassDilution={this.setLowPassDilution}
 				/>
 				{this.renderRunningOneCycle()}
 			</div>
