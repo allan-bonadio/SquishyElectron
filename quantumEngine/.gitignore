@@ -6,3 +6,6 @@ quantumEngine.js
 quantumEngine.wasm
 quantumTest.js
 quantumTest.wasm
+
+# various fft algs i downloaded, original as-downloaded versions
+*origFFT.cpp
