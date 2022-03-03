@@ -12,7 +12,7 @@
 //#include "../qCx.h"
 #include "../qSpace.h"
 #include "../qWave.h"
-#include "fftDefs.h"
+#include "fftMain.h"
 
 
 
@@ -54,7 +54,7 @@ void cooleyTukeyFFT(qCx *dest, qCx *src, int N)
 
 // inverse fft, same rules as fft(),
 // except this trashes the src coming in: all values become complex conjugages, sorry
-static void cooleyTukeyIFFT(qCx *dest, qCx *src, int N)
+void cooleyTukeyIFFT(qCx *dest, qCx *src, int N)
 {
 	// conjugate the qCx numbers
 	for (int i = 0; i < N; i++)

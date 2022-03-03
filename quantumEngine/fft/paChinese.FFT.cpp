@@ -13,9 +13,8 @@
 #include <iostream>
 #include "../qSpace.h"
 #include "../qWave.h"
-#include "fftDefs.h"
+#include "fftMain.h"
 
-const int PI = 3.1415926;
 using namespace std;
 
 //Define a plural structure - switched over to qCx
@@ -36,45 +35,45 @@ void Data_Expand(double *input, vector<double> &output, const int length);
 void Real_Complex(vector<double> &input, qCx *output, const int length);
 
 //Fast Fourier transform function
-void FFT(qCx *input, qCx *StoreResult, const int length);
+void FFT_Forword(qCx *input, qCx *StoreResult, const int length);
 
 //Fast Fourier anti-transformation
 void FFT_Inverse(qCx *arrayinput, qCx *arrayoutput, const int length);
 
-int testChinese()
-{
-    //Get the filled DATA;
-    vector<double> Data;
-    Data_Expand(Datapre, Data, 10);
-
-    //Print the sequence after printing
-    for (auto data : Data)
-    {
-        cout << data << endl;
-    }
-
-    //Since the following complex structure does not use a dynamic array structure, the size of the array is required according to the actual situation.
-    //Transform the input array into a plural array
-    qCx array1D[16];
-
-    //Store Fourier transform results
-    qCx Result[16];
-
-    //Store the result of the anti-Yibo transformation
-    qCx Result_Inverse[16];
-
-    Real_Complex(Data, array1D, 16);
-    FFT(array1D, Result, 16);
-    FFT_Inverse(Result, Result_Inverse, 16);
-    //Scope-based cycle, using Auto automatically judges the data type of the elements within the array
-    for (auto data : Result_Inverse)
-    {
-        //The amplitude after the output of Fourier transform
-        cout << data.re << "\t" << data.im << endl;
-    }
-
-    return 0;
-}
+//int testChinese()
+//{
+//    //Get the filled DATA;
+//    vector<double> Data;
+//    Data_Expand(Datapre, Data, 10);
+//
+//    //Print the sequence after printing
+//    for (auto data : Data)
+//    {
+//        cout << data << endl;
+//    }
+//
+//    //Since the following complex structure does not use a dynamic array structure, the size of the array is required according to the actual situation.
+//    //Transform the input array into a plural array
+//    qCx array1D[16];
+//
+//    //Store Fourier transform results
+//    qCx Result[16];
+//
+//    //Store the result of the anti-Yibo transformation
+//    qCx Result_Inverse[16];
+//
+//    Real_Complex(Data, array1D, 16);
+//    FFT(array1D, Result, 16);
+//    FFT_Inverse(Result, Result_Inverse, 16);
+//    //Scope-based cycle, using Auto automatically judges the data type of the elements within the array
+//    for (auto data : Result_Inverse)
+//    {
+//        //The amplitude after the output of Fourier transform
+//        cout << data.re << "\t" << data.im << endl;
+//    }
+//
+//    return 0;
+//}
 
 //qCx ComplexMulti(qCx One, qCx Two)
 //{
@@ -137,22 +136,37 @@ void Real_Complex(vector<double> &input, qCx *output, const int length)
     }
 }
 
+// temp buffers; only good for one length, picked up on fft call
+static int Bit[32];
+int allocLength = 0;
+static qCx* tempWave;
+static qCx* fourier;
+
 //FFT transformation function
 //input: input array
 //StoreResult: qCx array of output
 //length: the length of input array
-void paChineseFFT(qCx *input, qCx *StoreResult, const int length)
+// should be qCx *dest, qCx *src, int N
+void paChineseFFT(qCx *StoreResult, qCx *input, const int length)
 {
+	if (! allocLength) {
+		allocLength = length;
+		tempWave = laosQWave->allocateWave();
+		fourier = laosQWave->allocateWave();
+	}
+	if (allocLength != length) throw "allocLength !== length";
 
     //Get the number of sequence lengths in binary
-    int BitNum = log2(length);
+    int nBits = log2(length);
 
     //Store the binary number of each index, reuse it, and clear each time you use it.
-    list<int> Bit;
+    int Bit[32];
+    //list<int> Bit;
 
     //Temporarily store rearranged input sequences
-    vector<double> DataTemp1;
-    vector<double> DataTemp2;
+//    tempWave;
+//    template<> vector<double> tempReals;
+//    template<> vector<double> tempImaginaries;
 
     //Each index of the sequence of sequences
     for (int i = 0; i < length; ++i)
@@ -162,9 +176,9 @@ void paChineseFFT(qCx *input, qCx *StoreResult, const int length)
         //Flag2 is used to reverse binarization indexes
         int flag = 1, index = 0, flag2 = 0;
 
-		// turn indices inside out
+		// turn indices inside out.  This could probably be done better.
         //Traverse each of the index binary
-        for (int j = 0; j < BitNum; ++j)
+        for (int j = 0; j < nBits; ++j)
         {
             //Decimal transformation into two-way numbers, & bit operators acting in bits, and perform operations
             //Start from the lowest position (right side)
@@ -174,7 +188,7 @@ void paChineseFFT(qCx *input, qCx *StoreResult, const int length)
             int x = (i & flag) > 0 ? 1 : 0;
 
             //Push X from the front of Bit
-            Bit.push_front(x);
+            Bit[j] = x;  // this isn't right, should go on front?
 
             //Equivalent to Flag = flag << 1, to mark the value of Flag left to Flag
             flag <<= 1;
@@ -194,18 +208,21 @@ void paChineseFFT(qCx *input, qCx *StoreResult, const int length)
         //Press Data [index] from the rear end of DATATEMP, which realizes the location of the data of the original sequence.
         //Before transformation: f (0), f (1), f (2), f (3), f (4), f (5), f (6), f (7)
         //After transform: f (0), f (4), f (2), f (6), f (1), f (5), f (3), f (7)
-        DataTemp1.push_back(input[index].re);
-        DataTemp2.push_back(input[index].im);
+        tempWave[i] = input[index];
+//        tempReals.push_back(input[index].re);
+//        tempImaginaries.push_back(input[index].im);
 
         //Empty bit
-        Bit.clear();
+        for (int q = 0; q < nBits; q++) Bit[q] = 0;
+        //Bit.clear();
     }
 
     for (int i = 0; i < length; i++)
     {
         //Transferring data to multiple structures, the index of StoreResult [i] is different from the index of the original sequence, must pay attention to
-        StoreResult[i].re = DataTemp1[i];
-        StoreResult[i].im = DataTemp2[i];
+        StoreResult[i] = tempWave[i];
+		//StoreResult[i].re = tempReals[i];
+		//StoreResult[i].im = tempImaginaries[i];
     }
 
     //Requires the number of calculations
@@ -258,7 +275,7 @@ void paChineseFFT(qCx *input, qCx *StoreResult, const int length)
     }
 }
 
-void paChineseIFFT(qCx *arrayinput, qCx *arrayoutput, const int length)
+void paChineseIFFT(qCx *arrayoutput, qCx *arrayinput, const int length)
 {
     //Composition of complex numbers after Fourier transform
     for (int i = 0; i < length; i++)
@@ -267,7 +284,7 @@ void paChineseIFFT(qCx *arrayinput, qCx *arrayoutput, const int length)
     }
 
     //One-dimensional fast Fourier transform
-    FFT(arrayinput, arrayoutput, length);
+    paChineseFFT(arrayinput, arrayoutput, length);
 
     //Time domain signal to conjugate, and normalize
     for (int i = 0; i < length; i++)

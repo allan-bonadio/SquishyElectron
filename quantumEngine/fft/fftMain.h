@@ -10,20 +10,21 @@
 
 extern "C" {
 
-	void testFFT(void);
+	//void testFFT(void);
 
+	// UI requests FFT at end of next iteration (or immediately?)
 	void askForFFT(void);
 }
 
 
-extern void dumpFFT(qWave *qw);
+extern void cooleyTukeyFFT(qCx *dest, qCx *src, int N);
+extern void cooleyTukeyIFFT(qCx *dest, qCx *src, int N);
 
+extern void paChineseFFT(qCx *dest, qCx *src, int N);
+extern void paChineseIFFT(qCx *dest, qCx *src, int N);
 
-void cooleyTukeyFFT(qCx *dest, qCx *src, int N);
-void cooleyTukeyIFFT(qCx *dest, qCx *src, int N);
+// nice console dump of wave and FFT centered at zero.  For iteration.
+extern void analyzeWaveFFT(qWave *qw);
 
-void paChineseFFT(qCx *dest, qCx *src, int N);
-void paChineseIFFT(qCx *dest, qCx *src, int N);
-
-
-
+// rounds up to the nearest power of two
+extern int nextPowerOf2(int N);

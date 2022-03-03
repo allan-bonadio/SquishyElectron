@@ -8,7 +8,14 @@
 #include <chrono>
 #include "qSpace.h"
 #include "qWave.h"
-#include "fft/fftDefs.h"
+#include "fft/fftMain.h"
+
+
+
+
+extern void analyzeWaveFFT(qWave *qw);
+
+
 
 
 class qSpace *theSpace = NULL;
@@ -144,6 +151,8 @@ void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset =
 
 /* ********************************************************** integration */
 
+static int isIterating = false;
+
 // does several visscher steps, we'll call that one 'iteration'
 void qSpace::oneIteration() {
 	int ix;
@@ -154,6 +163,8 @@ void qSpace::oneIteration() {
 	int steps = this->stepsPerIteration / 2;
 	if (debugIteration)
 		printf("qSpace::oneIteration() - steps=%d   stepsPerIteration=%d\n", steps, this->stepsPerIteration);
+
+	isIterating = true;
 	for (ix = 0; ix < steps; ix++) {
 		// this seems to have a resolution of 100µs on Panama
 		//auto start = std::chrono::steady_clock::now();////
@@ -167,6 +178,7 @@ void qSpace::oneIteration() {
 		//std::chrono::duration<double> elapsed_seconds = end-start;////
 		//printf("elapsed time: %lf \n", elapsed_seconds.count());////
 	}
+	isIterating = false;
 
 	this->iterateSerial++;
 
@@ -200,14 +212,20 @@ void qSpace::oneIteration() {
 
 	if (this->pleaseFFT) {
 
-		dumpFFT(this->latestQWave);
+
+		analyzeWaveFFT(this->latestQWave);
 
 		this->pleaseFFT = false;
 	}
 
 }
 
-// user button to print it out at end of the next iteration
+// user button to print it out now, or at end of the next iteration
 void askForFFT(void) {
-	theSpace->pleaseFFT = true;
+	if (isIterating)
+		theSpace->pleaseFFT = true;
+	else {
+		analyzeWaveFFT(laosQWave);
+
+	}
 }
