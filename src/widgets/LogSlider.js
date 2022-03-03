@@ -8,7 +8,7 @@ import React from 'react';
 //import {scaleLinear} from 'd3-scale';
 //import {path as d3path} from 'd3-path';
 
-import {thousands, stepsPerDecadeFactors, indexToPower, powerToIndex} from './utils';
+import {thousands, stepsPerDecadeStepFactors, indexToPower, powerToIndex} from './utils';
 
 
 
@@ -17,7 +17,7 @@ import {thousands, stepsPerDecadeFactors, indexToPower, powerToIndex} from './ut
 // The indices.  wait, this doesn't work... trana get where the tic marks are
 // function createGoodPowersOf10(spd, iMin, iMax) {
 // 	let po10 = [];
-//		// no this is wrong it'll make factors of 10 starting at the min; should start at a power of 10
+//		// no this is wrong it'll make stepFactors of 10 starting at the min; should start at a power of 10
 // 	for (let p = iMin; p <= iMax; p += spd) {
 // 		po10.push(<option key={p}>{p}</option>);
 // //		po10.push(<option>{p + 3}</option>);
@@ -25,6 +25,20 @@ import {thousands, stepsPerDecadeFactors, indexToPower, powerToIndex} from './ut
 // 	}
 // 	return po10;
 // }
+
+
+// list of settings that are more better - not that simple!
+function createGoodPowers(spd, mini, maxi) {
+	const minIx = powerToIndex(spd, mini);
+	const maxIx = powerToIndex(spd, maxi);
+	let valz = [];
+	for (let ix = minIx; ix <= maxIx; ix += 10) {
+		valz.push(<option key={ix} value={ix} >{ix}</option>);
+	}
+	return valz;
+}
+
+
 
 /* ****************************************************************** component */
 function setPT() {
@@ -41,39 +55,52 @@ function setPT() {
 		sliderMax: PropTypes.number.isRequired,
 
 		stepsPerDecade: PropTypes.number.isRequired,
-		integer: PropTypes.bool,
 
+		// because sometimes floating point arithmetic leaves roundoff error, as a convenience,
+		// we can trim your power numbers.  The indexes are always integers; no need to round them.
+		willRoundPowers: PropTypes.bool,
+
+		// any unique value for this particular LogSlider, cuz we gotta generate a CSS ID.
+		// just so that two LogSliders end up with different unique codes.
+		// Prefer alphanumeric, punctuation we eliminate
+		unique: PropTypes.string.isRequired,
+
+		// handleChange(power, ix)
 		handleChange: PropTypes.func,
 	};
 
 	LogSlider.defaultProps = {
+		unique: 'you should really choose a unique code for this logslider',
 		className: '',
 		label: 'how much',
 		minLabel: 'low',
 		maxLabel: 'high',
 
-		integer: false,
+		willRoundPowers: false,
 
-		handleChange: (ix, power) => {},
+		handleChange: (power, ix) => {},
 	};
 }
 
 function LogSlider(props) {
 	const p = props;
-	const factors = stepsPerDecadeFactors[p.stepsPerDecade];
 	const spd = p.stepsPerDecade;
+	const stepFactors = stepsPerDecadeStepFactors[spd];
 	const cur = p.current;
-	//const cur = indexToPower(p.integer, factors, p.stepsPerDecade, p.current);
+	//const cur = indexToPower(p.willRoundPowers, stepFactors, p.stepsPerDecade, p.current);
 
 	function handleSlide(ev) {
 		console.info(`handleChange::  ev=`, ev);
-		const ix = ev.currentTarget.value;
-		const power = indexToPower(p.integer, factors, spd, ix);
+		const ix = +ev.currentTarget.value;
+		const power = indexToPower(p.willRoundPowers, stepFactors, spd, ix);
 		console.info(`handleChange::  ix=${ix}  power=${power}`);
 		p.handleChange(power, ix);
 	}
 
 	const wasOriginal = p.original ? <small>&nbsp; (was {thousands(p.original)})</small> : '';
+
+	// the actual css ID used for the datalist
+	const uniqueId = `LogSliderDataList-${p.unique.replace(/\W+/, '_')}`;
 
 	return <div className={`${p.className} LogSlider`}>
 		<aside>
@@ -87,11 +114,13 @@ function LogSlider(props) {
 		</aside>
 
 		<input type="range"
-			min={powerToIndex(spd, p.sliderMin)} max={powerToIndex(spd, p.sliderMax)}
+			min={powerToIndex(spd, p.sliderMin)}
+			max={powerToIndex(spd, p.sliderMax)}
 			value={powerToIndex(spd, p.current)}
-			list='nerfgod'
+			list={uniqueId}
 			onInput={handleSlide}
 		/>
+		<datalist id={uniqueId} >{createGoodPowers(spd, p.sliderMin, p.sliderMax)}</datalist>
 	</div>;
 }
 

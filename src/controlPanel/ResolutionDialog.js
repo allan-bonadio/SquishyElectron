@@ -9,7 +9,9 @@ import PropTypes from 'prop-types';
 import {qeBasicSpace} from '../wave/qeSpace';
 import SquishPanel from '../SquishPanel';
 import CommonDialog from '../widgets/CommonDialog';
-import {thousands} from '../widgets/utils';
+import {powerToIndex} from '../widgets/utils';
+import LogSlider from '../widgets/LogSlider';
+
 
 
 // had this been a real webiste, I would not have to copy/paste these here
@@ -22,40 +24,43 @@ import {thousands} from '../widgets/utils';
 // rounded off to convenient increments, so eg 60=>1M, 50=>100k,
 // 30=1000, 27=500, 23=>200, 20=>100, 13=>20, 10=>10 /*!!!*/, 7=>5
 // note 11=>12.5=>13 so start at 12 => 16, although it'll round up and always be an integer
-const MIN_SLIDER_RES = process.env.NODE_ENV == 'development' ? 0 : 12;
-const MAX_SLIDER_RES = 30;
+// const MIN_SLIDER_RES = process.env.NODE_ENV == 'development' ? 0 : 12;
+// const MAX_SLIDER_RES = 30;
+
+const MIN_2SLIDER_RES = process.env.NODE_ENV == 'development' ? 4 : 16;
+const MAX_2SLIDER_RES = 1024;
 
 // list of settings that are more better - not that simple!
-function createGoodPowersOf10() {
-	let po10 = [];
-	for (let p = MIN_SLIDER_RES; p <= MAX_SLIDER_RES; p += 10) {
-		po10.push(<option key={p}>{p}</option>);
-//		po10.push(<option>{p + 3}</option>);
-//		po10.push(<option>{p + 7}</option>);
-	}
-	return po10;
-}
-
-const GoodPowersOf10 = createGoodPowersOf10();
-
-// convert eg 20, 21, 25, 30 into 100, 125, 300, 1000
-// indices under 12 will result in rounded results,
-// 1 2 2 2 3 3 4 5 6 8 10 13 15...
-// so not recommended for human consumption
-function indexToPower(ix) {
-	let po10 = 10 ** Math.floor(ix/10);
-	let factor = [
-		1.0, 1.25, 1.5,
-		2.0, 2.50, 3.0,
-		4.0, 5.00, 6.0,
-		8.0][ix % 10];
-	return Math.ceil(factor * po10);
-}
-
-// convert eg 100, 125, 300, 1000 into 20, 21, 25, 30
-function powerToIndex(p) {
-	return Math.round(Math.log10(p) * 10);
-}
+// function createGoodPowersOf10() {
+// 	let po10 = [];
+// 	for (let p = MIN_SLIDER_RES; p <= MAX_SLIDER_RES; p += 10) {
+// 		po10.push(<option key={p}>{p}</option>);
+// //		po10.push(<option>{p + 3}</option>);
+// //		po10.push(<option>{p + 7}</option>);
+// 	}
+// 	return po10;
+// }
+//
+// const GoodPowersOf10 = createGoodPowersOf10();
+//
+// // convert eg 20, 21, 25, 30 into 100, 125, 300, 1000
+// // indices under 12 will result in rounded results,
+// // 1 2 2 2 3 3 4 5 6 8 10 13 15...
+// // so not recommended for human consumption
+// function indexToPower(ix) {
+// 	let po10 = 10 ** Math.floor(ix/10);
+// 	let factor = [
+// 		1.0, 1.25, 1.5,
+// 		2.0, 2.50, 3.0,
+// 		4.0, 5.00, 6.0,
+// 		8.0][ix % 10];
+// 	return Math.ceil(factor * po10);
+// }
+//
+// // convert eg 100, 125, 300, 1000 into 20, 21, 25, 30
+// function powerToIndex(p) {
+// 	return Math.round(Math.log10(p) * 10);
+// }
 
 export default class ResolutionDialog extends React.Component {
 	static propTypes = {
@@ -67,18 +72,20 @@ export default class ResolutionDialog extends React.Component {
 	// this is the state in the dialog; doesn't become real until OK().
 	// Therefore, initial values set from props.
 	state = {
-		N: this.props.N,
-		powerOf10: powerToIndex(this.props.N),
+		N: this.props.N,  // same as power
+		index: powerToIndex(16, this.props.N),
 		continuum: this.props.continuum,
 		viewClassName: this.props.viewClassName,
+		origN: this.props.N,
 	};
 
-	handleChangePowersOf10(ev) {
-		this.setState({
-			powerOf10: ev.target.valueAsNumber,
-			N: indexToPower(ev.target.valueAsNumber),
-		});
-	}
+
+// 	handleChangePowersOf10(ev) {
+// 		const target = ev.target;
+// 		const index = target.value;
+// 		this.setState({power, index, });
+// 	}
+// 	handleChangePowersOf10 = this.handleChangePowersOf10.bind(this);
 
 	/* ******************************************************************* open/close */
 
@@ -119,25 +126,58 @@ export default class ResolutionDialog extends React.Component {
 
 	/* ******************************************************************* rendering */
 
-	renderSlider() {
-		const s = this.state;
-		return <>
-			datapoints: <big>{thousands(indexToPower(this.state.powerOf10))}</big>
+/*
+			datapoints: <big>{thousands(indexToPower(this.state.power, ix))}</big>
 			&nbsp; <small>(was {thousands(this.props.N)})</small>
 			<div style={{break: 'both', fontSize: 'smaller'}}>
 				<div style={{float: 'left'}}>faster</div>
 				<div style={{float: 'right'}}>more accurate</div>
 			</div>
 
-			<input className='powerOf10Control' type="range"
+			<input className='power, ixControl' type="range"
 				min={MIN_SLIDER_RES} max={MAX_SLIDER_RES}
-				value={s.powerOf10}
+				value={s.power, ix}
 				list='GoodPowersOf10'
 				style={{width: '100%'}}
-				onInput={ev => this.handleChangePowersOf10(ev)}
+				onInput={this.handleChangePowersOf10}
+			/>
+			<br />
+
+*/
+
+
+	renderSlider() {
+		const s = this.state;
+		return <>
+			<LogSlider
+				unique='resolutionSlider'
+				className='resolutionSlider'
+				label='Datapoints'
+				minLabel='faster'
+				maxLabel='more accurate'
+
+				current={s.N}
+				original={this.origN}
+				sliderMin={MIN_2SLIDER_RES}
+				sliderMax={MAX_2SLIDER_RES}
+
+				stepsPerDecade={16}
+				willRoundPowers={true}
+
+				handleChange={this.handleResChange}
 			/>
 		</>;
 	}
+
+	handleResChange(power, ix) {
+		this.setState({
+			power,
+			ix: +ix,
+			N: +power,
+		});
+		console.info(`handleResChange(power=${power}, ix=${ix}) `)
+	}
+	handleResChange = this.handleResChange.bind(this);
 
 	renderContinuum() {
 		const s = this.state;
@@ -222,12 +262,13 @@ export default class ResolutionDialog extends React.Component {
 
 	}
 
+// 				<datalist id='GoodPowersOf10' >{GoodPowersOf10}</datalist>
+
 	render() {
 		//const s = this.state;
 
 		return (
 			<article className='dialog ResolutionDialog' style={{fontSize: '80%'}}>
-				<datalist id='GoodPowersOf10' >{GoodPowersOf10}</datalist>
 
 				<h3>Reconfigure the Universe</h3>
 
@@ -247,12 +288,11 @@ export default class ResolutionDialog extends React.Component {
 
 				<section className='dialogSection'
 					style={{padding: '1em', margin: '1em', textAlign: 'right'}}>
-					<button className='cancelButton'
-						onClick={ev => this.cancel(ev)}>
+					<button className='cancelButton' onClick={this.cancel}>
 							Cancel
 					</button>
 					<button className='setResolutionOKButton'
-						onClick={ev => this.OK(ev)}>
+						onClick={this.OK}>
 							Recreate Universe
 					</button>
 				</section>
