@@ -86,6 +86,7 @@ function CPToolbar(props) {
 
 
 		<LogSlider
+			unique='dtSlider'
 			className='dtSlider'
 			label='dt'
 			minLabel='.0001'
@@ -97,15 +98,16 @@ function CPToolbar(props) {
 			stepsPerDecade={6}
 
 			handleChange={(power, ix) => {
-				console.info(`handleChange dt::  ix=${ix}  power=${power}`);
+				console.info(`handleChange jj   ix=${ix}  power=${power}`);
 				props.setDt(power);
 			}}
 		/>
 		<LogSlider
+			unique='stepsPerIterationSlider'
 			className='stepsPerIterationSlider dtSlider'
 			label='steps Per Iteration'
-			minLabel='100'
-			maxLabel='10,000'
+			minLabel='faster'
+			maxLabel='smoother'
 
 			current={props.stepsPerIteration}
 			sliderMin={100}
@@ -118,6 +120,7 @@ function CPToolbar(props) {
 			}}
 		/>
 		<LogSlider
+			unique='lowPassDilutionSlider'
 			className='lowPassDilutionSlider dtSlider'
 			label='Low Pass Dilution'
 			minLabel='0.001'
