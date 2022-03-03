@@ -13,6 +13,10 @@ function setPT() {
 
 function SetResolutionTab(props) {
 	const p = props;
+	p.openResolutionDialog();  // just et ti over with
+
+
+
 
 	return (<div className='SetResolutionTab'>
 		<button className='setResolutionButton  round'
@@ -25,7 +29,10 @@ function SetResolutionTab(props) {
 
 		<p>
 			The actual universe is essentially infinite. &nbsp;
-			<small>(Well, actually it's probably finite, but so incredibly huge, you'll never notice the difference.)</small>
+			<small>(Well, actually it's probably finite,
+			<small>but so incredibly huge,
+			<small>you'll never notice the difference.)
+			</small></small></small>
 			&nbsp; Nobody's computer has that much ram or power.
 			Squishy Electron's universe runs on this web page, much smaller,
 			but we can simulate the microscopic... no, the <u>picoscopic </u>
