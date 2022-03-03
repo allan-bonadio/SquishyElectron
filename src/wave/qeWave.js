@@ -4,6 +4,7 @@
 */
 
 // import {qeBasicSpace} from './qeSpace';
+import cxToRgb from '../view/cxToRgb';
 
 /* **************************************************************** dumping */
 
@@ -27,9 +28,27 @@ class qeWave {
 			`\n==== end of Wave ====\n\n`);
 	}
 
+	rainbowDump() {
+		const wave = this.wave;
+		const {start, end} = this.space.startEnd2;
+
+		let tot = 0;  // always real
+		for (let ix = start; ix < end; ix += 2) {
+
+
+
+
+			let mag = (wave[ix] ** 2 + wave[ix + 1] ** 2) * 10000;
+			let color = cxToRgb({re: wave[ix], im: wave[ix + 1]});
+			console.log(`%c `, `background-color: ${color}; padding-right: ${mag}px; `);
+
+		}
+		return tot;
+	}
+
 	/* ********************************************************************** calculatons */
 
-	// calculate ⟨ψ | ψ⟩  'inner product' isn't the right name is it?  yes
+	// calculate ⟨ψ | ψ⟩  'inner product'
 	innerProduct() {
 		const wave = this.wave;
 		const {start, end} = this.space.startEnd2;
@@ -76,6 +95,7 @@ class qeWave {
 		this.space.fixThoseBoundaries(wave);
 		this.normalize();
 		//this.dumpWave('qeWave.setCircularWave() done');
+		this.rainbowDump('qeWave.setCircularWave() done');
 	}
 
 
@@ -103,6 +123,7 @@ class qeWave {
 		this.space.fixThoseBoundaries(wave);
 		this.normalize();
 		//this.dumpWave('qeWave.setStandingWave() done');
+		this.rainbowDump('qeWave.setStandingWave() done');
 	}
 
 	// freq is just like circular, although as a fraction of the stdDev instead of N
@@ -158,6 +179,7 @@ class qeWave {
 		this.space.fixThoseBoundaries(wave);
 		this.normalize();
 		//this.dumpWave('qeWave.setPulseWave() done');
+		this.rainbowDump('qeWave.setPulseWave() done');
 	}
 
 	// set one of the above canned waveforms, according to the waveParams object's values
