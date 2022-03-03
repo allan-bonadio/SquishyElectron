@@ -30,10 +30,10 @@ function cxToRgb(psi) {
 		else {
 			//console.log('     line 14, psi.re=', psi.re);
 			if (psi.re > 0.) {
-				return vec3(1., 0., 0.);  // red +1
+				return vec3(1., 0., 0.);  // red = +1
 			}
 			else {
-				return vec3(0., 1., 1.);  // cyan -1
+				return vec3(0., 1., 1.);  // cyan = -1
 			}
 		}
 	}
