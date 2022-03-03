@@ -17,11 +17,11 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \
 	-sEXPORTED_FUNCTIONS=@building/exports.json \
 	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","getValue","setValue"]' \
-	main.cpp $allCpp
+	main.cpp $allCpp || exit 99
 
 cp quantumEngine.wasm quantumEngine.js ../public
 
-exit 0
+exit $?
 
 # compiler hints and links:
 # https://emscripten.org/docs/tools_reference/emcc.html
