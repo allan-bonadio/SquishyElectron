@@ -28,3 +28,4 @@ extern void analyzeWaveFFT(qWave *qw);
 
 // rounds up to the nearest power of two
 extern int nextPowerOf2(int N);
+

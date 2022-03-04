@@ -3,8 +3,8 @@
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
-#include "../qSpace.h"
-#include "../qWave.h"
+#include "../spaceWave/qSpace.h"
+#include "../spaceWave/qWave.h"
 #include "fftMain.h"
 
 
@@ -20,7 +20,7 @@ int nextPowerOf2(int N) {
 
 /* ********************************************************* qWave interface */
 
-void testAllAlgorithms(qCx *wave, int length);
+void tryAllAlgorithms(qCx *wave, int length);
 
 
 // take this wave in and FFT it and dump the result to console
@@ -55,7 +55,7 @@ void analyzeWaveFFT(qWave *inputQWave) {
 		inputWave[inputIx] = qCx();
 
 	// do it
-	testAllAlgorithms(inputWave, nStates);
+	tryAllAlgorithms(inputWave, nStates);
 
 	delete fftSpace;
 	delete input;
@@ -64,34 +64,36 @@ void analyzeWaveFFT(qWave *inputQWave) {
 
 /* ********************************************************* test */
 
-void testOneFFT(qCx *buffer, int length,
+void tryOneFFT(qCx *buffer, int length,
 	void FFT(qCx *, qCx *, int), void IFFT(qCx *, qCx *, int),
 	const char *algName)
 {
 	//CArray buffer(inputArray, length);
-	qCx outputWave[length];
+	qCx outputWave[length], backToOriginal[length];
 
 	// forward
-	FFT(buffer, buffer, length);
+	FFT(outputWave, buffer, length);
 
-	for (int i = 0; i < length; ++i)
-		printf("FfT frequency space:\n");
+	printf("========================= %s FFT frequency space ==============  ",
+		algName);
 	dumpWaveSegment(outputWave, length/2, length, 0, true);
 	dumpWaveSegment(outputWave, 0, length/2, 0, true);
+	printf("======================== end of freq dump ==============\n");
 
 	// inverse
-	IFFT(outputWave, buffer, length);
-
-	printf("back to original wave\n");
-	// show last first so the low frequencies end up at the middle
-	dumpWaveSegment(outputWave, 0, length, 0, true);
+//	IFFT(backToOriginal, outputWave, length);
+//
+//	// show last first so the low frequencies end up at the middle
+//	dumpWaveSegment(backToOriginal, 0, length, 0, true);
 //	for (int i = 0; i < length; ++i)
 //		printf("inverse buffer point %d (%lf %lf)\n", i, buffer[i].re, buffer[i].im);
 }
 
-void testAllAlgorithms(qCx *wave, int length) {
-	testOneFFT(wave, length, cooleyTukeyFFT, cooleyTukeyIFFT, "cooleyTukeyFFT");
-	testOneFFT(wave, length, paChineseFFT, paChineseIFFT, "paChineseFFT");
+void tryAllAlgorithms(qCx *wave, int length) {
+	printf("tryAllAlgorithms begins");
+	tryOneFFT(wave, length, cooleyTukeyFFT, cooleyTukeyIFFT, "cooleyTukeyFFT");
+	tryOneFFT(wave, length, paChineseFFT, paChineseIFFT, "paChineseFFT");
+	printf("tryAllAlgorithms begins");
 }
 
 
@@ -108,13 +110,13 @@ extern "C" void testFFT(void) {
 	qCx sampleSquare[8];
 	sampleSquare[0] = sampleSquare[1] = sampleSquare[2] = sampleSquare[3] = qCx(1);
 	sampleSquare[4] = sampleSquare[5] = sampleSquare[6] = sampleSquare[7] = qCx();
-	testAllAlgorithms(sampleSquare, 8);
+	tryAllAlgorithms(sampleSquare, 8);
 
 	printf("8-pt chinese\n");
-	testAllAlgorithms(chinese8, 8);
+	tryAllAlgorithms(chinese8, 8);
 
 	printf("16-pt chinese\n");
-	testAllAlgorithms(chinese16, 16);
+	tryAllAlgorithms(chinese16, 16);
 
 }
 

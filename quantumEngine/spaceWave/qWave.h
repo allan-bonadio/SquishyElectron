@@ -52,6 +52,9 @@ struct qWave {
 	////virtual void setCircularWave(qReal n);
 	//void setStandingWave(qReal n);
 	//void setPulseWave(qReal widthFactor, qReal cycles, qReal offset);
+
+	// calculates special size
+	static newFourierWave(qSpace *space, qCx *useThisBuffer)
 };
 
 
