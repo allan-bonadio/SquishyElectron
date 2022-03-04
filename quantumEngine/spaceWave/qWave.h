@@ -44,14 +44,14 @@ struct qWave {
 
 	virtual void fixBoundaries(void);  // on this buffer
 	void prune(void);
-	qReal innerProduct(void);
+	double innerProduct(void);
 	virtual void normalize(void);
 	void lowPassFilter(double dilution = 0.01);
 	void nyquistFilter(void);
 
-	////virtual void setCircularWave(qReal n);
-	//void setStandingWave(qReal n);
-	//void setPulseWave(qReal widthFactor, qReal cycles, qReal offset);
+	////virtual void setCircularWave(double n);
+	//void setStandingWave(double n);
+	//void setPulseWave(double widthFactor, double cycles, double offset);
 
 	// calculates special size
 	static newFourierWave(qSpace *space, qCx *useThisBuffer)
@@ -67,7 +67,7 @@ struct qFlick : public qWave {
 	~qFlick();
 
 	// dump
-	qReal dumpRow(char *buf, int doubleAge, int ix, double *pPrevPhase, bool withExtras);
+	double dumpRow(char *buf, int doubleAge, int ix, double *pPrevPhase, bool withExtras);
 	void dumpOneAge(const char *title, int doubleAge, bool withExtras);
 	void dumpLatest(const char *titleIn, bool withExtras);
 	void dumpAllWaves(const char *title);
@@ -91,14 +91,14 @@ struct qFlick : public qWave {
 	void setCurrent(int which);
 
 	// for vischer
-	qReal innerProduct(void);
+	double innerProduct(void);
 	void normalize(void);
-	//void setCircularWave(qReal n);
+	//void setCircularWave(double n);
 
 	// retrieve properly interpolated values here
-	qReal magnitude(int doubleAge, int ix = 1);
+	double magnitude(int doubleAge, int ix = 1);
 	qCx value(int doubleAge, int ix = 1);
-	qReal magnitude(int ix = 1) { return magnitude(1, ix); }
+	double magnitude(int ix = 1) { return magnitude(1, ix); }
 	qCx value(int ix = 1) { return value(1, ix); }
 
 	void fixBoundaries(void);  // on latest two buffers

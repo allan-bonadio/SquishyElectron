@@ -164,7 +164,7 @@ void qSpace::visscherHalfStep(qWave *oldQWave, qWave *newQWave) {
 
 	// let's try moving the im forward dt/2 for the next wave.
 	// the current wave here is corrupt (being at the same time re/im) so add new one
-	qReal halfDt = this->dt / 2;
+	double halfDt = this->dt / 2;
 
 	// fake stepReal() by just copying over the real values
 	for (int ix = dims->start; ix < dims->end; ix++)

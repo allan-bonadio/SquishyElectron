@@ -15,7 +15,7 @@ extern class qCx *peruWave, *laosWave;
 
 extern class qWave *peruQWave, *laosQWave;
 
-extern qReal *thePotential;
+extern double *thePotential;
 //extern float *viewBuffer;
 
 extern qCx hamiltonian(qCx *wave, int x);
@@ -25,17 +25,17 @@ extern void qeStarted(void);
 struct qDimension {
 public:
 	// possible  states, just for this  dimension.  start+end=datapoints
-	int32_t N;
-	int32_t start;
-	int32_t end;
+	int N;
+	int start;
+	int end;
 
 	// accumulated number of eigenstates, from this dim to the end
 	// = product of Nv * Nv of next dimension or 1 if none
-	int32_t nStates;
+	int nStates;
 
 	// accumulated number of complex values in wave, from this dim to the end.
 	// includes boundaries.
-	int32_t nPoints;
+	int nPoints;
 
 	// contWELL or contENDLESS (has N+2 values for N possibilities)
 	// contDISCRETE = (has N values for N possibilities)
@@ -43,7 +43,7 @@ public:
 
 	// size for Fourier transforms, or zero if not yet calculated.  Often a power of two.
 	// no boundaries.
-	int32_t fourierSize;
+	int fourierSize;
 
 	// 'x', 'y' or 'z' - two particles will have x1, x2 but one in 2d will have x, y.
 	// Spin: Sz, or Sz1, Sz2, ...  Smax = 2S+1.  Sz= ix - S.  Orbital Ang: Lz, combined: Jz
@@ -87,7 +87,7 @@ public:
 
 	// number of  dimensions actually used, always <= MAX_DIMENSIONS
 	// do not confuse with nStates or nPoints
-	int32_t nDimensions;
+	int nDimensions;
 
 	// totals for all dimensions.  These numbers dominate lots of areas in the code.
 	int nStates;
@@ -98,10 +98,10 @@ public:
 	struct qWave *latestQWave;
 
 	struct qViewBuffer *qViewBuffer;
-	qReal *potential;
+	double *potential;
 
 	// time increment used in schrodinger's, plus constants handy in intgration
-	qReal dt;
+	double dt;
 	qCx dtOverI;  // get rid of this
 	qCx halfDtOverI;  // get rid of this
 	int stepsPerIteration;
@@ -117,7 +117,7 @@ public:
 	//int doLowPass;
 
 	// zero = off.  true to do it every iteration a little and use value as dilution factor
-	//qReal continuousLowPass;
+	//double continuousLowPass;
 
 	char label[LABEL_LEN];
 	char pleaseFFT;
@@ -133,7 +133,7 @@ public:
 
 	void dumpPotential(const char *title);
 	void setZeroPotential(void);
-	void setValleyPotential(qReal power, qReal scale, qReal offset);
+	void setValleyPotential(double power, double scale, double offset);
 
 	void oneIteration(void);
 	void oneRk2Step(qWave *oldQWave, qWave *newQWave);  // obsolete
@@ -154,14 +154,14 @@ public:
 // for JS to call
 extern "C" {
 	qSpace *startNewSpace(void);
-	qSpace *addSpaceDimension(int32_t N, int32_t continuum, const char *label);
+	qSpace *addSpaceDimension(int N, int continuum, const char *label);
 	qSpace *completeNewSpace(void);
 
 	qCx *qSpace_getWaveBuffer(void);
-	qReal *qSpace_getPotentialBuffer(void);
+	double *qSpace_getPotentialBuffer(void);
 	float *qViewBuffer_getViewBuffer();
-	qReal qSpace_getElapsedTime(void);
-	qReal qSpace_getIterateSerial(void);
+	double qSpace_getElapsedTime(void);
+	double qSpace_getIterateSerial(void);
 
 	void qSpace_oneIteration(void);
 

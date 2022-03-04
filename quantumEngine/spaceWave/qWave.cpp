@@ -97,15 +97,15 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 // print one complex number, plus maybe some more, on a line in the dump on stdout.
 // if it overflows the buffer, it won't.  just dump a row for a cx datapoint.
 // returns the magnitude non-visscher, but only withExtras
-static qReal dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtras) {
-	qReal re = w.re;
-	qReal im = w.im;
-	qReal mag = 0;
+static double dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtras) {
+	double re = w.re;
+	double im = w.im;
+	double mag = 0;
 	if (withExtras) {
 		mag = re * re + im * im;
-		qReal phase = 0.;
+		double phase = 0.;
 		if (im || re) phase = atan2(im, re) * 180. / PI;  // pos or neg
-		qReal dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
+		double dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
 		while (dPhase >= 360.) dPhase -= 360.;
 
 		sprintf(buf, "[%d] (%8.4lf,%8.4lf) | %8.3lf %8.3lf %8.4lf",
@@ -210,15 +210,15 @@ void qWave::fixBoundaries(void) {
 }
 
 // calculate ⟨ψ | ψ⟩  'inner product'.  Non-visscher.
-qReal qWave::innerProduct(void) {
+double qWave::innerProduct(void) {
 	qCx *wave = this->wave;
 	qDimension *dims = this->space->dimensions;
-	qReal sum = 0.;
+	double sum = 0.;
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx point = wave[ix];
-		qReal re = point.re;
-		qReal im = point.im;
+		double re = point.re;
+		double im = point.im;
 		sum += re * re + im * im;
 		//sum += wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im;
 // 		printf("innerProduct point %d (%lf,%lf) %lf\n", ix, wave[ix].re, wave[ix].im,
@@ -239,19 +239,19 @@ void qWave::normalize(void) {
 	//qWave *tempQWave = new qWave(this->space, tempWave);
 	qCx *wave = this->wave;
 	qDimension *dims = this->space->dimensions;
-	qReal mag = this->innerProduct();
+	double mag = this->innerProduct();
 	//printf("normalizing qWave.  magnitude=%lf", mag);
 	//tempQWave->dumpWave("The wave,before normalize", true);
 
 	if (mag == 0. || ! isfinite(mag)) {
 		// ALL ZEROES!??! this is bogus, shouldn't be happening
 		printf("ALL ZEROES ! ? ? ! not finite ! ? ? !  set them all to a constant, normalized\n");
-		const qReal f = 1e-9;
+		const double f = 1e-9;
 		for (int ix = dims->start; ix < dims->end; ix++)
 			wave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
 	}
 	else {
-		const qReal factor = pow(mag, -0.5);
+		const double factor = pow(mag, -0.5);
 
 		for (int ix = dims->start; ix < dims->end; ix++)
 			wave[ix] *= factor;
@@ -263,11 +263,11 @@ void qWave::normalize(void) {
 
 /* ************************************************* bad ideas I might revisit?  */
 
-qReal cleanOneNumber(qReal u, int ix, int sense) {
+double cleanOneNumber(double u, int ix, int sense) {
 	if (!isfinite(u)) {
 		// just enough to be nonzero without affecting the balance
 		printf("had to prune [%d]= %f\n", ix, u);
-		qReal faker = sense ? 1e-9 :  -1e-9;
+		double faker = sense ? 1e-9 :  -1e-9;
 		return faker;
 	}
 	return u;

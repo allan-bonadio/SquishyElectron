@@ -10,7 +10,7 @@
 #include "qWave.h"
 
 // dx is always 1.  dt is below.
-static const qReal dt = 0.02;
+static const double dt = 0.02;
 
 // when the Planck constant is expressed in SI units, it has the exact value
 // h = 6.62607015×10−34 J⋅sec
@@ -28,7 +28,7 @@ static const qCx halfDtOverI = qCx(0., -dt / 2.);
 // factor = 1/3 or 1/6, see NumRecFort p552.
 void waveDDT(qDimension *dims,
 			qCx *origWave, qCx *fromWave, qCx *nextYWave,
-			qReal nextYFactor, qReal sumFactor) {
+			double nextYFactor, double sumFactor) {
 	dims->fixBoundaries(fromWave); // always before hamiltonian
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		qCx dPsi = hamiltonian(fromWave, ix) * dtOverI * nextYFactor;

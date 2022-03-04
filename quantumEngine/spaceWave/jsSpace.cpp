@@ -41,23 +41,23 @@ qCx *qSpace_getWaveBuffer(void) {
 	return theSpace->latestQWave->wave;
 }
 
-qReal *qSpace_getPotentialBuffer(void) {
+double *qSpace_getPotentialBuffer(void) {
 	return thePotential;
 }
 
-qReal qSpace_getElapsedTime(void) {
+double qSpace_getElapsedTime(void) {
 	if (!theSpace) throw "null space in getElapsedTime()";
 	return theSpace->elapsedTime;
 }
 
-qReal qSpace_getIterateSerial(void) {
+double qSpace_getIterateSerial(void) {
 	if (!theSpace) throw "null space in getIterateSerial()";
 	return theSpace->iterateSerial;
 }
 
 void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
 void qSpace_setZeroPotential(void) { theSpace->setZeroPotential(); }
-void qSpace_setValleyPotential(qReal power, qReal scale, qReal offset) {
+void qSpace_setValleyPotential(double power, double scale, double offset) {
 	theSpace->setValleyPotential(power, scale, offset);
 }
 
@@ -170,7 +170,7 @@ qSpace *completeNewSpace(void) {
 	/* *********************************** allocate other buffers */
 
 	// we make our own potential
-	theSpace->potential = thePotential = new qReal[theSpace->nPoints];
+	theSpace->potential = thePotential = new double[theSpace->nPoints];
 
 	// we make our own view buffer - needs potential to be in place
 	theSpace->qViewBuffer = theQViewBuffer = new qViewBuffer(theSpace);

@@ -53,17 +53,17 @@ qFlick::~qFlick() {
 
 // print one complex number, from a flick at time doubleAge, on a line in the dump on stdout.
 // if it overflows the buffer, it won't.  just dump a row for a cx datapoint.
-qReal qFlick::dumpRow(char *buf, int doubleAge, int ix, double *pPrevPhase, bool withExtras) {
+double qFlick::dumpRow(char *buf, int doubleAge, int ix, double *pPrevPhase, bool withExtras) {
 	qCx w = this->value(ix, doubleAge);  // interpolates
 	int it = doubleAge / 2;
 	char leftParen = (doubleAge & 1) ? '(' : '[';
 	char rightParen = (doubleAge & 1) ? ']' : ')';
-	qReal mag = 0;
+	double mag = 0;
 	if (withExtras) {
 		mag = this->magnitude(ix, doubleAge);  // interpolates
-		qReal phase = 0.;
+		double phase = 0.;
 		if (w.im || w.re) phase = atan2(w.im, w.re) * 180 / PI;  // pos or neg
-		qReal dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
+		double dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
 		while (dPhase >= 360.) dPhase -= 360.;
 
 		sprintf(buf, "[%d] %c%8.4lf,%8.4lf%c | %8.2lf %8.2lf %8.4lf",
@@ -156,7 +156,7 @@ qCx qFlick::value(int doubleAge, int ix) {
 
 // calculate the magnitude, re**2 + im**2 kindof, at this point and time
 // pretty clumsy but accurate, we'll figure out something
-qReal qFlick::magnitude(int doubleAge, int ix) {
+double qFlick::magnitude(int doubleAge, int ix) {
 	//printf("qFlick::magnitude: doubleAge[%d]   ix[%d] \n", doubleAge, ix);
 	// if doubleAge is 1 or 2, we should end up with it=0
 	const int it = (doubleAge-1) / 2;
@@ -256,12 +256,12 @@ void qFlick::fixBoundaries(void) {
 // if doubleAge is a odd integer, it takes an Im value at doubleAge and mean
 // 		between the reals from doubleAge and doubleAge+1
 // you can't take it at zero cuz there's no Im before that.
-qReal qFlick::innerProduct(void) {
+double qFlick::innerProduct(void) {
 	int doubleAge = 1;  // not sure if I'll ever want this as a variable
 
 	printf("qFlick::innerProduct starting at age %d\n", doubleAge);
 	qDimension *dims = this->space->dimensions;
-	qReal sum = 0.;
+	double sum = 0.;
 	int end = dims->end;
 	if (doubleAge <= 0)
 		throw "Error in qFlick::innerProduct: doubleAge is negative";
@@ -288,7 +288,7 @@ void qFlick::normalize(void) {
 	//this->dumpWave("qFlick::normalize starting", true);
 
 	qDimension *dims = this->space->dimensions;
-	qReal innerProduct = this->innerProduct();
+	double innerProduct = this->innerProduct();
 	printf("qFlick::normalize() total innerProduct is %lf \r", innerProduct);
 
 	qCx *wave = this->waves[0];
@@ -302,7 +302,7 @@ void qFlick::normalize(void) {
 			wave[ix] = older[ix] = qCx(1);
 		innerProduct = dims->N;
 	}
-	qReal factor = sqrt(1./innerProduct);
+	double factor = sqrt(1./innerProduct);
 	printf("           total innerProduct is %lf factor=%lf\r", innerProduct, factor);
 
 	// apply the factor everywhere
@@ -320,7 +320,7 @@ void qFlick::normalize(void) {
 // n 'should' be an integer to make it meet up on ends if endless
 // pass negative to make it go backward.
 // the first point here is like x=0 as far as the trig functions, and the last like x=-1
-//void qFlick::setCircularWave(qReal n) {
+//void qFlick::setCircularWave(double n) {
 //	if (this->space->nPoints <= 0) throw "qFlick::setCircularWave() with zero points";
 //
 //	qCx tempWave[this->space->nPoints];
@@ -337,14 +337,14 @@ void qFlick::normalize(void) {
 //	int end = dims->end;
 //
 //	// dAngle is change in phase per x point
-//	qReal angle, dAngle = 2. * PI / dims->N * n;
+//	double angle, dAngle = 2. * PI / dims->N * n;
 //
 //printf(" got past dAngle\n");
 //	// visscher gap. How much angle would the Im component go in dt/2?
 //	// I have no idea.
-//	qReal dt = this->space->dt;
-//	qReal nN = n * dims->N;
-//	qReal vGap = -nN * nN * dt / 2 * gapFactor;
+//	double dt = this->space->dt;
+//	double nN = n * dims->N;
+//	double vGap = -nN * nN * dt / 2 * gapFactor;
 //
 //	vGap = 0;
 //

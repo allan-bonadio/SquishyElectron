@@ -15,7 +15,7 @@
 // call this JS callback so JS knows we're up and ready.
 // Hand it some sizes for the heck of it.
 // somehow there's a race condition where this isn't set soon enough... sometimes
-EM_JS(void, qeStarted, (int32_t mDimensions, int32_t mLabel),
+EM_JS(void, qeStarted, (int mDimensions, int mLabel),
 {
 	// maybe we can tighten this up a bit someday
 	setTimeout(() => quantumEngineHasStarted(mDimensions, mLabel), 200);

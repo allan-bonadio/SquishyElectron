@@ -43,7 +43,7 @@ void cooleyTukeyFFT(qCx *dest, qCx *src, int N)
 	// combine
 	for (size_t k = 0; k < N2; ++k)
 	{
-		qReal angle = -2 * PI * k / N;
+		double angle = -2 * PI * k / N;
 		qCx t = qCx(cos(angle), sin(angle)) * odd[k];
 		//std::polar(1.0, -2 * PI * k / N) * odd[k];
 		dest[k    ] = even[k] + t;

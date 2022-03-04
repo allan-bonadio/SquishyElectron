@@ -8,7 +8,7 @@
 //#include <stacktrace/call_stack.hpp>
 
 qCx qCx::operator/(qCx b) {
-	qReal det = b.re * b.re + b.im * b.im;
+	double det = b.re * b.re + b.im * b.im;
 	return qCx(
 		(re * b.re + im * b.im) / det,
 		(im * b.re - re * b.im) / det
@@ -19,11 +19,11 @@ qCx qCx::operator/(qCx b) {
 qCx qCx::operator/=(qCx b) {
 	//printf("÷ this=%lf %lf; b=%lf %lf\n", this->re, this->im, b.re, b.im);
 	//printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
-	qReal det = b.re * b.re + b.im * b.im;
+	double det = b.re * b.re + b.im * b.im;
 	//printf("÷ this=%lf %lf; b=%lf %lf\n", this->re, this->im, b.re, b.im);
 	//printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
 	//printf("÷ re * b.re=%lf; im * b.im=%lf\n", re * b.re, im * b.im);
-	qReal t = (re * b.re + im * b.im) / det;
+	double t = (re * b.re + im * b.im) / det;
 	//printf("÷ det=%lf; t=%lf\n", det, t);
 	this->im = (im * b.re - re * b.im) / det;
 	this->re = t;
@@ -32,12 +32,12 @@ qCx qCx::operator/=(qCx b) {
 }
 
 // more work than it's worth - should use the norm instead
-qReal qCx::abs() {
+double qCx::abs() {
 	return sqrt(this->norm());
 }
 
 // in real degrees!  -180 thru +180
-qReal qCx::phase() {
+double qCx::phase() {
 	return atan2(im, re) * 180 / PI;
 }
 

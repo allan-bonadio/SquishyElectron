@@ -41,8 +41,8 @@ float qViewBuffer::loadViewBuffer(void) {
 
 //	printf("qViewBuffer::loadViewBuffer this->space->nPoints %ld\n", (long) this->space->nPoints);
 	int nPoints = this->space->nPoints;
-	qReal highest = 0;
-	qReal tiny = 1e-8;
+	double highest = 0;
+	double tiny = 1e-8;
 
 	if (debugInDetail) {
 //		printf("loadViewBuffer(P): thePotential=%ld\n",
@@ -76,12 +76,12 @@ float qViewBuffer::loadViewBuffer(void) {
 
 		if (debugInDetail)
 			printf("qViewBuffer::loadViewBuffer thePotential %ld\n", (long) theSpace->potential);
-		qReal *potPtr = theSpace->potential + pointNum;
+		double *potPtr = theSpace->potential + pointNum;
 		if (!potPtr) throw "qViewBuffer::loadViewBuffer potPtr is null";
 		if (debugInDetail)
 			printf("qViewBuffer::loadViewBuffer potPtr %ld\n", (long) potPtr);
-		qReal re = wavePtr->re;
-		qReal im = wavePtr->im;
+		double re = wavePtr->re;
+		double im = wavePtr->im;
 
 		if (debugInDetail) printf("loadViewBuffer(raw:%d): %lf %lf %lf\n",
 			pointNum, re, im, tiny);
@@ -102,7 +102,7 @@ float qViewBuffer::loadViewBuffer(void) {
 				twoRowPtr[4], twoRowPtr[5], twoRowPtr[6], twoRowPtr[7]);
 
 		// while we're here, collect the highest point (obsolete i think)
-		qReal height = re * re + im * im;
+		double height = re * re + im * im;
 		if (height > highest)
 			highest = height;
 	}
@@ -125,20 +125,20 @@ void dumpViewBuffer(const char *title) {
 //	printf("dumpViewBuffer qViewBuffer ptr %ld\n", (long) theSpace->qViewBuffer);
 //	printf("dumpViewBuffer viewBuffer %ld\n", (long) theSpace->qViewBuffer->viewBuffer);
 	float *viewBuffer = theSpace->qViewBuffer->viewBuffer;
-	qReal prevRe = viewBuffer[0];
-	qReal prevIm = viewBuffer[1];
+	double prevRe = viewBuffer[0];
+	double prevIm = viewBuffer[1];
 
 	if (!title) title = "";
 	printf("==== dump ViewBuffer | %s\n", title);
 	printf("   ix  |    re      im     pot    serial  |   phase    magn\n");
 	for (int i = 0; i < theSpace->nPoints*2; i++) {
-		qReal re = viewBuffer[i*4];
-		qReal im = viewBuffer[i*4+1];
+		double re = viewBuffer[i*4];
+		double im = viewBuffer[i*4+1];
 		if (i & 1) {
-			qReal dRe = re - prevRe;
-			qReal dIm = im - prevIm;
-			qReal phase = 0.;
-			qReal magn = 0.;
+			double dRe = re - prevRe;
+			double dIm = im - prevIm;
+			double phase = 0.;
+			double magn = 0.;
 			phase = atan2(im, re) * 180 / PI;
 			magn = im * im + re * re;
 			printf("%6d |  %6.3f  %6.3f  %6.3f  %6.3f  |  %6.3f  %6.3f\n",

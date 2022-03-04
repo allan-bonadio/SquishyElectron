@@ -10,7 +10,7 @@
 #include "qWave.h"
 
 // dx is always 1.  dt is below.
-static const qReal dt = 0.02;
+static const double dt = 0.02;
 
 // if they're really over i, they should be negative, right?
 static const qCx dtOverI = qCx(0., -dt);
@@ -27,7 +27,7 @@ static const qCx halfDtOverI = qCx(0., -dt / 2.);
 // factor = 1/3 or 1/6, see NumRecFort p552.
 void waveDDT(qDimension *dims,
 			qWave *origQWave, qWave *fromQWave, qWave *nextYQWave,
-			qReal nextYFactor, qReal sumFactor) {
+			double nextYFactor, double sumFactor) {
 	qCx *origWave = origQWave->wave;
 	qCx *fromWave = fromQWave->wave;
 	qCx *nextYWave = nextYQWave->wave;

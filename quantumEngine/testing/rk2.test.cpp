@@ -10,7 +10,7 @@
 #include "../spaceWave/qWave.h"
 
 // construct our space & stuff
-static void makeNewSpace(int32_t N, int32_t continuum, const char *label) {
+static void makeNewSpace(int N, int continuum, const char *label) {
 	startNewSpace();
 	addSpaceDimension(5, contENDLESS, "x");
 	completeNewSpace();
@@ -43,8 +43,8 @@ static void firstRK2(void) {
 	// lemme seee this first
 	// for (int i = 0; i < 7; i++) {
 	// 	qCx expe = firstExpected[i];
-	// 	qReal phase = atan2(expe.im, expe.re) * 180. / PI;
-	// 	qReal magn = expe.re * expe.re + expe.im * expe.im;
+	// 	double phase = atan2(expe.im, expe.re) * 180. / PI;
+	// 	double magn = expe.re * expe.re + expe.im * expe.im;
 	// 	printf("firstExpected %d: %lf %lf | %lf %lf\n",
 	// 		i, expe.re, expe.im, phase, magn);
 	// }
@@ -97,8 +97,8 @@ static void secondRK2(void) {
 	// lemme seee this second
 	// for (int i = 0; i < 7; i++) {
 	// 	qCx expe = secondExpected[i];
-	// 	qReal phase = atan2(expe.im, expe.re) * 180. / PI;
-	// 	qReal magn = expe.re * expe.re + expe.im * expe.im;
+	// 	double phase = atan2(expe.im, expe.re) * 180. / PI;
+	// 	double magn = expe.re * expe.re + expe.im * expe.im;
 	// 	printf("secondExpected %d: %lf %lf | %lf %lf\n",
 	// 		i, expe.re, expe.im, phase, magn);
 	// }

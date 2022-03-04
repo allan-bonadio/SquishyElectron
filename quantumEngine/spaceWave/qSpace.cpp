@@ -21,7 +21,7 @@ extern void analyzeWaveFFT(qWave *qw);
 class qSpace *theSpace = NULL;
 
 
-qReal *thePotential = NULL;
+double *thePotential = NULL;
 
 
 static bool debugIterSummary = true;
@@ -102,8 +102,8 @@ void qSpace::initSpace() {
 	this->tallyDimensions();
 
 	// try out different formulas here.  Um, this is actually reset based on slider in CPToolbar
-	qReal dt = this->dt = 1. / (this->nStates * this->nStates);
-	//qReal dt = this->dt = nStates * 0.02;  // try out different factors here
+	double dt = this->dt = 1. / (this->nStates * this->nStates);
+	//double dt = this->dt = nStates * 0.02;  // try out different factors here
 
 	// used only for the RKs - therefore obsolete
 //	this->dtOverI = qCx(0., -dt);
@@ -137,9 +137,9 @@ void qSpace::setZeroPotential(void) {
 	//theQViewBuffer->loadViewBuffer(this->latestQWave);
 }
 
-void qSpace::setValleyPotential(qReal power = 1, qReal scale = 1, qReal offset = 0) {
+void qSpace::setValleyPotential(double power = 1, double scale = 1, double offset = 0) {
 	qDimension *dims = this->dimensions;
-	qReal mid = floor(dims->nPoints / 2);
+	double mid = floor(dims->nPoints / 2);
 	for (int ix = 0; ix < dims->nPoints; ix++) {
 		thePotential[ix] = pow(abs(ix - mid), power) * scale + offset;
 	}

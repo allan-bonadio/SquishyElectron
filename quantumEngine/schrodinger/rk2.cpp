@@ -10,8 +10,8 @@
 #include "qWave.h"
 
 // dx is always 1.  dt is below.
-// static const qReal dt = 0.1;
-//static const qReal dt = 0.02;
+// static const double dt = 0.1;
+//static const double dt = 0.02;
 
 // if they're really over i, they should be negative, right?
 // static const qCx dtOverI = qCx(0., -dt);
