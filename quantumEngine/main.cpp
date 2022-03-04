@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <cmath>
 
-#include "qSpace.h"
-#include "fft/fftMain.h"
+#include "spaceWave/qSpace.h"
+#include "fourier/fftMain.h"
 
 
 

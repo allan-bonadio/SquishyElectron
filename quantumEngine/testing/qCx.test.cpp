@@ -4,7 +4,7 @@
 */
 
 #include <stdio.h>
-#include "../qCx.h"
+#include "../spaceWave/qCx.h"
 #include "test.h"
 
 static void cxVerify(qCx actual, qCx expected, const char *msg) {

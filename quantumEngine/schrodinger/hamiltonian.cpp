@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
-#include "qSpace.h"
+#include "../spaceWave/qSpace.h"
 
 
 // this is the slope, not the increment, so dt is irrelevant

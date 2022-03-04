@@ -6,8 +6,8 @@
 
 #include <stdio.h>
 #include <ctime>
-#include "qSpace.h"
-#include "qWave.h"
+#include "../spaceWave/qSpace.h"
+#include "../spaceWave/qWave.h"
 
 
 static bool debugVisscher = false;

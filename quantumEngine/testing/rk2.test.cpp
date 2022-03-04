@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "test.h"
 #include "../qSpace.h"
-#include "../qWave.h"
+#include "../spaceWave/qWave.h"
 
 // construct our space & stuff
 static void makeNewSpace(int32_t N, int32_t continuum, const char *label) {

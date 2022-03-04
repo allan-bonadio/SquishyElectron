@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 #include "../qSpace.h"
-#include "../qWave.h"
+#include "../spaceWave/qWave.h"
 #include "test.h"
 
 

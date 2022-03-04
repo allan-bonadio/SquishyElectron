@@ -3,8 +3,8 @@
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
-#include "../qSpace.h"
-#include "../qWave.h"
+#include "../spaceWave/qSpace.h"
+#include "../spaceWave/qWave.h"
 #include "test.h"
 
 

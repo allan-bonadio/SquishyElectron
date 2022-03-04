@@ -11,8 +11,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "../qSpace.h"
-#include "../qWave.h"
+#include "../spaceWave/qSpace.h"
+#include "../spaceWave/qWave.h"
 #include "fftMain.h"
 
 using namespace std;

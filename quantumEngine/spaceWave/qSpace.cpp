@@ -8,7 +8,7 @@
 #include <chrono>
 #include "qSpace.h"
 #include "qWave.h"
-#include "fft/fftMain.h"
+#include "../fourier/fftMain.h"
 
 
 

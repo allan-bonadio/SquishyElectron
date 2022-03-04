@@ -9,9 +9,8 @@
 
 /* *************************************************** only powers of 2 */
 #include <cmath>
-//#include "../qCx.h"
-#include "../qSpace.h"
-#include "../qWave.h"
+#include "../spaceWave/qSpace.h"
+#include "../spaceWave/qWave.h"
 #include "fftMain.h"
 
 
