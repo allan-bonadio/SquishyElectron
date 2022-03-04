@@ -39,7 +39,11 @@ public:
 
 	// contWELL or contENDLESS (has N+2 values for N possibilities)
 	// contDISCRETE = (has N values for N possibilities)
-	int32_t continuum;
+	int continuum;
+
+	// size for Fourier transforms, or zero if not yet calculated.  Often a power of two.
+	// no boundaries.
+	int32_t fourierSize;
 
 	// 'x', 'y' or 'z' - two particles will have x1, x2 but one in 2d will have x, y.
 	// Spin: Sz, or Sz1, Sz2, ...  Smax = 2S+1.  Sz= ix - S.  Orbital Ang: Lz, combined: Jz
