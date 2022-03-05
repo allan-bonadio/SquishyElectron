@@ -25,11 +25,12 @@ void cooleyTukeyFFT(qCx *dest, qCx *src, int N)
 	//printf("cooleyTukeyFFT(N=%d)\n", N);
 	if (N <= 1) return;
 
+	// make we can do this with first-stride-length objects
 	// divide
 	int N2 = N/2;
 	qCx even[N2];
 	qCx odd[N2];  //; = src[std::slice(1, N/2, 2)];
-	for (size_t k = 0; k < N; k++) {
+	for (size_t k = 0; k < N; k++) {  // do this two rows at a time
 		if (k & 1)
 			odd[(k-1)/2] = src[k];
 		else
@@ -44,7 +45,7 @@ void cooleyTukeyFFT(qCx *dest, qCx *src, int N)
 	for (size_t k = 0; k < N2; ++k)
 	{
 		double angle = -2 * PI * k / N;
-		qCx t = qCx(cos(angle), sin(angle)) * odd[k];
+		qCx t = qCx(cos(angle), sin(angle)) * odd[k];  // make a table to look these up
 		//std::polar(1.0, -2 * PI * k / N) * odd[k];
 		dest[k    ] = even[k] + t;
 		dest[k+N2] = even[k] - t;
