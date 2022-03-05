@@ -11,92 +11,53 @@
 
 /* ****************************************************** small utilities */
 
-// find next power of 10 >= N
-int nextPowerOf2(int N) {
+// find next largest integer that we can fft these days
+// these days it's a power of 2
+void qSpace::chooseSpectrumSize() {
 	int powerOf2;
-	for (powerOf2 = 1; powerOf2 < N; powerOf2 += powerOf2) ;
-	return powerOf2;
+	for (powerOf2 = 1; powerOf2 < this->nPoints; powerOf2 += powerOf2)
+		continue;
+	this->spectrumSize = powerOf2;
 }
 
-/* ********************************************************* qWave interface */
+/* ********************************************************* demo */
 
-void tryAllAlgorithms(qCx *wave, int length);
+// do an FFT and dump the results with demoAllAlgorithms
 
-
-// take this wave in and FFT it and dump the result to console
-// if not a powerof2 length, padds it.
-void analyzeWaveFFT(qWave *inputQWave) {
-	qSpace *origSpace = inputQWave->space;
-	qDimension *origDims = origSpace->dimensions;
-
-	// find power of 2 to pad it up to
-//	int j;
-//	for (j = 1; j < origDims->nStates; j += j) ;
-	int nStates = nextPowerOf2(origDims->nStates);
-
-	// make a space for it, bare-bones
-	qSpace *fftSpace = new qSpace(1);
-	fftSpace->addDimension(nStates, contDISCRETE, "FFT");
-	fftSpace->initSpace();
-
-	qCx *origWave = inputQWave->wave;
-
-	qWave *input = new qWave(fftSpace);
-	qCx *inputWave = input->wave;
-
-//	qWave *output = new qWave(fftSpace);
-//	qCx *outputWave = output->wave;
-
-	// now copy the input into input and pad it; note no continuum bufferpoints
-	int inputIx = 0;
-	for (int ix = origDims->start; ix < origDims->end; ix++)
-		inputWave[inputIx++] = origWave[ix];
-	for (; inputIx < nStates; inputIx++)
-		inputWave[inputIx] = qCx();
-
-	// do it
-	tryAllAlgorithms(inputWave, nStates);
-
-	delete fftSpace;
-	delete input;
-}
-
-
-/* ********************************************************* test */
-
-void tryOneFFT(qCx *buffer, int length,
+// try 1 fft algorithm on one buffer
+void demoOneFFT(qCx *buffer, int length,
 	void FFT(qCx *, qCx *, int), void IFFT(qCx *, qCx *, int),
 	const char *algName)
 {
-	//CArray buffer(inputArray, length);
 	qCx outputWave[length], backToOriginal[length];
 
 	// forward
 	FFT(outputWave, buffer, length);
 
-	printf("========================= %s FFT frequency space ==============  ",
+	printf("♪ ========================= %s FFT frequency space ==============  ",
 		algName);
-	dumpWaveSegment(outputWave, length/2, length, 0, true);
-	dumpWaveSegment(outputWave, 0, length/2, 0, true);
-	printf("======================== end of freq dump ==============\n");
+	qBuffer::dumpSegment(outputWave, length/2, length, 0, true);
+	qBuffer::dumpSegment(outputWave, 0, length/2, 0, true);
+	printf("♪ ======================== end of freq dump ==============\n");
 
 	// inverse
 //	IFFT(backToOriginal, outputWave, length);
 //
 //	// show last first so the low frequencies end up at the middle
-//	dumpWaveSegment(backToOriginal, 0, length, 0, true);
+//	qBuffer::dumpSegment(backToOriginal, 0, length, 0, true);
 //	for (int i = 0; i < length; ++i)
 //		printf("inverse buffer point %d (%lf %lf)\n", i, buffer[i].re, buffer[i].im);
 }
 
-void tryAllAlgorithms(qCx *wave, int length) {
-	printf("tryAllAlgorithms begins");
-	tryOneFFT(wave, length, cooleyTukeyFFT, cooleyTukeyIFFT, "cooleyTukeyFFT");
-	tryOneFFT(wave, length, paChineseFFT, paChineseIFFT, "paChineseFFT");
-	printf("tryAllAlgorithms begins");
+void demoAllAlgorithms(qCx *wave, int length) {
+	printf("demoAllAlgorithms begins");
+	demoOneFFT(wave, length, cooleyTukeyFFT, cooleyTukeyIFFT, "cooleyTukeyFFT");
+	demoOneFFT(wave, length, paChineseFFT, paChineseIFFT, "paChineseFFT");
+	printf("demoAllAlgorithms begins");
 }
 
 
+/* ********************************************************* test */
 
 
 
@@ -110,13 +71,62 @@ extern "C" void testFFT(void) {
 	qCx sampleSquare[8];
 	sampleSquare[0] = sampleSquare[1] = sampleSquare[2] = sampleSquare[3] = qCx(1);
 	sampleSquare[4] = sampleSquare[5] = sampleSquare[6] = sampleSquare[7] = qCx();
-	tryAllAlgorithms(sampleSquare, 8);
+	demoAllAlgorithms(sampleSquare, 8);
 
 	printf("8-pt chinese\n");
-	tryAllAlgorithms(chinese8, 8);
+	demoAllAlgorithms(chinese8, 8);
 
 	printf("16-pt chinese\n");
-	tryAllAlgorithms(chinese16, 16);
+	demoAllAlgorithms(chinese16, 16);
 
 }
+
+/* ********************************************************* qWave interface */
+
+// do i use this anymore?!?!
+static qSpectrum *scratchSpectrum = NULL;
+
+// take this wave in and FFT it and dump the result to console
+// if not a powerof2 length, padds it.
+void analyzeWaveFFT(qWave *inputQWave) {
+	qSpace *origSpace = inputQWave->space;
+	qDimension *origDims = origSpace->dimensions;
+
+	if (scratchSpectrum && (scratchSpectrum->nPoints != origSpace->nPoints)) {
+		delete scratchSpectrum;
+		scratchSpectrum = NULL;
+	}
+	if (!scratchSpectrum)
+		scratchSpectrum = new qSpectrum(origSpace);
+
+
+	// find power of 2 to pad it up to
+//	int j;
+//	for (j = 1; j < origDims->nStates; j += j) ;
+//	int nStates = chooseSpectrumSize(origDims->nStates);
+
+
+//	qCx *origWave = inputQWave->wave;
+//
+//	qWave *input = qWave::newSpectrum(fftSpace);
+//	qCx *inputWave = input->wave;
+
+//	qWave *output = qWave::newQWave(fftSpace);
+//	qCx *outputWave = output->wave;
+
+// sorry we'll do padding later; hope all your Ns are powers of 2
+//	// now copy the input into input and pad it; note no continuum bufferpoints
+//	int inputIx = 0;
+//	for (int ix = origDims->start; ix < origDims->end; ix++)
+//		inputWave[inputIx++] = origWave[ix];
+//	for (; inputIx < nStates; inputIx++)
+//		inputWave[inputIx] = qCx();
+
+	// do it
+	demoAllAlgorithms(inputQWave->wave + inputQWave->start, inputQWave->start);
+
+//	delete fftSpace;
+//	delete input;
+}
+
 

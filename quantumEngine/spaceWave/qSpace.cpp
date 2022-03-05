@@ -93,6 +93,9 @@ void qSpace::tallyDimensions(void) {
 	}
 	this->nStates = nStates;
 	this->nPoints = nPoints;
+
+	this->chooseSpectrumSize();
+
 	//printf(" got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
 }
 
@@ -101,7 +104,7 @@ void qSpace::tallyDimensions(void) {
 void qSpace::initSpace() {
 	this->tallyDimensions();
 
-	// try out different formulas here.  Um, this is actually reset based on slider in CPToolbar
+	// try out different formulas here.  Um, this is actually set manually
 	double dt = this->dt = 1. / (this->nStates * this->nStates);
 	//double dt = this->dt = nStates * 0.02;  // try out different factors here
 

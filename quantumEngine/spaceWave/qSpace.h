@@ -128,8 +128,13 @@ public:
 	// always a fixed size, for simplicity.
 	qDimension dimensions[MAX_DIMENSIONS];
 
-	// will dump any wave that uses this space.  same as in qWave::
+	void chooseSpectrumSize(void);
+	int spectrumSize;
+
+	// will dump any wave that uses this space.  same as in qWave:: or qSpectrum::
 	void dumpThatWave(qCx *wave, bool withExtras = false);
+	void dumpThatSpectrum(qCx *wave, bool withExtras = false);
+
 
 	void dumpPotential(const char *title);
 	void setZeroPotential(void);
