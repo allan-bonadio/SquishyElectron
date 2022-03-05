@@ -12,7 +12,7 @@ let debugSpace = true;
 const _ = num => num.toFixed(4).padStart(9);
 
 // generate string for this one cx value, w, at location ix
-// rewritten from the c++ version in qWave, dumpRow()
+// rewritten from the c++ version in qBuffer::dumpRow()
 // pls keep in sync!
 function dumpRow(ix, re, im, prev, isBorder) {
 	const mag = re * re + im * im;
@@ -173,8 +173,13 @@ export class qeSpace extends qeBasicSpace {
 		setFamiliarPotential(this, this.potentialBuffer, potentialParams);
 
 		// wrap viewbuffer as a nice TypedArray of floats (4 for each row; 8 for each datapoint)
+		let buff = window.Module.HEAPF32.buffer;
+		let buffOffet = qe.qViewBuffer_getViewBuffer();
+		let np = this.nPoints*8;
 		this.viewBuffer = qe.viewBuffer =
-			new Float32Array(window.Module.HEAPF32.buffer, qe.qViewBuffer_getViewBuffer(), this.nPoints*8);
+			new Float32Array(buff, buffOffet, np);
+// 		this.viewBuffer = qe.viewBuffer =
+// 			new Float32Array(window.Module.HEAPF32.buffer, qe.qViewBuffer_getViewBuffer(), this.nPoints*8);
 		qe.qViewBuffer_loadViewBuffer();
 
 		if (debugSpace) console.log(`done with the resulting qeSpace:`, this);
