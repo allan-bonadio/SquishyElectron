@@ -3,17 +3,6 @@
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
-/*
-Data structures used for these buffers:
-qCx *wave  # wave: just an array of complex nums that's nPoints long
-qWave - object that owns a single wave, and points to its space
-qFlick - object that owns a list of waves, and points to its space
-
-Visscher has upended so much of this, splitting the real and imaginary parts of
-schrodinger's.  qFlick can do visscher; you need at least 3 time inrements to
-calculate an inner product.  I don't know how to make a circular wave anymore
-not sure how much dt/2 is.
-*/
 
 #include <cmath>
 #include "qSpace.h"
@@ -27,47 +16,42 @@ int traceLowPassFilter = false;
 
 /* ************************************************************ birth & death & basics */
 
-// buffer is initialized to zero bytes therefore 0.0 everywhere
-qWave::qWave(qSpace *space) {
+// This produces a wave ready to hold an electron
+qWave::qWave(qSpace *space, qCx *useThisBuffer) {
+	qBuffer();
 	this->space = space;
-	this->wave = this->allocateWave();
-	this->dynamicallyAllocated = 1;
+	initBuffer(space->nPoints, useThisBuffer);
+
+	qDimension *dim = space->dimensions;
+	this->start = dim->start;
+	this->end = dim->end;
 }
 
-qWave::qWave(qSpace *space, qCx *buffer) {
-	this->space = space;
-	this->wave = buffer;
-	this->dynamicallyAllocated = 0;
+// use these instead of the constructor.
+//static qWave *qWave::newQWave(qSpace *space, qCx *useThisBuffer) {
+//	qWave *qw = (useThisBuffer) ? new qWave(space, useThisBuffer) : new qWave(space);
+//
+//}
+//
+//// this holds a spectrum rather than a wave.  (Fundamentally the same but a few details.)
+//static qBuffer *qBuffer::newSpectrum(qSpace *space, qCx *useThisBuffer) {
+//	qBuffer *qw = (useThisBuffer) ? new qBuffer(space, useThisBuffer) : new qBuffer(space);
+//
+//	qw->nPoints = space->spectrumSize;
+//	qw->start = 0;
+//	qw->end = space->spectrumSize;
+//
+//	qw->spectrum = true;
+//	return qw
+//}
+
+qWave::~qWave(void) {
 }
 
-qWave::~qWave() {
-	//printf("start the qWave instance destructor...\n");
-	this->space = NULL;
-	//printf("    set space to null...\n");
 
-	if (this->dynamicallyAllocated)
-		this->freeWave(this->wave);
-	//printf("    freed buffer...\n");
 
-	//printf("setted buffer to null; done with qWave destructor.\n");
-}
 
-qCx *qWave::allocateWave(void) {
-	return (qCx *) malloc(this->space->nPoints * sizeof(qCx));
-}
-
-void qWave::freeWave(qCx *wave) {
-	free(wave);
-}
-
-void qWave::copyThatWave(qCx *dest, qCx *src) {
-//	printf("qWave::copyThatWave(%d <== %d)\n", (int) dest, (int) src);
-	if (!dest) dest = this->wave;
-	if (!src) src = this->wave;
-	memcpy(dest, src, this->space->nPoints * sizeof(qCx));
-}
-
-/* never tested - might never work under visscher */
+/* never tested - might never work  */
 void qWave::forEachPoint(void (*callback)(qCx, int) ) {
 	qDimension *dims = this->space->dimensions;
 	qCx *wave = this->wave;
@@ -79,7 +63,7 @@ void qWave::forEachPoint(void (*callback)(qCx, int) ) {
 	}
 }
 
-/* never tested - might never work under visscher  */
+/* never tested - might never work   */
 void qWave::forEachState(void (*callback)(qCx, int) ) {
 	qDimension *dims = this->space->dimensions;
 	int end = dims->end;
@@ -93,58 +77,7 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 }
 
 /* ******************************************************** diagnostic dump **/
-
-// print one complex number, plus maybe some more, on a line in the dump on stdout.
-// if it overflows the buffer, it won't.  just dump a row for a cx datapoint.
-// returns the magnitude non-visscher, but only withExtras
-static double dumpRow(char *buf, int ix, qCx w, double *pPrevPhase, bool withExtras) {
-	double re = w.re;
-	double im = w.im;
-	double mag = 0;
-	if (withExtras) {
-		mag = re * re + im * im;
-		double phase = 0.;
-		if (im || re) phase = atan2(im, re) * 180. / PI;  // pos or neg
-		double dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
-		while (dPhase >= 360.) dPhase -= 360.;
-
-		sprintf(buf, "[%d] (%8.4lf,%8.4lf) | %8.3lf %8.3lf %8.4lf",
-			ix, re, im, phase, dPhase, mag);
-		*pPrevPhase = phase;
-	}
-	else {
-		sprintf(buf,"[%d] (%8.4lf,%8.4lf)", ix, re, im);
-	}
-	return mag;
-}
-
-void dumpWaveSegment(qCx *wave, int start, int end, int continuum, bool withExtras) {
-
-	int ix = 0;
-	char buf[200];
-	double prevPhase = 0.;
-	double innerProd = 0.;
-
-	// somehow, commenting out these lines fixes the nan problem.
-	// but the nan problem doesn't happen on flores?
-	// i haven't seen the nan problem since like a month ago.  ab 2021-08-25
-	if (continuum) {
-		dumpRow(buf, ix, wave[0], &prevPhase, withExtras);
-		printf("%s", buf);
-	}
-
-	for (ix = start; ix < end; ix++) {
-		innerProd += dumpRow(buf, ix, wave[ix], &prevPhase, withExtras);
-		printf("\n%s", buf);
-	}
-
-	if (continuum) {
-		dumpRow(buf, ix, wave[end], &prevPhase, withExtras);
-		printf("\nend %s", buf);
-	}
-
-	printf(" innerProd=%11.8lf\n", innerProd);
-}
+// only a wave knows how to traverse its states
 
 // this is wave-independent.  This prints N+2 lines:
 // one for the 0 element if it's a continuum
@@ -154,12 +87,12 @@ void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
 	if (this->nPoints <= 0) throw "qSpace::dumpThatWave() with zero points";
 
 	const qDimension *dims = this->dimensions;
-	dumpWaveSegment(wave, dims->start, dims->end, dims->continuum, withExtras);
+	qBuffer::dumpSegment(wave, dims->start, dims->end, dims->continuum, withExtras);
 }
 
 // any wave, probably shouldn't call this
 void qWave::dumpThatWave(qCx *wave, bool withExtras) {
-	printf("any wave, probably shouldn't call this\n");
+	//printf("any wave, probably shouldn't call this\n");
 	this->space->dumpThatWave(wave, withExtras);
 }
 
@@ -169,6 +102,9 @@ void qWave::dumpWave(const char *title, bool withExtras) {
 	this->space->dumpThatWave(this->wave, withExtras);
 	printf("\n==== end of Wave ====\n\n");
 }
+
+
+
 
 /* ************************************************************ arithmetic */
 
@@ -209,58 +145,6 @@ void qWave::fixBoundaries(void) {
 	this->space->fixThoseBoundaries(this->wave);
 }
 
-// calculate ⟨ψ | ψ⟩  'inner product'.  Non-visscher.
-double qWave::innerProduct(void) {
-	qCx *wave = this->wave;
-	qDimension *dims = this->space->dimensions;
-	double sum = 0.;
-
-	for (int ix = dims->start; ix < dims->end; ix++) {
-		qCx point = wave[ix];
-		double re = point.re;
-		double im = point.im;
-		sum += re * re + im * im;
-		//sum += wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im;
-// 		printf("innerProduct point %d (%lf,%lf) %lf\n", ix, wave[ix].re, wave[ix].im,
-// 			wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im);
-	}
-	return sum;
-}
-
-// enforce ⟨ψ | ψ⟩ = 1 by dividing out the current magnitude sum
-void qWave::normalize(void) {
-	// for visscher, we have to make it in a temp wave and copy back to our buffer
-	// huh?  this is never copied back.  normalize here does nothing.
-//	qCx tempWave[this->space->nPoints];
-//	qWave tqWave(this->space, tempWave);
-//	qWave *tempQWave = &tqWave;
-
-	//qCx *wave = tempWave;
-	//qWave *tempQWave = new qWave(this->space, tempWave);
-	qCx *wave = this->wave;
-	qDimension *dims = this->space->dimensions;
-	double mag = this->innerProduct();
-	//printf("normalizing qWave.  magnitude=%lf", mag);
-	//tempQWave->dumpWave("The wave,before normalize", true);
-
-	if (mag == 0. || ! isfinite(mag)) {
-		// ALL ZEROES!??! this is bogus, shouldn't be happening
-		printf("ALL ZEROES ! ? ? ! not finite ! ? ? !  set them all to a constant, normalized\n");
-		const double f = 1e-9;
-		for (int ix = dims->start; ix < dims->end; ix++)
-			wave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
-	}
-	else {
-		const double factor = pow(mag, -0.5);
-
-		for (int ix = dims->start; ix < dims->end; ix++)
-			wave[ix] *= factor;
-	}
-	this->fixBoundaries();
-	//this->dumpWave("qWave::normalize done", true);
-	///this->space->visscherHalfStep(wave, this);
-}
-
 /* ************************************************* bad ideas I might revisit?  */
 
 double cleanOneNumber(double u, int ix, int sense) {
@@ -289,7 +173,7 @@ void qWave::prune() {
 
 // these have to be in C++ cuz they're called during iteration
 
-// average the wave's points with the closest neighbors to fix the divergence
+// average the wave's points (by x) with the closest neighbors to fix the divergence
 // along the x axis I always see.  Since the density of our mesh is finite,
 // you can't expect noise at or near the nyquist frequency to be meaningful.
 // dilution works like this: formerly 1/2, it's the fraction of the next point
@@ -356,7 +240,7 @@ void qWave::nyquistFilter(void) {
 	if (traceLowPassFilter) printf("qWave::nyquistFilter()\n");
 
 	if (!this->scratchBuffer)
-		this->scratchBuffer = allocateWave();
+		this->scratchBuffer = allocateWave();  // this won't work if space changes resolution!
 
 	qCx *wave = this->wave;
 	qDimension *dims = this->space->dimensions;
@@ -374,7 +258,7 @@ void qWave::nyquistFilter(void) {
 	}
 
 
-	this->copyThatWave(this->wave, this->scratchBuffer);
+	this->copyThatWave(this->wave, this->scratchBuffer, this->nPoints);
 
 //	this->dumpWave("after nyquist filter");
 }

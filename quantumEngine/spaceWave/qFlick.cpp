@@ -36,7 +36,7 @@ qFlick::~qFlick() {
 
 	// note how this starts at 1 so item zero can be freed by superclass
 	for (int i = 1; i < this->nWaves; i++) {
-		this->freeWave(waves[i]);
+		freeWave(waves[i]);
 		waves[i] = NULL;
 	}
 	printf("    freed most of the buffers...\n");

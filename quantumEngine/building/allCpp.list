@@ -6,6 +6,8 @@ schrodinger/visscher.cpp
 spaceWave/jsSpace.cpp
 spaceWave/qCx.cpp
 spaceWave/qSpace.cpp
+spaceWave/qBuffer.cpp
 spaceWave/qWave.cpp
 spaceWave/qFlick.cpp
+spaceWave/qSpectrum.cpp
 spaceWave/qViewBuffer.cpp
