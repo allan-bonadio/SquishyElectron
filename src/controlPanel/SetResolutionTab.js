@@ -13,7 +13,7 @@ function setPT() {
 
 function SetResolutionTab(props) {
 	const p = props;
-	p.openResolutionDialog();  // just et ti over with
+	// doesn't work p.openResolutionDialog();  // just et ti over with
 
 
 
