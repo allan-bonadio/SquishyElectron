@@ -171,11 +171,10 @@ export default class ResolutionDialog extends React.Component {
 
 	handleResChange(power, ix) {
 		this.setState({
-			power,
 			ix: +ix,
 			N: +power,
 		});
-		console.info(`handleResChange(power=${power}, ix=${ix}) `)
+		console.info(`handleResChange(power=${power}, ix=$ix) `)
 	}
 	handleResChange = this.handleResChange.bind(this);
 
