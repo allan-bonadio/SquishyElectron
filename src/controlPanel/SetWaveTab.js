@@ -28,7 +28,7 @@ function setPT() {
 
 		waveParams: PropTypes.shape({
 			frequency: PropTypes.number,
-			waveBreed: PropTypes.oneOf(['circular', 'standing', 'pulse',]),
+			waveBreed: PropTypes.oneOf(['circular', 'standing', 'pulse', 'chord', ]),
 			// plus others, ignore for this check
 		}).isRequired,
 
@@ -105,23 +105,26 @@ class SetWaveTab extends React.Component {
 
 	render() {
 		const p = this.props;
+		const breed = p.waveParams.waveBreed;
+		const needPulseWidth = breed == 'pulse';
+		const needOffset = (breed == 'pulse' || breed == 'chord');
 
 		const sliders = <>
 			<TextNSlider className='frequency' label='frequency'
 				value={+p.waveParams.waveFrequency}
-				min={-10} max={10} step={'circular' != p.waveParams.waveBreed ? .5 : 1}
+				min={-10} max={10} step={'circular' != breed ? .5 : 1}
 				handleChange={waveFrequency => p.setCPState({waveFrequency})}
 			/>
 
 			<TextNSlider className='pulseWidth' label='pulse width, %'
-				style={{display: 'pulse' == p.waveParams.waveBreed ? 'block' :  'none'}}
+				style={{display: needPulseWidth ? 'block' :  'none'}}
 				value={+p.waveParams.stdDev}
 				min={1} max={10} step={.1}
 				handleChange={stdDev => p.setCPState({stdDev})}
 			/>
 
 			<TextNSlider className='offset' label='offset, %'
-				style={{display: 'pulse' == p.waveParams.waveBreed ? 'block' :  'none'}}
+				style={{display: needOffset ? 'block' :  'none'}}
 				value={+p.waveParams.pulseOffset}
 				min={0} max={100} step={2}
 				handleChange={pulseOffset => p.setCPState({pulseOffset})}
@@ -133,20 +136,26 @@ class SetWaveTab extends React.Component {
 		const radios = <div className='waveTabCol middle'>
 			<label>
 				circular
-				<input type='radio' checked={'circular' == p.waveParams.waveBreed}
+				<input type='radio' checked={'circular' == breed}
 					onChange={ev => p.setCPState({waveBreed: 'circular'})} />
 			</label>
 
 			<label>
 				standing
-				<input type='radio'  checked={'standing' == p.waveParams.waveBreed}
+				<input type='radio'  checked={'standing' == breed}
 					onChange={ev => p.setCPState({waveBreed: 'standing'})} />
 			</label>
 
 			<label>
 				pulse
-				<input type='radio'  checked={'pulse' == p.waveParams.waveBreed}
+				<input type='radio'  checked={'pulse' == breed}
 					onChange={ev => p.setCPState({waveBreed: 'pulse'})} />
+			</label>
+
+			<label>
+				chord
+				<input type='radio'  checked={'chord' == breed}
+					onChange={ev => p.setCPState({waveBreed: 'chord'})} />
 			</label>
 		</div>;
 
