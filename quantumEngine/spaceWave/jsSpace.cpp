@@ -9,7 +9,6 @@
 /* ********************************************************** wave stuff */
 
 // after the initSpace() call, allocate the buffers.
-// i'm not really using most of these...
 void allocWaves(void) {
 
 //printf(" got past new qFlick\n");
@@ -19,16 +18,18 @@ void allocWaves(void) {
 
 	peruWave = peruQWave->wave;
 	laosWave = laosQWave->wave;
+printf("        🚀 🚀 🚀       peruQWave=%x   peruWave=%x   laosQWave=%x   laosWave=%x  \n",
+(uint32_t) peruQWave, (uint32_t) peruWave, (uint32_t) laosQWave, (uint32_t) laosWave);
 }
 
 static void freeWaves(void) {
-	printf("about to delete qWaves:\n");
+	printf("🚀 🚀 🚀 about to delete qWaves:\n");
 	delete peruQWave;
 	delete laosQWave;
 
 	delete[] thePotential;
 	delete theQViewBuffer;
-	printf("done deleting.\n");
+	printf("🚀 🚀 🚀 done deleting.\n");
 }
 
 /* ********************************************************** glue functions for js */
@@ -38,6 +39,15 @@ extern "C" {
 
 // return a pointer to just the main wave for theSpace
 qCx *qSpace_getWaveBuffer(void) {
+	printf("🚀 🚀 🚀 qSpace_getWaveBuffer() theSpace: %x\n", (uint32_t) (theSpace));
+	printf("        🚀 🚀 🚀        the qWave %x\n", (uint32_t) (theSpace->latestQWave));
+	printf("        🚀 🚀 🚀        the wave %x\n", (uint32_t) (theSpace->latestQWave->wave));
+	printf("        🚀 🚀 🚀     q=w %d   s=w %d   q=s %d\n",
+		(uint32_t) (theSpace->latestQWave) == (uint32_t) (theSpace->latestQWave->wave),
+		(uint32_t) (theSpace) == (uint32_t) (theSpace->latestQWave->wave),
+		(uint32_t) (theSpace->latestQWave) == (uint32_t) (theSpace)
+	);
+
 	return theSpace->latestQWave->wave;
 }
 
@@ -46,12 +56,12 @@ double *qSpace_getPotentialBuffer(void) {
 }
 
 double qSpace_getElapsedTime(void) {
-	if (!theSpace) throw "null space in getElapsedTime()";
+	if (!theSpace) throw "🚀 🚀 🚀 null space in getElapsedTime()";
 	return theSpace->elapsedTime;
 }
 
 double qSpace_getIterateSerial(void) {
-	if (!theSpace) throw "null space in getIterateSerial()";
+	if (!theSpace) throw "🚀 🚀 🚀 null space in getIterateSerial()";
 	return theSpace->iterateSerial;
 }
 
@@ -67,28 +77,28 @@ void qSpace_setDt(double dt) {
 
 // iterations are what the user sees.  steps are what Visscher does repeatedly.
 void qSpace_setStepsPerIteration(int stepsPerIteration) {
-	printf("qSpace_setStepsPerIteration(%d)\n", stepsPerIteration);
+	printf("🚀 🚀 🚀 qSpace_setStepsPerIteration(%d)\n", stepsPerIteration);
 	if (stepsPerIteration < 1 || stepsPerIteration > 1e8) {
 		char buf[100];
 		sprintf(buf, "qSpace_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
 		throw buf;
 	}
 	theSpace->stepsPerIteration = stepsPerIteration;
-	printf("qSpace_setStepsPerIteration result %d in theSpace=%d\n",
-		theSpace->stepsPerIteration, (int) theSpace);
+	printf("🚀 🚀 🚀 qSpace_setStepsPerIteration result %d in theSpace=%x\n",
+		theSpace->stepsPerIteration, (uint32_t) theSpace);
 }
 
 // low pass filter.
 void qSpace_setLowPassDilution(double dilution) {
-	printf("qSpace_setLowPassDilution(%lf)\n", dilution);
+	printf("🚀 🚀 🚀 qSpace_setLowPassDilution(%lf)\n", dilution);
 	if (dilution >= 1. || dilution <= 0.) {
 		char buf[100];
-		sprintf(buf, "qSpace_setLowPassDilution, %lf, must be between 0 and 1\n", dilution);
+		sprintf(buf, "🚀 🚀 🚀qSpace_setLowPassDilution, %lf, must be between 0 and 1\n", dilution);
 		throw buf;
 	}
 	theSpace->lowPassDilution = dilution;
-	printf("qSpace_setLowPassDilution result %lf in theSpace=%d\n",
-		theSpace->lowPassDilution, (int) theSpace);
+	printf("🚀 🚀 🚀 qSpace_setLowPassDilution result %lf in theSpace=%x\n",
+		theSpace->lowPassDilution, (uint32_t) theSpace);
 }
 
 void qSpace_oneIteration(void) { theSpace->oneIteration(); }
@@ -110,7 +120,7 @@ qSpace *startNewSpace(void) {
 		delete theSpace;
 	}
 	theSpace = new qSpace(1);
-	//printf("  done startNewSpace()\n");
+	//printf("🚀 🚀 🚀  done startNewSpace()\n");
 
 	return theSpace;
 }
@@ -135,7 +145,7 @@ qSpace *addSpaceDimension(int N, int continuum, const char *label) {
 //	dims->label[LABEL_LEN-1] = 0;
 //
 //	theSpace->nDimensions++;
-	//printf("  done addSpaceDimension() %s\n", dims->label);
+	//printf("🚀 🚀 🚀  done addSpaceDimension() %s\n", dims->label);
 	return theSpace;
 }
 
@@ -160,35 +170,46 @@ qSpace *completeNewSpace(void) {
 	for (int ix = 0; ix < dims->start + dims->end; ix++)
 		wave[ix] = qCx(1., 0.);
 
-	//printf(" newly created wave, before norm:\n");
-	//theSpace->dumpThatWave(wave, true);
+	printf("🚀 🚀 🚀 newly created wave, before norm:\n");
+	theSpace->dumpThatWave(wave, true);
 
 	theSpace->latestQWave->normalize();
-	//printf(" newly created wave, AFTER norm:\n");
-	//theSpace->dumpThatWave(wave, true);
+	printf("🚀 🚀 🚀 newly created wave, AFTER norm:\n");
+	theSpace->dumpThatWave(wave, true);
 
 	/* *********************************** allocate other buffers */
 
 	// we make our own potential
 	theSpace->potential = thePotential = new double[theSpace->nPoints];
 
-	// we make our own view buffer - needs potential to be in place
+		printf("   🚀 🚀 🚀 completeNewSpace BEFORE creation  theQViewBuffer=%x  "
+			"theQViewBuffer->viewBuffer=%x\n",
+				(uint32_t) theQViewBuffer,
+				theQViewBuffer ? (uint32_t) theQViewBuffer->viewBuffer : 0);
+
+
+	// our own view buffer - needs potential to be in place
 	theSpace->qViewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
 	//dumpViewBuffer("newly created");
 
+		printf("   🚀 🚀 🚀 completeNewSpace After Creation but BEFORE loadViewBuffer  theQViewBuffer=%x  "
+			"theQViewBuffer->viewBuffer=%x\n",
+				(uint32_t) theQViewBuffer, (uint32_t) theQViewBuffer && theQViewBuffer->viewBuffer);
+
+
 	theQViewBuffer->loadViewBuffer();  // just so i can see the default if needed
 
+		printf("   🚀 🚀 🚀 completeNewSpace AFTER loadViewBuffer  theQViewBuffer=%x  "
+			"theQViewBuffer->viewBuffer=%x\n",
+				(uint32_t) theQViewBuffer, (uint32_t) theQViewBuffer && theQViewBuffer->viewBuffer);
 
 
-	// obsolete: a default.  must be done After viewBuffer and thePotential are in place.
-//	theSpace->latestQWave->setCircularWave(1);
-//	theQViewBuffer->loadViewBuffer();
 
-
-	printf("qSpace::completeNewSpace(): done\n");
+	printf("   🚀 🚀 🚀 qSpace::completeNewSpace(): done\n");
 	return theSpace;
 }
 
 
+// end of extern "C"
 }
 

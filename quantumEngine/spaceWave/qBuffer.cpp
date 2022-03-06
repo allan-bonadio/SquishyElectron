@@ -43,6 +43,7 @@ qCx *qBuffer::allocateWave(int nPoints) {
 qBuffer::qBuffer(void) {
 }
 
+// actually create the buffer that we need
 // usually called by subclasses when they figure out how long a buffer is needed
 void qBuffer::initBuffer(int nPoints, qCx *useThisBuffer) {
 	if (useThisBuffer) {
@@ -55,25 +56,27 @@ void qBuffer::initBuffer(int nPoints, qCx *useThisBuffer) {
 	}
 	this->nPoints = nPoints;
 	this->start = this->end = -1;  // wave or spectrum calculates these differently
+	printf("🍕 qBuffer::initBuffer this=%d  wave=%d  nPoints: %d\n",
+		(int) this, (int) this->wave, nPoints);
 }
 
 qBuffer::~qBuffer() {
 	//printf("start the qWave instance destructor...\n");
 	this->space = NULL;
-	//printf("    set space to null...\n");
+	//printf("   🍕  set space to null...\n");
 
 	if (this->dynamicallyAllocated)
 		freeWave(this->wave);
-	//printf("    freed buffer...\n");
+	//printf("   🍕  freed buffer...\n");
 
-	//printf("setted buffer to null; done with qWave destructor.\n");
+	//printf("   🍕  setted buffer to null; done with qWave destructor.\n");
 
 }
 
 
 
 void qBuffer::copyThatWave(qCx *dest, qCx *src, int length) {
-//	printf("qWave::copyThatWave(%d <== %d)\n", (int) dest, (int) src);
+//	printf("🍕 qWave::copyThatWave(%d <== %d)\n", (int) dest, (int) src);
 	if (!dest) dest = this->wave;
 	if (!src) src = this->wave;
 	if (length < 0)
@@ -185,18 +188,20 @@ void qBuffer::normalize(void) {
 	qCx *wave = this->wave;
 	qDimension *dims = this->space->dimensions;
 	double mag = this->innerProduct();
-	//printf("normalizing qWave.  magnitude=%lf", mag);
+	printf("🍕 normalizing qBuffer.  magnitude=%lf\n", mag);
 	//tempQWave->dumpWave("The wave,before normalize", true);
 
 	if (mag == 0. || ! isfinite(mag)) {
 		// ALL ZEROES!??! this is bogus, shouldn't be happening
-		printf("ALL ZEROES ! ? ? ! not finite ! ? ? !  set them all to a constant, normalized\n");
+		printf("🍕 ALL ZEROES ! ? ? ! not finite ! ? ? !  set them all to a constant, normalized\n");
 		const double f = 1e-9;
 		for (int ix = dims->start; ix < dims->end; ix++)
 			wave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
 	}
 	else {
 		const double factor = pow(mag, -0.5);
+		printf("🍕 normalizing qBuffer.  factor=%lf, start=%d, end=%d, N=%d\n",
+			factor, dims->start, dims->end, dims->N);
 
 		for (int ix = dims->start; ix < dims->end; ix++)
 			wave[ix] *= factor;

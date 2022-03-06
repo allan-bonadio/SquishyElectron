@@ -165,7 +165,7 @@ export function indexToPower(willRoundPowers, stepFactors, spd, ix) {
 	}
 	let power = factor * decadePower;
 	if (willRoundPowers) power = Math.round(power) ;
-	console.info(`indexToPower - spd=${spd}  ix=${ix}  => power=${power}    factor=${factor}  whichDecade=${whichDecade } `)
+	//console.info(`indexToPower - spd=${spd}  ix=${ix}  => power=${power}    factor=${factor}  whichDecade=${whichDecade } `)
 	return power
 }
 
@@ -180,7 +180,7 @@ export function powerToIndex(spd, power) {
 		logOf = Math.log2(power);
 	}
 
-	console.info(`powerToIndex - spd=${spd}  power=${power}    logOf=${logOf}  6=${6}   `)
+	//console.info(`powerToIndex - spd=${spd}  power=${power}    logOf=${logOf}  6=${6}   `)
 
 	// now it's reasonable at this point to say why are we rounding vs flooring?
 	return Math.floor(logOf);

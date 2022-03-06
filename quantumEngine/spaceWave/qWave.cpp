@@ -19,9 +19,13 @@ int traceLowPassFilter = false;
 // This produces a wave ready to hold an electron
 qWave::qWave(qSpace *space, qCx *useThisBuffer) {
 	qBuffer();
+
+	//printf("🌊🌊 qWave::qWave() wave's Space: %x  nPoints:%d\n", (uint32_t) (space), space->nPoints);
+	//printf("      🌊🌊        qWave: %x\n", (uint32_t) (this));
 	this->space = space;
 	initBuffer(space->nPoints, useThisBuffer);
 
+	//printf("      🌊🌊  allocated wave: %x\n", (uint32_t) (this->wave));
 	qDimension *dim = space->dimensions;
 	this->start = dim->start;
 	this->end = dim->end;
@@ -84,7 +88,7 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 // the complete set of states
 // one for the N+1 if continuum
 void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
-	if (this->nPoints <= 0) throw "qSpace::dumpThatWave() with zero points";
+	if (this->nPoints <= 0) throw "🌊🌊 qSpace::dumpThatWave() with zero points";
 
 	const qDimension *dims = this->dimensions;
 	qBuffer::dumpSegment(wave, dims->start, dims->end, dims->continuum, withExtras);
@@ -92,15 +96,15 @@ void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
 
 // any wave, probably shouldn't call this
 void qWave::dumpThatWave(qCx *wave, bool withExtras) {
-	//printf("any wave, probably shouldn't call this\n");
+	//printf("🌊🌊 any wave, probably shouldn't call this\n");
 	this->space->dumpThatWave(wave, withExtras);
 }
 
 // this is the member function that dumps its own wave and space
 void qWave::dumpWave(const char *title, bool withExtras) {
-	printf("\n==== Wave | %s ", title);
+	printf("\n🌊🌊 ==== Wave | %s ", title);
 	this->space->dumpThatWave(this->wave, withExtras);
-	printf("\n==== end of Wave ====\n\n");
+	printf("\n🌊🌊 ==== end of Wave ====\n\n");
 }
 
 
@@ -111,7 +115,7 @@ void qWave::dumpWave(const char *title, bool withExtras) {
 // refresh the wraparound points for ANY WAVE subscribing to this space
 // 'those' or 'that' means some wave other than this->wave
 void qSpace::fixThoseBoundaries(qCx *wave) {
-	if (this->nPoints <= 0) throw "qSpace::fixThoseBoundaries() with zero points";
+	if (this->nPoints <= 0) throw "🌊🌊 qSpace::fixThoseBoundaries() with zero points";
 
 	qDimension *dims = this->dimensions;
 	switch (dims->continuum) {
@@ -123,16 +127,16 @@ void qSpace::fixThoseBoundaries(qCx *wave) {
 		// if I actually set the voltage to ∞
 		wave[0] = qCx();
 		wave[dims->end] = qCx();
-		//printf("contWELL cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", dims->continuum,
+		//printf("🌊🌊 contWELL cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", dims->continuum,
 		//wave[0].re, wave[0].im, wave[dims->end].re, wave[dims->end].im);
 		break;
 
 	case contENDLESS:
-		//printf("Endless ye said: on the endless case, %d = %d, %d = %d\n", 0, dims->N, dims->end, 1 );
+		//printf("🌊🌊 Endless ye said: on the endless case, %d = %d, %d = %d\n", 0, dims->N, dims->end, 1 );
 		// the points on the end get set to the opposite side
 		wave[0] = wave[dims->N];
 		wave[dims->end] = wave[1];
-		//printf("contENDLESS cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", dims->continuum,
+		//printf("🌊🌊 contENDLESS cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", dims->continuum,
 		//	wave[0].re, wave[0].im, wave[dims->end].re, wave[dims->end].im);
 		break;
 	}
@@ -150,7 +154,7 @@ void qWave::fixBoundaries(void) {
 double cleanOneNumber(double u, int ix, int sense) {
 	if (!isfinite(u)) {
 		// just enough to be nonzero without affecting the balance
-		printf("had to prune [%d]= %f\n", ix, u);
+		printf("🌊🌊 had to prune [%d]= %f\n", ix, u);
 		double faker = sense ? 1e-9 :  -1e-9;
 		return faker;
 	}
@@ -159,7 +163,7 @@ double cleanOneNumber(double u, int ix, int sense) {
 
 // look for NaNs and other foul numbers, and replace them with something .. better.
 void qWave::prune() {
-	printf("Do we really have to do this?  let's stop.\n");
+	printf("🌊🌊 Do we really have to do this?  let's stop.\n");
 
 	qDimension *dims = this->space->dimensions;
 	qCx *wave = this->wave;
@@ -181,7 +185,7 @@ void qWave::prune() {
 // Changes the wave in-place
 void qWave::lowPassFilter(double dilution) {
 	double concentration = 1. - dilution;
-	if (traceLowPassFilter) printf("qWave::lowPassFilter(%2.6lf)\n", dilution);
+	if (traceLowPassFilter) printf("🌊🌊 qWave::lowPassFilter(%2.6lf)\n", dilution);
 
 
 	if (!this->scratchBuffer)
@@ -200,7 +204,7 @@ void qWave::lowPassFilter(double dilution) {
 	if (dims->continuum) {
 		for (int ix = dims->end - LOW_PASS_WARMUP; ix < dims->end; ix++)
 			average = wave[ix] * dilution + average * concentration;
-		if (traceLowPassFilter) printf("    quick prep for forward average: %lf %lf\n", average.re, average.im);
+		if (traceLowPassFilter) printf("   🌊🌊  quick prep for forward average: %lf %lf\n", average.re, average.im);
 
 		////average /= concentration;  // do I need this?  not if normalized after this
 	}
@@ -210,7 +214,7 @@ void qWave::lowPassFilter(double dilution) {
 		temp = wave[ix] * concentration + average * dilution;
 		average = wave[ix] * dilution + average * concentration;
 
-		if (traceLowPassFilter) printf("    lowPassBuffer %d forward run: %lf %lf\n", ix, temp.re, temp.im);
+		if (traceLowPassFilter) printf("   🌊🌊  lowPassBuffer %d forward run: %lf %lf\n", ix, temp.re, temp.im);
 		this->scratchBuffer[ix] = temp;
 	}
 
@@ -220,7 +224,7 @@ void qWave::lowPassFilter(double dilution) {
 	if (dims->continuum) {
 		for (int ix = dims->start + LOW_PASS_WARMUP; ix >= dims->start; ix--)
 			average = wave[ix] * dilution + average * concentration;
-		if (traceLowPassFilter) printf("    quick prep for reverse average: %lf %lf\n", average.re, average.im);
+		if (traceLowPassFilter) printf("   🌊🌊  quick prep for reverse average: %lf %lf\n", average.re, average.im);
 
 		////average /= concentration;  // do I need this?
 	}
@@ -230,14 +234,14 @@ void qWave::lowPassFilter(double dilution) {
 		temp = wave[ix] * concentration + average * dilution;
 		average = wave[ix] * dilution + average * concentration;
 		wave[ix] = (this->scratchBuffer[ix] + temp) / 2;
-		if (traceLowPassFilter) printf("    lowPassBuffer %d reverse run: (%lf %lf)\n", ix, temp.re, temp.im);
+		if (traceLowPassFilter) printf("    🌊🌊 lowPassBuffer %d reverse run: (%lf %lf)\n", ix, temp.re, temp.im);
 	}
 
 }
 
 // this is kindof a notch filter for frequency N/2
 void qWave::nyquistFilter(void) {
-	if (traceLowPassFilter) printf("qWave::nyquistFilter()\n");
+	if (traceLowPassFilter) printf("🌊🌊 qWave::nyquistFilter()\n");
 
 	if (!this->scratchBuffer)
 		this->scratchBuffer = allocateWave();  // this won't work if space changes resolution!
@@ -251,7 +255,8 @@ void qWave::nyquistFilter(void) {
 	// this should zero out the nyquist frequency exactly
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		this->scratchBuffer[ix] = (wave[ix] + wave[ix] - wave[ix-1] - wave[ix+1]) / 4.;
-//		printf("%d scratchBuf=(%lf %lf) wave-1=(%lf %lf) wave0=(%lf %lf) wave+1=(%lf %lf)\n",
+
+//		printf("🌊🌊 %d scratchBuf=(%lf %lf) wave-1=(%lf %lf) wave0=(%lf %lf) wave+1=(%lf %lf)\n",
 //		ix,
 //		this->scratchBuffer[ix].re, this->scratchBuffer[ix].im,
 //		wave[ix-1].re, wave[ix-1].im, wave[ix].re, wave[ix].im, wave[ix+1].re, wave[ix+1].im);

@@ -11,17 +11,18 @@ static const bool debugViewBuffer = true;
 static const bool debugInDetail = false;
 
 
-// 'the' being the only one sometimes
+// 'the' being the only one sometimes.  set in jsSpace completeNewSpace
 qViewBuffer *theQViewBuffer;
 
 qViewBuffer::qViewBuffer(qSpace *space) {
 	// 4 floats per vertex, two verts per point
 	this->space = space;
 	this->viewBuffer = new float[space->nPoints * 8];
-	if (debugViewBuffer) printf("📺 viewBuffer(): this->viewBuffer ptr %ld \n",
-		(long) this->viewBuffer);
-	printf("📺 qViewBuffer constructor done: this=%d   this->viewBuffer=%d\n",
-		(int) this, (int) this->viewBuffer);
+	if (debugViewBuffer) printf("📺 viewBuffer(): this->viewBuffer ptr %x \n",
+		(unsigned int) this->viewBuffer);
+	//printf("📺 qViewBuffer constructor done: this=%x   this->viewBuffer=%x\n",
+	//(unsigned int) this, (unsigned int) this->viewBuffer);
+	// done in completeNewSpace    theQViewBuffer = this;
 }
 
 qViewBuffer::~qViewBuffer() {
@@ -35,29 +36,29 @@ qViewBuffer::~qViewBuffer() {
 // Two vertices per datapoint: bottom then top, same data.
 // also converts from doubles to floats for GL.
 float qViewBuffer::loadViewBuffer(void) {
-	if (debugViewBuffer) printf("📺 loadViewBuffer() starts: this->viewBuffer = %ld \n",
-		(long) this->viewBuffer);
-//	printf("qViewBuffer::loadViewBuffer space ptr %ld\n", (long) this->space);
-//	printf("qViewBuffer::loadViewBuffer latestQWave ptr %ld\n", (long) this->space->latestQWave);
+	if (debugViewBuffer) printf("📺 loadViewBuffer() starts: this->viewBuffer = %x \n",
+		(unsigned int) this->viewBuffer);
+//	printf("qViewBuffer::loadViewBuffer space ptr %x\n", (unsigned int) this->space);
+//	printf("qViewBuffer::loadViewBuffer latestQWave ptr %x\n", (unsigned int) this->space->latestQWave);
 	qWave *latestQWave = this->space->latestQWave;
-//	printf("qViewBuffer::loadViewBuffer latestWave ptr %ld\n", (long) latestQWave->wave);
+//	printf("qViewBuffer::loadViewBuffer latestWave ptr %x\n", (unsigned int) latestQWave->wave);
 	qCx *latestWave = latestQWave->wave;
 
-//	printf("qViewBuffer::loadViewBuffer this->space->nPoints %ld\n", (long) this->space->nPoints);
+//	printf("qViewBuffer::loadViewBuffer this->space->nPoints %x\n", (unsigned int) this->space->nPoints);
 	int nPoints = this->space->nPoints;
 	double highest = 0;
 	double tiny = 1e-8;
 
 	if (debugInDetail) {
-//		printf("loadViewBuffer(P): thePotential=%ld\n",
-//			(long) thePotential);
-//		printf("loadViewBuffer(B): this->space->latestQWave->wave=%ld->%ld->%ld->%ld\n",
-//			(long) this,
-//			(long) this->space,
-//			(long) this->space->latestQWave,
-//			(long) this->space->latestQWave->wave);
-//		printf("loadViewBuffer(vb,lqw): viewBuffer %ld and latestQWave->wave=%ld\n",
-//			(long) viewBuffer, (long) latestWave);
+//		printf("loadViewBuffer(P): thePotential=%x\n",
+//			(unsigned int) thePotential);
+//		printf("loadViewBuffer(B): this->space->latestQWave->wave=%x->%x->%x->%x\n",
+//			(unsigned int) this,
+//			(unsigned int) this->space,
+//			(unsigned int) this->space->latestQWave,
+//			(unsigned int) this->space->latestQWave->wave);
+//		printf("loadViewBuffer(vb,lqw): viewBuffer %x and latestQWave->wave=%x\n",
+//			(unsigned int) viewBuffer, (unsigned int) latestWave);
 		latestQWave->dumpWave("📺 at start of loadViewBuffer()");
 	}
 
@@ -65,27 +66,27 @@ float qViewBuffer::loadViewBuffer(void) {
 //	printf("qViewBuffer::loadViewBuffer about to do all the pts\n");
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
 		if (debugInDetail) {
-			printf("📺 qViewBuffer::loadViewBuffer this->viewBuffer %ld\n",
-				(long) this->viewBuffer);
-			printf("📺 qViewBuffer::loadViewBuffer this->viewBuffer + pointNum * 8=%ld\n",
-				(long) this->viewBuffer + pointNum * 8);
+			printf("📺 qViewBuffer::loadViewBuffer this->viewBuffer %x\n",
+				(unsigned int) this->viewBuffer);
+			printf("📺 qViewBuffer::loadViewBuffer this->viewBuffer + pointNum * 8=%x\n",
+				(unsigned int) this->viewBuffer + pointNum * 8);
 		}
 		float *twoRowPtr = this->viewBuffer + pointNum * 8;
 		if (debugInDetail)
-			printf("📺 qViewBuffer::loadViewBuffer twoRowPtr =%ld\n", (long) twoRowPtr);
+			printf("📺 qViewBuffer::loadViewBuffer twoRowPtr =%x\n", (unsigned int) twoRowPtr);
 		qCx *wavePtr = latestWave + pointNum;
 		if (debugInDetail)
-			printf("📺 qViewBuffer::loadViewBuffer wavePtr =%ld\n", (long) wavePtr);
+			printf("📺 qViewBuffer::loadViewBuffer wavePtr =%x\n", (unsigned int) wavePtr);
 
-		if (debugInDetail) printf("📺 loadViewBuffer(pointNum=%d): twoRowPtr =%ld and wavePtr=%ld\n",
-			pointNum, (long) twoRowPtr, (long) wavePtr);
+		if (debugInDetail) printf("📺 loadViewBuffer(pointNum=%x): twoRowPtr =%x and wavePtr=%x\n",
+			pointNum, (unsigned int) twoRowPtr, (unsigned int) wavePtr);
 
 		if (debugInDetail)
-			printf("📺 qViewBuffer::loadViewBuffer thePotential=%ld\n", (long) theSpace->potential);
+			printf("📺 qViewBuffer::loadViewBuffer thePotential=%x\n", (unsigned int) theSpace->potential);
 		double *potPtr = theSpace->potential + pointNum;
 		if (!potPtr) throw "📺 qViewBuffer::loadViewBuffer potPtr is null";
 		if (debugInDetail)
-			printf("📺 qViewBuffer::loadViewBuffer potPtr=%ld\n", (long) potPtr);
+			printf("📺 qViewBuffer::loadViewBuffer potPtr=%x\n", (unsigned int) potPtr);
 		double re = wavePtr->re;
 		double im = wavePtr->im;
 
@@ -114,8 +115,8 @@ float qViewBuffer::loadViewBuffer(void) {
 	}
 
 	if (debugViewBuffer) {
-		printf("    qViewBuffer::at end of loadViewBuffer this=%d  this->viewBuffer=%d\n",
-				(int) this, (int) this->viewBuffer);
+		printf("    qViewBuffer::at end of loadViewBuffer this=%x  this->viewBuffer=%x\n",
+				(unsigned int) this, (unsigned int) this->viewBuffer);
 		//printf("  ===  📺  viewBuffer.cpp done, as written to view buffer:\n");
 		//dumpViewBuffer("loadViewBuffer done");
 	}
@@ -129,11 +130,11 @@ float qViewBuffer::loadViewBuffer(void) {
 
 // dump the view buffer just before it heads off to webgl.
 void dumpViewBuffer(const char *title) {
-//	printf("dumpViewBuffer theSpace %ld\n", (long) theSpace);
-//	printf("dumpViewBuffer qViewBuffer ptr %ld\n", (long) theSpace->qViewBuffer);
-//	printf("dumpViewBuffer viewBuffer %ld\n", (long) theSpace->qViewBuffer->viewBuffer);
+//	printf("dumpViewBuffer theSpace %x\n", (unsigned int) theSpace);
+//	printf("dumpViewBuffer qViewBuffer ptr %x\n", (unsigned int) theSpace->qViewBuffer);
+//	printf("dumpViewBuffer viewBuffer %x\n", (unsigned int) theSpace->qViewBuffer->viewBuffer);
 	float *viewBuffer = theSpace->qViewBuffer->viewBuffer;
-	printf("📺 The viewBuffer = %d\n", (int) viewBuffer);
+	printf("📺 The viewBuffer = %x\n", (unsigned int) viewBuffer);
 	double prevRe = viewBuffer[0];
 	double prevIm = viewBuffer[1];
 
@@ -164,8 +165,8 @@ void dumpViewBuffer(const char *title) {
 				re, im, viewBuffer[i*4+2], viewBuffer[i*4+3]);
 		}
 	}
-	printf("    qViewBuffer::at end of dumpViewBuffer qViewBuffer=%d  qViewBuffer->viewBuffer=%d  local viewBuffer=%d\n",
-			(int) theSpace->qViewBuffer, (int) theSpace->qViewBuffer->viewBuffer, (int) viewBuffer);
+	printf("    qViewBuffer::at end of dumpViewBuffer qViewBuffer=%x  qViewBuffer->viewBuffer=%x  local viewBuffer=%x\n",
+			(unsigned int) theSpace->qViewBuffer, (unsigned int) theSpace->qViewBuffer->viewBuffer, (unsigned int) viewBuffer);
 }
 
 
@@ -176,14 +177,17 @@ extern "C" {
 	}
 
 	float *qViewBuffer_getViewBuffer(void) {
-		printf("📺 qViewBuffer_getViewBuffer: theQViewBuffer=%d   theQViewBuffer->viewBuffer=%d\n",
-			(int) theQViewBuffer, (int) theQViewBuffer->viewBuffer);
+//		printf("📺 qViewBuffer_getViewBuffer: theQViewBuffer=%x \n",
+//			(unsigned int) theQViewBuffer);
+//		printf("📺                    theQViewBuffer->viewBuffer=%x\n",
+//			theQViewBuffer ? (unsigned int) theQViewBuffer->viewBuffer : 0);
+		if (! theQViewBuffer) return NULL;
 		return theQViewBuffer->viewBuffer;
 	}
 
 	void qViewBuffer_loadViewBuffer(void) {
 		if (debugViewBuffer)
-			printf("📺 qViewBuffer_getViewBuffer... theQViewBuffer=%ld\n", (long) theQViewBuffer);
+			printf("📺 qViewBuffer_getViewBuffer... theQViewBuffer=%x\n", (unsigned int) theQViewBuffer);
 		theQViewBuffer->loadViewBuffer();
 	}
 }

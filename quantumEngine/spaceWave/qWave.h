@@ -28,6 +28,8 @@ struct qBuffer {
 
 	// calls solo allocateWave() but for this wave's count and stuff
 	qCx *allocateWave(int nPoints = -1);
+
+	// constructor for qWacve and qSpectrum calls this to finish up & alloc buffer
 	void initBuffer(int nPoints, qCx *useThisBuffer);
 
 	// the actual data, hopefully in the right size allocated block

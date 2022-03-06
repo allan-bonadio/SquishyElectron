@@ -42,10 +42,16 @@ void qSpace::resetCounters(void) {
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
 qSpace::qSpace(int nDims) {
+	printf("🚀 🚀 qSpace::qSpace() theSpace: %x\n", (uint32_t) (this));
+	if (nDims <= 0)
+		throw "🚀 🚀 Error nDimensions bad";
+
 	this->resetCounters();
 	this->nDimensions = 0;
 	this->lowPassDilution = 0.5;
 	this->pleaseFFT = false;
+
+
 }
 
 qSpace::~qSpace(void) {
@@ -55,8 +61,8 @@ qSpace::~qSpace(void) {
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
 void qSpace::addDimension(int N, int continuum, const char *label) {
 	if (this->nDimensions >= MAX_DIMENSIONS) {
-		printf("Error dimensions: %d\n", this->nDimensions);
-		throw "too many dimensions";
+		printf("🚀 🚀 Error dimensions: %d\n", this->nDimensions);
+		throw "🚀 🚀 too many dimensions";
 	}
 
 	qDimension *dims = this->dimensions + this->nDimensions;
@@ -96,7 +102,7 @@ void qSpace::tallyDimensions(void) {
 
 	this->chooseSpectrumSize();
 
-	//printf(" got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
+	//printf("🚀 🚀  got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
 }
 
 // call this After addDIMENSION calls to get it ready to go.
@@ -120,7 +126,7 @@ void qSpace::dumpPotential(const char *title) {
 	int ix;
 	qDimension *dims = this->dimensions;
 
-	printf("== Potential %s, %d...%d", title, dims->start, dims->end);
+	printf("🚀 🚀 == Potential %s, %d...%d", title, dims->start, dims->end);
 	if (dims->continuum) printf("  start [O]=%lf", thePotential[0]);
 	printf("\n");
 
@@ -128,7 +134,7 @@ void qSpace::dumpPotential(const char *title) {
 		if (0 == ix % 10) printf("\n[%d] ", ix);
 		printf("%lf ", thePotential[ix]);
 	}
-	if (dims->continuum) printf("\nend [%d]=%lf", ix, thePotential[ix]);
+	if (dims->continuum) printf("\n🚀 🚀 end [%d]=%lf", ix, thePotential[ix]);
 	printf("\n");
 }
 
@@ -136,8 +142,6 @@ void qSpace::setZeroPotential(void) {
 	qDimension *dims = this->dimensions;
 	for (int ix = 0; ix < dims->nPoints; ix++)
 		thePotential[ix] = 0.;
-
-	//theQViewBuffer->loadViewBuffer(this->latestQWave);
 }
 
 void qSpace::setValleyPotential(double power = 1, double scale = 1, double offset = 0) {
@@ -146,9 +150,6 @@ void qSpace::setValleyPotential(double power = 1, double scale = 1, double offse
 	for (int ix = 0; ix < dims->nPoints; ix++) {
 		thePotential[ix] = pow(abs(ix - mid), power) * scale + offset;
 	}
-
-	// this is overkill but gotta update the Potential column in the view buffer
-	//theQViewBuffer->loadViewBuffer(this->latestQWave);
 }
 
 
@@ -161,11 +162,11 @@ void qSpace::oneIteration() {
 	int ix;
 
 	if (debugIteration)
-		printf("qSpace::oneIteration() - dt=%lf   stepsPerIteration=%d\n", this->dt, this->stepsPerIteration);
+		printf("🚀 🚀 qSpace::oneIteration() - dt=%lf   stepsPerIteration=%d\n", this->dt, this->stepsPerIteration);
 
 	int steps = this->stepsPerIteration / 2;
 	if (debugIteration)
-		printf("qSpace::oneIteration() - steps=%d   stepsPerIteration=%d\n", steps, this->stepsPerIteration);
+		printf("🚀 🚀 qSpace::oneIteration() - steps=%d   stepsPerIteration=%d\n", steps, this->stepsPerIteration);
 
 	isIterating = true;
 	for (ix = 0; ix < steps; ix++) {
@@ -175,7 +176,7 @@ void qSpace::oneIteration() {
 		this->oneVisscherStep(laosQWave, peruQWave);
 		this->oneVisscherStep(peruQWave, laosQWave);
 		if (debugIteration && 0 == ix % 100)
-			printf("200 step, step %d\n", ix * 2);
+			printf("🚀 🚀  step every hundred, step %d\n", ix * 2);
 
 		//auto end = std::chrono::steady_clock::now();////
 		//std::chrono::duration<double> elapsed_seconds = end-start;////
@@ -200,7 +201,7 @@ void qSpace::oneIteration() {
 
 	if (debugIterSummary) {
 		char buf[100];
-		sprintf(buf, "finished one iteration (%d steps, N=%d), inner product: %lf",
+		sprintf(buf, "🚀 🚀 finished one iteration (%d steps, N=%d), inner product: %lf",
 			this->stepsPerIteration, this->dimensions->N, this->latestQWave->innerProduct());
 	}
 
@@ -209,7 +210,7 @@ void qSpace::oneIteration() {
 		this->latestQWave->dumpWave(buf, true);
 	}
 	if (debugJustInnerProduct) {
-		printf("finished one integration iteration (%d steps, N=%d), inner product: %lf\n",
+		printf("🚀 🚀 finished one integration iteration (%d steps, N=%d), inner product: %lf\n",
 			this->stepsPerIteration, this->dimensions->N, this->latestQWave->innerProduct());
 	}
 

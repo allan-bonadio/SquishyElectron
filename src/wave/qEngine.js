@@ -5,7 +5,7 @@
 
 import {qe, defineQEngineFuncs} from './qe';
 import qCx from './qCx';
-import qeWave from './qeWave';
+//import qeWave from './qeWave';
 //import qeSpace from './qeSpace';
 
 // all of these must be attached to window to  get called by c++
@@ -87,17 +87,17 @@ export function qeDefineAccess() {
 
 	// what a disaster...
 
+	// nobody uses this anymore
 	// tune into the most recently used wave buffer.  The iteration algorithm can sometimes leave the
 	// results in different buffers, depending.  No, not any more!
 	qe.createQEWaveFromCBuf = function createQEWaveFromCBuf() {
 		// make this thing which is the wave buffer, as a nice TypedArray of doubles (pairs making up cx numbers)
 		const wave = new Float64Array(window.Module.HEAPF64.buffer, qe.qSpace_getWaveBuffer(), 2 * qe.space.nPoints);
 		qe.space.waveBuffer = qe.waveBuffer = wave;
-		//console.info(`the wave we're createQEWaveFromCBuf():`, wave);
-		qe.qewave = new qeWave(qe.space, wave);
 	}
 
 	// get the complex wave value at this point in the wave
+	// not used very much now
 	qe.get1DWave = function get1DWave(ixPoint) {
 		const ix = 2*ixPoint;
 		return qCx(
