@@ -7,6 +7,7 @@
 import cxToRgb from '../view/cxToRgb';
 
 // do this old school class so  i can use the constructor without new
+// very handy - either arg can be a complex obj, or a real, and the im arg can be absent
 function qCx(re, im) {
 	// if called as a function instead of with new, convert
 	if (!this || this === window)
@@ -23,7 +24,7 @@ function qCx(re, im) {
 	else {
 		if (typeof im == 'object') {
 			// very unlikely
-			return {re: (re || 0) - im.im ,im:  im.re};
+			return {re: (re || 0) - im.im, im:  im.re};
 		}
 		else {
 			// this is the most common use
@@ -38,12 +39,11 @@ qCx.prototype.color = function color() {
 	return cxToRgb(this);
 };
 
-// aint workin
-qCx.prototype.magn = function magn() {
+// aint workin?
+qCx.prototype.norm = function norm() {
 	return this.re ** 2 + this.im ** 2;
 }
 
-// very handy - either arg can be a complex obj, or a real, and the im arg can be absent
 // const qCx = (re, im) => {
 // 	if (typeof re == 'object') {
 // 		if (typeof im == 'object') {
@@ -65,18 +65,6 @@ qCx.prototype.magn = function magn() {
 // 	}
 // };
 
-// add on these methods, makes some formulas easier.
-// factor is always real; often like 2 or -1/2
-// always RETURNS value, inputs and this are unchanged
-// complex.prototype.addTo = function(z, factor = 1){
-// 	z = qCx(z);
-// 	return qCx(this.re + z.re * factor, this.im + z.im * factor);
-// };
-//
-// complex.prototype.multBy = function(z){
-// 	z = qCx(z);
-// 	return qCx(this.re * z.re - this.im * z.im, this.im * z.re + this.re * z.im);
-// };
 
 
 export default qCx;
