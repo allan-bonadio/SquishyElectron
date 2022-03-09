@@ -132,7 +132,7 @@ export class MiniGraph extends React.Component {
 //		let magn = y;
 //		if (isisWave) {
 //			values[xPx] = {x: xPx, ...y};
-//			magn = y.re * y.re + y.im * y.im;
+//			magn = y.re * y.re + y.im * y.im;  // y.norm()
 //		}
 //		else {
 //			values[xPx] = {x: xPx, y};

@@ -65,7 +65,7 @@ class draw {
 	oneBar(x, psi) {
 		if (!  psi || typeof psi != 'object') debugger;
 		let color = this.complexColor(psi);
-		let magnitude = (psi.re * psi.re + psi.im * psi.im);
+		let magnitude = psi.norm();
 		//console.log(`${x} magnitude: ${magnitude}`);
 
 		// little gaps appear unles you do this

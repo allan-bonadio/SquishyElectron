@@ -53,7 +53,7 @@ class qeWave {
 		const wave = this.wave;
 		const {start, end} = this.space.startEnd2;
 
-		console.log(`%c rainbow dump    🌊  `, `background-color: #fff; padding-right: 100%; `);
+		console.log(`%c rainbow dump    🌊  `, `font: times 16px italic; color: #222; background-color: #fff; padding-right: 80%; `);
 
 		let tot = 0;  // always real
 		for (let ix = start; ix < end; ix += 2) {
