@@ -4,20 +4,17 @@
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
-
 // a 'wave' is a straight array of qCx, of length space->nPoints.
 //    named this way even for spectrums
 // a 'qBuffer' is a wrapped wave that knows how to traverse itself
-// a 'qWave' is an object with cool methods for the wave it encloses, plus a qSpace pointer.
+// a 'qWave' is an object with cool methods for the wave it encloses,
+//    plus a qSpace pointer.  Subclass of qBuffer.
 // a 'qFlick' (see below) is a sequence of waves (defunct)
 // a 'qViewBuffer' is specifically to send coordinates to WebGL for display; very different
-// a 'qSpectrum' is like a qWave designed for FFT results
-
+// a 'qSpectrum' is like a qWave designed for FFT results.  Subclass of qBuffer.
 
 extern qCx *allocateWave(int nPoints);
-extern void freeWave(qCx *wave);
-
-
+extern void freeWave(struct qCx *wave);
 
 // a long array of qCx complex numbers, plus some other info
 struct qBuffer {
@@ -29,8 +26,8 @@ struct qBuffer {
 	// calls solo allocateWave() but for this wave's count and stuff
 	qCx *allocateWave(int nPoints = -1);
 
-	// constructor for qWacve and qSpectrum calls this to finish up & alloc buffer
-	void initBuffer(int nPoints, qCx *useThisBuffer);
+	// constructor for qWave and qSpectrum calls this to finish up & alloc buffer
+	void initBuffer(qCx *useThisBuffer);
 
 	// the actual data, hopefully in the right size allocated block
 	qCx *wave;

@@ -19,9 +19,9 @@ qViewBuffer::qViewBuffer(qSpace *space) {
 	this->space = space;
 	this->viewBuffer = new float[space->nPoints * 8];
 	if (debugViewBuffer) printf("📺 viewBuffer(): this->viewBuffer ptr %x \n",
-		(unsigned int) this->viewBuffer);
+		(uint32_t) this->viewBuffer);
 	//printf("📺 qViewBuffer constructor done: this=%x   this->viewBuffer=%x\n",
-	//(unsigned int) this, (unsigned int) this->viewBuffer);
+	//(uint32_t) this, (uint32_t) this->viewBuffer);
 	// done in completeNewSpace    theQViewBuffer = this;
 }
 
@@ -37,28 +37,28 @@ qViewBuffer::~qViewBuffer() {
 // also converts from doubles to floats for GL.
 float qViewBuffer::loadViewBuffer(void) {
 	if (debugViewBuffer) printf("📺 loadViewBuffer() starts: this->viewBuffer = %x \n",
-		(unsigned int) this->viewBuffer);
-//	printf("qViewBuffer::loadViewBuffer space ptr %x\n", (unsigned int) this->space);
-//	printf("qViewBuffer::loadViewBuffer latestQWave ptr %x\n", (unsigned int) this->space->latestQWave);
+		(uint32_t) this->viewBuffer);
+//	printf("qViewBuffer::loadViewBuffer space ptr %x\n", (uint32_t) this->space);
+//	printf("qViewBuffer::loadViewBuffer latestQWave ptr %x\n", (uint32_t) this->space->latestQWave);
 	qWave *latestQWave = this->space->latestQWave;
-//	printf("qViewBuffer::loadViewBuffer latestWave ptr %x\n", (unsigned int) latestQWave->wave);
+//	printf("qViewBuffer::loadViewBuffer latestWave ptr %x\n", (uint32_t) latestQWave->wave);
 	qCx *latestWave = latestQWave->wave;
 
-//	printf("qViewBuffer::loadViewBuffer this->space->nPoints %x\n", (unsigned int) this->space->nPoints);
+//	printf("qViewBuffer::loadViewBuffer this->space->nPoints %x\n", (uint32_t) this->space->nPoints);
 	int nPoints = this->space->nPoints;
 	double highest = 0;
 	double tiny = 1e-8;
 
 	if (debugInDetail) {
 //		printf("loadViewBuffer(P): thePotential=%x\n",
-//			(unsigned int) thePotential);
+//			(uint32_t) thePotential);
 //		printf("loadViewBuffer(B): this->space->latestQWave->wave=%x->%x->%x->%x\n",
-//			(unsigned int) this,
-//			(unsigned int) this->space,
-//			(unsigned int) this->space->latestQWave,
-//			(unsigned int) this->space->latestQWave->wave);
+//			(uint32_t) this,
+//			(uint32_t) this->space,
+//			(uint32_t) this->space->latestQWave,
+//			(uint32_t) this->space->latestQWave->wave);
 //		printf("loadViewBuffer(vb,lqw): viewBuffer %x and latestQWave->wave=%x\n",
-//			(unsigned int) viewBuffer, (unsigned int) latestWave);
+//			(uint32_t) viewBuffer, (uint32_t) latestWave);
 		latestQWave->dumpWave("📺 at start of loadViewBuffer()");
 	}
 
@@ -67,26 +67,26 @@ float qViewBuffer::loadViewBuffer(void) {
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
 		if (debugInDetail) {
 			printf("📺 qViewBuffer::loadViewBuffer this->viewBuffer %x\n",
-				(unsigned int) this->viewBuffer);
+				(uint32_t) this->viewBuffer);
 			printf("📺 qViewBuffer::loadViewBuffer this->viewBuffer + pointNum * 8=%x\n",
-				(unsigned int) this->viewBuffer + pointNum * 8);
+				(uint32_t) this->viewBuffer + pointNum * 8);
 		}
 		float *twoRowPtr = this->viewBuffer + pointNum * 8;
 		if (debugInDetail)
-			printf("📺 qViewBuffer::loadViewBuffer twoRowPtr =%x\n", (unsigned int) twoRowPtr);
+			printf("📺 qViewBuffer::loadViewBuffer twoRowPtr =%x\n", (uint32_t) twoRowPtr);
 		qCx *wavePtr = latestWave + pointNum;
 		if (debugInDetail)
-			printf("📺 qViewBuffer::loadViewBuffer wavePtr =%x\n", (unsigned int) wavePtr);
+			printf("📺 qViewBuffer::loadViewBuffer wavePtr =%x\n", (uint32_t) wavePtr);
 
 		if (debugInDetail) printf("📺 loadViewBuffer(pointNum=%x): twoRowPtr =%x and wavePtr=%x\n",
-			pointNum, (unsigned int) twoRowPtr, (unsigned int) wavePtr);
+			pointNum, (uint32_t) twoRowPtr, (uint32_t) wavePtr);
 
 		if (debugInDetail)
-			printf("📺 qViewBuffer::loadViewBuffer thePotential=%x\n", (unsigned int) theSpace->potential);
+			printf("📺 qViewBuffer::loadViewBuffer thePotential=%x\n", (uint32_t) theSpace->potential);
 		double *potPtr = theSpace->potential + pointNum;
 		if (!potPtr) throw "📺 qViewBuffer::loadViewBuffer potPtr is null";
 		if (debugInDetail)
-			printf("📺 qViewBuffer::loadViewBuffer potPtr=%x\n", (unsigned int) potPtr);
+			printf("📺 qViewBuffer::loadViewBuffer potPtr=%x\n", (uint32_t) potPtr);
 		double re = wavePtr->re;
 		double im = wavePtr->im;
 
@@ -116,7 +116,7 @@ float qViewBuffer::loadViewBuffer(void) {
 
 	if (debugViewBuffer) {
 		printf("    qViewBuffer::at end of loadViewBuffer this=%x  this->viewBuffer=%x\n",
-				(unsigned int) this, (unsigned int) this->viewBuffer);
+				(uint32_t) this, (uint32_t) this->viewBuffer);
 		//printf("  ===  📺  viewBuffer.cpp done, as written to view buffer:\n");
 		//dumpViewBuffer("loadViewBuffer done");
 	}
@@ -130,11 +130,11 @@ float qViewBuffer::loadViewBuffer(void) {
 
 // dump the view buffer just before it heads off to webgl.
 void dumpViewBuffer(const char *title) {
-//	printf("dumpViewBuffer theSpace %x\n", (unsigned int) theSpace);
-//	printf("dumpViewBuffer qViewBuffer ptr %x\n", (unsigned int) theSpace->qViewBuffer);
-//	printf("dumpViewBuffer viewBuffer %x\n", (unsigned int) theSpace->qViewBuffer->viewBuffer);
+//	printf("dumpViewBuffer theSpace %x\n", (uint32_t) theSpace);
+//	printf("dumpViewBuffer qViewBuffer ptr %x\n", (uint32_t) theSpace->qViewBuffer);
+//	printf("dumpViewBuffer viewBuffer %x\n", (uint32_t) theSpace->qViewBuffer->viewBuffer);
 	float *viewBuffer = theSpace->qViewBuffer->viewBuffer;
-	printf("📺 The viewBuffer = %x\n", (unsigned int) viewBuffer);
+	printf("📺 The viewBuffer = %x\n", (uint32_t) viewBuffer);
 	double prevRe = viewBuffer[0];
 	double prevIm = viewBuffer[1];
 
@@ -166,7 +166,7 @@ void dumpViewBuffer(const char *title) {
 		}
 	}
 	printf("    qViewBuffer::at end of dumpViewBuffer qViewBuffer=%x  qViewBuffer->viewBuffer=%x  local viewBuffer=%x\n",
-			(unsigned int) theSpace->qViewBuffer, (unsigned int) theSpace->qViewBuffer->viewBuffer, (unsigned int) viewBuffer);
+			(uint32_t) theSpace->qViewBuffer, (uint32_t) theSpace->qViewBuffer->viewBuffer, (uint32_t) viewBuffer);
 }
 
 
@@ -178,16 +178,16 @@ extern "C" {
 
 	float *qViewBuffer_getViewBuffer(void) {
 //		printf("📺 qViewBuffer_getViewBuffer: theQViewBuffer=%x \n",
-//			(unsigned int) theQViewBuffer);
+//			(uint32_t) theQViewBuffer);
 //		printf("📺                    theQViewBuffer->viewBuffer=%x\n",
-//			theQViewBuffer ? (unsigned int) theQViewBuffer->viewBuffer : 0);
+//			theQViewBuffer ? (uint32_t) theQViewBuffer->viewBuffer : 0);
 		if (! theQViewBuffer) return NULL;
 		return theQViewBuffer->viewBuffer;
 	}
 
 	void qViewBuffer_loadViewBuffer(void) {
 		if (debugViewBuffer)
-			printf("📺 qViewBuffer_getViewBuffer... theQViewBuffer=%x\n", (unsigned int) theQViewBuffer);
+			printf("📺 qViewBuffer_getViewBuffer... theQViewBuffer=%x\n", (uint32_t) theQViewBuffer);
 		theQViewBuffer->loadViewBuffer();
 	}
 }

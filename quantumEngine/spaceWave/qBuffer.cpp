@@ -32,7 +32,7 @@ void freeWave(qCx *wave) {
 // make one, the right size for this buffer's space, or nPoints long
 qCx *qBuffer::allocateWave(int nPoints) {
 	if (nPoints < 0)
-		nPoints = this->space->nPoints;
+		nPoints = this->space->freeBufferListLength;
 	return (qCx *) malloc(nPoints * sizeof(qCx));
 	this->nPoints = nPoints;
 }
@@ -45,31 +45,29 @@ qBuffer::qBuffer(void) {
 
 // actually create the buffer that we need
 // usually called by subclasses when they figure out how long a buffer is needed
-void qBuffer::initBuffer(int nPoints, qCx *useThisBuffer) {
+void qBuffer::initBuffer(qCx *useThisBuffer) {
 	if (useThisBuffer) {
 		this->wave = useThisBuffer;
 		this->dynamicallyAllocated = 0;
 	}
 	else {
-		this->wave = allocateWave(nPoints);
+		this->wave = this->space->borrowBuffer();
 		this->dynamicallyAllocated = 1;
 	}
-	this->nPoints = nPoints;
-	this->start = this->end = -1;  // wave or spectrum calculates these differently
-	printf("🍕 qBuffer::initBuffer this=%d  wave=%d  nPoints: %d\n",
-		(int) this, (int) this->wave, nPoints);
+	this->nPoints = this->start = this->end = -1;  // wave / spectrum calculates these differently
+	printf("🍕 qBuffer::initBuffer this=%x  wave=%x  nPoints: %d\n",
+		(uint32_t) this, (uint32_t) this->wave, nPoints);
 }
 
 qBuffer::~qBuffer() {
-	//printf("start the qWave instance destructor...\n");
+	printf("🍕  start the qBuffer instance destructor...\n");
+	if (this->dynamicallyAllocated) {
+		this->space->returnBuffer(this->wave);
+		printf("   🍕  freed buffer...\n");
+	}
+
 	this->space = NULL;
-	//printf("   🍕  set space to null...\n");
-
-	if (this->dynamicallyAllocated)
-		freeWave(this->wave);
-	//printf("   🍕  freed buffer...\n");
-
-	//printf("   🍕  setted buffer to null; done with qWave destructor.\n");
+	printf("   🍕  setted buffer to null; done with qBuffer destructor.\n");
 
 }
 

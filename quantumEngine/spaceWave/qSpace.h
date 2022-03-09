@@ -7,6 +7,7 @@
 #include "qCx.h"
 
 // do not exceed these!  they are open ended arrays.
+// keep LABEL_LEN a multiple of 4 or 8 for alignment.
 #define LABEL_LEN  16
 #define MAX_DIMENSIONS  2
 
@@ -59,11 +60,16 @@ const int contDISCRETE = 0;
 const int contWELL = 1;
 const int contENDLESS = 2;
 
+//coerce your buffers into being one of these and you link them into a list
+struct FreeBuffer {
+	struct FreeBuffer *next;
+};
+
 /* ************************************************************ the space */
 
 struct qSpace {
 public:
-	qSpace(int nDims);
+	qSpace(const char *label);
 	~qSpace(void);
 
 	// additional for space creation
@@ -72,6 +78,13 @@ public:
 		void tallyDimensions(void);
 	public:
 	void initSpace(void);
+
+	char label[LABEL_LEN];
+
+	// Dimensions are listed from outer to inner as with the resulting ψ array:
+	// ψ[outermost-dim][dim][dim][innermost-dim]
+	// always a fixed size, for simplicity.
+	qDimension dimensions[MAX_DIMENSIONS];
 
 	// how much time we've iterated, from creation.  pseudo-seconds.  Since we've eliminated
 	// all the actual physical constants from the math, why not choose our own definition
@@ -100,34 +113,14 @@ public:
 	struct qViewBuffer *qViewBuffer;
 	double *potential;
 
-	// time increment used in schrodinger's, plus constants handy in intgration
+	// params that the user can set
 	double dt;
-	qCx dtOverI;  // get rid of this
-	qCx halfDtOverI;  // get rid of this
 	int stepsPerIteration;
 	double lowPassDilution;
 
-	int bufferNum;  // get rid of this
 
-	/* ****************************************** hacks that might go away */
-	// set to N or whatever, count down, when you hhit zero, lowPass (sometimes)
-	//int filterCount;
 
-	// true if you want rk to go through periodic lowpass or whatever filter
-	//int doLowPass;
-
-	// zero = off.  true to do it every iteration a little and use value as dilution factor
-	//double continuousLowPass;
-
-	char label[LABEL_LEN];
-	char pleaseFFT;
-
-	/* *********************************************** Dimensions & other serious stuff */
-	// Dimensions are listed from outer to inner as with the resulting ψ array:
-	// ψ[outermost-dim][dim][dim][innermost-dim]
-	// always a fixed size, for simplicity.
-	qDimension dimensions[MAX_DIMENSIONS];
-
+	/* *********************************************** buffers */
 	void chooseSpectrumSize(void);
 	int spectrumSize;
 
@@ -135,30 +128,48 @@ public:
 	void dumpThatWave(qCx *wave, bool withExtras = false);
 	void dumpThatSpectrum(qCx *wave, bool withExtras = false);
 
+	void fixThoseBoundaries(qCx *wave);  // like for qWave but on any wave
 
+	// the linked list of blocks available for rental.
+	// All contain (freeBufferListLength) complex number slots.
+	FreeBuffer *freeBufferList;
+
+	// number of qCx-s that'll be enough for both spectrums and waves
+	// so waves that are cache-able have exactly this length.
+	int freeBufferListLength;
+
+	// if you take one, return it.  If it isn't the right length,
+	// returning might lead to it being used as if it was.
+	qCx *borrowBuffer(void);
+	void returnBuffer(qCx *abuffer);
+	void clearFreeBuffers(void);
+
+	/* *********************************************** potential */
 	void dumpPotential(const char *title);
 	void setZeroPotential(void);
 	void setValleyPotential(double power, double scale, double offset);
 
+	/* *********************************************** iteration */
 	void oneIteration(void);
 	void oneRk2Step(qWave *oldQWave, qWave *newQWave);  // obsolete
 	void oneRk4Step(qWave *oldQWave, qWave *newQWave);  // obsolete
 	void oneVisscherStep(qWave *oldQWave, qWave *newQWave);  // obsolete
 
-	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);
-
-	void fixThoseBoundaries(qCx *wave);  // like for qWave but on any wave
-
 	// visscher
 	void stepReal(qCx *oldW, qCx *newW, double dt);
 	void stepImaginary(qCx *oldW, qCx *newW, double dt);
+	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);
+
+	char pleaseFFT;
+	char isIterating;
+	void askForFFT(void);
 };
 
 /* ************************************************************ JS interface */
 
 // for JS to call
 extern "C" {
-	qSpace *startNewSpace(void);
+	qSpace *startNewSpace(const char *name = "a space");
 	qSpace *addSpaceDimension(int N, int continuum, const char *label);
 	qSpace *completeNewSpace(void);
 

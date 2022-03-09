@@ -20,13 +20,16 @@ int traceLowPassFilter = false;
 qWave::qWave(qSpace *space, qCx *useThisBuffer) {
 	qBuffer();
 
+	printf("🌊🌊 qWave::qWave(%s)  %x => %x", space->label,
+		(uint32_t) useThisBuffer, (uint32_t) this);
 	//printf("🌊🌊 qWave::qWave() wave's Space: %x  nPoints:%d\n", (uint32_t) (space), space->nPoints);
 	//printf("      🌊🌊        qWave: %x\n", (uint32_t) (this));
 	this->space = space;
-	initBuffer(space->nPoints, useThisBuffer);
+	initBuffer(useThisBuffer);
 
 	//printf("      🌊🌊  allocated wave: %x\n", (uint32_t) (this->wave));
 	qDimension *dim = space->dimensions;
+	this->nPoints = dim->nPoints;
 	this->start = dim->start;
 	this->end = dim->end;
 }

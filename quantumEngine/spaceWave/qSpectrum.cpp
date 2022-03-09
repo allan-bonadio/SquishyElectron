@@ -13,9 +13,12 @@
 // This produces a spectrum ready to hold an FFT transformed wave
 qSpectrum::qSpectrum(qSpace *space, qCx *useThisBuffer) {
 	qBuffer();
+	printf("🌈 🌈 qSpectrum::qSpectrum(%s)  %x => %x", space->label,
+		(uint32_t) useThisBuffer, (uint32_t) this);
 	this->space = space;
-	initBuffer(this->space->spectrumSize, useThisBuffer);
+	initBuffer(useThisBuffer);
 
+	this->nPoints = space->spectrumSize;
 	this->start = 0;
 	this->end = space->spectrumSize;
 }
@@ -36,9 +39,9 @@ void qSpace::dumpThatSpectrum(qCx *wave, bool withExtras) {
 
 // this is the member function that dumps its own Spectrum and space
 void qSpectrum::dumpSpectrum(const char *title, bool withExtras) {
-	printf("\n==== Spectrum | %s ", title);
+	printf("\n🌈 🌈 ==== Spectrum | %s ", title);
 	this->space->dumpThatSpectrum(this->wave, withExtras);
-	printf("\n==== end of Spectrum ====\n\n");
+	printf("\n🌈 🌈 ==== end of Spectrum ====\n\n");
 }
 
 

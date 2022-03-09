@@ -10,17 +10,8 @@
 #include "qWave.h"
 #include "../fourier/fftMain.h"
 
-
-
-
 extern void analyzeWaveFFT(qWave *qw);
-
-
-
-
 class qSpace *theSpace = NULL;
-
-
 double *thePotential = NULL;
 
 
@@ -39,23 +30,30 @@ void qSpace::resetCounters(void) {
 	this->elapsedTime = 0.;
 	this->iterateSerial = 0;
 }
+
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
-qSpace::qSpace(int nDims) {
-	printf("🚀 🚀 qSpace::qSpace() theSpace: %x\n", (uint32_t) (this));
-	if (nDims <= 0)
-		throw "🚀 🚀 Error nDimensions bad";
+qSpace::qSpace(const char *lab) {
+	printf("🚀 🚀 qSpace::qSpace() theSpace this: %x\n", (uint32_t) (this));
+	this->nDimensions = 0;
 
 	this->resetCounters();
-	this->nDimensions = 0;
 	this->lowPassDilution = 0.5;
+
 	this->pleaseFFT = false;
+	this->isIterating = false;
 
+	strncpy(this->label, lab, LABEL_LEN);
+	this->label[LABEL_LEN-1] = 0;
 
+	printf("🚀 🚀 qSpace::qSpace() done this: %x\n", (uint32_t) (this));
 }
 
 qSpace::~qSpace(void) {
-	// nothing yet but stay tuned
+	printf("🚀 🚀 qSpace destructor of %s, this: %x\n", label, (uint32_t) (this));
+	// these cached buffers need to go free
+	this->clearFreeBuffers();
+	printf("🚀 🚀 qSpace destructor done this: %x\n", (uint32_t) (this));
 }
 
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
@@ -155,20 +153,21 @@ void qSpace::setValleyPotential(double power = 1, double scale = 1, double offse
 
 /* ********************************************************** integration */
 
-static int isIterating = false;
 
-// does several visscher steps, we'll call that one 'iteration'
+// does several visscher steps, we'll call that two 'steps'
 void qSpace::oneIteration() {
 	int ix;
 
 	if (debugIteration)
-		printf("🚀 🚀 qSpace::oneIteration() - dt=%lf   stepsPerIteration=%d\n", this->dt, this->stepsPerIteration);
+		printf("🚀 🚀 qSpace::oneIteration() - dt=%lf   stepsPerIteration=%d\n",
+			this->dt, this->stepsPerIteration);
 
 	int steps = this->stepsPerIteration / 2;
 	if (debugIteration)
-		printf("🚀 🚀 qSpace::oneIteration() - steps=%d   stepsPerIteration=%d\n", steps, this->stepsPerIteration);
+		printf("🚀 🚀 qSpace::oneIteration() - steps=%d   stepsPerIteration=%d\n",
+			steps, this->stepsPerIteration);
 
-	isIterating = true;
+	this->isIterating = true;
 	for (ix = 0; ix < steps; ix++) {
 		// this seems to have a resolution of 100µs on Panama
 		//auto start = std::chrono::steady_clock::now();////
@@ -182,7 +181,7 @@ void qSpace::oneIteration() {
 		//std::chrono::duration<double> elapsed_seconds = end-start;////
 		//printf("elapsed time: %lf \n", elapsed_seconds.count());////
 	}
-	isIterating = false;
+	this->isIterating = false;
 
 	this->iterateSerial++;
 
@@ -215,21 +214,59 @@ void qSpace::oneIteration() {
 	}
 
 	if (this->pleaseFFT) {
-
-
 		analyzeWaveFFT(this->latestQWave);
-
 		this->pleaseFFT = false;
 	}
-
 }
 
-// user button to print it out now, or at end of the next iteration
-void askForFFT(void) {
-	if (isIterating)
-		theSpace->pleaseFFT = true;
-	else {
-		analyzeWaveFFT(laosQWave);
 
+// user button to print it out now, or at end of the next iteration
+void qSpace::askForFFT(void) {
+	if (this->isIterating)
+		this->pleaseFFT = true;
+	else
+		analyzeWaveFFT(this->latestQWave);
+}
+
+
+/* ********************************************************** buffer cache */
+
+
+// this is all on the honor system.  If you borrow a buf, you either have to return it
+// with returnBuffer() or you free it with freeWave().
+qCx *qSpace::borrowBuffer(void) {
+	FreeBuffer *rentedCache = this->freeBufferList;
+	if (rentedCache) {
+		// there was one available on the free list, pop it off
+		this->freeBufferList = rentedCache->next;
+		return (qCx *) rentedCache;
 	}
+	else {
+		// must make a new one
+		return allocateWave(this->freeBufferListLength);;
+	}
+}
+
+// return the buffer to the free list.  Potentially endless but probably not.
+// do not return buffers that aren't the right size - freeBufferListLength
+void qSpace::returnBuffer(qCx *rentedBuffer) {
+	FreeBuffer *rented = (FreeBuffer *) rentedBuffer;
+	rented->next = this->freeBufferList;
+	this->freeBufferList = rented;
+}
+
+// this is the only way they're freed; otherwise they just collect.
+// shouldn't be too many, though.  Called by destructor.
+void qSpace::clearFreeBuffers() {
+	printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: %x\n",
+		(uint32_t) (this->freeBufferList));
+	FreeBuffer *n;
+	for (FreeBuffer *f = this->freeBufferList; f; f = n) {
+		n = f->next;
+		printf("           🚀 🚀 about to free this one: %x\n",
+			(uint32_t) (f));
+		freeWave((qCx *) f);
+	}
+	printf("              🚀 🚀 qSpace::clearFreeBuffers() done. freeBufferList=%x\n",
+		(uint32_t) this->freeBufferList);
 }

@@ -83,8 +83,6 @@ extern "C" void testFFT(void) {
 
 /* ********************************************************* qWave interface */
 
-// do i use this anymore?!?!
-static qSpectrum *scratchSpectrum = NULL;
 
 // take this wave in and FFT it and dump the result to console
 // if not a powerof2 length, padds it.
@@ -92,12 +90,14 @@ void analyzeWaveFFT(qWave *inputQWave) {
 	qSpace *origSpace = inputQWave->space;
 	qDimension *origDims = origSpace->dimensions;
 
-	if (scratchSpectrum && (scratchSpectrum->nPoints != origSpace->nPoints)) {
-		delete scratchSpectrum;
-		scratchSpectrum = NULL;
-	}
-	if (!scratchSpectrum)
-		scratchSpectrum = new qSpectrum(origSpace);
+	qSpectrum *spec = new qSpectrum(origSpace);
+
+//	if (scratchSpectrum && (scratchSpectrum->nPoints != origSpace->nPoints)) {
+//		delete scratchSpectrum;
+//		scratchSpectrum = NULL;
+//	}
+//	if (!scratchSpectrum)
+//		scratchSpectrum = new qSpectrum(origSpace);
 
 
 	// find power of 2 to pad it up to
@@ -123,7 +123,9 @@ void analyzeWaveFFT(qWave *inputQWave) {
 //		inputWave[inputIx] = qCx();
 
 	// do it
-	demoAllAlgorithms(inputQWave->wave + inputQWave->start, inputQWave->start);
+	demoAllAlgorithms(inputQWave->wave + inputQWave->start, origSpace->nStates);
+
+	delete spec;
 
 //	delete fftSpace;
 //	delete input;

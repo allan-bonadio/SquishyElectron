@@ -42,7 +42,7 @@ qCx *qSpace_getWaveBuffer(void) {
 	printf("🚀 🚀 🚀 qSpace_getWaveBuffer() theSpace: %x\n", (uint32_t) (theSpace));
 	printf("        🚀 🚀 🚀        the qWave %x\n", (uint32_t) (theSpace->latestQWave));
 	printf("        🚀 🚀 🚀        the wave %x\n", (uint32_t) (theSpace->latestQWave->wave));
-	printf("        🚀 🚀 🚀     q=w %d   s=w %d   q=s %d\n",
+	printf("        🚀 🚀 🚀     q=w %d   s=w %d   q=s %x\n",
 		(uint32_t) (theSpace->latestQWave) == (uint32_t) (theSpace->latestQWave->wave),
 		(uint32_t) (theSpace) == (uint32_t) (theSpace->latestQWave->wave),
 		(uint32_t) (theSpace->latestQWave) == (uint32_t) (theSpace)
@@ -104,7 +104,7 @@ void qSpace_setLowPassDilution(double dilution) {
 void qSpace_oneIteration(void) { theSpace->oneIteration(); }
 void qSpace_resetCounters(void) { theSpace->resetCounters(); }
 
-
+void qSpace_askForFFT(void) { theSpace->askForFFT(); }
 
 
 /* ******************************************************** space creation from JS */
@@ -112,15 +112,19 @@ void qSpace_resetCounters(void) { theSpace->resetCounters(); }
 // call this to throw away existing theSpace and waves, and start new
 // it's tedious to send a real data structure thru the emscripten interface, so the JS
 // constructs the dimensions by repeated calls to addSpaceDimension()
-qSpace *startNewSpace(void) {
-	//printf("startNewSpace()\n");
+qSpace *startNewSpace(const char *label) {
+	printf("🚀 🚀 🚀  startNewSpace(%s)\n", label);
 
 	if (theSpace) {
 		freeWaves();
+
+		printf("🚀 🚀 🚀  JSstartNewSpace   about to delete theSpace (%s => %s)\n", theSpace->label, label);
 		delete theSpace;
+		printf("🚀 🚀 🚀  JSstartNewSpace   done deleting theSpace (%s => %s)\n", theSpace->label, label);
 	}
-	theSpace = new qSpace(1);
-	//printf("🚀 🚀 🚀  done startNewSpace()\n");
+	printf("🚀 🚀 🚀  JSstartNewSpace   about to create new theSpace (%s => %s)\n", theSpace->label, label);
+	theSpace = new qSpace(label);
+	printf("🚀 🚀 🚀  JSstartNewSpace   done startNewSpace()\n");
 
 	return theSpace;
 }
