@@ -19,7 +19,7 @@ exportsSrc  = [
 	{name: 'main', retType: 'number', args: []},
 
 	// recreating the space
-	{name: 'startNewSpace', retType: 'number', args: []},
+	{name: 'startNewSpace', retType: 'number', args: ['string']},
 	{name: 'addSpaceDimension', retType: 'number',
 		args: ['number', 'number', 'string']},
 	{name: 'completeNewSpace', retType: 'number', args: []},
@@ -51,8 +51,8 @@ exportsSrc  = [
 	{name: 'qViewBuffer_dumpViewBuffer', retType: null, args: ['string']},
 
 	// FFT
-// 	{name: 'testFFT', retType: null, args: []},
-	{name: 'askForFFT', retType: null, args: []},
+ 	{name: 'testFFT', retType: null, args: []},
+	{name: 'qSpace_askForFFT', retType: null, args: []},
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():
