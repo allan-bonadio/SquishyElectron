@@ -8,7 +8,7 @@
 //#include <stacktrace/call_stack.hpp>
 
 qCx qCx::operator/(qCx b) {
-	double det = b.re * b.re + b.im * b.im;
+	double det = b.norm();
 	return qCx(
 		(re * b.re + im * b.im) / det,
 		(im * b.re - re * b.im) / det
@@ -19,7 +19,7 @@ qCx qCx::operator/(qCx b) {
 qCx qCx::operator/=(qCx b) {
 	//printf("÷ this=%lf %lf; b=%lf %lf\n", this->re, this->im, b.re, b.im);
 	//printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
-	double det = b.re * b.re + b.im * b.im;
+	double det = b.norm();
 	//printf("÷ this=%lf %lf; b=%lf %lf\n", this->re, this->im, b.re, b.im);
 	//printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
 	//printf("÷ re * b.re=%lf; im * b.im=%lf\n", re * b.re, im * b.im);

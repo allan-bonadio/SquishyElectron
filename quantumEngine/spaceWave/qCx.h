@@ -38,7 +38,6 @@ public:
 
 	// informal constructors
 	qCx(double real, double imag = 0.) {re = real; im = imag;}
-	//qCx(double real) {re = real; im = 0;}
 	qCx(void) {re = im = 0;}
 
 	// // // // // // // // // // // // // addition
@@ -83,6 +82,11 @@ public:
 	qCx operator/=(double b) {re /= b; im /= b; return *this;}
 
 
+	// // // // // // // // // // // // // equality
+	bool operator==(qCx b) { return re == b.re && im == b.im; }
+	bool operator!=(qCx b) { return re != b.re || im != b.im; }
+
+	// // // // // // // // // // // // // other
 	// inline so faster
 	double norm() {return re*re + im*im;};
 
