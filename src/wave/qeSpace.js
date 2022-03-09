@@ -152,7 +152,7 @@ export class qeSpace extends qeBasicSpace {
 		super(dims);
 
 		// this actually does it over on the C++ side
-		qe.startNewSpace();
+		qe.startNewSpace("a qeSpace");
 		dims.forEach(dim => {
 			qe.addSpaceDimension(dim.N, dim.continuum, dim.label);
 
