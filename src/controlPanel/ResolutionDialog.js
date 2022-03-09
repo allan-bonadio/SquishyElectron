@@ -169,12 +169,12 @@ export default class ResolutionDialog extends React.Component {
 		</>;
 	}
 
-	handleResChange(power, ix) {
+	handleResChange(N, ix) {
 		this.setState({
 			ix: +ix,
-			N: +power,
+			N: +N,
 		});
-		console.info(`handleResChange(power=${power}, ix=$ix) `)
+		console.info(`handleResChange(N=${N}, ix=$ix) `)
 	}
 	handleResChange = this.handleResChange.bind(this);
 
@@ -213,51 +213,25 @@ export default class ResolutionDialog extends React.Component {
 	renderViewRadios() {
 		const s = this.state;
 		const onChange = ev => this.setState({viewClassName: ev.target.value});
-		if (true) {
-			// the one that theoreticallyt should work
-			const viewz = SquishPanel.getListOfViews()
-			const radioz = [];
-			for (let vuName in viewz) {
-				const vu = viewz[vuName];
-				//console.log(`doin this vu:`, vu.viewClassName);
-				//console.dir(vu);
-				//console.log(`   typeof:`, typeof vuName, typeof vu);
-				//console.log(`   names:`, vu.viewClassName, vu.viewClassName, vu.name);
-				radioz.push(<label key={vu.viewClassName}>
-					<input type='radio' key={vu.viewClassName} name='viewClassName'
-						value={vu.viewClassName}
-						checked={vu.viewClassName == this.state.viewClassName}
-						onChange={onChange}/>
-					{vu.viewClassName}</label>);
-			}
 
-			return radioz;
-			}
-		else {
-			return (<>
-				view:
-				<label><input type='radio' name='viewClassName'  value='flatViewDef' key='flatViewDef'
-						checked={s.viewClassName == 'flatViewDef'}
-						onChange={onChange}/>
-					flatViewDef</label>
-				<label><input type='radio' name='viewClassName'  value='flatDrawingViewDef' key='flatDrawingViewDef'
-						checked={s.viewClassName == 'flatDrawingViewDef'}
-						onChange={onChange}/>
-					viewVariableViewDef</label>
-				<label><input type='radio' name='viewClassName'  value='abstractViewDef' key='abstractViewDef'
-						checked={s.viewClassName == 'abstractViewDef'}
-						onChange={onChange}/>
-					abstractViewDef</label>
-				<label><input type='radio' name='viewClassName'  value='manualViewDef' key='manualViewDef'
-						checked={s.viewClassName == 'manualViewDef'}
-						onChange={onChange}/>
-					manualViewDef</label>
-				<label><input type='radio' name='viewClassName'  value='viewVariableViewDef' key='viewVariable'
-						checked={s.viewClassName == 'viewVariableViewDef'}
-						onChange={onChange}/>
-					viewVariableViewDef</label>
-			</>);
+		// the one that theoreticallyt should work
+		const viewz = SquishPanel.getListOfViews()
+		const radioz = [];
+		for (let vuName in viewz) {
+			const vu = viewz[vuName];
+			//console.log(`doin this vu:`, vu.viewClassName);
+			//console.dir(vu);
+			//console.log(`   typeof:`, typeof vuName, typeof vu);
+			//console.log(`   names:`, vu.viewClassName, vu.viewClassName, vu.name);
+			radioz.push(<label key={vu.viewClassName}>
+				<input type='radio' key={vu.viewClassName} name='viewClassName'
+					value={vu.viewClassName}
+					checked={vu.viewClassName == this.state.viewClassName}
+					onChange={onChange}/>
+				{vu.viewClassName}</label>);
 		}
+
+		return radioz;
 
 	}
 
