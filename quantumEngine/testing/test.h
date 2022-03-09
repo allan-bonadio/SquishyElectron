@@ -14,9 +14,14 @@ extern const char *redAnsiStyle, *offAnsiStyle;
 
 extern bool isClose(double a, double b);
 
+extern void qtMessage(const char *fmt, ...);
+
 extern bool qtVerify(int actual, int expected, const char *msg);
-extern bool qtVerify(double actual, int expected, const char *msg);
-extern bool qtVerify(struct qSpace *actual, struct qSpace *expected, const char *msg);
+extern bool qtVerify(double actual, double expected, const char *msg);
+extern bool qtVerify(struct qCx actual, struct qCx expected, const char *msg);
+//extern bool qtVerify(struct qCx *actual, struct qCx *expected, const char *msg);
+//extern bool qtVerify(struct qSpace *actual, struct qSpace *expected, const char *msg);
+extern bool qtVerify(void *actual, void *expected, const char *msg);
 //extern void qtVerify(qSpace *actual, qSpace *expected, const char *msg);
 //extern void qtVerify(int actual, int expected, const char *msg);
 
@@ -25,5 +30,6 @@ extern bool qtVerify(struct qSpace *actual, struct qSpace *expected, const char 
 
 extern struct qSpace *make1dSpace(int N);  // handy
 extern struct qSpace *makeBare1dSpace(int N);
+extern void setCircularWave(struct qWave *target, double n = 1.);
 
 

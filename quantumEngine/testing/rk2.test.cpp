@@ -6,16 +6,9 @@
 #include <cmath>
 #include <stdio.h>
 #include "test.h"
-#include "../qSpace.h"
+#include "../spaceWave/qSpace.h"
 #include "../spaceWave/qWave.h"
 
-// construct our space & stuff
-static void makeNewSpace(int N, int continuum, const char *label) {
-	startNewSpace();
-	addSpaceDimension(5, contENDLESS, "x");
-	completeNewSpace();
-	theQWave->setCircularWave(1.);
-}
 
 // how to check these: for 5 states, calculate the phase and the magnitude of each.
 //  Magnitudes should average 1/N or about .2 for a 5-state wave. Phases should be
@@ -49,13 +42,15 @@ static void firstRK2(void) {
 	// 		i, expe.re, expe.im, phase, magn);
 	// }
 
-	makeNewSpace(5, contENDLESS, "x");
+//makeNewSpace(5, contENDLESS, "x");
 	theSpace->dt = 0.1;  // to make the numbers come out right
+	setCircularWave(laosQWave);
+
 	//theSpace->doLowPass = false;  // to make the numbers come out right
 	printf("First Test - &&&&& dt is %lf\n", theSpace->dt);
-	theQWave->dumpWave("before rk2 test", true);
+	laosQWave->dumpWave("before rk2 test", true);
 
-	theSpace->oneRk2Step(theQWave, otherQWave);
+	theSpace->oneRk2Step(laosQWave, otherQWave);
 
 	otherQWave->dumpWave("after rk2 test", true);
 
@@ -103,21 +98,21 @@ static void secondRK2(void) {
 	// 		i, expe.re, expe.im, phase, magn);
 	// }
 
-	makeNewSpace(5, contENDLESS, "x");
+//makeNewSpace(5, contENDLESS, "x");
 	printf("Second Test - &&&&& dt is %lf\n", theSpace->dt);
-	theQWave->dumpWave("before rk2 second test", true);
+	laosQWave->dumpWave("before rk2 second test", true);
 
-	theSpace->oneRk2Step(theQWave, otherQWave);
-	theSpace->oneRk2Step(otherQWave, theQWave);
-	theSpace->oneRk2Step(theQWave, otherQWave);
-	theSpace->oneRk2Step(otherQWave, theQWave);
-	theSpace->oneRk2Step(theQWave, otherQWave);
-	theSpace->oneRk2Step(otherQWave, theQWave);  // i added this does it mess up the test?
+	theSpace->oneRk2Step(laosQWave, otherQWave);
+	theSpace->oneRk2Step(otherQWave, laosQWave);
+	theSpace->oneRk2Step(laosQWave, otherQWave);
+	theSpace->oneRk2Step(otherQWave, laosQWave);
+	theSpace->oneRk2Step(laosQWave, otherQWave);
+	theSpace->oneRk2Step(otherQWave, laosQWave);  // i added this does it mess up the test?
 
-	theQWave->dumpWave("after rk2 second test", true);
+	laosQWave->dumpWave("after rk2 second test", true);
 
 	for (int ix = 0; ix < 7; ix++) {
-		qCx act = theWave[ix];
+		qCx act = laosWave[ix];
 		qCx xpct = secondExpected[ix];
 		if (act.re != xpct.re || act.im != xpct.im) {
 			printf("%srk2 %d:actual=(%lf, %lf) vs secondExpected=(%lf, %lf) %s\n",
@@ -127,7 +122,7 @@ static void secondRK2(void) {
 
 	// in case you need to regenerate secondExpected from Actual
 	for (int ix = 0; ix < 7; ix++) printf("\tqCx(%20.18lf, %20.18lf),\n",
-		theWave[ix].re, theWave[ix].im);
+		laosWave[ix].re, laosWave[ix].im);
 
 	delete otherQWave;
 }
@@ -141,6 +136,6 @@ void run_rk2_tests(void) {
 	secondRK2();
 
 	secondRK2();
-	printf("Done with RK2 tests\n");
+	printf("::::: Done with RK2 tests\n");
 }
 

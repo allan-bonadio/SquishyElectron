@@ -4,24 +4,25 @@
 */
 
 #include <stdio.h>
-#include "../qSpace.h"
-#include "../spaceWave/qWave.h"
-#include "test.h"
+#include "../../spaceWave/qSpace.h"
+#include "../../spaceWave/qWave.h"
+#include "../test.h"
 
 
 static void makeASpaceAndIterate(void) {
 
 	qSpace *space = makeBare1dSpace(64);
+
 	//qSpace *space = make1dSpace(8);
 	double dt = 0.001;
-	const int dumpCycle = 100;
-	const int nIterations = 1000;
-	printf("space space.nStates: %d, dt=%lf, nIterations=%d, dumpCycle=d\n",
+	int dumpCycle = 100;
+	int nIterations = 1000;
+	printf("space space.nStates: %d, dt=%lf, nIterations=%d, dumpCycle=%d\n",
 		space->nStates, dt, nIterations, dumpCycle);
 
 	qFlick *flick = new qFlick(space, 4);
 
-	flick->setCircularWave(1.);
+	setCircularWave(flick, 1.);
 	flick->dumpAllWaves("    after circular: should be normalized and duplicated");
 	flick->dumpWave("    vissFlicks test circular: should be clean circular wave\n", true);
 
@@ -66,6 +67,6 @@ void run_vissFlicks_tests(void) {
 	printf(":::::::::::::::::::::::::::::::::::::::::::::: viss flicks tests\n");
 
 	makeASpaceAndIterate();
-	printf("Done with viss flicks tests\n");
+	printf("::::: Done with viss flicks tests\n");
 }
 

@@ -3,21 +3,20 @@
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
-#include "../spaceWave/qSpace.h"
-#include "../spaceWave/qWave.h"
-#include "test.h"
+#include "../../spaceWave/qSpace.h"
+#include "../../spaceWave/qWave.h"
+#include "../test.h"
 
 
 void handleEachPt(qCx psi, int ix) {
-	printf("each pt:  %d: %lf %lf   norm: %lf\n", ix, psi.re, psi.im,
-		psi.re*psi.re + psi.im * psi.im);
+	printf("each pt:  %d: %lf %lf   norm: %lf\n", ix, psi.re, psi.im, psi.norm());
 }
 
 void run_wave_tests(void) {
 	printf(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: wave tests\n");
 
 	//  creating/
-	startNewSpace();
+	startNewSpace("run_wave_tests");
 	addSpaceDimension(3, contWELL, "p");
 	completeNewSpace();
 
@@ -46,6 +45,6 @@ void run_wave_tests(void) {
 	// destroying
 	delete qw;
 	//delete theSpace;
-	printf("done with wave tests\n");
+	printf("::::: done with wave tests\n");
 }
 

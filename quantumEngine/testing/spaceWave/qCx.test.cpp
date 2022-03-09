@@ -4,8 +4,8 @@
 */
 
 #include <stdio.h>
-#include "../spaceWave/qCx.h"
-#include "test.h"
+#include "../../spaceWave/qCx.h"
+#include "../test.h"
 
 static void cxVerify(qCx actual, qCx expected, const char *msg) {
 	printf("testing %s\n", msg);
@@ -134,7 +134,7 @@ void run_qCx_tests(void) {
 
 
 	/* **********************************************/
-	printf("Done with qCx tests\n");
+	printf("::::: Done with qCx tests\n");
 }
 
 

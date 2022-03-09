@@ -5,7 +5,8 @@ cd ..
 
 echo "q test runner. Just run it from any directory, no args needed"
 echo "Read src to verify.  (must add new test srcs to this file)"
-echo "add in argument of --inspect or --inspect-brk or any other node args"
+echo "Add in argument of --inspect or --inspect-brk or any other "
+echo "node args; they will be passed through."
 
 # source this to run MscriptN stuff:
 . /dvl/emscripten/emsdk-main/emsdk_env.sh
@@ -13,9 +14,9 @@ echo "add in argument of --inspect or --inspect-brk or any other node args"
 # create a space-sep list of ALL the cpp files (almost all)
 allCpp=`cat building/allCpp.list`
 
-mt=" testing/main.test.cpp testing/qCx.test.cpp "
-et=" testing/rk2.test.cpp testing/vissFlicks.test.cpp "
-swt="testing/space.test.cpp  testing/wave.test.cpp "
+mt=" testing/main.test.cpp testing/spaceWave/qCx.test.cpp "
+et=" testing/rk2.test.cpp testing/spaceWave/vissFlicks.test.cpp "
+swt="testing/spaceWave/space.test.cpp  testing/spaceWave/wave.test.cpp "
 allTesters=" $mt $et $swt "
 
 # note that main.cpp is NOT included in the .cpp files; that's for web use only
@@ -32,11 +33,10 @@ emcc -o quantumTest.js -sLLD_REPORT_UNDEFINED -g \
 
 # now run the tests
 echo
-echo ========================================================================
-echo ========================================================== Results:
-echo ========================================================================
+echo ====================== done compiling ==================================
+echo
 
-
+# it's generated from the emcc compile above
 node $* quantumTest.js
 
 
