@@ -12,7 +12,7 @@ extern "C" {
 
 	void testFFT(void);
 
-	// UI requests FFT at end of next iteration (or immediately?)
+	// UI requests FFT immediate, or at end of next iteration
 	void askForFFT(void);
 }
 

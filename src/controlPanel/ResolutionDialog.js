@@ -110,7 +110,6 @@ export default class ResolutionDialog extends React.Component {
 
 	// called when user clicks OK, before dialog is hidden in App
 	OK(ev) {
-		//const s = //this.state;
 		ResolutionDialog.okCallback(this.state);
 		CommonDialog.startClosingDialog();
 	}
@@ -211,7 +210,6 @@ export default class ResolutionDialog extends React.Component {
 	}
 
 	renderViewRadios() {
-		const s = this.state;
 		const onChange = ev => this.setState({viewClassName: ev.target.value});
 
 		// the one that theoreticallyt should work

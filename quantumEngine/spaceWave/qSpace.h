@@ -131,12 +131,12 @@ public:
 	void fixThoseBoundaries(qCx *wave);  // like for qWave but on any wave
 
 	// the linked list of blocks available for rental.
-	// All contain (freeBufferListLength) complex number slots.
+	// All contain (freeBufferLength) complex number slots.
 	FreeBuffer *freeBufferList;
 
 	// number of qCx-s that'll be enough for both spectrums and waves
 	// so waves that are cache-able have exactly this length.
-	int freeBufferListLength;
+	int freeBufferLength;
 
 	// if you take one, return it.  If it isn't the right length,
 	// returning might lead to it being used as if it was.
