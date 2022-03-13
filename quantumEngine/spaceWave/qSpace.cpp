@@ -34,7 +34,7 @@ void qSpace::resetCounters(void) {
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
 qSpace::qSpace(const char *lab) {
-	printf("🚀 🚀 qSpace::qSpace() theSpace this: %x\n", (uint32_t) (this));
+	printf("🚀 🚀 qSpace::qSpace() theSpace this: x%x\n", (uint32_t) (this));
 	this->nDimensions = 0;
 
 	this->resetCounters();
@@ -46,14 +46,14 @@ qSpace::qSpace(const char *lab) {
 	strncpy(this->label, lab, LABEL_LEN);
 	this->label[LABEL_LEN-1] = 0;
 
-	printf("🚀 🚀 qSpace::qSpace() done this: %x\n", (uint32_t) (this));
+	printf("🚀 🚀 qSpace::qSpace() done this: x%x, length %lx\n", (uint32_t) (this), sizeof(qSpace));
 }
 
 qSpace::~qSpace(void) {
-	printf("🚀 🚀 qSpace destructor of %s, this: %x\n", label, (uint32_t) (this));
+	printf("🚀 🚀 qSpace destructor of %s, this: x%x\n", label, (uint32_t) (this));
 	// these cached buffers need to go free
 	this->clearFreeBuffers();
-	printf("🚀 🚀 qSpace destructor done this: %x\n", (uint32_t) (this));
+	printf("🚀 🚀 qSpace destructor done this: x%x\n", (uint32_t) (this));
 }
 
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
@@ -99,6 +99,10 @@ void qSpace::tallyDimensions(void) {
 	this->nPoints = nPoints;
 
 	this->chooseSpectrumSize();
+	if (this->nPoints > this->spectrumSize)
+		this->freeBufferLength = this->nPoints;
+	else
+		this->freeBufferLength = this->spectrumSize;
 
 	//printf("🚀 🚀  got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
 }
@@ -209,8 +213,8 @@ void qSpace::oneIteration() {
 		this->latestQWave->dumpWave(buf, true);
 	}
 	if (debugJustInnerProduct) {
-		printf("🚀 🚀 finished one integration iteration (%d steps, N=%d), inner product: %lf\n",
-			this->stepsPerIteration, this->dimensions->N, this->latestQWave->innerProduct());
+printf("🚀 🚀 finished one integration iteration (%d steps, N=%d), inner product: %lf\n",
+this->stepsPerIteration, this->dimensions->N, this->latestQWave->innerProduct());
 	}
 
 	if (this->pleaseFFT) {
@@ -237,18 +241,24 @@ void qSpace::askForFFT(void) {
 qCx *qSpace::borrowBuffer(void) {
 	FreeBuffer *rentedCache = this->freeBufferList;
 	if (rentedCache) {
+printf("🚀 🚀 qSpace::borrowBuffer() with some cached. freeBufferList: x%x\n",
+(uint32_t) (this->freeBufferList));
+
 		// there was one available on the free list, pop it off
 		this->freeBufferList = rentedCache->next;
 		return (qCx *) rentedCache;
 	}
 	else {
 		// must make a new one
-		return allocateWave(this->freeBufferListLength);;
+printf("🚀 🚀 qSpace::borrowBuffer() with none cached. freeBufferList: x%x   freeBufferLength: %d\n",
+(uint32_t) (this->freeBufferList), this->freeBufferLength);
+
+		return allocateWave(this->freeBufferLength);
 	}
 }
 
 // return the buffer to the free list.  Potentially endless but probably not.
-// do not return buffers that aren't the right size - freeBufferListLength
+// do not return buffers that aren't the right size - freeBufferLength
 void qSpace::returnBuffer(qCx *rentedBuffer) {
 	FreeBuffer *rented = (FreeBuffer *) rentedBuffer;
 	rented->next = this->freeBufferList;
@@ -258,15 +268,16 @@ void qSpace::returnBuffer(qCx *rentedBuffer) {
 // this is the only way they're freed; otherwise they just collect.
 // shouldn't be too many, though.  Called by destructor.
 void qSpace::clearFreeBuffers() {
-	printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: %x\n",
-		(uint32_t) (this->freeBufferList));
+printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: x%x\n",
+	(uint32_t) (this->freeBufferList));
 	FreeBuffer *n;
 	for (FreeBuffer *f = this->freeBufferList; f; f = n) {
 		n = f->next;
-		printf("           🚀 🚀 about to free this one: %x\n",
-			(uint32_t) (f));
+printf("           🚀 🚀 about to free this one: x%x\n",
+(uint32_t) (f));
 		freeWave((qCx *) f);
 	}
-	printf("              🚀 🚀 qSpace::clearFreeBuffers() done. freeBufferList=%x\n",
+	this->freeBufferList = NULL;
+	printf("              🚀 🚀 qSpace::clearFreeBuffers() done. freeBufferList=x%x\n",
 		(uint32_t) this->freeBufferList);
 }
