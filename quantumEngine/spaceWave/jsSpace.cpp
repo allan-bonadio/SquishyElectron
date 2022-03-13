@@ -18,7 +18,7 @@ void allocWaves(void) {
 
 	peruWave = peruQWave->wave;
 	laosWave = laosQWave->wave;
-printf("        🚀 🚀 🚀       peruQWave=%x   peruWave=%x   laosQWave=%x   laosWave=%x  \n",
+printf("        🚀 🚀 🚀       peruQWave=x%x   peruWave=x%x   laosQWave=x%x   laosWave=x%x  \n",
 (uint32_t) peruQWave, (uint32_t) peruWave, (uint32_t) laosQWave, (uint32_t) laosWave);
 }
 
@@ -39,10 +39,10 @@ extern "C" {
 
 // return a pointer to just the main wave for theSpace
 qCx *qSpace_getWaveBuffer(void) {
-	printf("🚀 🚀 🚀 qSpace_getWaveBuffer() theSpace: %x\n", (uint32_t) (theSpace));
-	printf("        🚀 🚀 🚀        the qWave %x\n", (uint32_t) (theSpace->latestQWave));
-	printf("        🚀 🚀 🚀        the wave %x\n", (uint32_t) (theSpace->latestQWave->wave));
-	printf("        🚀 🚀 🚀     q=w %d   s=w %d   q=s %x\n",
+	printf("🚀 🚀 🚀 qSpace_getWaveBuffer() theSpace: x%x\n", (uint32_t) (theSpace));
+	printf("        🚀 🚀 🚀        the qWave x%x\n", (uint32_t) (theSpace->latestQWave));
+	printf("        🚀 🚀 🚀        the wave x%x\n", (uint32_t) (theSpace->latestQWave->wave));
+	printf("        🚀 🚀 🚀     q=w %d   s=w %d   q=s x%x\n",
 		(uint32_t) (theSpace->latestQWave) == (uint32_t) (theSpace->latestQWave->wave),
 		(uint32_t) (theSpace) == (uint32_t) (theSpace->latestQWave->wave),
 		(uint32_t) (theSpace->latestQWave) == (uint32_t) (theSpace)
@@ -84,7 +84,7 @@ void qSpace_setStepsPerIteration(int stepsPerIteration) {
 		throw buf;
 	}
 	theSpace->stepsPerIteration = stepsPerIteration;
-	printf("🚀 🚀 🚀 qSpace_setStepsPerIteration result %d in theSpace=%x\n",
+	printf("🚀 🚀 🚀 qSpace_setStepsPerIteration result %d in theSpace=x%x\n",
 		theSpace->stepsPerIteration, (uint32_t) theSpace);
 }
 
@@ -97,7 +97,7 @@ void qSpace_setLowPassDilution(double dilution) {
 		throw buf;
 	}
 	theSpace->lowPassDilution = dilution;
-	printf("🚀 🚀 🚀 qSpace_setLowPassDilution result %lf in theSpace=%x\n",
+	printf("🚀 🚀 🚀 qSpace_setLowPassDilution result %lf in theSpace=x%x\n",
 		theSpace->lowPassDilution, (uint32_t) theSpace);
 }
 
@@ -186,26 +186,26 @@ qSpace *completeNewSpace(void) {
 	// we make our own potential
 	theSpace->potential = thePotential = new double[theSpace->nPoints];
 
-		printf("   🚀 🚀 🚀 completeNewSpace BEFORE creation  theQViewBuffer=%x  "
-			"theQViewBuffer->viewBuffer=%x\n",
+		printf("   🚀 🚀 🚀 completeNewSpace BEFORE creation  theQViewBuffer=x%x  "
+			"theQViewBuffer->viewBuffer=x%x\n",
 				(uint32_t) theQViewBuffer,
-				theQViewBuffer ? (uint32_t) theQViewBuffer->viewBuffer : 0);
+				theQViewBuffer ? (uint32_t) theQViewBuffer->viewBuffer : -1);
 
 
 	// our own view buffer - needs potential to be in place
 	theSpace->qViewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
 	//dumpViewBuffer("newly created");
 
-		printf("   🚀 🚀 🚀 completeNewSpace After Creation but BEFORE loadViewBuffer  theQViewBuffer=%x  "
-			"theQViewBuffer->viewBuffer=%x\n",
-				(uint32_t) theQViewBuffer, (uint32_t) theQViewBuffer && theQViewBuffer->viewBuffer);
+		printf("   🚀 🚀 🚀 completeNewSpace After Creation but BEFORE loadViewBuffer  theQViewBuffer=x%x  "
+			"theQViewBuffer->viewBuffer=x%x\n",
+				(uint32_t) theQViewBuffer, theQViewBuffer ?  (uint32_t) theQViewBuffer->viewBuffer : -1);
 
 
 	theQViewBuffer->loadViewBuffer();  // just so i can see the default if needed
 
-		printf("   🚀 🚀 🚀 completeNewSpace AFTER loadViewBuffer  theQViewBuffer=%x  "
-			"theQViewBuffer->viewBuffer=%x\n",
-				(uint32_t) theQViewBuffer, (uint32_t) theQViewBuffer && theQViewBuffer->viewBuffer);
+		printf("   🚀 🚀 🚀 completeNewSpace AFTER loadViewBuffer  theQViewBuffer=x%x  "
+			"theQViewBuffer->viewBuffer=x%x\n",
+				(uint32_t) theQViewBuffer, theQViewBuffer ?  (uint32_t) theQViewBuffer->viewBuffer : -1);
 
 
 

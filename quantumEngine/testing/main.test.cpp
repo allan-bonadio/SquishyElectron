@@ -107,7 +107,7 @@ bool qtVerify(qCx actual, qCx expected, const char *msg) {
 //// for Space*s, qSpace qCx pointers
 //bool qtVerify(qSpace *actual, qSpace *expected, const char *msg) {
 //	if (actual != expected) {
-//		qtMessage(" wasn't same object... %x ≠ %x: %s\n", (uint32_t) actual, (uint32_t) expected, msg);
+//		qtMessage(" wasn't same object... x%x ≠ x%x: %s\n", (uint32_t) actual, (uint32_t) expected, msg);
 //		return true;
 //	}
 //	return false;
@@ -117,7 +117,7 @@ bool qtVerify(qCx actual, qCx expected, const char *msg) {
 // all pointers, just compare the pointers
 bool qtVerify(void *actual, void *expected, const char *msg) {
 	if (actual != expected) {
-		printf("*** fail %x  ≠  %x: %s\n",
+		printf("*** fail x%x  ≠  x%x: %s\n",
 			(uint32_t) actual, (uint32_t) expected, msg);
 		return true;
 	}

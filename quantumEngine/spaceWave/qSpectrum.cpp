@@ -13,7 +13,7 @@
 // This produces a spectrum ready to hold an FFT transformed wave
 qSpectrum::qSpectrum(qSpace *space, qCx *useThisBuffer) {
 	qBuffer();
-	printf("🌈 🌈 qSpectrum::qSpectrum(%s)  %x => %x", space->label,
+	printf("🌈 🌈 qSpectrum::qSpectrum(%s)  utb=x%x => this x%x", space->label,
 		(uint32_t) useThisBuffer, (uint32_t) this);
 	this->space = space;
 	initBuffer(useThisBuffer);

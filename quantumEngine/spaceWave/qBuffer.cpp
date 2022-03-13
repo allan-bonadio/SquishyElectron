@@ -8,10 +8,12 @@ a long array of qCx complex numbers, plus some other info
 
 Data structures used for these buffers:
 qCx *wave  # wave: just an array of complex nums that's nPoints long
+	In JS, it turns into a Float64Array with 2nPoints numbers
 qBuffer - object, superclass of qWave and qSpectrum
 qWave - object that owns a single wave, and points to its space
 qSpectrum - object that owns a single qSpectrum, and points to its space
-qFlick - object that owns a list of waves, and points to its space (not sure if i'll keep usin tat)
+qFlick - object that owns a list of waves, and points to its space
+	(not sure if i'll keep using qFlick)
 */
 
 
@@ -22,7 +24,11 @@ qFlick - object that owns a list of waves, and points to its space (not sure if 
 // just allocate a wave of whatever length
 // buffer is initialized to zero bytes therefore 0.0 everywhere
 qCx *allocateWave(int nPoints) {
-	return (qCx *) malloc(nPoints * sizeof(qCx));
+	qCx *buf = (qCx *) malloc(nPoints * sizeof(qCx));
+printf("🍕 allocateWave()  wave=x%x  nPoints: %d bytelength=x%lx\n",
+(uint32_t) buf, nPoints, nPoints * sizeof(qCx));
+printf("🍕 allocateWave() next alloc distance: %d\n", (uint32_t) malloc(8) - (uint32_t) buf);
+	return buf;
 }
 
 void freeWave(qCx *wave) {
@@ -32,31 +38,39 @@ void freeWave(qCx *wave) {
 // make one, the right size for this buffer's space, or nPoints long
 qCx *qBuffer::allocateWave(int nPoints) {
 	if (nPoints < 0)
-		nPoints = this->space->freeBufferListLength;
-	return (qCx *) malloc(nPoints * sizeof(qCx));
+		nPoints = this->space->freeBufferLength;
 	this->nPoints = nPoints;
+printf("🍕 qBuffer::allocateWave this=x%x  wave=x%x  nPoints: %d   freeBufferLength: x%x\n",
+(uint32_t) this, (uint32_t) this->wave, nPoints, this->space->freeBufferLength);
+	qCx *buf =  (qCx *) malloc(nPoints * sizeof(qCx));
+printf("🍕 qBuffer::allocateWave next alloc distance: %d\n", (uint32_t) malloc(8) - (uint32_t) buf);
+	return buf;
 }
 
 
 
 // create one, dynamically allocated or Bring Your Own Buffer to use
 qBuffer::qBuffer(void) {
+printf("🍕 allocated qBuffer::qBuffer this qBuffer obj: x%x length %lx\n", (uint32_t) this, sizeof(qBuffer));
+
 }
 
 // actually create the buffer that we need
-// usually called by subclasses when they figure out how long a buffer is needed
+// usually called by subclass constructors when they figure out how long a buffer is needed
 void qBuffer::initBuffer(qCx *useThisBuffer) {
 	if (useThisBuffer) {
 		this->wave = useThisBuffer;
 		this->dynamicallyAllocated = 0;
 	}
 	else {
+		// borrow will allocate if nothing in the freelist
 		this->wave = this->space->borrowBuffer();
 		this->dynamicallyAllocated = 1;
 	}
-	this->nPoints = this->start = this->end = -1;  // wave / spectrum calculates these differently
-	printf("🍕 qBuffer::initBuffer this=%x  wave=%x  nPoints: %d\n",
-		(uint32_t) this, (uint32_t) this->wave, nPoints);
+	this->start = this->end = -1;  // wave / spectrum calculates these differently
+	this->nPoints = this->space->freeBufferLength;  // wave / spectrum calculates these differently
+printf("🍕 qBuffer::initBuffer this=x%x  wave=x%x  nPoints: %d\n",
+(uint32_t) this, (uint32_t) this->wave, nPoints);
 }
 
 qBuffer::~qBuffer() {
@@ -173,7 +187,8 @@ double qBuffer::innerProduct(void) {
 
 
 
-// enforce ⟨ψ | ψ⟩ = 1 by dividing out the current magnitude sum
+// enforce ⟨ψ | ψ⟩ = 1 by dividing out the current magnitude sum.
+// BUffer must be installed as well as nPoints, start and end
 void qBuffer::normalize(void) {
 	// for visscher, we have to make it in a temp wave and copy back to our buffer
 	// huh?  this is never copied back.  normalize here does nothing.
@@ -201,8 +216,13 @@ void qBuffer::normalize(void) {
 		printf("🍕 normalizing qBuffer.  factor=%lf, start=%d, end=%d, N=%d\n",
 			factor, dims->start, dims->end, dims->N);
 
-		for (int ix = dims->start; ix < dims->end; ix++)
+		for (int ix = dims->start; ix < dims->end; ix++) {
 			wave[ix] *= factor;
+			if (((uint32_t) qViewBuffer_getViewBuffer()) & 3) {
+				printf("🍕 getViewBuffer() is odd: %x at ix=%d\n",
+					(uint32_t) qViewBuffer_getViewBuffer(), ix);
+			}
+		}
 	}
 	this->fixBoundaries();
 	//this->dumpWave("qWave::normalize done", true);

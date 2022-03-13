@@ -20,37 +20,22 @@ int traceLowPassFilter = false;
 qWave::qWave(qSpace *space, qCx *useThisBuffer) {
 	qBuffer();
 
-	printf("🌊🌊 qWave::qWave(%s)  %x => %x", space->label,
+	printf("🌊🌊 qWave::qWave(%s)  utb=x%x => this=x%x", space->label,
 		(uint32_t) useThisBuffer, (uint32_t) this);
-	//printf("🌊🌊 qWave::qWave() wave's Space: %x  nPoints:%d\n", (uint32_t) (space), space->nPoints);
-	//printf("      🌊🌊        qWave: %x\n", (uint32_t) (this));
+	printf("🌊🌊 qWave::qWave() wave's Space: x%x  nPoints:%d\n", (uint32_t) (space), space->nPoints);
+	printf("      🌊🌊        qWave: x%x\n", (uint32_t) (this));
 	this->space = space;
 	initBuffer(useThisBuffer);
 
-	//printf("      🌊🌊  allocated wave: %x\n", (uint32_t) (this->wave));
+	printf("      🌊🌊  allocated wave: x%x\n", (uint32_t) (this->wave));
 	qDimension *dim = space->dimensions;
 	this->nPoints = dim->nPoints;
 	this->start = dim->start;
 	this->end = dim->end;
-}
 
-// use these instead of the constructor.
-//static qWave *qWave::newQWave(qSpace *space, qCx *useThisBuffer) {
-//	qWave *qw = (useThisBuffer) ? new qWave(space, useThisBuffer) : new qWave(space);
-//
-//}
-//
-//// this holds a spectrum rather than a wave.  (Fundamentally the same but a few details.)
-//static qBuffer *qBuffer::newSpectrum(qSpace *space, qCx *useThisBuffer) {
-//	qBuffer *qw = (useThisBuffer) ? new qBuffer(space, useThisBuffer) : new qBuffer(space);
-//
-//	qw->nPoints = space->spectrumSize;
-//	qw->start = 0;
-//	qw->end = space->spectrumSize;
-//
-//	qw->spectrum = true;
-//	return qw
-//}
+printf("🌊🌊 allocated qWave::qWave this qWave obj: x%x length x%x\n",
+(uint32_t) this, (uint32_t) sizeof(qWave));
+}
 
 qWave::~qWave(void) {
 }
