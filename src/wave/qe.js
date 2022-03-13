@@ -1,4 +1,4 @@
-// this file generated Sun Mar 06 2022 13:08:23 GMT-0800 (Pacific Standard Time)
+// this file generated Fri Mar 11 2022 15:49:23 GMT-0800 (Pacific Standard Time)
 // by the file SquishyElectron/quantumEngine/building/genExports.js
 let cwrap;
 export const qe = {};
@@ -6,7 +6,7 @@ export function defineQEngineFuncs() {
 	cwrap = window.Module.cwrap;
 
 	qe.main = cwrap('main', 'number', []);
-	qe.startNewSpace = cwrap('startNewSpace', 'number', []);
+	qe.startNewSpace = cwrap('startNewSpace', 'number', ['string']);
 	qe.addSpaceDimension = cwrap('addSpaceDimension', 'number', ['number','number','string']);
 	qe.completeNewSpace = cwrap('completeNewSpace', 'number', []);
 	qe.qSpace_getWaveBuffer = cwrap('qSpace_getWaveBuffer', 'number', []);
