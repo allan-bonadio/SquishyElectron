@@ -180,7 +180,7 @@ console.log(`🚀  qViewBuffer_getViewBuffer 170: 🛸`, qe.qViewBuffer_getViewB
 		this.wave = this.qewave.wave;
 
 console.log(`🚀  qViewBuffer_getViewBuffer 176: 🛸`, qe.qViewBuffer_getViewBuffer());
- if (qe.qViewBuffer_getViewBuffer & 3) debugger;
+ if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 
 
 
@@ -191,7 +191,7 @@ console.log(`🚀  qViewBuffer_getViewBuffer 176: 🛸`, qe.qViewBuffer_getViewB
 console.log(`🚀  qViewBuffer_getViewBuffer 181: 🛸`, qe.qViewBuffer_getViewBuffer());
 
 console.log(`🚀  qViewBuffer_getViewBuffer 195: 🛸`, qe.qViewBuffer_getViewBuffer());
- if (qe.qViewBuffer_getViewBuffer & 3) debugger;
+ if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 
 		// this will be good after completeNewSpace() is called
 		this.potentialBuffer = getWrappedPotential(this);
@@ -202,11 +202,12 @@ console.log(`🚀  qViewBuffer_getViewBuffer 187: 🛸`, qe.qViewBuffer_getViewB
 		// wrap viewbuffer as a nice TypedArray of floats (4 for each row; 8 for each datapoint)
 console.log(`🚀  qViewBuffer_getViewBuffer 193: 🛸`, qe.qViewBuffer_getViewBuffer());
 // isn't the viewBuffer itself suipposed to do rthat?  oh ytean that's C++.  Here we make our own.
-		let buff = window.Module.HEAPF32.buffer;
-		let buffOffet = qe.qViewBuffer_getViewBuffer();
-		let np = this.nPoints*8;
+		let emscriptenMemory = window.Module.HEAPF32.buffer;
+		let address = qe.qViewBuffer_getViewBuffer();
+		let np = this.nPoints * 16;  // 16 = sizeof(qCx)
+
 		this.viewBuffer = qe.viewBuffer =
-			new Float32Array(buff, buffOffet, np);
+			new Float32Array(emscriptenMemory, address, np);
 // 		this.viewBuffer = qe.viewBuffer =
 // 			new Float32Array(window.Module.HEAPF32.buffer, qe.qViewBuffer_getViewBuffer(), this.nPoints*8);
 		qe.qViewBuffer_loadViewBuffer();
