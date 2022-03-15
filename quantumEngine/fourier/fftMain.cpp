@@ -15,7 +15,7 @@
 // these days it's a power of 2
 void qSpace::chooseSpectrumSize() {
 	int powerOf2;
-	for (powerOf2 = 1; powerOf2 < this->nPoints; powerOf2 += powerOf2)
+	for (powerOf2 = 1; powerOf2 < this->nStates; powerOf2 += powerOf2)
 		continue;
 	this->spectrumSize = powerOf2;
 }
@@ -34,10 +34,10 @@ void demoOneFFT(qCx *buffer, int length,
 	// forward
 	FFT(outputWave, buffer, length);
 
-	printf("♪ ========================= %s FFT frequency space ==============  ",
+	printf("♪ ========================= %s FFT frequency space ==============  \n",
 		algName);
-	qBuffer::dumpSegment(outputWave, length/2, length, 0, true);
-	qBuffer::dumpSegment(outputWave, 0, length/2, 0, true);
+	qBuffer::dumpSegment(outputWave, true, length/2, length, 0);
+	qBuffer::dumpSegment(outputWave, true, 0, length/2, 0);
 	printf("♪ ======================== end of freq dump ==============\n");
 
 	// inverse
@@ -50,10 +50,10 @@ void demoOneFFT(qCx *buffer, int length,
 }
 
 void demoAllAlgorithms(qCx *wave, int length) {
-	printf("demoAllAlgorithms begins");
+	printf("demoAllAlgorithms begins\n");
 	demoOneFFT(wave, length, cooleyTukeyFFT, cooleyTukeyIFFT, "cooleyTukeyFFT");
 	demoOneFFT(wave, length, paChineseFFT, paChineseIFFT, "paChineseFFT");
-	printf("demoAllAlgorithms begins");
+	printf("demoAllAlgorithms done\n");
 }
 
 
@@ -90,7 +90,9 @@ void analyzeWaveFFT(qWave *inputQWave) {
 	qSpace *origSpace = inputQWave->space;
 	qDimension *origDims = origSpace->dimensions;
 
+	printf("about to create qSpectrum\n");
 	qSpectrum *spec = new qSpectrum(origSpace);
+	printf("    qSpectrum created\n");
 
 //	if (scratchSpectrum && (scratchSpectrum->nPoints != origSpace->nPoints)) {
 //		delete scratchSpectrum;
@@ -125,7 +127,9 @@ void analyzeWaveFFT(qWave *inputQWave) {
 	// do it
 	demoAllAlgorithms(inputQWave->wave + inputQWave->start, origSpace->nStates);
 
+	printf("about to delete qSpectrum\n");
 	delete spec;
+	printf("    qSpectrum deleted\n");
 
 //	delete fftSpace;
 //	delete input;
