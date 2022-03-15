@@ -7,7 +7,7 @@
 #include "qSpace.h"
 #include "qWave.h"
 
-static const bool debugViewBuffer = true;
+static const bool debugViewBuffer = false;
 static const bool debugInDetail = false;
 
 
