@@ -19,6 +19,8 @@ static bool debugIterSummary = true;
 static bool debugIteration = false;
 static bool debugJustWave = false;
 static bool debugJustInnerProduct = false;
+static bool debugFreeBuffer = true;
+
 
 // someday I need an C++ error handling layer.  See
 // https://emscripten.org/docs/porting/Debugging.html?highlight=assertions#handling-c-exceptions-from-javascript
@@ -99,10 +101,15 @@ void qSpace::tallyDimensions(void) {
 	this->nPoints = nPoints;
 
 	this->chooseSpectrumSize();
+
 	if (this->nPoints > this->spectrumSize)
 		this->freeBufferLength = this->nPoints;
 	else
 		this->freeBufferLength = this->spectrumSize;
+	if (debugFreeBuffer) {
+		printf("🚀 🚀 qSpace::tallyDimensions, nPoints=x%x   spectrumSize=x%x   freeBufferLength=x%x   ",
+			(uint32_t) this->nPoints, (uint32_t) this->spectrumSize, (uint32_t) this->freeBufferLength);
+	}
 
 	//printf("🚀 🚀  got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
 }
@@ -233,16 +240,17 @@ void qSpace::askForFFT(void) {
 }
 
 
-/* ********************************************************** buffer cache */
-
+/* ********************************************************** FreeBuffer */
 
 // this is all on the honor system.  If you borrow a buf, you either have to return it
 // with returnBuffer() or you free it with freeWave().
 qCx *qSpace::borrowBuffer(void) {
 	FreeBuffer *rentedCache = this->freeBufferList;
 	if (rentedCache) {
-printf("🚀 🚀 qSpace::borrowBuffer() with some cached. freeBufferList: x%x\n",
-(uint32_t) (this->freeBufferList));
+		if (debugFreeBuffer) {
+			printf("🚀 🚀 qSpace::borrowBuffer() with some cached. freeBufferList: x%x\n",
+			(uint32_t) (this->freeBufferList));
+		}
 
 		// there was one available on the free list, pop it off
 		this->freeBufferList = rentedCache->next;
@@ -250,9 +258,10 @@ printf("🚀 🚀 qSpace::borrowBuffer() with some cached. freeBufferList: x%x\n
 	}
 	else {
 		// must make a new one
-printf("🚀 🚀 qSpace::borrowBuffer() with none cached. freeBufferList: x%x   freeBufferLength: %d\n",
-(uint32_t) (this->freeBufferList), this->freeBufferLength);
-
+		if (debugFreeBuffer) {
+			printf("🚀 🚀 qSpace::borrowBuffer() with none cached. freeBufferList: x%x   freeBufferLength: %d\n",
+			(uint32_t) (this->freeBufferList), this->freeBufferLength);
+		}
 		return allocateWave(this->freeBufferLength);
 	}
 }
@@ -260,6 +269,8 @@ printf("🚀 🚀 qSpace::borrowBuffer() with none cached. freeBufferList: x%x  
 // return the buffer to the free list.  Potentially endless but probably not.
 // do not return buffers that aren't the right size - freeBufferLength
 void qSpace::returnBuffer(qCx *rentedBuffer) {
+	printf("rentedBuffer: x%x  freeBufferList=x%x",
+		(uint32_t) rentedBuffer, (uint32_t) this->freeBufferList);
 	FreeBuffer *rented = (FreeBuffer *) rentedBuffer;
 	rented->next = this->freeBufferList;
 	this->freeBufferList = rented;
