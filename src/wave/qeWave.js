@@ -4,7 +4,7 @@
 */
 
 // import {qeBasicSpace} from './qeSpace';
-import {qe} from './qe';
+//import {qe} from './qe';
 import cxToRgb from '../view/cxToRgb';
 
 /* **************************************************************** dumping */
@@ -53,11 +53,12 @@ class qeWave {
 			`\n🌊 ==== end of Wave ====\n\n`);
 	}
 
-	rainbowDump() {
+	rainbowDump(title) {
 		const wave = this.wave;
 		const {start, end} = this.space.startEnd2;
 
-		console.log(`%c rainbow dump    🌊  `, `font: times 16px italic; color: #222; background-color: #fff; padding-right: 80%; `);
+		console.log(`%c rainbow dump    🌊   ${title}`,
+			`font: times 16px italic; color: #222; background-color: #fff; padding-right: 70%; font: 14px Palatino;`);
 
 		let tot = 0;  // always real
 		for (let ix = start; ix < end; ix += 2) {
@@ -108,19 +109,16 @@ class qeWave {
 		const dAngle = Math.PI / N * (+n) * 2;
 		const wave = this.wave;
 
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 		for (let ix = start; ix < end; ix += 2) {
 			const angle = dAngle * (ix - start) / 2;
 			wave[ix] = Math.cos(angle);
 			wave[ix + 1] = Math.sin(angle);
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 		}
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 
 		this.space.fixThoseBoundaries(wave);
 		this.normalize();
 		//this.dumpWave('qeWave.setCircularWave() done');
-		this.rainbowDump('🌊  qeWave.setCircularWave() done');
+		//this.rainbowDump('🌊  qeWave.setCircularWave() done');
 	}
 
 
@@ -148,7 +146,7 @@ if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 		this.space.fixThoseBoundaries(wave);
 		this.normalize();
 		//this.dumpWave('qeWave.setStandingWave() done');
-		this.rainbowDump('🌊  qeWave.setStandingWave() done');
+		//this.rainbowDump('🌊  qeWave.setStandingWave() done');
 	}
 
 	// freq is just like circular, although as a fraction of the stdDev instead of N
@@ -162,50 +160,22 @@ if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 		console.log(`🌊  setPulseWave freq=${freqUi} => ${freq} `+
 			`  offset=${offsetUi}% => ${offset}`)
 
-console.log(`🌊  qeWave setPulseWave ViewBuffer= 161: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
+		// start with a circular wave, freq WITHIN the pulse width
+		this.setCircularWave(freq);
 
+		// modulate with a gaussian, centered at the offset, with stdDev
+		const s2 = 1 / (stdDev * 2);
+		for (let ix = start; ix < end; ix += 2) {
+			const 𝜟 = ix - offset;
+			const stretch = Math.exp(-𝜟 * 𝜟 * s2);
+			wave[ix] *= stretch;
+			wave[ix + 1] *= stretch;
+		}
 
-//		for (let ix = start; ix < end; ix += 2) {
-// 			const angle = dAngle * (ix - start - offset);
-
-
-
-//console.log(`🌊  qeWave setPulseWave ViewBuffer= 183: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
-
-
-// the old alg - I need frequencies that fit in the finite universe
-// 		// start with a circular wave, freq WITHIN the pulse width
-console.log(`🌊  qeWave setPulseWave ViewBuffer= 176: 🚄`, qe.qViewBuffer_getViewBuffer());
-			this.setCircularWave(freq);
-console.log(`🌊  qeWave setPulseWave ViewBuffer= 178: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
-
-			// modulate with a gaussian, centered at the offset, with stdDev
-			const s2 = 1 / (stdDev * 2);
-			for (let ix = start; ix < end; ix++) {
-console.log(`🌊  qeWave setPulseWave ViewBuffer= 180: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
-				const 𝜟 = ix - offset;
-				const stretch = Math.exp(-𝜟 * 𝜟 * s2);
-				wave[2*ix] *= stretch;
-				wave[2*ix + 1] *= stretch;
-			}
-//		}
-
-//console.log(`🌊  qeWave setPulseWave ViewBuffer= 201: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 		this.space.fixThoseBoundaries(wave);
-//console.log(`🌊  qeWave setPulseWave ViewBuffer= 204: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 		this.normalize();
-//console.log(`🌊  qeWave setPulseWave ViewBuffer= 207: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 		//this.dumpWave('qeWave.setPulseWave() done');
 		this.rainbowDump('qeWave.setPulseWave() done');
-//console.log(`🌊  qeWave setPulseWave ViewBuffer= 211: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 	}
 
 
@@ -221,8 +191,6 @@ if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 		console.log(`🌊  setPulseWave freq=${freqUi} => ${freq} `+
 			`  offset=${offsetUi}% => ${offset}`)
 
-//console.log(`🌊  qeWave setPulseWave ViewBuffer= 156: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 
 		//const dAngle = 4 * Math.PI / N;
 		const dAngle = 1.0 * Math.PI / N;
@@ -231,45 +199,31 @@ if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 		let freqHigh = freq + 1.;
 		let freqHighHigh = freqHigh + 1.;
 
-		// weighting
-		let weightOne = 0.5;
-		let weightTwo = .25
+		// FIve neighboring frequencies, weighting, where the middle freq has weight 1.0
+		let nearWeight = 0.9;
+		let farWeight = .8
 
 		for (let ix = start; ix < end; ix += 2) {
 			const angle = dAngle * (ix - start - offset);
 
-//console.log(`🌊  qeWave setPulseWave ViewBuffer= 172: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
-
-			wave[ix] = Math.cos(freqLowLow*angle) * weightTwo + Math.cos(freqLow*angle) * weightOne +
+		//
+			wave[ix] = Math.cos(freqLowLow*angle) * farWeight + Math.cos(freqLow*angle) * nearWeight +
 				Math.cos(freq*angle) +
-				Math.cos(freqHigh*angle) * weightOne + Math.cos(freqHighHigh*angle) * weightTwo;
+				Math.cos(freqHigh*angle) * nearWeight + Math.cos(freqHighHigh*angle) * farWeight;
 
-//console.log(`🌊  qeWave setPulseWave ViewBuffer= 180: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
-
-			wave[ix+1] = Math.sin(freqLowLow*angle) * weightTwo +Math.sin(freqLow*angle) * weightOne +
+		//
+			wave[ix+1] = Math.sin(freqLowLow*angle) * farWeight +Math.sin(freqLow*angle) * nearWeight +
 				Math.sin(freq*angle) +
-				Math.sin(freqHigh*angle) * weightOne + Math.sin(freqHighHigh*angle) * weightTwo;
+				Math.sin(freqHigh*angle) * nearWeight + Math.sin(freqHighHigh*angle) * farWeight;
 
 
-//console.log(`🌊  qeWave setPulseWave ViewBuffer= 183: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
-
+		//
 		}
 
-//console.log(`🌊  qeWave setPulseWave ViewBuffer= 201: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
-		this.space.fixThoseBoundaries(wave);
-//console.log(`🌊  qeWave setPulseWave ViewBuffer= 204: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
-		this.normalize();
-//console.log(`🌊  qeWave setPulseWave ViewBuffer= 207: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
-		//this.dumpWave('qeWave.setPulseWave() done');
-		this.rainbowDump('qeWave.setPulseWave() done');
-//console.log(`🌊  qeWave setPulseWave ViewBuffer= 211: 🚄`, qe.qViewBuffer_getViewBuffer());
-if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
+		//		this.space.fixThoseBoundaries(wave);
+		//		this.normalize();
+		//		//this.dumpWave('qeWave.setPulseWave() done');
+		this.rainbowDump('qeWave.setChordWave() done');
 	}
 
 	// set one of the above canned waveforms, according to the waveParams object's values
