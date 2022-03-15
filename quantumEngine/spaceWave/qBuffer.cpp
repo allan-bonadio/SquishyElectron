@@ -21,13 +21,19 @@ qFlick - object that owns a list of waves, and points to its space
 #include "qSpace.h"
 #include "qWave.h"
 
+static bool debugNormalize = false;
+static bool debugAllocate = false;
+
 // just allocate a wave of whatever length
 // buffer is initialized to zero bytes therefore 0.0 everywhere
 qCx *allocateWave(int nPoints) {
 	qCx *buf = (qCx *) malloc(nPoints * sizeof(qCx));
-printf("🍕 allocateWave()  wave=x%x  nPoints: %d bytelength=x%lx\n",
-(uint32_t) buf, nPoints, nPoints * sizeof(qCx));
-printf("🍕 allocateWave() next alloc distance: %d\n", (uint32_t) malloc(8) - (uint32_t) buf);
+	if (debugAllocate) {
+		printf("🍕 allocateWave()  wave=x%x  nPoints: %d bytelength=x%lx\n",
+			(uint32_t) buf, nPoints, nPoints * sizeof(qCx));
+		printf("🍕 allocateWave() next alloc distance: %d\n",
+			(uint32_t) malloc(8) - (uint32_t) buf);
+	}
 	return buf;
 }
 
@@ -39,11 +45,15 @@ void freeWave(qCx *wave) {
 qCx *qBuffer::allocateWave(int nPoints) {
 	if (nPoints < 0)
 		nPoints = this->space->freeBufferLength;
+
 	this->nPoints = nPoints;
-printf("🍕 qBuffer::allocateWave this=x%x  wave=x%x  nPoints: %d   freeBufferLength: x%x\n",
-(uint32_t) this, (uint32_t) this->wave, nPoints, this->space->freeBufferLength);
+	if (debugAllocate)
+		printf("🍕 qBuffer::allocateWave this=x%x  wave=x%x  nPoints: %d   freeBufferLength: x%x\n",
+			(uint32_t) this, (uint32_t) this->wave, nPoints, this->space->freeBufferLength);
 	qCx *buf =  (qCx *) malloc(nPoints * sizeof(qCx));
-printf("🍕 qBuffer::allocateWave next alloc distance: %d\n", (uint32_t) malloc(8) - (uint32_t) buf);
+	if (debugAllocate)
+		printf("🍕 qBuffer::allocateWave next alloc distance: %d\n",
+			(uint32_t) malloc(8) - (uint32_t) buf);
 	return buf;
 }
 
@@ -51,8 +61,6 @@ printf("🍕 qBuffer::allocateWave next alloc distance: %d\n", (uint32_t) malloc
 
 // create one, dynamically allocated or Bring Your Own Buffer to use
 qBuffer::qBuffer(void) {
-printf("🍕 allocated qBuffer::qBuffer this qBuffer obj: x%x length %lx\n", (uint32_t) this, sizeof(qBuffer));
-
 }
 
 // actually create the buffer that we need
@@ -69,19 +77,22 @@ void qBuffer::initBuffer(qCx *useThisBuffer) {
 	}
 	this->start = this->end = -1;  // wave / spectrum calculates these differently
 	this->nPoints = this->space->freeBufferLength;  // wave / spectrum calculates these differently
-printf("🍕 qBuffer::initBuffer this=x%x  wave=x%x  nPoints: %d\n",
-(uint32_t) this, (uint32_t) this->wave, nPoints);
+	if (debugAllocate) {
+		printf("🍕 qBuffer::initBuffer this=x%x  wave=x%x  nPoints: %d\n",
+			(uint32_t) this, (uint32_t) this->wave, nPoints);
+	}
 }
 
 qBuffer::~qBuffer() {
-	printf("🍕  start the qBuffer instance destructor...\n");
+	if (debugAllocate)
+		printf("🍕  start the qBuffer instance destructor...\n");
 	if (this->dynamicallyAllocated) {
 		this->space->returnBuffer(this->wave);
-		printf("   🍕  freed buffer...\n");
+		if (debugAllocate) printf("   🍕  freed buffer...\n");
 	}
 
 	this->space = NULL;
-	printf("   🍕  setted buffer to null; done with qBuffer destructor.\n");
+	if (debugAllocate) printf("   🍕  setted buffer to null; done with qBuffer destructor.\n");
 
 }
 
@@ -201,7 +212,8 @@ void qBuffer::normalize(void) {
 	qCx *wave = this->wave;
 	qDimension *dims = this->space->dimensions;
 	double mag = this->innerProduct();
-	printf("🍕 normalizing qBuffer.  magnitude=%lf\n", mag);
+	if (debugNormalize)
+		printf("🍕 normalizing qBuffer.  magnitude=%lf\n", mag);
 	//tempQWave->dumpWave("The wave,before normalize", true);
 
 	if (mag == 0. || ! isfinite(mag)) {
@@ -213,7 +225,8 @@ void qBuffer::normalize(void) {
 	}
 	else {
 		const double factor = pow(mag, -0.5);
-		printf("🍕 normalizing qBuffer.  factor=%lf, start=%d, end=%d, N=%d\n",
+		if (debugNormalize)
+			printf("🍕 normalizing qBuffer.  factor=%lf, start=%d, end=%d, N=%d\n",
 			factor, dims->start, dims->end, dims->N);
 
 		for (int ix = dims->start; ix < dims->end; ix++) {
