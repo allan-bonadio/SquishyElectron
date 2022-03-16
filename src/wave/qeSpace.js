@@ -1,6 +1,6 @@
 /*
 ** qeSpace - the JS representations of the c++ qSpace object
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 import qe from './qe';
 import qeWave from './qeWave';

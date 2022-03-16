@@ -1,6 +1,6 @@
 /*
 ** squish View -- a webgl image of the quantum wave
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';

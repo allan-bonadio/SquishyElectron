@@ -1,6 +1,6 @@
 /*
 ** abstract View Def -- superclass for all the views, which live inside the SquishView
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 import {viewUniform, viewAttribute} from './viewVariable';

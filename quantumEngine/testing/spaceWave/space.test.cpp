@@ -1,6 +1,6 @@
 /*
 ** space test -- testing a 	qSpace, basic stuff
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 #include <stdio.h>

@@ -1,6 +1,6 @@
 /*
 ** complex To RGB -- convert a complex value to a CSS RGB string
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 // this is rewritten from cxToColor.glsl to be the JS implementation.

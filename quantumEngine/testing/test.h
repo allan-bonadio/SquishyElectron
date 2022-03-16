@@ -1,6 +1,6 @@
 /*
 ** test.h -- c++ utilities for unit tests for Squishy Electron
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 extern void run_qCx_tests(void);

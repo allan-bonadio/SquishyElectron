@@ -1,6 +1,6 @@
 /*
 ** Mini Graph -- small rectangular graph showing user what kind of wave or potential they're asking for
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';

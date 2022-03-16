@@ -1,6 +1,6 @@
 /*
 ** Hamiltonian -- calculate the energy of the wave, H | ψ >
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 #include "../spaceWave/qSpace.h"

@@ -1,6 +1,6 @@
 /*
 ** vischer / flicks -- testing for the data structures of the Visscher algorithm
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 #include <stdio.h>

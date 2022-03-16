@@ -1,7 +1,7 @@
 /*
 ** squish panel -- like a self-contained quantum system, including space,
 ** 				waves, and drawings and interactivity.
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';

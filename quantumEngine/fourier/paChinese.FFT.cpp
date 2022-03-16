@@ -1,6 +1,6 @@
 /*
 ** blah blah -- like a source file for Squishy Electron
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
 // found on programmerall.com but I can't find it again.

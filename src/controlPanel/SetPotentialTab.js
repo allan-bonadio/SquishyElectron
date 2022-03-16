@@ -1,6 +1,6 @@
 /*
 ** Set Potential tab -- user can set the potential to something interesting
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';

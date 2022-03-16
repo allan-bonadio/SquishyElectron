@@ -1,6 +1,6 @@
 /*
 ** quantum Spectrum -- quantum Spectrum buffer
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
 

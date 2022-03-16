@@ -1,7 +1,7 @@
 /*
 ** quantum Wave -- an organized wave and space pointer &tc that represents a QM state
 **            This file also has qFlick and view buffers in it
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 // a 'wave' is a straight array of qCx, of length space->nPoints.

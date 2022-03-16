@@ -1,6 +1,6 @@
 /*
 ** View Variable View Def -- an old prototype used to develop the View Variable system
-** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 import {abstractViewDef} from './abstractViewDef';
