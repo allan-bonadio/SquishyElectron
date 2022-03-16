@@ -83,8 +83,8 @@ public:
 
 
 	// // // // // // // // // // // // // equality
-	bool operator==(qCx b) { return re == b.re && im == b.im; }
-	bool operator!=(qCx b) { return re != b.re || im != b.im; }
+	bool operator==(const qCx b) { return re == b.re && im == b.im; }
+	bool operator!=(const qCx b) { return re != b.re || im != b.im; }
 
 	// // // // // // // // // // // // // other
 	// inline so faster
