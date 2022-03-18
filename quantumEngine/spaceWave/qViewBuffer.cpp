@@ -17,46 +17,46 @@ qViewBuffer *theQViewBuffer;
 qViewBuffer::qViewBuffer(qSpace *space) {
 	// 4 floats per vertex, two verts per point
 	this->space = space;
-	this->viewBuffer = new float[space->nPoints * 8];
-	if (debugViewBuffer) printf("📺 viewBuffer(): this->viewBuffer ptr x%p \n",
-		this->viewBuffer);
-	//printf("📺 qViewBuffer constructor done: this=x%p   this->viewBuffer=x%p\n",
-	//this, this->viewBuffer);
+	viewBuffer = new float[space->nPoints * 8];
+	if (debugViewBuffer) printf("📺 viewBuffer(): viewBuffer ptr x%p \n",
+		viewBuffer);
+	//printf("📺 qViewBuffer constructor done: this=x%p   viewBuffer=x%p\n",
+	//this, viewBuffer);
 	// done in completeNewSpace    theQViewBuffer = this;
 }
 
 qViewBuffer::~qViewBuffer() {
-	delete this->viewBuffer;
+	delete viewBuffer;
 }
 
-// copy the numbers in our space's qWave into this->viewBuffer
+// copy the numbers in our space's qWave into viewBuffer
 // one row per vertex, two rows per wave datapoint.
 // each row of 4 floats looks like this:
 //     real   imaginary    potential    serial
 // Two vertices per datapoint: bottom then top, same data.
 // also converts from doubles to floats for GL.
 float qViewBuffer::loadViewBuffer(void) {
-	if (debugViewBuffer) printf("📺 loadViewBuffer() starts: this->viewBuffer = x%p \n",
-		this->viewBuffer);
-//	printf("qViewBuffer::loadViewBuffer space ptr x%p\n", this->space);
-//	printf("qViewBuffer::loadViewBuffer latestQWave ptr x%p\n", this->space->latestQWave);
-	qWave *latestQWave = this->space->latestQWave;
+	if (debugViewBuffer) printf("📺 loadViewBuffer() starts: viewBuffer = x%p \n",
+		viewBuffer);
+//	printf("qViewBuffer::loadViewBuffer space ptr x%p\n", space);
+//	printf("qViewBuffer::loadViewBuffer latestQWave ptr x%p\n", space->latestQWave);
+	qWave *latestQWave = space->latestQWave;
 //	printf("qViewBuffer::loadViewBuffer latestWave ptr x%p\n", latestQWave->wave);
 	qCx *latestWave = latestQWave->wave;
 
-//	printf("qViewBuffer::loadViewBuffer this->space->nPoints x%x\n", this->space->nPoints);
-	int nPoints = this->space->nPoints;
+//	printf("qViewBuffer::loadViewBuffer space->nPoints x%x\n", space->nPoints);
+	int nPoints = space->nPoints;
 	double highest = 0;
 	double tiny = 1e-8;
 
 	if (debugInDetail) {
 		printf("loadViewBuffer(P): thePotential=x%p\n",
 			thePotential);
-		printf("loadViewBuffer(B): this->space->latestQWave->wave=x%p->x%p->x%p->x%p\n",
+		printf("loadViewBuffer(B): space->latestQWave->wave=x%p->x%p->x%p->x%p\n",
 			this,
-			this->space,
-			this->space->latestQWave,
-			this->space->latestQWave->wave);
+			space,
+			space->latestQWave,
+			space->latestQWave->wave);
 		printf("loadViewBuffer(vb,lqw): viewBuffer x%p and latestQWave->wave=x%p\n",
 			viewBuffer, latestWave);
 		latestQWave->dumpWave("📺 at start of loadViewBuffer()");
@@ -66,12 +66,12 @@ float qViewBuffer::loadViewBuffer(void) {
 //	printf("qViewBuffer::loadViewBuffer about to do all the pts\n");
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
 		if (debugInDetail) {
-			printf("📺 qViewBuffer::loadViewBuffer this->viewBuffer x%p\n",
-				this->viewBuffer);
-			printf("📺 qViewBuffer::loadViewBuffer this->viewBuffer + pointNum * 8=x%p\n",
-				this->viewBuffer + pointNum * 8);
+			printf("📺 qViewBuffer::loadViewBuffer viewBuffer x%p\n",
+				viewBuffer);
+			printf("📺 qViewBuffer::loadViewBuffer viewBuffer + pointNum * 8=x%p\n",
+				viewBuffer + pointNum * 8);
 		}
-		float *twoRowPtr = this->viewBuffer + pointNum * 8;
+		float *twoRowPtr = viewBuffer + pointNum * 8;
 		if (debugInDetail)
 			printf("📺 qViewBuffer::loadViewBuffer twoRowPtr =x%p\n", twoRowPtr);
 		qCx *wavePtr = latestWave + pointNum;
@@ -115,8 +115,8 @@ float qViewBuffer::loadViewBuffer(void) {
 	}
 
 	if (debugViewBuffer) {
-		printf("    qViewBuffer::at end of loadViewBuffer this=x%p  this->viewBuffer=x%p\n",
-				this, this->viewBuffer);
+		printf("    qViewBuffer::at end of loadViewBuffer this=x%p  viewBuffer=x%p\n",
+				this, viewBuffer);
 		//printf("  ===  📺  viewBuffer.cpp done, as written to view buffer:\n");
 		//dumpViewBuffer("loadViewBuffer done");
 	}

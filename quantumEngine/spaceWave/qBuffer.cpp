@@ -42,12 +42,12 @@ void freeWave(qCx *wave) {
 // make one, the right size for this buffer's space, or nPoints long
 qCx *qBuffer::allocateWave(int nPoints) {
 	if (nPoints < 0)
-		nPoints = this->space->freeBufferLength;
+		nPoints = space->freeBufferLength;
 
 	this->nPoints = nPoints;
 	if (debugAllocate)
 		printf("🍕 qBuffer::allocateWave this=x%p  wave=x%p  nPoints: %d   freeBufferLength: x%x\n",
-			this, this->wave, nPoints, this->space->freeBufferLength);
+			this, wave, nPoints, space->freeBufferLength);
 	qCx *buf =  (qCx *) malloc(nPoints * sizeof(qCx));
 	return buf;
 }
@@ -62,31 +62,31 @@ qBuffer::qBuffer(void) {
 // usually called by subclass constructors when they figure out how long a buffer is needed
 void qBuffer::initBuffer(qCx *useThisBuffer) {
 	if (useThisBuffer) {
-		this->wave = useThisBuffer;
-		this->dynamicallyAllocated = 0;
+		wave = useThisBuffer;
+		dynamicallyAllocated = 0;
 	}
 	else {
 		// borrow will allocate if nothing in the freelist
-		this->wave = this->space->borrowBuffer();
-		this->dynamicallyAllocated = 1;
+		wave = space->borrowBuffer();
+		dynamicallyAllocated = 1;
 	}
-	this->start = this->end = -1;  // wave / spectrum calculates these differently
-	this->nPoints = this->space->freeBufferLength;  // wave / spectrum calculates these differently
+	start = end = -1;  // wave / spectrum calculates these differently
+	nPoints = space->freeBufferLength;  // wave / spectrum calculates these differently
 	if (debugAllocate) {
 		printf("🍕 qBuffer::initBuffer this=x%p  wave=x%p  nPoints: %d\n",
-			this, this->wave, nPoints);
+			this, wave, nPoints);
 	}
 }
 
 qBuffer::~qBuffer() {
 	if (debugAllocate)
 		printf("🍕  start the qBuffer instance destructor...\n");
-	if (this->dynamicallyAllocated) {
-		this->space->returnBuffer(this->wave);
+	if (dynamicallyAllocated) {
+		space->returnBuffer(wave);
 		if (debugAllocate) printf("   🍕  freed buffer...\n");
 	}
 
-	this->space = NULL;
+	space = NULL;
 	if (debugAllocate) printf("   🍕  setted buffer to null; done with qBuffer destructor.\n");
 
 }
@@ -95,10 +95,10 @@ qBuffer::~qBuffer() {
 
 void qBuffer::copyThatWave(qCx *dest, qCx *src, int length) {
 //	printf("🍕 qWave::copyThatWave(%d <== %d)\n", (int) dest, (int) src);
-	if (!dest) dest = this->wave;
-	if (!src) src = this->wave;
+	if (!dest) dest = wave;
+	if (!src) src = wave;
 	if (length < 0)
-		length = this->nPoints;
+		length = nPoints;
 	memcpy(dest, src, length * sizeof(qCx));
 }
 
@@ -176,10 +176,10 @@ void qBuffer::fixBoundaries(void) {
 // calculate ⟨ψ | ψ⟩  'inner product'.  Non-visscher.
 double qBuffer::innerProduct(void) {
 	qCx *wave = this->wave;
-	qDimension *dims = this->space->dimensions;
+	qDimension *dims = space->dimensions;
 	double sum = 0.;
 
-	for (int ix = this->start; ix < this->end; ix++) {
+	for (int ix = start; ix < end; ix++) {
 		qCx point = wave[ix];
 		double re = point.re;
 		double im = point.im;
@@ -198,15 +198,15 @@ double qBuffer::innerProduct(void) {
 void qBuffer::normalize(void) {
 	// for visscher, we have to make it in a temp wave and copy back to our buffer
 	// huh?  this is never copied back.  normalize here does nothing.
-//	qCx tempWave[this->space->nPoints];
-//	qWave tqWave(this->space, tempWave);
+//	qCx tempWave[space->nPoints];
+//	qWave tqWave(space, tempWave);
 //	qWave *tempQWave = &tqWave;
 
 	//qCx *wave = tempWave;
-	//qWave *tempQWave = qWave::newQWave(this->space, tempWave);
+	//qWave *tempQWave = qWave::newQWave(space, tempWave);
 	qCx *wave = this->wave;
-	qDimension *dims = this->space->dimensions;
-	double mag = this->innerProduct();
+	qDimension *dims = space->dimensions;
+	double mag = innerProduct();
 	if (debugNormalize)
 		printf("🍕 normalizing qBuffer.  magnitude=%lf\n", mag);
 	//tempQWave->dumpWave("The wave,before normalize", true);
@@ -232,9 +232,9 @@ void qBuffer::normalize(void) {
 			}
 		}
 	}
-	this->fixBoundaries();
-	//this->dumpWave("qWave::normalize done", true);
-	///this->space->visscherHalfStep(wave, this);
+	fixBoundaries();
+	//dumpWave("qWave::normalize done", true);
+	///space->visscherHalfStep(wave, this);
 }
 
 

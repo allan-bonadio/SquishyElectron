@@ -53,20 +53,20 @@ void qSpace::oneRk4Step(void) {
 	for (int ix = dims->start; ix < dims->end; ix++)
 		peruWave[ix] = qCx(0);
 
-	this->dumpWave("theWave ", theWave);
+	dumpWave("theWave ", theWave);
 
 	// always start from theWave.  I need (nextYWave = k_1/2) and (peruWave += k_1/6)
 	// into two separate wave buffers.  waveDDT() does both.
 	waveDDT(dims, theWave, theWave, k1Wave, 1./2., 1./6.);
-	this->dumpWave("after k1, k1Wave ", k1Wave);
+	dumpWave("after k1, k1Wave ", k1Wave);
 
 	// same for the steps on p551
 	waveDDT(dims, theWave, k1Wave, k2Wave, 1./2., 1./3.);
-	this->dumpWave("after k2 ", k2Wave);
+	dumpWave("after k2 ", k2Wave);
 	waveDDT(dims, theWave, k2Wave, k3Wave, 1./2., 1./3.);
-	this->dumpWave("after k3 ", k3Wave);
+	dumpWave("after k3 ", k3Wave);
 	waveDDT(dims, theWave, k3Wave, k4Wave, 1., 1./6.);
-	this->dumpWave("after k4 ", k4Wave);
+	dumpWave("after k4 ", k4Wave);
 
 	// now we have our dPsi, correct to  4th order, theoretically
 	for (int ix = dims->start; ix < dims->end; ix++)

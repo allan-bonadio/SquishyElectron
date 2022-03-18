@@ -15,9 +15,9 @@
 // these days it's a power of 2
 void qSpace::chooseSpectrumSize() {
 	int powerOf2;
-	for (powerOf2 = 1; powerOf2 < this->nStates; powerOf2 += powerOf2)
+	for (powerOf2 = 1; powerOf2 < nStates; powerOf2 += powerOf2)
 		continue;
-	this->spectrumSize = powerOf2;
+	spectrumSize = powerOf2;
 }
 
 /* ********************************************************* demo */

@@ -23,28 +23,28 @@ qFlick::qFlick(qSpace *space, int maxWaves) :
 	if (maxWaves > 1000) throw "maxwaves is too big, sure you want that?";
 
 	// array of waves
-	this->waves = (qCx **) malloc(maxWaves * sizeof(int *));
+	waves = (qCx **) malloc(maxWaves * sizeof(int *));
 
 	// being a qWave, we already have one, just need the other
-	this->waves[0] = this->wave;
-	this->waves[1] = allocateWave();
+	waves[0] = wave;
+	waves[1] = allocateWave();
 }
 
 qFlick::~qFlick() {
 	printf("start the qFlick instance destructor...\n");
-	this->setCurrent(0);
+	setCurrent(0);
 
 	// note how this starts at 1 so item zero can be freed by superclass
-	for (int i = 1; i < this->nWaves; i++) {
+	for (int i = 1; i < nWaves; i++) {
 		freeWave(waves[i]);
 		waves[i] = NULL;
 	}
 	printf("    freed most of the buffers...\n");
 
-	free(this->waves);
+	free(waves);
 	printf("    freed waves...\n");
 
-	this->waves = NULL;
+	waves = NULL;
 	printf("setted waves to null; done with qFlick destructor.\n");
 
 }
@@ -54,13 +54,13 @@ qFlick::~qFlick() {
 // print one complex number, from a flick at time doubleAge, on a line in the dump on stdout.
 // if it overflows the buffer, it won't.  just dump a row for a cx datapoint.
 double qFlick::dumpRow(char *buf, int doubleAge, int ix, double *pPrevPhase, bool withExtras) {
-	qCx w = this->value(ix, doubleAge);  // interpolates
+	qCx w = value(ix, doubleAge);  // interpolates
 	int it = doubleAge / 2;
 	char leftParen = (doubleAge & 1) ? '(' : '[';
 	char rightParen = (doubleAge & 1) ? ']' : ')';
 	double mag = 0;
 	if (withExtras) {
-		mag = this->magnitude(ix, doubleAge);  // interpolates
+		mag = magnitude(ix, doubleAge);  // interpolates
 		double phase = 0.;
 		if (w.im || w.re) phase = atan2(w.im, w.re) * 180 / PI;  // pos or neg
 		double dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
@@ -81,14 +81,14 @@ double qFlick::dumpRow(char *buf, int doubleAge, int ix, double *pPrevPhase, boo
 // title is the title of the particular call to dumpFlick() like func name
 void qFlick::dumpOneAge(const char *title, int doubleAge, bool withExtras) {
 	printf("==== Flick @%d | %s:", doubleAge, title);
-	const qDimension *dims = this->space->dimensions;
+	const qDimension *dims = space->dimensions;
 	char buf[200];
 	double prevPhase = 0.;
 	double innerProd = 0;
 
 	int ix = 0;
 	if (dims->continuum) {
-		this->dumpRow(buf, doubleAge, ix, &prevPhase, withExtras);
+		dumpRow(buf, doubleAge, ix, &prevPhase, withExtras);
 		printf("\n%s", buf);
 	}
 
@@ -109,16 +109,16 @@ void qFlick::dumpOneAge(const char *title, int doubleAge, bool withExtras) {
 
 
 void qFlick::dumpLatest(const char *titleIn, bool withExtras) {
-	this->dumpOneAge(titleIn, 1, withExtras);
-	this->dumpOneAge(titleIn, 2, withExtras);
+	dumpOneAge(titleIn, 1, withExtras);
+	dumpOneAge(titleIn, 2, withExtras);
 }
 
 // a raw dump of the waves here
 void qFlick::dumpAllWaves(const char *title) {
 	printf("==== FlickAll | %s\n", title);
-	for (int i = 0; i < this->nWaves; i++) {
+	for (int i = 0; i < nWaves; i++) {
 		//printf("wave %d -- ", i);
-		//this->dumpThatWave(this->waves[i], true);
+		//dumpThatWave(waves[i], true);
 		//printf("      inner products: %lf\n", );
 	}
 	printf("==== FlickAll End ====\n");
@@ -126,7 +126,7 @@ void qFlick::dumpAllWaves(const char *title) {
 
 void qFlick::dumpOverview(const char *title) {
 	printf("==== Flick Overview | %s\n", title);
-	for (int i = 0; i < this->nWaves; i++) {
+	for (int i = 0; i < nWaves; i++) {
 		printf("         waves[%d]=0x%p    sample @x=1: %lf,  %lf\n",
 			i, waves[i], waves[i][1].re, waves[i][1].im);
 	}
@@ -139,10 +139,10 @@ void qFlick::dumpOverview(const char *title) {
 // always interpolate the missing component as an average of the two nearest
 qCx qFlick::value(int doubleAge, int ix) {
 	const int it = (doubleAge-1) / 2;
-	if (! this->waves[it]) printf("*** no wave[it] in qf:value!\n");
-	qCx newPoint = this->waves[it][ix];
-	if (! this->waves[it+1]) printf("*** no wave[it+1] in qf:value!\n");
-	qCx oldPoint = this->waves[it + 1][ix];
+	if (! waves[it]) printf("*** no wave[it] in qf:value!\n");
+	qCx newPoint = waves[it][ix];
+	if (! waves[it+1]) printf("*** no wave[it+1] in qf:value!\n");
+	qCx oldPoint = waves[it + 1][ix];
 
 
 	if (ix & 1)
@@ -165,10 +165,10 @@ double qFlick::magnitude(int doubleAge, int ix) {
 //	printf("qFlick::magnitude: waves[1]=0x%p \n", (int) waves[1]);
 //	printf("qFlick::magnitude: waves[2]=0x%p \n", (int) waves[2]);
 
-	if (! this->waves[it]) printf("*** no wave[it] in qf:magnitude!\n");
-	qCx newPoint = this->waves[it][ix];
-	if (! this->waves[it+1]) printf("*** no wave[it+1] in qf:magnitude!\n");
-	qCx oldPoint = this->waves[it + 1][ix];
+	if (! waves[it]) printf("*** no wave[it] in qf:magnitude!\n");
+	qCx newPoint = waves[it][ix];
+	if (! waves[it+1]) printf("*** no wave[it+1] in qf:magnitude!\n");
+	qCx oldPoint = waves[it + 1][ix];
 
 	// if doubleAge is 1, the real is real, the im is interpolated
 	// if doubleAge is 2, the Im is real, and the Re is interpolated
@@ -183,21 +183,21 @@ double qFlick::magnitude(int doubleAge, int ix) {
 //void qFlick::pushCopy(qCx *wave) {
 //	qCx *w = allocateWave();  // starts out zeroed
 //	if (wave)
-//		this->copyThatWave(w, wave);
-//	this->pushWave(w);
+//		copyThatWave(w, wave);
+//	pushWave(w);
 //}
 
 // initialize this flick by pushing this wave twice (two allocated),
 // so you can take the inner product at .5 and 1.0 (doubleAges 1 and 2).
 //void qFlick::installWave(qCx *wave) {
-//	this->pushCopy(wave);
-//	this->pushCopy(wave);
+//	pushCopy(wave);
+//	pushCopy(wave);
 //}
 
 // push a new, zeroed or filled, wave onto the beginning of this flick, item zero.
 // We also recycle blocks that roll off the end here.
 void qFlick::pushWave(void) {
-	//this->dumpAllWaves("qFlick::pushWave() Start");
+	//dumpAllWaves("qFlick::pushWave() Start");
 	printf("pushing a wave...\n");
 
 	// first we need a buffer.
@@ -205,29 +205,29 @@ void qFlick::pushWave(void) {
 	if (nWaves >= maxWaves) {
 		// sorry charlie, gotta get rid of the oldest one...
 		// but stick around we'll recycle you for the new one
-		newWave = this->waves[this->maxWaves - 1];
+		newWave = waves[maxWaves - 1];
 
 		// zap it to zeros, like new!
-		std::memset(newWave, 0, this->space->nPoints * sizeof(qCx));
+		std::memset(newWave, 0, space->nPoints * sizeof(qCx));
 	}
 	else {
 		// waves[] grows like this till it's full, then it recycles the
 		// ones that roll off the end
-		newWave = this->allocateWave();
-		this->nWaves++;
+		newWave = allocateWave();
+		nWaves++;
 	}
 
 	// shove over
-	for (int i = this->nWaves - 1; i >= 1; i--)
+	for (int i = nWaves - 1; i >= 1; i--)
 		waves[i] = waves[i-1];
 
 	// and here we are.  Good luck with it!
 	waves[0] = newWave;
 
 	// somebody will set this back to zero?
-	this->currentIx++;
+	currentIx++;
 
-	//this->dumpAllWaves("pushWave() done");
+	//dumpAllWaves("pushWave() done");
 }
 
 
@@ -235,17 +235,17 @@ void qFlick::pushWave(void) {
 // that's what they see, that's what gets 'normalized' or whatever
 // to 'getCurrent' wave, just get qfk->wave;
 void qFlick::setCurrent(int newIx) {
-	if (newIx < 0 || newIx >= this->nWaves)
+	if (newIx < 0 || newIx >= nWaves)
 		printf("qFlick::setCurrent() bad index: %d\n", newIx);
-	this->currentIx = newIx;
-	this->wave = this->waves[newIx];
+	currentIx = newIx;
+	wave = waves[newIx];
 }
 
 
 
 void qFlick::fixBoundaries(void) {
-	this->space->fixThoseBoundaries(this->waves[0]);
-	this->space->fixThoseBoundaries(this->waves[1]);
+	space->fixThoseBoundaries(waves[0]);
+	space->fixThoseBoundaries(waves[1]);
 }
 
 
@@ -260,19 +260,19 @@ double qFlick::innerProduct(void) {
 	int doubleAge = 1;  // not sure if I'll ever want this as a variable
 
 	printf("qFlick::innerProduct starting at age %d\n", doubleAge);
-	qDimension *dims = this->space->dimensions;
+	qDimension *dims = space->dimensions;
 	double sum = 0.;
 	int end = dims->end;
 	if (doubleAge <= 0)
 		throw "Error in qFlick::innerProduct: doubleAge is negative";
 //	const int t = doubleAge / 2;
 //	const bool even = (doubleAge & 1) == 0;
-//	qCx *newWave = this->waves[t];
-//	qCx *oldWave = this->waves[t + 1];
+//	qCx *newWave = waves[t];
+//	qCx *oldWave = waves[t + 1];
 
 	//printf("        got to loop\n");
 	for (int ix = dims->start; ix < end; ix++) {
-		double mag = this->magnitude(doubleAge, ix);
+		double mag = magnitude(doubleAge, ix);
 		sum += mag;
 		//printf("                dage=%d ix=%d  mag=%lf  sum=%lf\n",
 		//	doubleAge, ix, mag, sum);
@@ -285,33 +285,33 @@ double qFlick::innerProduct(void) {
 // Normalize (should be) always idempotent;
 // anything else you wana do, make your own function
 void qFlick::normalize(void) {
-	//this->dumpWave("qFlick::normalize starting", true);
+	//dumpWave("qFlick::normalize starting", true);
 
-	qDimension *dims = this->space->dimensions;
-	double innerProduct = this->innerProduct();
-	printf("qFlick::normalize() total innerProduct is %lf \r", innerProduct);
+	qDimension *dims = space->dimensions;
+	double inProd = innerProduct();
+	printf("qFlick::normalize() total innerProduct is %lf \r", inProd);
 
-	qCx *wave = this->waves[0];
-	qCx *older = this->waves[1];
+	qCx *wave = waves[0];
+	qCx *older = waves[1];
 	printf("           wave = x%p   older x%p\r", wave, older);
 
-	if (innerProduct == 0.) {
+	if (inProd == 0.) {
 		// wtf is this zero wave?  never possible.  And, we can't divide by zero.
 		// Fill it with +1, normalized.  This should be really unusual.
 		for (int ix = dims->start; ix < dims->end; ix++)
 			wave[ix] = older[ix] = qCx(1);
-		innerProduct = dims->N;
+		inProd = dims->N;
 	}
-	double factor = sqrt(1./innerProduct);
-	printf("           total innerProduct is %lf factor=%lf\r", innerProduct, factor);
+	double factor = sqrt(1./inProd);
+	printf("           total innerProduct is %lf factor=%lf\r", inProd, factor);
 
 	// apply the factor everywhere
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		wave[ix] *= factor;
 		older[ix] *= factor;
 	}
-	this->fixBoundaries();
-	this->dumpWave("qFlick::normalize done", true);
+	fixBoundaries();
+	dumpWave("qFlick::normalize done", true);
 }
 
 /* ************************************************************ populating */
@@ -321,18 +321,18 @@ void qFlick::normalize(void) {
 // pass negative to make it go backward.
 // the first point here is like x=0 as far as the trig functions, and the last like x=-1
 //void qFlick::setCircularWave(double n) {
-//	if (this->space->nPoints <= 0) throw "qFlick::setCircularWave() with zero points";
+//	if (space->nPoints <= 0) throw "qFlick::setCircularWave() with zero points";
 //
-//	qCx tempWave[this->space->nPoints];
-//	qWave tqWave(this->space, tempWave);
+//	qCx tempWave[space->nPoints];
+//	qWave tqWave(space, tempWave);
 //	qWave *tempQWave = &tqWave;
 //
 //	printf(" starting qFlick::setCircularWave(%3.2lf) with points=%d\n",
-//		n, this->space->nPoints);
-//	//this->dumpWave("before set sircular & normalize", true);
+//		n, space->nPoints);
+//	//dumpWave("before set sircular & normalize", true);
 //	qCx *wave = tempWave;
-//	//qCx *wave = this->wave;
-//	qDimension *dims = this->space->dimensions;
+//	//qCx *wave = wave;
+//	qDimension *dims = space->dimensions;
 //	int start = dims->start;
 //	int end = dims->end;
 //
@@ -342,7 +342,7 @@ void qFlick::normalize(void) {
 //printf(" got past dAngle\n");
 //	// visscher gap. How much angle would the Im component go in dt/2?
 //	// I have no idea.
-//	double dt = this->space->dt;
+//	double dt = space->dt;
 //	double nN = n * dims->N;
 //	double vGap = -nN * nN * dt / 2 * gapFactor;
 //
@@ -359,21 +359,21 @@ void qFlick::normalize(void) {
 ////		printf("        wave[%d] =%lf, %lf\n", ix, wave[ix].re, wave[ix].im);
 //	}
 ////	printf("flick, before boundaries, 1 copy");
-//	this->fixBoundaries();
+//	fixBoundaries();
 ////	printf("flick, freshly generated, 1 copy");
-////	this->dumpThatWave(wave, true);
+////	dumpThatWave(wave, true);
 //
-//		tempQWave->copyThatWave(this->waves[0], tempQWave->wave);
-//		tempQWave->copyThatWave(this->waves[1], tempQWave->wave);
+//		tempQWave->copyThatWave(waves[0], tempQWave->wave);
+//		tempQWave->copyThatWave(waves[1], tempQWave->wave);
 //		//printf("  copied that wave\n");
-//		//this->dumpAllWaves("qFlick::setCircularWave: copied wave 2ice; about to normalize");
-//		//this->space->visscherHalfStep(tempQWave, this);
-//		//this->dumpWave("after set sircular & normalize", true);
-//		this->normalize();
+//		//dumpAllWaves("qFlick::setCircularWave: copied wave 2ice; about to normalize");
+//		//space->visscherHalfStep(tempQWave, this);
+//		//dumpWave("after set sircular & normalize", true);
+//		normalize();
 //		//printf(" got past normalize here\n");
-//	//	this->dumpWave("after set sircular & normalize", true);
-//	this->fixBoundaries();
-//	//this->dumpAllWaves("qFlick::setCircularWave: normalize");
+//	//	dumpWave("after set sircular & normalize", true);
+//	fixBoundaries();
+//	//dumpAllWaves("qFlick::setCircularWave: normalize");
 //
 //	// the interactive code should do this
 ////	theQViewBuffer->loadViewBuffer(this);
@@ -383,5 +383,5 @@ void qFlick::normalize(void) {
 
 /* ************************************************************ visscher */
 
-// 	this->pushWave();
+// 	pushWave();
 

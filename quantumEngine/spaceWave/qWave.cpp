@@ -27,11 +27,11 @@ qWave::qWave(qSpace *space, qCx *useThisBuffer) {
 	this->space = space;
 	initBuffer(useThisBuffer);
 
-	printf("      🌊🌊  allocated wave: x%p\n", (this->wave));
+	printf("      🌊🌊  allocated wave: x%p\n", (wave));
 	qDimension *dim = space->dimensions;
-	this->nPoints = dim->nPoints;
-	this->start = dim->start;
-	this->end = dim->end;
+	nPoints = dim->nPoints;
+	start = dim->start;
+	end = dim->end;
 
 printf("🌊🌊 allocated qWave::qWave this qWave obj: x%p length x%lx\n",
 this, (long) sizeof(qWave));
@@ -45,8 +45,8 @@ qWave::~qWave(void) {
 
 /* never tested - might never work  */
 void qWave::forEachPoint(void (*callback)(qCx, int) ) {
-	qDimension *dims = this->space->dimensions;
-	qCx *wave = this->wave;
+	qDimension *dims = space->dimensions;
+	qCx *wave = wave;
 	int end = dims->end + dims->start;
 	for (int ix = 0; ix < end; ix++) {
 		//printf("\n[%d] ", ix);
@@ -57,9 +57,9 @@ void qWave::forEachPoint(void (*callback)(qCx, int) ) {
 
 /* never tested - might never work   */
 void qWave::forEachState(void (*callback)(qCx, int) ) {
-	qDimension *dims = this->space->dimensions;
+	qDimension *dims = space->dimensions;
 	int end = dims->end;
-	qCx *wave = this->wave;
+	qCx *wave = wave;
 	for (int ix = dims->start; ix < end; ix++) {
 		//printf("\n[%d] ", ix);
 		//printf("(%lf,%lf) ", wave[ix].re, wave[ix].im);
@@ -76,22 +76,22 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 // the complete set of states
 // one for the N+1 if continuum
 void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
-	if (this->nPoints <= 0) throw "🌊🌊 qSpace::dumpThatWave() with zero points";
+	if (nPoints <= 0) throw "🌊🌊 qSpace::dumpThatWave() with zero points";
 
-	const qDimension *dims = this->dimensions;
+	const qDimension *dims = dimensions;
 	qBuffer::dumpSegment(wave, dims->start, dims->end, dims->continuum, withExtras);
 }
 
 // any wave, probably shouldn't call this
 void qWave::dumpThatWave(qCx *wave, bool withExtras) {
 	//printf("🌊🌊 any wave, probably shouldn't call this\n");
-	this->space->dumpThatWave(wave, withExtras);
+	space->dumpThatWave(wave, withExtras);
 }
 
 // this is the member function that dumps its own wave and space
 void qWave::dumpWave(const char *title, bool withExtras) {
 	printf("\n🌊🌊 ==== Wave | %s ", title);
-	this->space->dumpThatWave(this->wave, withExtras);
+	space->dumpThatWave(wave, withExtras);
 	printf("\n🌊🌊 ==== end of Wave ====\n\n");
 }
 
@@ -103,9 +103,9 @@ void qWave::dumpWave(const char *title, bool withExtras) {
 // refresh the wraparound points for ANY WAVE subscribing to this space
 // 'those' or 'that' means some wave other than this->wave
 void qSpace::fixThoseBoundaries(qCx *wave) {
-	if (this->nPoints <= 0) throw "🌊🌊 qSpace::fixThoseBoundaries() with zero points";
+	if (nPoints <= 0) throw "🌊🌊 qSpace::fixThoseBoundaries() with zero points";
 
-	qDimension *dims = this->dimensions;
+	qDimension *dims = dimensions;
 	switch (dims->continuum) {
 	case contDISCRETE:
 		break;
@@ -134,7 +134,7 @@ void qSpace::fixThoseBoundaries(qCx *wave) {
 // from their counterpoints or zerro or whatever they get set to.
 // 'those' or 'that' means some wave other than this->wave
 void qWave::fixBoundaries(void) {
-	this->space->fixThoseBoundaries(this->wave);
+	space->fixThoseBoundaries(wave);
 }
 
 /* ************************************************* bad ideas I might revisit?  */
@@ -153,8 +153,8 @@ double cleanOneNumber(double u, int ix, int sense) {
 void qWave::prune() {
 	printf("🌊🌊 Do we really have to do this?  let's stop.\n");
 
-	qDimension *dims = this->space->dimensions;
-	qCx *wave = this->wave;
+	qDimension *dims = space->dimensions;
+	qCx *wave = wave;
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		wave[ix].re = cleanOneNumber(wave[ix].re, ix, ix & 1);
 		wave[ix].im = cleanOneNumber(wave[ix].im, ix, ix & 2);
@@ -176,13 +176,13 @@ void qWave::lowPassFilter(double dilution) {
 	if (traceLowPassFilter) printf("🌊🌊 qWave::lowPassFilter(%2.6lf)\n", dilution);
 
 
-	if (!this->scratchBuffer)
-		this->scratchBuffer = allocateWave();
-	qCx *wave = this->wave;
-	qDimension *dims = this->space->dimensions;
+	if (!scratchBuffer)
+		scratchBuffer = allocateWave();
+	qCx *wave = wave;
+	qDimension *dims = space->dimensions;
 
-	// not sure we need this this->prune();
-	//this->fixBoundaries();
+	// not sure we need this prune();
+	//fixBoundaries();
 
 	qCx average;
 	qCx temp;
@@ -203,7 +203,7 @@ void qWave::lowPassFilter(double dilution) {
 		average = wave[ix] * dilution + average * concentration;
 
 		if (traceLowPassFilter) printf("   🌊🌊  lowPassBuffer %d forward run: %lf %lf\n", ix, temp.re, temp.im);
-		this->scratchBuffer[ix] = temp;
+		scratchBuffer[ix] = temp;
 	}
 
 	// now in the other direction - reversed
@@ -221,7 +221,7 @@ void qWave::lowPassFilter(double dilution) {
 	for (int ix = dims->end-1; ix >= dims->start; ix--) {
 		temp = wave[ix] * concentration + average * dilution;
 		average = wave[ix] * dilution + average * concentration;
-		wave[ix] = (this->scratchBuffer[ix] + temp) / 2;
+		wave[ix] = (scratchBuffer[ix] + temp) / 2;
 		if (traceLowPassFilter) printf("    🌊🌊 lowPassBuffer %d reverse run: (%lf %lf)\n", ix, temp.re, temp.im);
 	}
 
@@ -231,28 +231,28 @@ void qWave::lowPassFilter(double dilution) {
 void qWave::nyquistFilter(void) {
 	if (traceLowPassFilter) printf("🌊🌊 qWave::nyquistFilter()\n");
 
-	if (!this->scratchBuffer)
-		this->scratchBuffer = allocateWave();  // this won't work if space changes resolution!
+	if (!scratchBuffer)
+		scratchBuffer = allocateWave();  // this won't work if space changes resolution!
 
-	qCx *wave = this->wave;
-	qDimension *dims = this->space->dimensions;
+	qCx *wave = wave;
+	qDimension *dims = space->dimensions;
 
-	// not sure we need this this->prune();
-	this->fixBoundaries();
+	// not sure we need this prune();
+	fixBoundaries();
 
 	// this should zero out the nyquist frequency exactly
 	for (int ix = dims->start; ix < dims->end; ix++) {
-		this->scratchBuffer[ix] = (wave[ix] + wave[ix] - wave[ix-1] - wave[ix+1]) / 4.;
+		scratchBuffer[ix] = (wave[ix] + wave[ix] - wave[ix-1] - wave[ix+1]) / 4.;
 
 //		printf("🌊🌊 %d scratchBuf=(%lf %lf) wave-1=(%lf %lf) wave0=(%lf %lf) wave+1=(%lf %lf)\n",
 //		ix,
-//		this->scratchBuffer[ix].re, this->scratchBuffer[ix].im,
+//		scratchBuffer[ix].re, scratchBuffer[ix].im,
 //		wave[ix-1].re, wave[ix-1].im, wave[ix].re, wave[ix].im, wave[ix+1].re, wave[ix+1].im);
 	}
 
 
-	this->copyThatWave(this->wave, this->scratchBuffer, this->nPoints);
+	copyThatWave(wave, scratchBuffer, nPoints);
 
-//	this->dumpWave("after nyquist filter");
+//	dumpWave("after nyquist filter");
 }
 

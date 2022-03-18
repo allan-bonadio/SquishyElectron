@@ -17,23 +17,23 @@ qCx qCx::operator/(qCx b) {
 
 // what is wrong with this?  this is handed in ÷ 10.
 qCx qCx::operator/=(qCx b) {
-	//printf("÷ this=%lf %lf; b=%lf %lf\n", this->re, this->im, b.re, b.im);
+	//printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
 	//printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
 	double det = b.norm();
-	//printf("÷ this=%lf %lf; b=%lf %lf\n", this->re, this->im, b.re, b.im);
+	//printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
 	//printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
 	//printf("÷ re * b.re=%lf; im * b.im=%lf\n", re * b.re, im * b.im);
 	double t = (re * b.re + im * b.im) / det;
 	//printf("÷ det=%lf; t=%lf\n", det, t);
-	this->im = (im * b.re - re * b.im) / det;
-	this->re = t;
+	im = (im * b.re - re * b.im) / det;
+	re = t;
 	//printf("÷ re=%lf  im=%lf\n", re, im);
 	return *this;
 }
 
 // more work than it's worth - should use the norm instead
 double qCx::abs() {
-	return sqrt(this->norm());
+	return sqrt(norm());
 }
 
 // in real degrees!  -180 thru +180

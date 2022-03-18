@@ -25,13 +25,13 @@ void qSpace::oneRk2Step(qWave *oldQWave, qWave *newQWave) {
 	qCx *newW = newQW->wave;
 
 
-	qDimension *dims = this->dimensions;
+	qDimension *dims = dimensions;
 	oldQW->fixBoundaries();
 	//oldQW->dumpWave("starting oldW", true);
 
 	// use laosWave for all the first-try ψ values
 	for (int ix = dims->start; ix < dims->end; ix++) {
-		laosWave[ix] = oldW[ix] + hamiltonian(oldW, ix) * this->halfDtOverI;
+		laosWave[ix] = oldW[ix] + hamiltonian(oldW, ix) * halfDtOverI;
 		qCheck("oneRk2Step A", newW[ix]);
 	}
 	laosQWave->fixBoundaries();
@@ -45,7 +45,7 @@ void qSpace::oneRk2Step(qWave *oldQWave, qWave *newQWave) {
 
 	// then use laosWave as the input to a better rate and a better inc at newW.
 	for (int ix = dims->start; ix < dims->end; ix++) {
-		newW[ix] = oldW[ix] + hamiltonian(laosWave, ix) * this->dtOverI;
+		newW[ix] = oldW[ix] + hamiltonian(laosWave, ix) * dtOverI;
 		qCheck("oneRk2Step B", newW[ix]);
 	}
 	newQW->fixBoundaries();
@@ -61,13 +61,13 @@ oldW = newW;  // fix this someday!!!
 	oldQW->fixBoundaries();
 	//oldQW->dumpWave("almost done oldW", true);
 
-//	if (this->continuousLowPass) {
-// 		oldQW->lowPassFilter(this->continuousLowPass);
+//	if (continuousLowPass) {
+// 		oldQW->lowPassFilter(continuousLowPass);
 //	}
 
-//	if (this->doLowPass && --this->filterCount <= 0) {
+//	if (doLowPass && --filterCount <= 0) {
 //		printf("\n@@@@@@ it's time for a filter %d %d  frame%1.0lf @@@@@@\n",
-//			this->filterCount, this->nStates, this->iterateSerial);
+//			filterCount, nStates, iterateSerial);
 //		//oldQW->dumpWave("filtering, starting", true);
 // 		//oldQW->lowPassFilter();
 //		//oldQW->dumpWave("filtering, after LP, before normalize", true);
@@ -75,19 +75,19 @@ oldW = newW;  // fix this someday!!!
 //		//oldQW->dumpWave("filtering, after normalize", true);
 //
 //		// just a guess but this should depend on how wayward the wave has gotten.
-//		this->filterCount = 100;
-//		//this->filterCount = this->nStates;
+//		filterCount = 100;
+//		//filterCount = nStates;
 //	}
 
-	this->elapsedTime += dt;
-	this->iterateSerial++;
+	elapsedTime += dt;
+	iterateSerial++;
 
 
 //	oldQW->lowPassFilter();
 //
 	if (true) {
 		char atRk2[100];
-		sprintf(atRk2, "at end of rk2 frame %1.0lf ", this->iterateSerial);
+		sprintf(atRk2, "at end of rk2 frame %1.0lf ", iterateSerial);
 		oldQW->dumpWave(atRk2, true);
 	}
 }

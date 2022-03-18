@@ -59,9 +59,9 @@ and for now omit the potential
 // here we will calculate the ψr(t + dt) values in buffer 0 only, and fill them in.
 // the ψi values in buffer 0 are still uncalculated
 void qSpace::stepReal(qCx *oldW, qCx *newW, double dt) {
-	qDimension *dims = this->dimensions;
+	qDimension *dims = dimensions;
 	//printf("⚛️ start of stepReal");
-	//this->dumpThatWave(oldW, true);
+	//dumpThatWave(oldW, true);
 	//printf("⚛︎ stepReal start N States=(%d), dt=%lf\n",
 	//	dims->nStates, dt);
 
@@ -80,20 +80,20 @@ void qSpace::stepReal(qCx *oldW, qCx *newW, double dt) {
 		newW[ix].re = oldW[ix].re - dt * Hψ;
 		qCheck("vischer stepReal", newW[ix]);
 	}
-	this->fixThoseBoundaries(newW);
+	fixThoseBoundaries(newW);
 	//printf("⚛️ end of stepReal:");
-	//this->dumpThatWave(newW, true);
+	//dumpThatWave(newW, true);
 }
 
 // second step: advance the Imaginaries of ψ a dt, from dt/2 to 3dt/2
 // given the reals we just generated in stepReal() (usually)
 void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
-	qDimension *dims = this->dimensions;
+	qDimension *dims = dimensions;
 	//printf("⚛︎ start of stepImaginary(), oldWave=");
-	//this->dumpThatWave(oldW, true);
+	//dumpThatWave(oldW, true);
 	//printf("⚛︎ dt=%lf\n", dt);
 
-	double *potential = this->potential;
+	double *potential = potential;
 	//printf("⚛︎ the hamiltonian ψ.im at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
 
@@ -112,9 +112,9 @@ void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
 		//newW[ix].im = oldW1.im - dt * H.im * newW[ix].re;
 		qCheck("vischer stepImaginary", newW[ix]);
 	}
-	this->fixThoseBoundaries(newW);
+	fixThoseBoundaries(newW);
 	//printf("⚛️ end of stepImaginary - result wave:");
-	//this->dumpThatWave(newW, true);
+	//dumpThatWave(newW, true);
 }
 
 // form the new wave from the old wave, in separate buffers, chosen by our caller.
@@ -124,7 +124,7 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 	qWave *newQW = newQWave;
 	qCx *newW = newQWave->wave;
 
-	qDimension *dims = this->dimensions;
+	qDimension *dims = dimensions;
 	oldQW->fixBoundaries();
 	if (debugVisscher) oldQW->dumpWave("starting oneVisscherStep", true);
 
@@ -142,11 +142,11 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 	// ok so after this, the time has advanced dt, and real is at elapsedTime and
 	// imaginary is at elapsedTime + dt/2.  Yes the re and the im are not synchronized.
 	// it was Visscher's idea.  I think he got it from someone else.
-	this->elapsedTime += dt;
+	elapsedTime += dt;
 
 	if (debugVisscher) {
 		char atVisscher[100];
-		sprintf(atVisscher, "at end of Visscher frame %1.0lf | ", this->iterateSerial);
+		sprintf(atVisscher, "at end of Visscher frame %1.0lf | ", iterateSerial);
 		newQW->dumpWave(atVisscher, true);
 	}
 }
@@ -158,19 +158,19 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 // im component a half dt ahead.  This does it for newly created stuff, like set waves.
 // If not visscher, returns harmlessly.
 void qSpace::visscherHalfStep(qWave *oldQWave, qWave *newQWave) {
-	qDimension *dims = this->dimensions;
+	qDimension *dims = dimensions;
 	qCx *oldW = oldQWave->wave;
 	qCx *newW = newQWave->wave;
 
 	// let's try moving the im forward dt/2 for the next wave.
 	// the current wave here is corrupt (being at the same time re/im) so add new one
-	double halfDt = this->dt / 2;
+	double halfDt = dt / 2;
 
 	// fake stepReal() by just copying over the real values
 	for (int ix = dims->start; ix < dims->end; ix++)
 		newW[ix].re = oldW[ix].re;
 
 	stepImaginary(oldQWave->wave, newQWave->wave, halfDt);
-	this->fixThoseBoundaries(newW);
+	fixThoseBoundaries(newW);
 }
 

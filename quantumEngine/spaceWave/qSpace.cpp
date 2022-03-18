@@ -29,24 +29,24 @@ static bool debugFreeBuffer = true;
 
 // resetCounters
 void qSpace::resetCounters(void) {
-	this->elapsedTime = 0.;
-	this->iterateSerial = 0;
+	elapsedTime = 0.;
+	iterateSerial = 0;
 }
 
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
 qSpace::qSpace(const char *lab) {
 	printf("🚀 🚀 qSpace::qSpace() theSpace this: x%p\n", (this));
-	this->nDimensions = 0;
+	nDimensions = 0;
 
-	this->resetCounters();
-	this->lowPassDilution = 0.5;
+	resetCounters();
+	lowPassDilution = 0.5;
 
-	this->pleaseFFT = false;
-	this->isIterating = false;
+	pleaseFFT = false;
+	isIterating = false;
 
-	strncpy(this->label, lab, LABEL_LEN);
-	this->label[LABEL_LEN-1] = 0;
+	strncpy(label, lab, LABEL_LEN);
+	label[LABEL_LEN-1] = 0;
 
 	printf("🚀 🚀 qSpace::qSpace() done this: x%p, length %lx\n", (this), sizeof(qSpace));
 }
@@ -54,18 +54,18 @@ qSpace::qSpace(const char *lab) {
 qSpace::~qSpace(void) {
 	printf("🚀 🚀 qSpace destructor of %s, this: x%p\n", label, (this));
 	// these cached buffers need to go free
-	this->clearFreeBuffers();
+	clearFreeBuffers();
 	printf("🚀 🚀 qSpace destructor done this: x%p\n", (this));
 }
 
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
 void qSpace::addDimension(int N, int continuum, const char *label) {
-	if (this->nDimensions >= MAX_DIMENSIONS) {
-		printf("🚀 🚀 Error dimensions: %d\n", this->nDimensions);
+	if (nDimensions >= MAX_DIMENSIONS) {
+		printf("🚀 🚀 Error dimensions: %d\n", nDimensions);
 		throw "🚀 🚀 too many dimensions";
 	}
 
-	qDimension *dims = this->dimensions + this->nDimensions;
+	qDimension *dims = dimensions + nDimensions;
 	dims->N = N;
 	dims->continuum = continuum;
 	if (continuum) {
@@ -80,60 +80,59 @@ void qSpace::addDimension(int N, int continuum, const char *label) {
 	strncpy(dims->label, label, LABEL_LEN-1);
 	dims->label[LABEL_LEN-1] = 0;
 
-	this->nDimensions++;
+	nDimensions++;
 }
 
 // after all the addDimension calls, what have we got?  calculate, not alloc.
 void qSpace::tallyDimensions(void) {
-	int nPoints = 1, nStates = 1;
+	nPoints = 1;
+	nStates = 1;
 
 	int ix;
 	// finish up all the dimensions now that we know them all
-	for (ix = this->nDimensions-1; ix >= 0; ix--) {
-		qDimension *dims = this->dimensions + ix;
+	for (ix = nDimensions-1; ix >= 0; ix--) {
+		qDimension *dims = dimensions + ix;
 
 		nStates *= dims->N;
 		dims->nStates = nStates;
 		nPoints *= dims->start + dims->end;
 		dims->nPoints = nPoints;
 	}
-	this->nStates = nStates;
-	this->nPoints = nPoints;
 
-	this->chooseSpectrumSize();
+	chooseSpectrumSize();
 
-	if (this->nPoints > this->spectrumSize)
-		this->freeBufferLength = this->nPoints;
+	if (nPoints > spectrumSize)
+		freeBufferLength = nPoints;
 	else
-		this->freeBufferLength = this->spectrumSize;
+		freeBufferLength = spectrumSize;
 	if (debugFreeBuffer) {
 		printf("🚀 🚀 qSpace::tallyDimensions, nPoints=x%x   spectrumSize=x%x   freeBufferLength=x%x   ",
-			this->nPoints, this->spectrumSize, this->freeBufferLength);
+			nPoints, spectrumSize, freeBufferLength);
 	}
 
 	//printf("🚀 🚀  got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
 }
 
 // call this After addDIMENSION calls to get it ready to go.
-// If this->nPoints is still zero, initSpace hasn't been called yet; failure
+// If nPoints is still zero, initSpace hasn't been called yet; failure
 void qSpace::initSpace() {
-	this->tallyDimensions();
+	tallyDimensions();
 
 	// try out different formulas here.  Um, this is actually set manually
-	double dt = this->dt = 1. / (this->nStates * this->nStates);
-	//double dt = this->dt = nStates * 0.02;  // try out different factors here
+	double dt = dt = 1. / (nStates * nStates);
+	//double dt = dt = nStates * 0.02;  // try out different factors here
 
 	// used only for the RKs - therefore obsolete
-//	this->dtOverI = qCx(0., -dt);
-//	this->halfDtOverI = qCx(0., -dt / 2.);
-//	this->bufferNum = 0;
+//	dtOverI = qCx(0., -dt);
+//	halfDtOverI = qCx(0., -dt / 2.);
+//	bufferNum = 0;
 }
 
 /* ********************************************************** potential */
 
 void qSpace::dumpPotential(const char *title) {
 	int ix;
-	qDimension *dims = this->dimensions;
+	qDimension *dims = dimensions;
 
 	printf("🚀 🚀 == Potential %s, %d...%d", title, dims->start, dims->end);
 	if (dims->continuum) printf("  start [O]=%lf", thePotential[0]);
@@ -148,13 +147,13 @@ void qSpace::dumpPotential(const char *title) {
 }
 
 void qSpace::setZeroPotential(void) {
-	qDimension *dims = this->dimensions;
+	qDimension *dims = dimensions;
 	for (int ix = 0; ix < dims->nPoints; ix++)
 		thePotential[ix] = 0.;
 }
 
 void qSpace::setValleyPotential(double power = 1, double scale = 1, double offset = 0) {
-	qDimension *dims = this->dimensions;
+	qDimension *dims = dimensions;
 	double mid = floor(dims->nPoints / 2);
 	for (int ix = 0; ix < dims->nPoints; ix++) {
 		thePotential[ix] = pow(abs(ix - mid), power) * scale + offset;
@@ -171,20 +170,20 @@ void qSpace::oneIteration() {
 
 	if (debugIteration)
 		printf("🚀 🚀 qSpace::oneIteration() - dt=%lf   stepsPerIteration=%d\n",
-			this->dt, this->stepsPerIteration);
+			dt, stepsPerIteration);
 
-	int steps = this->stepsPerIteration / 2;
+	int steps = stepsPerIteration / 2;
 	if (debugIteration)
 		printf("🚀 🚀 qSpace::oneIteration() - steps=%d   stepsPerIteration=%d\n",
-			steps, this->stepsPerIteration);
+			steps, stepsPerIteration);
 
-	this->isIterating = true;
+	isIterating = true;
 	for (ix = 0; ix < steps; ix++) {
 		// this seems to have a resolution of 100µs on Panama
 		//auto start = std::chrono::steady_clock::now();////
 
-		this->oneVisscherStep(laosQWave, peruQWave);
-		this->oneVisscherStep(peruQWave, laosQWave);
+		oneVisscherStep(laosQWave, peruQWave);
+		oneVisscherStep(peruQWave, laosQWave);
 		if (debugIteration && 0 == ix % 100)
 			printf("🚀 🚀  step every hundred, step %d\n", ix * 2);
 
@@ -192,18 +191,18 @@ void qSpace::oneIteration() {
 		//std::chrono::duration<double> elapsed_seconds = end-start;////
 		//printf("elapsed time: %lf \n", elapsed_seconds.count());////
 	}
-	this->isIterating = false;
+	isIterating = false;
 
-	this->iterateSerial++;
+	iterateSerial++;
 
 	// printf("qSpace::oneIteration(): viewBuffer %ld and latestWave=%ld\n",
 	// 	(long) viewBuffer, (long) latestWave);
-	this->latestQWave = laosQWave;
+	latestQWave = laosQWave;
 
 	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
-	//this->latestQWave->lowPassFilter(this->lowPassDilution);
-	this->latestQWave->nyquistFilter();
-	this->latestQWave->normalize();
+	//	latestQWave->lowPassFilter(lowPassDilution);
+	latestQWave->nyquistFilter();
+	latestQWave->normalize();
 
 
 	// need it; somehow? not done in JS
@@ -212,31 +211,31 @@ void qSpace::oneIteration() {
 	if (debugIterSummary) {
 		char buf[100];
 		sprintf(buf, "🚀 🚀 finished one iteration (%d steps, N=%d), inner product: %lf",
-			this->stepsPerIteration, this->dimensions->N, this->latestQWave->innerProduct());
+			stepsPerIteration, dimensions->N, latestQWave->innerProduct());
 	}
 
 	if (debugJustWave) {
 		char buf[100];
-		this->latestQWave->dumpWave(buf, true);
+		latestQWave->dumpWave(buf, true);
 	}
 	if (debugJustInnerProduct) {
 printf("🚀 🚀 finished one integration iteration (%d steps, N=%d), inner product: %lf\n",
-this->stepsPerIteration, this->dimensions->N, this->latestQWave->innerProduct());
+stepsPerIteration, dimensions->N, latestQWave->innerProduct());
 	}
 
-	if (this->pleaseFFT) {
-		analyzeWaveFFT(this->latestQWave);
-		this->pleaseFFT = false;
+	if (pleaseFFT) {
+		analyzeWaveFFT(latestQWave);
+		pleaseFFT = false;
 	}
 }
 
 
 // user button to print it out now, or at end of the next iteration
 void qSpace::askForFFT(void) {
-	if (this->isIterating)
-		this->pleaseFFT = true;
+	if (isIterating)
+		pleaseFFT = true;
 	else
-		analyzeWaveFFT(this->latestQWave);
+		analyzeWaveFFT(latestQWave);
 }
 
 
@@ -245,24 +244,24 @@ void qSpace::askForFFT(void) {
 // this is all on the honor system.  If you borrow a buf, you either have to return it
 // with returnBuffer() or you free it with freeWave().
 qCx *qSpace::borrowBuffer(void) {
-	FreeBuffer *rentedCache = this->freeBufferList;
+	FreeBuffer *rentedCache = freeBufferList;
 	if (rentedCache) {
 		if (debugFreeBuffer) {
 			printf("🚀 🚀 qSpace::borrowBuffer() with some cached. freeBufferList: x%p\n",
-			(this->freeBufferList));
+			(freeBufferList));
 		}
 
 		// there was one available on the free list, pop it off
-		this->freeBufferList = rentedCache->next;
+		freeBufferList = rentedCache->next;
 		return (qCx *) rentedCache;
 	}
 	else {
 		// must make a new one
 		if (debugFreeBuffer) {
 			printf("🚀 🚀 qSpace::borrowBuffer() with none cached. freeBufferList: x%p   freeBufferLength: %d\n",
-			(this->freeBufferList), this->freeBufferLength);
+			(freeBufferList), freeBufferLength);
 		}
-		return allocateWave(this->freeBufferLength);
+		return allocateWave(freeBufferLength);
 	}
 }
 
@@ -270,25 +269,25 @@ qCx *qSpace::borrowBuffer(void) {
 // do not return buffers that aren't the right size - freeBufferLength
 void qSpace::returnBuffer(qCx *rentedBuffer) {
 	printf("rentedBuffer: x%p  freeBufferList=x%p",
-		rentedBuffer, this->freeBufferList);
+		rentedBuffer, freeBufferList);
 	FreeBuffer *rented = (FreeBuffer *) rentedBuffer;
-	rented->next = this->freeBufferList;
-	this->freeBufferList = rented;
+	rented->next = freeBufferList;
+	freeBufferList = rented;
 }
 
 // this is the only way they're freed; otherwise they just collect.
 // shouldn't be too many, though.  Called by destructor.
 void qSpace::clearFreeBuffers() {
 printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: x%p\n",
-	(this->freeBufferList));
+	(freeBufferList));
 	FreeBuffer *n;
-	for (FreeBuffer *f = this->freeBufferList; f; f = n) {
+	for (FreeBuffer *f = freeBufferList; f; f = n) {
 		n = f->next;
 printf("           🚀 🚀 about to free this one: x%p\n",
 (f));
 		freeWave((qCx *) f);
 	}
-	this->freeBufferList = NULL;
+	freeBufferList = NULL;
 	printf("              🚀 🚀 qSpace::clearFreeBuffers() done. freeBufferList=x%p\n",
-		this->freeBufferList);
+		freeBufferList);
 }
