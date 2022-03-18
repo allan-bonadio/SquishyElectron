@@ -10,7 +10,6 @@
 #include <string.h>
 #include <float.h>
 
-#include <emscripten.h>
 
 #define byte unsigned char
 #define char16 char16_t
