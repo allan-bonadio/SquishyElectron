@@ -36,7 +36,7 @@ void qSpace::resetCounters(void) {
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
 qSpace::qSpace(const char *lab) {
-	printf("🚀 🚀 qSpace::qSpace() theSpace this: x%x\n", (uint32_t) (this));
+	printf("🚀 🚀 qSpace::qSpace() theSpace this: x%p\n", (this));
 	this->nDimensions = 0;
 
 	this->resetCounters();
@@ -48,14 +48,14 @@ qSpace::qSpace(const char *lab) {
 	strncpy(this->label, lab, LABEL_LEN);
 	this->label[LABEL_LEN-1] = 0;
 
-	printf("🚀 🚀 qSpace::qSpace() done this: x%x, length %lx\n", (uint32_t) (this), sizeof(qSpace));
+	printf("🚀 🚀 qSpace::qSpace() done this: x%p, length %lx\n", (this), sizeof(qSpace));
 }
 
 qSpace::~qSpace(void) {
-	printf("🚀 🚀 qSpace destructor of %s, this: x%x\n", label, (uint32_t) (this));
+	printf("🚀 🚀 qSpace destructor of %s, this: x%p\n", label, (this));
 	// these cached buffers need to go free
 	this->clearFreeBuffers();
-	printf("🚀 🚀 qSpace destructor done this: x%x\n", (uint32_t) (this));
+	printf("🚀 🚀 qSpace destructor done this: x%p\n", (this));
 }
 
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
@@ -108,7 +108,7 @@ void qSpace::tallyDimensions(void) {
 		this->freeBufferLength = this->spectrumSize;
 	if (debugFreeBuffer) {
 		printf("🚀 🚀 qSpace::tallyDimensions, nPoints=x%x   spectrumSize=x%x   freeBufferLength=x%x   ",
-			(uint32_t) this->nPoints, (uint32_t) this->spectrumSize, (uint32_t) this->freeBufferLength);
+			this->nPoints, this->spectrumSize, this->freeBufferLength);
 	}
 
 	//printf("🚀 🚀  got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
@@ -248,8 +248,8 @@ qCx *qSpace::borrowBuffer(void) {
 	FreeBuffer *rentedCache = this->freeBufferList;
 	if (rentedCache) {
 		if (debugFreeBuffer) {
-			printf("🚀 🚀 qSpace::borrowBuffer() with some cached. freeBufferList: x%x\n",
-			(uint32_t) (this->freeBufferList));
+			printf("🚀 🚀 qSpace::borrowBuffer() with some cached. freeBufferList: x%p\n",
+			(this->freeBufferList));
 		}
 
 		// there was one available on the free list, pop it off
@@ -259,8 +259,8 @@ qCx *qSpace::borrowBuffer(void) {
 	else {
 		// must make a new one
 		if (debugFreeBuffer) {
-			printf("🚀 🚀 qSpace::borrowBuffer() with none cached. freeBufferList: x%x   freeBufferLength: %d\n",
-			(uint32_t) (this->freeBufferList), this->freeBufferLength);
+			printf("🚀 🚀 qSpace::borrowBuffer() with none cached. freeBufferList: x%p   freeBufferLength: %d\n",
+			(this->freeBufferList), this->freeBufferLength);
 		}
 		return allocateWave(this->freeBufferLength);
 	}
@@ -269,8 +269,8 @@ qCx *qSpace::borrowBuffer(void) {
 // return the buffer to the free list.  Potentially endless but probably not.
 // do not return buffers that aren't the right size - freeBufferLength
 void qSpace::returnBuffer(qCx *rentedBuffer) {
-	printf("rentedBuffer: x%x  freeBufferList=x%x",
-		(uint32_t) rentedBuffer, (uint32_t) this->freeBufferList);
+	printf("rentedBuffer: x%p  freeBufferList=x%p",
+		rentedBuffer, this->freeBufferList);
 	FreeBuffer *rented = (FreeBuffer *) rentedBuffer;
 	rented->next = this->freeBufferList;
 	this->freeBufferList = rented;
@@ -279,16 +279,16 @@ void qSpace::returnBuffer(qCx *rentedBuffer) {
 // this is the only way they're freed; otherwise they just collect.
 // shouldn't be too many, though.  Called by destructor.
 void qSpace::clearFreeBuffers() {
-printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: x%x\n",
-	(uint32_t) (this->freeBufferList));
+printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: x%p\n",
+	(this->freeBufferList));
 	FreeBuffer *n;
 	for (FreeBuffer *f = this->freeBufferList; f; f = n) {
 		n = f->next;
-printf("           🚀 🚀 about to free this one: x%x\n",
-(uint32_t) (f));
+printf("           🚀 🚀 about to free this one: x%p\n",
+(f));
 		freeWave((qCx *) f);
 	}
 	this->freeBufferList = NULL;
-	printf("              🚀 🚀 qSpace::clearFreeBuffers() done. freeBufferList=x%x\n",
-		(uint32_t) this->freeBufferList);
+	printf("              🚀 🚀 qSpace::clearFreeBuffers() done. freeBufferList=x%p\n",
+		this->freeBufferList);
 }
