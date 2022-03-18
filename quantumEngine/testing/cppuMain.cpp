@@ -1,3 +1,8 @@
+/*
+** cppu main -- cppu Unit Test main source, top level
+** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+*/
+
 #include "../spaceWave/qCx.h"
 
 #include "CppUTest/TestHarness.h"
