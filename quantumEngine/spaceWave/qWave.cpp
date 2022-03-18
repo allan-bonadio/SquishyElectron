@@ -20,21 +20,21 @@ int traceLowPassFilter = false;
 qWave::qWave(qSpace *space, qCx *useThisBuffer) {
 	qBuffer();
 
-	printf("🌊🌊 qWave::qWave(%s)  utb=x%x => this=x%x", space->label,
-		(uint32_t) useThisBuffer, (uint32_t) this);
-	printf("🌊🌊 qWave::qWave() wave's Space: x%x  nPoints:%d\n", (uint32_t) (space), space->nPoints);
-	printf("      🌊🌊        qWave: x%x\n", (uint32_t) (this));
+	printf("🌊🌊 qWave::qWave(%s)  utb=x%p => this=x%p", space->label,
+		useThisBuffer, this);
+	printf("🌊🌊 qWave::qWave() wave's Space: x%p  nPoints:%d\n", (space), space->nPoints);
+	printf("      🌊🌊        qWave: x%p\n", (this));
 	this->space = space;
 	initBuffer(useThisBuffer);
 
-	printf("      🌊🌊  allocated wave: x%x\n", (uint32_t) (this->wave));
+	printf("      🌊🌊  allocated wave: x%p\n", (this->wave));
 	qDimension *dim = space->dimensions;
 	this->nPoints = dim->nPoints;
 	this->start = dim->start;
 	this->end = dim->end;
 
-printf("🌊🌊 allocated qWave::qWave this qWave obj: x%x length x%x\n",
-(uint32_t) this, (uint32_t) sizeof(qWave));
+printf("🌊🌊 allocated qWave::qWave this qWave obj: x%p length x%lx\n",
+this, (long) sizeof(qWave));
 }
 
 qWave::~qWave(void) {

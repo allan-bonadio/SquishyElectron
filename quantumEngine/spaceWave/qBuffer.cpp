@@ -29,10 +29,8 @@ static bool debugAllocate = false;
 qCx *allocateWave(int nPoints) {
 	qCx *buf = (qCx *) malloc(nPoints * sizeof(qCx));
 	if (debugAllocate) {
-		printf("🍕 allocateWave()  wave=x%x  nPoints: %d bytelength=x%lx\n",
-			(uint32_t) buf, nPoints, nPoints * sizeof(qCx));
-		printf("🍕 allocateWave() next alloc distance: %d\n",
-			(uint32_t) malloc(8) - (uint32_t) buf);
+		printf("🍕 allocateWave()  wave=x%p  nPoints: %d bytelength=x%lx\n",
+			buf, nPoints, nPoints * sizeof(qCx));
 	}
 	return buf;
 }
@@ -48,12 +46,9 @@ qCx *qBuffer::allocateWave(int nPoints) {
 
 	this->nPoints = nPoints;
 	if (debugAllocate)
-		printf("🍕 qBuffer::allocateWave this=x%x  wave=x%x  nPoints: %d   freeBufferLength: x%x\n",
-			(uint32_t) this, (uint32_t) this->wave, nPoints, this->space->freeBufferLength);
+		printf("🍕 qBuffer::allocateWave this=x%p  wave=x%p  nPoints: %d   freeBufferLength: x%x\n",
+			this, this->wave, nPoints, this->space->freeBufferLength);
 	qCx *buf =  (qCx *) malloc(nPoints * sizeof(qCx));
-	if (debugAllocate)
-		printf("🍕 qBuffer::allocateWave next alloc distance: %d\n",
-			(uint32_t) malloc(8) - (uint32_t) buf);
 	return buf;
 }
 
@@ -78,8 +73,8 @@ void qBuffer::initBuffer(qCx *useThisBuffer) {
 	this->start = this->end = -1;  // wave / spectrum calculates these differently
 	this->nPoints = this->space->freeBufferLength;  // wave / spectrum calculates these differently
 	if (debugAllocate) {
-		printf("🍕 qBuffer::initBuffer this=x%x  wave=x%x  nPoints: %d\n",
-			(uint32_t) this, (uint32_t) this->wave, nPoints);
+		printf("🍕 qBuffer::initBuffer this=x%p  wave=x%p  nPoints: %d\n",
+			this, this->wave, nPoints);
 	}
 }
 
@@ -231,9 +226,9 @@ void qBuffer::normalize(void) {
 
 		for (int ix = dims->start; ix < dims->end; ix++) {
 			wave[ix] *= factor;
-			if (((uint32_t) qViewBuffer_getViewBuffer()) & 3) {
-				printf("🍕 getViewBuffer() is odd: %x at ix=%d\n",
-					(uint32_t) qViewBuffer_getViewBuffer(), ix);
+			if (((uintptr_t) qViewBuffer_getViewBuffer()) & 3) {
+				printf("🍕 getViewBuffer() is odd: x%p at ix=%d\n",
+					qViewBuffer_getViewBuffer(), ix);
 			}
 		}
 	}
