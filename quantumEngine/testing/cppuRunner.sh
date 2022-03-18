@@ -1,50 +1,38 @@
 #!/bin/bash
 
+########################################################
+# cppu Unit Test Runner -- for Squishy Electron
+# Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+
+
 # this runs from the main quantumEngine directory
 cd `dirname $0`
 cd ..
 
-echo CppU Test runner
+echo CppUTest Test runner
+
+# https://cpputest.github.io
+export CPPUTEST_HOME=/dvl/cpputest/cpputest-3.8
 
 # no enscriptm here!  just native C++.
 #. /dvl/emscripten/emsdk-main/emsdk_env.sh
 
-# create a space-sep list of ALL the cpp files (almost all)
-#allCpp=`cat building/allCpp.list`
-#
-#mt=" testing/main.test.cpp testing/spaceWave/qCx.test.cpp "
-#et=" testing/rk2.test.cpp testing/spaceWave/vissFlicks.test.cpp "
-#swt="testing/spaceWave/space.test.cpp  testing/spaceWave/wave.test.cpp "
-#allTesters=" $mt $et $swt "
-
-export CPPUTEST_HOME=/dvl/cpputest/cpputest-3.8
-#export CPPFLAGS="-I$CPPUTEST_HOME/include"
-#export CXXFLAGS="-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h"
-#export CFLAGS="-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorMallocMacros.h"
-#export LD_LIBRARIES="-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt"
-
-g++ -o cppuTestBin \
-	-I$CPPUTEST_HOME/include \
-	-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h \
-	-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt \
-	testing/cppuMain.cpp testing/*/*.cppu.cpp \
-	spaceWave/qCx.cpp \
-	|| exit $?
-
-#testing/*.cppu.cpp
+# create a space-sep list of ALL the runtime cpp files (almost all)
+allCpp=`cat building/allCpp.list`
 
 # note that main.cpp is NOT included in the .cpp files; that's for web use only
 # and makes all the diff.  Update list of test srcs as needed.
-#emcc -o cppuTest.js -sLLD_REPORT_UNDEFINED  \
-#	-g -O0 -sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 \
-#	-sNO_DISABLE_EXCEPTION_CATCHING \
-#	-I/dvl/cpputest/cpputest-3.8/include \
-#	testing/cppuExample.cppu.cpp  \
-#	|| exit $?
-#
-#
-## now run the tests
-echo ====================== done compiling ==================================
+# some of these options - dunno if I need them
+g++ -o cppuTestBin  -Wno-c++11-extensions  -fexceptions  \
+	-I$CPPUTEST_HOME/include \
+	-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h \
+	-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt \
+	testing/cppuMain.cpp */*.cppu.cpp \
+	$allCpp \
+	|| exit $?
+
+
+echo ====================== done compiling... start testing ==================================
 echo
 
 # it's a real C++ program and I can use gdb!

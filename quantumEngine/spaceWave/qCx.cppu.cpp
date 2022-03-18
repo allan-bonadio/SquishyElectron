@@ -1,19 +1,11 @@
 //#include <string>
-#include "../../spaceWave/qCx.h"
-#include "../cppuMain.h"
+#include "./qCx.h"
+#include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"
 
-// somebody else did this; maybe it'll help
-// no just generates error messages
-//#include <stdc++.h>
-//#include <bits/stdc++.h>
-
-
+// does this do anything?
 using namespace std;
-
-
-
 
 
 TEST_GROUP(qCx)
