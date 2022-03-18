@@ -6,6 +6,5 @@ quantumEngine.js
 quantumEngine.wasm
 quantumTest.js
 quantumTest.wasm
+cppuTestBin
 
-# various fft algs i downloaded, original as-downloaded versions
-*origFFT.cpp
