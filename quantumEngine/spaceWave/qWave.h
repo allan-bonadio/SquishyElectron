@@ -21,7 +21,9 @@ struct qBuffer {
 
 	// create one, dynamically allocated or Bring Your Own Buffer to use
 	qBuffer(void);
-	~qBuffer();
+	virtual ~qBuffer();
+
+	uint32_t magic;
 
 	// calls solo allocateWave() but for this wave's count and stuff
 	qCx *allocateWave(int nPoints = -1);
@@ -58,12 +60,12 @@ struct qBuffer {
 };
 
 
-struct qWave : public qBuffer {
+struct qWave : public virtual qBuffer {
 
 	// create a qWave, dynamically allocated or hand in a buffer to use
 	qWave(qSpace *space, qCx *useThisBuffer = NULL);
 
-	~qWave();
+	virtual ~qWave();
 
 
 	// for a naked wave, and for a qWave.  dumpThatWave same as in qSpace::
@@ -136,7 +138,7 @@ struct qFlick : public qWave {
 };
 
 
-struct qSpectrum : public qBuffer {
+struct qSpectrum : public virtual  qBuffer {
 
 	// create a qWave, dynamically allocated or hand in a buffer to use
 	qSpectrum(qSpace *space, qCx *useThisBuffer = NULL);
@@ -152,6 +154,8 @@ struct qSpectrum : public qBuffer {
 
 // always dynamically allocated
 struct qViewBuffer {
+	uint32_t magic;
+
 	// always dynamically allocated
 	float *viewBuffer;
 
