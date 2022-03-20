@@ -22,7 +22,7 @@ qFlick - object that owns a list of waves, and points to its space
 #include "qWave.h"
 
 static bool debugNormalize = false;
-static bool debugAllocate = false;
+static bool debugAllocate = true;
 
 // just allocate a wave of whatever length
 // buffer is initialized to zero bytes therefore 0.0 everywhere
@@ -56,6 +56,7 @@ qCx *qBuffer::allocateWave(int nPoints) {
 
 // create one, dynamically allocated or Bring Your Own Buffer to use
 qBuffer::qBuffer(void) {
+	magic = 'qBuf';
 }
 
 // actually create the buffer that we need
@@ -63,12 +64,14 @@ qBuffer::qBuffer(void) {
 void qBuffer::initBuffer(qCx *useThisBuffer) {
 	if (useThisBuffer) {
 		wave = useThisBuffer;
-		dynamicallyAllocated = 0;
+		dynamicallyAllocated = false;
 	}
 	else {
 		// borrow will allocate if nothing in the freelist
-		wave = space->borrowBuffer();
-		dynamicallyAllocated = 1;
+		//wave = space->borrowBuffer();
+
+		wave = allocateWave(space->freeBufferLength);
+		dynamicallyAllocated = true;
 	}
 	start = end = -1;  // wave / spectrum calculates these differently
 	nPoints = space->freeBufferLength;  // wave / spectrum calculates these differently
@@ -82,7 +85,9 @@ qBuffer::~qBuffer() {
 	if (debugAllocate)
 		printf("🍕  start the qBuffer instance destructor...\n");
 	if (dynamicallyAllocated) {
-		space->returnBuffer(wave);
+		freeWave(wave);
+
+		//space->returnBuffer(wave);
 		if (debugAllocate) printf("   🍕  freed buffer...\n");
 	}
 
@@ -136,6 +141,11 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 
 // you can use this on waves or spectrums; for the latter, leave off the start and the rest
 void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int continuum) {
+	printf("qBuffer::dumpSegment(x%p, %s)\n", wave, withExtras ? "with extras" : "without extras");
+	printf("      start:%d  end:%d  continuum: %d\n", start, end, continuum);
+
+	if (start >= end)
+		throw "qBuffer::dumpSegment() start >= end";
 
 	int ix = 0;
 	char buf[200];
@@ -160,7 +170,7 @@ void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int co
 		printf("\nend %s", buf);
 	}
 
-	printf(" innerProd=%11.8lf\n", innerProd);
+	printf("    inner product=%11.8lf\n", innerProd);
 }
 
 
