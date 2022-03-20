@@ -7,8 +7,9 @@
 #include "qCx.h"
 
 // do not exceed these!  they are open ended arrays.
-// keep LABEL_LEN a multiple of 4 or 8 for alignment.
-#define LABEL_LEN  16
+// keep LABEL_LEN+1 a multiple of 4 or 8 for alignment.
+#define LABEL_LEN  31
+
 #define MAX_DIMENSIONS  2
 
 extern class qSpace *theSpace;
@@ -42,7 +43,8 @@ public:
 	// contDISCRETE = (has N values for N possibilities)
 	int continuum;
 
-	// size for Fourier transforms, or zero if not yet calculated.  Often a power of two.
+	// size for Fourier transforms, or zero if not yet calculated.  ON THIS DIMENSION ONLY!
+	// Often a power of two.
 	// no boundaries.
 	int fourierSize;
 
@@ -51,7 +53,7 @@ public:
 	// variable total angular mom: L combines Lz and Ltot so: state ix = 0...Lmax^2
 	// Ltot = floor(sqrt(ix))   Lz = ix - L(L+1) and you have to choose a Lmax sorry
 	// Also could have Energy dimensions...
-	char label[LABEL_LEN];
+	char label[LABEL_LEN+1];
 
 };
 
@@ -79,7 +81,9 @@ public:
 	public:
 	void initSpace(void);
 
-	char label[LABEL_LEN];
+	int magic;
+
+	char label[LABEL_LEN+1];
 
 	// Dimensions are listed from outer to inner as with the resulting ψ array:
 	// ψ[outermost-dim][dim][dim][innermost-dim]
@@ -172,6 +176,8 @@ extern "C" {
 	qSpace *startNewSpace(const char *name = "a space");
 	qSpace *addSpaceDimension(int N, int continuum, const char *label);
 	qSpace *completeNewSpace(void);
+	void deleteTheSpace(void);
+
 
 	qCx *qSpace_getWaveBuffer(void);
 	double *qSpace_getPotentialBuffer(void);

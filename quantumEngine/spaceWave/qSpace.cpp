@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <chrono>
+#include <cstring>
 #include "qSpace.h"
 #include "qWave.h"
 #include "../fourier/fftMain.h"
@@ -15,11 +16,11 @@ class qSpace *theSpace = NULL;
 double *thePotential = NULL;
 
 
-static bool debugIterSummary = true;
+static bool debugIterSummary = false;
 static bool debugIteration = false;
 static bool debugJustWave = false;
 static bool debugJustInnerProduct = false;
-static bool debugFreeBuffer = true;
+static bool debugFreeBuffer = false;
 
 
 // someday I need an C++ error handling layer.  See
@@ -27,16 +28,12 @@ static bool debugFreeBuffer = true;
 
 /* ********************************************************** qSpace construction */
 
-// resetCounters
-void qSpace::resetCounters(void) {
-	elapsedTime = 0.;
-	iterateSerial = 0;
-}
-
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
 qSpace::qSpace(const char *lab) {
-	printf("🚀 🚀 qSpace::qSpace() theSpace this: x%p\n", (this));
+	magic = 'qSpa';
+
+	printf("🚀 🚀 qSpace::qSpace() constructor starts label:%s  this= x%p\n", lab, (this));
 	nDimensions = 0;
 
 	resetCounters();
@@ -46,16 +43,19 @@ qSpace::qSpace(const char *lab) {
 	isIterating = false;
 
 	strncpy(label, lab, LABEL_LEN);
-	label[LABEL_LEN-1] = 0;
+	label[LABEL_LEN] = 0;
 
-	printf("🚀 🚀 qSpace::qSpace() done this: x%p, length %lx\n", (this), sizeof(qSpace));
+	freeBufferList = NULL;
+
+	//printf("🚀 🚀 qSpace::qSpace() constructor done this= x%p, length %lx\n",
+	//	(this), sizeof(qSpace));
 }
 
 qSpace::~qSpace(void) {
-	printf("🚀 🚀 qSpace destructor of %s, this: x%p\n", label, (this));
+	//printf("🚀 🚀 qSpace destructor starting %s, this= x%p\n", label, (this));
 	// these cached buffers need to go free
 	clearFreeBuffers();
-	printf("🚀 🚀 qSpace destructor done this: x%p\n", (this));
+	//printf("🚀 🚀 qSpace destructor done this= x%p\n", (this));
 }
 
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
@@ -77,8 +77,8 @@ void qSpace::addDimension(int N, int continuum, const char *label) {
 		dims->end = N;
 	}
 
-	strncpy(dims->label, label, LABEL_LEN-1);
-	dims->label[LABEL_LEN-1] = 0;
+	strncpy(dims->label, label, LABEL_LEN);
+	dims->label[LABEL_LEN] = 0;
 
 	nDimensions++;
 }
@@ -118,7 +118,7 @@ void qSpace::tallyDimensions(void) {
 void qSpace::initSpace() {
 	tallyDimensions();
 
-	// try out different formulas here.  Um, this is actually set manually
+	// try out different formulas here.  Um, this is actually set manually in CP
 	double dt = dt = 1. / (nStates * nStates);
 	//double dt = dt = nStates * 0.02;  // try out different factors here
 
@@ -128,22 +128,28 @@ void qSpace::initSpace() {
 //	bufferNum = 0;
 }
 
+
+void qSpace::resetCounters(void) {
+	elapsedTime = 0.;
+	iterateSerial = 0;
+}
+
 /* ********************************************************** potential */
 
 void qSpace::dumpPotential(const char *title) {
 	int ix;
 	qDimension *dims = dimensions;
 
-	printf("🚀 🚀 == Potential %s, %d...%d", title, dims->start, dims->end);
+	//printf("🚀 🚀 == Potential %s, %d...%d", title, dims->start, dims->end);
 	if (dims->continuum) printf("  start [O]=%lf", thePotential[0]);
-	printf("\n");
+	//printf("\n");
 
-	for (ix = dims->start; ix < dims->end; ix++) {
-		if (0 == ix % 10) printf("\n[%d] ", ix);
-		printf("%lf ", thePotential[ix]);
-	}
-	if (dims->continuum) printf("\n🚀 🚀 end [%d]=%lf", ix, thePotential[ix]);
-	printf("\n");
+	//for (ix = dims->start; ix < dims->end; ix++) {
+	//	if (0 == ix % 10) printf("\n[%d] ", ix);
+	//	printf("%lf ", thePotential[ix]);
+	//}
+	//if (dims->continuum) printf("\n🚀 🚀 end [%d]=%lf", ix, thePotential[ix]);
+	//printf("\n");
 }
 
 void qSpace::setZeroPotential(void) {
@@ -219,8 +225,8 @@ void qSpace::oneIteration() {
 		latestQWave->dumpWave(buf, true);
 	}
 	if (debugJustInnerProduct) {
-printf("🚀 🚀 finished one integration iteration (%d steps, N=%d), inner product: %lf\n",
-stepsPerIteration, dimensions->N, latestQWave->innerProduct());
+		printf("🚀 🚀 finished one integration iteration (%d steps, N=%d), inner product: %lf\n",
+			stepsPerIteration, dimensions->N, latestQWave->innerProduct());
 	}
 
 	if (pleaseFFT) {
@@ -278,9 +284,9 @@ void qSpace::returnBuffer(qCx *rentedBuffer) {
 // this is the only way they're freed; otherwise they just collect.
 // shouldn't be too many, though.  Called by destructor.
 void qSpace::clearFreeBuffers() {
-printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: x%p\n",
-	(freeBufferList));
-	FreeBuffer *n;
+	printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: x%p\n",
+		(freeBufferList));
+	FreeBuffer *n = freeBufferList;
 	for (FreeBuffer *f = freeBufferList; f; f = n) {
 		n = f->next;
 printf("           🚀 🚀 about to free this one: x%p\n",
