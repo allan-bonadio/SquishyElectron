@@ -17,8 +17,8 @@ qSpectrum::qSpectrum(qSpace *space, qCx *useThisBuffer) {
 
 	printf("🌈 🌈 qSpectrum::qSpectrum(%s)  utb=x%p => this x%p", space->label,
 		useThisBuffer, this);
-	space = space;
-	initBuffer(useThisBuffer);
+	this->space = space;
+	initBuffer(space->freeBufferLength, useThisBuffer);
 
 	nPoints = space->spectrumSize;
 	start = 0;
@@ -36,7 +36,7 @@ qSpectrum::~qSpectrum(void) {
 void qSpace::dumpThatSpectrum(qCx *wave, bool withExtras) {
 	if (spectrumSize <= 0) throw "qSpace::dumpThatSpectrum() with zero points";
 
-	qBuffer::dumpSegment(wave, withExtras, 0, spectrumSize, dimensions->continuum);
+	qBuffer::dumpSegment(wave, withExtras, 0, spectrumSize, 0);
 }
 
 // this is the member function that dumps its own Spectrum and space

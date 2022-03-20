@@ -284,16 +284,16 @@ void qSpace::returnBuffer(qCx *rentedBuffer) {
 // this is the only way they're freed; otherwise they just collect.
 // shouldn't be too many, though.  Called by destructor.
 void qSpace::clearFreeBuffers() {
-	printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: x%p\n",
-		(freeBufferList));
+	//printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: x%p\n",
+	//	(freeBufferList));
 	FreeBuffer *n = freeBufferList;
 	for (FreeBuffer *f = freeBufferList; f; f = n) {
 		n = f->next;
-printf("           🚀 🚀 about to free this one: x%p\n",
-(f));
+	//printf("           🚀 🚀 about to free this one: x%p\n",
+	//(f));
 		freeWave((qCx *) f);
 	}
 	freeBufferList = NULL;
-	printf("              🚀 🚀 qSpace::clearFreeBuffers() done. freeBufferList=x%p\n",
-		freeBufferList);
+	//printf("              🚀 🚀 qSpace::clearFreeBuffers() done. freeBufferList=x%p\n",
+	//	freeBufferList);
 }

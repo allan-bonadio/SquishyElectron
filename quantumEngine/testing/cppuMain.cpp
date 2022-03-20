@@ -50,9 +50,9 @@ SimpleString StringFrom(const qCx value) {
 // Space generated in theSpace.  Old theSpace deleted.
 // frees and reallocates laos, peru, thePotential and the ViewBuffer
 qSpace *makeFull1dSpace(int N) {
-	printf("🧨 🧨  starting makeFull1dSpace(%d)\n", N);
+	//printf("🧨 🧨  starting makeFull1dSpace(%d)\n", N);
 	startNewSpace(MAKEFULL1DSPACE_LABEL);
-	printf("🧨 🧨     finished makeFull1dSpace(%d)\n", N);
+	//printf("🧨 🧨     finished makeFull1dSpace(%d)\n", N);
 	addSpaceDimension(N, contENDLESS, "x");
 	qSpace *space = completeNewSpace();
 	return space;
@@ -63,8 +63,8 @@ qSpace *makeFull1dSpace(int N) {
 // this space, you should be able to delete it directly.
 qSpace *makeBare1dSpace(int N) {
 	qSpace *space = new qSpace(MAKEBARE1DSPACE_LABEL);
-	printf("🧨 🧨 makeBare1dSpace: sizeof(qSpace) = %ld    space* = 0x%p\n",
-		sizeof(qSpace), space);
+	//printf("🧨 🧨 makeBare1dSpace: sizeof(qSpace) = %ld    space* = 0x%p\n",
+	//	sizeof(qSpace), space);
 	space->addDimension(N, contENDLESS, MAKEBARE1DDIM_LABEL);
 	space->initSpace();
 	return space;
@@ -90,12 +90,14 @@ void setCircularWave(qWave *target, double n) {
 }
 
 // fill up this buffer with some byte values just to prove that we can do it
-// oh yeah read from each location, too.
-void trashABuffer(void *buf, size_t size) {
+// oh yeah read from each location, too.  Size is number of BYTES.
+// If I end up stomping on something I shouldn't, it'll crash soon enough.
+// and cpputest might even detect that
+void claimItsMine(void *buf, size_t size) {
 	if (size == 0)
-		throw "trashABuffer()- size is zero";
+		throw "claimItsMine()- size is zero";
 	if (!buf)
-		throw "trashABuffer()- buf is NULL";
+		throw "claimItsMine()- buf is NULL";
 
 	uint8_t *buffer = (uint8_t *) buf;
 	for (int i = 0; i < size; i++)
