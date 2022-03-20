@@ -23,6 +23,8 @@ exportsSrc  = [
 	{name: 'addSpaceDimension', retType: 'number',
 		args: ['number', 'number', 'string']},
 	{name: 'completeNewSpace', retType: 'number', args: []},
+	{name: 'deleteTheSpace', retType: null, args: []},
+
 
 	// gets
 	{name: 'qSpace_getWaveBuffer', retType: 'number', args: []},

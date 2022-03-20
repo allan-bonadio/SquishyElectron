@@ -18,17 +18,46 @@ void allocWaves(void) {
 
 	peruWave = peruQWave->wave;
 	laosWave = laosQWave->wave;
-printf("        🚀 🚀 🚀       peruQWave=x%p   peruWave=x%p   laosQWave=x%p   laosWave=x%p  \n",
-peruQWave, peruWave, laosQWave, laosWave);
+
+	printf("        🚀 🚀 🚀       peruQWave=x%p   peruWave=x%p   laosQWave=x%p   laosWave=x%p  \n",
+		peruQWave, peruWave, laosQWave, laosWave);
+
+	/* *********************************** allocate other buffers */
+
+	// we make our own potential
+	theSpace->potential = thePotential = new double[theSpace->nPoints];
+
+
+	// our own view buffer - needs potential to be in place
+	theSpace->qViewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
+	dumpViewBuffer("newly created");
+
+	printf("   🚀 🚀 🚀 completeNewSpace BEFORE creation  theQViewBuffer=x%p  "
+		"theQViewBuffer->viewBuffer=x%p\n",
+			theQViewBuffer,
+			theQViewBuffer ? theQViewBuffer->viewBuffer : NULL);
 }
 
+// call to destroy them
 static void freeWaves(void) {
-	printf("🚀 🚀 🚀 about to delete qWaves:\n");
+	printf("🚀 🚀 🚀 about to delete qWaves:peruQWave\n");
 	delete peruQWave;
+	peruQWave = NULL;
+	printf("🚀 🚀 🚀 about to delete qWaves:laosQWave\n");
 	delete laosQWave;
+	laosQWave = NULL;
 
-	delete[] thePotential;
-	delete theQViewBuffer;
+
+	printf("       delete thePotential:\n");
+	if (thePotential)
+		delete[] thePotential;
+	thePotential = NULL;
+
+	printf("       delete theQViewBuffer:\n");
+	if (theQViewBuffer)
+		delete theQViewBuffer;
+	theQViewBuffer = NULL;
+
 	printf("🚀 🚀 🚀 done deleting.\n");
 }
 
@@ -113,18 +142,21 @@ void qSpace_askForFFT(void) { theSpace->askForFFT(); }
 // it's tedious to send a real data structure thru the emscripten interface, so the JS
 // constructs the dimensions by repeated calls to addSpaceDimension()
 qSpace *startNewSpace(const char *label) {
-	printf("🚀 🚀 🚀  startNewSpace(%s)\n", label);
+	printf("🚀 🚀 🚀  startNewSpace(%s), theSpace=x%p (should be zero)\n", label, theSpace);
 
 	if (theSpace) {
+		printf("🚀 🚀 🚀  theSpace(%s): about to freeWaves()\n", label);
 		freeWaves();
+		printf("🚀 🚀 🚀  theSpace: did freeWaves()\n");
 
-		printf("🚀 🚀 🚀  JSstartNewSpace   about to delete theSpace (%s => %s)\n", theSpace->label, label);
+		printf("🚀 🚀 🚀  JSstartNewSpace   about to delete theSpace (%s)\n", label);
 		delete theSpace;
-		printf("🚀 🚀 🚀  JSstartNewSpace   done deleting theSpace (%s => %s)\n", theSpace->label, label);
+		theSpace = NULL;
+		printf("🚀 🚀 🚀  JSstartNewSpace   done deleting theSpace (%s)\n", label);
 	}
-	printf("🚀 🚀 🚀  JSstartNewSpace   about to create new theSpace (%s => %s)\n", theSpace->label, label);
+	printf("🚀 🚀 🚀  startNewSpace: about to construct new space  itself '%s'\n", label);
 	theSpace = new qSpace(label);
-	printf("🚀 🚀 🚀  JSstartNewSpace   done startNewSpace()\n");
+	printf("🚀 🚀 🚀  JS startNewSpace   done (%s => %s)   theSpace=x%p\n", theSpace->label, label, theSpace);
 
 	return theSpace;
 }
@@ -133,23 +165,6 @@ qSpace *startNewSpace(const char *label) {
 qSpace *addSpaceDimension(int N, int continuum, const char *label) {
 	//printf("addSpaceDimension(%d, %d, %s)\n", N, continuum, label);
 	theSpace->addDimension(N, continuum, label);
-//	qDimension *dims = theSpace->dimensions + theSpace->nDimensions;
-//	dims->N = N;
-//	dims->continuum = continuum;
-//	if (continuum) {
-//		dims->start = 1;
-//		dims->end = N + 1;
-//	}
-//	else {
-//		dims->start = 0;
-//		dims->end = N;
-//	}
-//
-//	strncpy(dims->label, label, LABEL_LEN-1);
-//	dims->label[LABEL_LEN-1] = 0;
-//
-//	theSpace->nDimensions++;
-	//printf("🚀 🚀 🚀  done addSpaceDimension() %s\n", dims->label);
 	return theSpace;
 }
 
@@ -161,9 +176,12 @@ qSpace *completeNewSpace(void) {
 	theSpace->initSpace();
 	//printf("did initSpace\n");
 
-
 	/* *********************************** allocate waves */
 	allocWaves();
+
+	printf("   🚀 🚀 🚀 completeNewSpace After Creation but BEFORE loadViewBuffer  theQViewBuffer=x%p  "
+		"theQViewBuffer->viewBuffer=x%p\n",
+			theQViewBuffer, theQViewBuffer ?  theQViewBuffer->viewBuffer : NULL);
 
 	// we make our own wave - static
 	theSpace->latestQWave = laosQWave;
@@ -181,31 +199,13 @@ qSpace *completeNewSpace(void) {
 	printf("🚀 🚀 🚀 newly created wave, AFTER norm:\n");
 	theSpace->dumpThatWave(wave, true);
 
-	/* *********************************** allocate other buffers */
-
-	// we make our own potential
-	theSpace->potential = thePotential = new double[theSpace->nPoints];
-
-		printf("   🚀 🚀 🚀 completeNewSpace BEFORE creation  theQViewBuffer=x%p  "
-			"theQViewBuffer->viewBuffer=x%p\n",
-				theQViewBuffer,
-				theQViewBuffer ? theQViewBuffer->viewBuffer : NULL);
-
-
-	// our own view buffer - needs potential to be in place
-	theSpace->qViewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
-	//dumpViewBuffer("newly created");
-
-		printf("   🚀 🚀 🚀 completeNewSpace After Creation but BEFORE loadViewBuffer  theQViewBuffer=x%p  "
-			"theQViewBuffer->viewBuffer=x%p\n",
-				theQViewBuffer, theQViewBuffer ?  theQViewBuffer->viewBuffer : NULL);
 
 
 	theQViewBuffer->loadViewBuffer();  // just so i can see the default if needed
 
-		printf("   🚀 🚀 🚀 completeNewSpace AFTER loadViewBuffer  theQViewBuffer=x%p  "
-			"theQViewBuffer->viewBuffer=x%p\n",
-				theQViewBuffer, theQViewBuffer ?  theQViewBuffer->viewBuffer : NULL);
+	printf("   🚀 🚀 🚀 completeNewSpace AFTER loadViewBuffer  theQViewBuffer=x%p  "
+		"theQViewBuffer->viewBuffer=x%p\n",
+			theQViewBuffer, theQViewBuffer ?  theQViewBuffer->viewBuffer : NULL);
 
 
 
@@ -213,6 +213,16 @@ qSpace *completeNewSpace(void) {
 	return theSpace;
 }
 
+// dispose of ALL of that
+void deleteTheSpace() {
+	printf("   🚀 🚀 🚀 deleteTheSpace(): starts\n");
+	freeWaves();
+	printf("    deleteTheSpace(): finished freeWaves\n");
+
+	delete theSpace;
+	theSpace = NULL;
+	printf("    deleteTheSpace(): done\n");
+}
 
 // end of extern "C"
 }
