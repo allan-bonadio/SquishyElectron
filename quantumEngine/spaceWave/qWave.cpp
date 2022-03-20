@@ -13,6 +13,7 @@ class qWave *laosQWave = NULL, *peruQWave = NULL;
 class qCx *laosWave = NULL, *peruWave = NULL;
 
 int traceLowPassFilter = false;
+int traceConstDeconst = true;
 
 /* ************************************************************ birth & death & basics */
 
@@ -20,24 +21,40 @@ int traceLowPassFilter = false;
 qWave::qWave(qSpace *space, qCx *useThisBuffer) {
 	qBuffer();
 
-	printf("🌊🌊 qWave::qWave(%s)  utb=x%p => this=x%p", space->label,
-		useThisBuffer, this);
-	printf("🌊🌊 qWave::qWave() wave's Space: x%p  nPoints:%d\n", (space), space->nPoints);
-	printf("      🌊🌊        qWave: x%p\n", (this));
+	magic = 'qWav';
+
+	if (traceConstDeconst) {
+		printf("🌊🌊 qWave::qWave(%s)  utb=x%p => this=x%p\n", space->label,
+			useThisBuffer, this);
+		printf("🌊🌊 qWave::qWave() wave's Space: x%p  nPoints:%d\n", (space), space->nPoints);
+		printf("      🌊🌊        qWave: x%p\n", (this));
+	}
+
 	this->space = space;
 	initBuffer(useThisBuffer);
 
-	printf("      🌊🌊  allocated wave: x%p\n", (wave));
+	if (traceConstDeconst)
+		printf("      🌊🌊  allocated wave: x%p\n", (wave));
 	qDimension *dim = space->dimensions;
 	nPoints = dim->nPoints;
 	start = dim->start;
 	end = dim->end;
 
-printf("🌊🌊 allocated qWave::qWave this qWave obj: x%p length x%lx\n",
-this, (long) sizeof(qWave));
+	if (traceConstDeconst) {
+		printf("🌊🌊 allocated qWave::qWave resulting qWave obj: x%p   sizeof qWave = x%lx\n",
+			this, (long) sizeof(qWave));
+		printf("        sizeof(int):%ld   sizeof(void *):%ld\n", sizeof(int), sizeof(void *));
+	}
 }
 
 qWave::~qWave(void) {
+	// the qBuffer superclass frees the wave
+
+	if (traceConstDeconst) {
+		printf("🌊🌊 qWave::~qWave resulting qWave obj: x%p \n",
+			this);
+		printf("        sizeof(int):%ld   sizeof(void *):%ld\n", sizeof(int), sizeof(void *));
+	}
 }
 
 
@@ -79,7 +96,7 @@ void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
 	if (nPoints <= 0) throw "🌊🌊 qSpace::dumpThatWave() with zero points";
 
 	const qDimension *dims = dimensions;
-	qBuffer::dumpSegment(wave, dims->start, dims->end, dims->continuum, withExtras);
+	qBuffer::dumpSegment(wave, withExtras, dims->start, dims->end, dims->continuum);
 }
 
 // any wave, probably shouldn't call this
