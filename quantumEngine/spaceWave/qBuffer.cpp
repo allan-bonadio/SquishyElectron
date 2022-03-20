@@ -22,7 +22,7 @@ qFlick - object that owns a list of waves, and points to its space
 #include "qWave.h"
 
 static bool debugNormalize = false;
-static bool debugAllocate = true;
+static bool debugAllocate = false;
 
 // just allocate a wave of whatever length
 // buffer is initialized to zero bytes therefore 0.0 everywhere
@@ -41,7 +41,7 @@ void freeWave(qCx *wave) {
 
 // make one, the right size for this buffer's space, or nPoints long
 qCx *qBuffer::allocateWave(int nPoints) {
-	if (nPoints < 0)
+	if (nPoints <= 0)
 		nPoints = space->freeBufferLength;
 
 	this->nPoints = nPoints;
@@ -54,14 +54,17 @@ qCx *qBuffer::allocateWave(int nPoints) {
 
 
 
-// create one, dynamically allocated or Bring Your Own Buffer to use
+// create one
 qBuffer::qBuffer(void) {
 	magic = 'qBuf';
+	wave = NULL;
 }
 
 // actually create the buffer that we need
+// dynamically allocated or Bring Your Own Buffer to use
 // usually called by subclass constructors when they figure out how long a buffer is needed
-void qBuffer::initBuffer(qCx *useThisBuffer) {
+// length is in units of qComplex (16 by)
+void qBuffer::initBuffer(int length, qCx *useThisBuffer) {
 	if (useThisBuffer) {
 		wave = useThisBuffer;
 		dynamicallyAllocated = false;
@@ -70,11 +73,11 @@ void qBuffer::initBuffer(qCx *useThisBuffer) {
 		// borrow will allocate if nothing in the freelist
 		//wave = space->borrowBuffer();
 
-		wave = allocateWave(space->freeBufferLength);
+		wave = allocateWave(length);
 		dynamicallyAllocated = true;
 	}
 	start = end = -1;  // wave / spectrum calculates these differently
-	nPoints = space->freeBufferLength;  // wave / spectrum calculates these differently
+	nPoints = length;  // wave / spectrum calculates these differently
 	if (debugAllocate) {
 		printf("🍕 qBuffer::initBuffer this=x%p  wave=x%p  nPoints: %d\n",
 			this, wave, nPoints);
@@ -129,8 +132,8 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 		if (dPhase >= 360.) dPhase -= 360.;
 
 		// if this or the previous point was (0,0) then the phase and dPhase will be NAN, and they print that way
-		sprintf(buf, "[%d] (%8.4lf,%8.4lf) | %8.3lf %8.3lf %8.4lf",
-			ix, re, im, phase, dPhase, mag);
+		//sprintf(buf, "[%d] (%8.4lf,%8.4lf) | %8.3lf %8.3lf %8.4lf",
+		//	ix, re, im, phase, dPhase, mag);
 		*pPrevPhase = phase;
 	}
 	else {
@@ -141,8 +144,8 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 
 // you can use this on waves or spectrums; for the latter, leave off the start and the rest
 void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int continuum) {
-	printf("qBuffer::dumpSegment(x%p, %s)\n", wave, withExtras ? "with extras" : "without extras");
-	printf("      start:%d  end:%d  continuum: %d\n", start, end, continuum);
+	//printf("qBuffer::dumpSegment(x%p, %s)\n", wave, withExtras ? "with extras" : "without extras");
+	//printf("      start:%d  end:%d  continuum: %d\n", start, end, continuum);
 
 	if (start >= end)
 		throw "qBuffer::dumpSegment() start >= end";
