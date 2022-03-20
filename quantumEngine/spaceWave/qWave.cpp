@@ -13,7 +13,7 @@ class qWave *laosQWave = NULL, *peruQWave = NULL;
 class qCx *laosWave = NULL, *peruWave = NULL;
 
 int traceLowPassFilter = false;
-int traceConstDeconst = true;
+int traceConstDeconst = false;
 
 /* ************************************************************ birth & death & basics */
 
@@ -31,7 +31,7 @@ qWave::qWave(qSpace *space, qCx *useThisBuffer) {
 	}
 
 	this->space = space;
-	initBuffer(useThisBuffer);
+	initBuffer(space->freeBufferLength, useThisBuffer);
 
 	if (traceConstDeconst)
 		printf("      🌊🌊  allocated wave: x%p\n", (wave));
