@@ -81,10 +81,10 @@ TEST(qSpace, qSpace_CompleteNewSpaceGauntlet)
 	LONGS_EQUAL(1, space->nDimensions);
 
 	// lets see if the buffers are all large enough
-	trashABuffer(laosWave, nPoints * sizeof(qCx));
-	trashABuffer(peruWave, nPoints * sizeof(qCx));
-	trashABuffer(theSpace->potential, nPoints * sizeof(double));
-	trashABuffer(theQViewBuffer->viewBuffer, nPoints * sizeof(float) * 8);
+	claimItsMine(laosWave, nPoints * sizeof(qCx));
+	claimItsMine(peruWave, nPoints * sizeof(qCx));
+	claimItsMine(theSpace->potential, nPoints * sizeof(double));
+	claimItsMine(theQViewBuffer->viewBuffer, nPoints * sizeof(float) * 8);
 
 	deleteTheSpace();
 }
