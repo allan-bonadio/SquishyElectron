@@ -26,7 +26,7 @@ qViewBuffer::qViewBuffer(qSpace *space) {
 }
 
 qViewBuffer::~qViewBuffer() {
-	delete viewBuffer;
+	delete[] viewBuffer;
 }
 
 // copy the numbers in our space's qWave into viewBuffer
