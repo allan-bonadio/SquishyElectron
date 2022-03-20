@@ -27,7 +27,7 @@ g++ -o cppuTestBin  -Wno-c++11-extensions  -fexceptions  \
 	-I$CPPUTEST_HOME/include \
 	-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h \
 	-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt \
-	testing/cppuMain.cpp */*.cppu.cpp \
+	testing/cppuMain.cpp */*.spec.cpp \
 	$allCpp \
 	|| exit $?
 
