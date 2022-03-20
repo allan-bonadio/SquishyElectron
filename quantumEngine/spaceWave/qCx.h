@@ -14,9 +14,6 @@
 #define byte unsigned char
 #define char16 char16_t
 
-// what kind of floats are we using: double or float or even long double
-#define double  double
-
 // ripped off from math.h
 #define SQRT2         1.41421356237309504880  /* sqrt(2) */
 #define PI            3.14159265358979323846  /* pi */

@@ -124,7 +124,7 @@ bool qtVerify(void *actual, void *expected, const char *msg) {
 	return false;
 }
 
-// make a new 1d space with N state locations along x
+// make a new 1d space with N state locations along x.  Full setup.
 // using the JS interfaces.  Needed for most stuff.
 qSpace *make1dSpace(int N) {
 	startNewSpace("a 1d Test space");

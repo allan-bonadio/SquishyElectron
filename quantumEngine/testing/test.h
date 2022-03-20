@@ -28,7 +28,7 @@ extern bool qtVerify(void *actual, void *expected, const char *msg);
 // works for any type that can be tested with ==
 #define qtVERIFY(a, b, msg)  if (a != b) printf("*** mismatch %s: #a ≠ #b\n", msg)
 
-extern struct qSpace *make1dSpace(int N);  // handy
+extern struct qSpace *makeFull1dSpace(int N);  // handy
 extern struct qSpace *makeBare1dSpace(int N);
 extern void setCircularWave(struct qWave *target, double n = 1.);
 
