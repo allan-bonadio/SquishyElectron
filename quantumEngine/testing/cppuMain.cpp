@@ -93,11 +93,11 @@ void setCircularWave(qWave *target, double n) {
 // oh yeah read from each location, too.  Size is number of BYTES.
 // If I end up stomping on something I shouldn't, it'll crash soon enough.
 // and cpputest might even detect that
-void claimItsMine(void *buf, size_t size) {
+void proveItsMine(void *buf, size_t size) {
 	if (size == 0)
-		throw "claimItsMine()- size is zero";
+		throw "proveItsMine()- size is zero";
 	if (!buf)
-		throw "claimItsMine()- buf is NULL";
+		throw "proveItsMine()- buf is NULL";
 
 	uint8_t *buffer = (uint8_t *) buf;
 	for (int i = 0; i < size; i++)

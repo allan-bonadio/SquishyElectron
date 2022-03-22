@@ -19,4 +19,4 @@ extern struct qSpace *makeFull1dSpace(int N);  // handy
 #define MAKEFULL1DSPACE_LABEL "makeFull1dSpace"
 
 // make sure we own all the bytes in this buffer by reading and writing each byte
-extern void claimItsMine(void *buf, size_t size);
+extern void proveItsMine(void *buf, size_t size);

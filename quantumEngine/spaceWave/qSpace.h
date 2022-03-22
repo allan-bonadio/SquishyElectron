@@ -46,7 +46,7 @@ public:
 	// size for Fourier transforms, or zero if not yet calculated.  ON THIS DIMENSION ONLY!
 	// Often a power of two.
 	// no boundaries.
-	int fourierSize;
+	int spectrumLength;
 
 	// 'x', 'y' or 'z' - two particles will have x1, x2 but one in 2d will have x, y.
 	// Spin: Sz, or Sz1, Sz2, ...  Smax = 2S+1.  Sz= ix - S.  Orbital Ang: Lz, combined: Jz
@@ -126,7 +126,7 @@ public:
 
 	/* *********************************************** buffers */
 	void chooseSpectrumSize(void);
-	int spectrumSize;
+	int spectrumLength;
 
 	// will dump any wave that uses this space.  same as in qWave:: or qSpectrum::
 	void dumpThatWave(qCx *wave, bool withExtras = false);

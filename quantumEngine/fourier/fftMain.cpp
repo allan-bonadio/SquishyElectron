@@ -17,8 +17,8 @@ void qSpace::chooseSpectrumSize() {
 	int powerOf2;
 	for (powerOf2 = 1; powerOf2 < nStates; powerOf2 += powerOf2)
 		continue;
-	dimensions->fourierSize = powerOf2;
-	spectrumSize = powerOf2;
+	dimensions->spectrumLength = powerOf2;
+	spectrumLength = powerOf2;
 }
 
 /* ********************************************************* demo */

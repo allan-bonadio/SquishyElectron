@@ -15,10 +15,12 @@ void allocWaves(void) {
 	// the other buffers...
 	peruQWave = new qWave(theSpace);
 	laosQWave = new qWave(theSpace);
+	printf("🚀 🚀 🚀  %s:%d freeBufferList: x%p\n", __FILE__, __LINE__, theSpace->freeBufferList);
 
 	peruWave = peruQWave->wave;
 	laosWave = laosQWave->wave;
 
+	printf("🚀 🚀 🚀  %s:%d freeBufferList: x%p\n", __FILE__, __LINE__, theSpace->freeBufferList);
 	//printf("        🚀 🚀 🚀       peruQWave=x%p   peruWave=x%p   laosQWave=x%p   laosWave=x%p  \n",
 	//	peruQWave, peruWave, laosQWave, laosWave);
 
@@ -26,10 +28,12 @@ void allocWaves(void) {
 
 	// we make our own potential
 	theSpace->potential = thePotential = new double[theSpace->nPoints];
+	printf("🚀 🚀 🚀  %s:%d freeBufferList: x%p\n", __FILE__, __LINE__, theSpace->freeBufferList);
 
 
 	// our own view buffer - needs potential to be in place
 	theSpace->qViewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
+	printf("🚀 🚀 🚀  %s:%d freeBufferList: x%p\n", __FILE__, __LINE__, theSpace->freeBufferList);
 	//dumpViewBuffer("newly created");
 
 	//printf("   🚀 🚀 🚀 completeNewSpace BEFORE creation  theQViewBuffer=x%p  "
@@ -144,6 +148,7 @@ void qSpace_askForFFT(void) { theSpace->askForFFT(); }
 qSpace *startNewSpace(const char *label) {
 	//printf("🚀 🚀 🚀  startNewSpace(%s), theSpace=x%p (should be zero)\n", label, theSpace);
 
+	// use theSpace as a way of detecting if they were freed before.
 	if (theSpace) {
 		//printf("🚀 🚀 🚀  theSpace(%s): about to freeWaves()\n", label);
 		freeWaves();
@@ -156,21 +161,25 @@ qSpace *startNewSpace(const char *label) {
 	}
 	//printf("🚀 🚀 🚀  startNewSpace: about to construct new space  itself '%s'\n", label);
 	theSpace = new qSpace(label);
-	//printf("🚀 🚀 🚀  JS startNewSpace   done (%s => %s)   theSpace=x%p\n", theSpace->label, label, theSpace);
+	printf("🚀 🚀 🚀  JS startNewSpace   done (%s == %s)   theSpace=x%p, freeBufferList: x%p\n",
+		theSpace->label, label, theSpace, theSpace->freeBufferList);
 
 	return theSpace;
 }
 
 // call this from JS to add one or more dimensions
 qSpace *addSpaceDimension(int N, int continuum, const char *label) {
-	//printf("addSpaceDimension(%d, %d, %s)\n", N, continuum, label);
+	printf("addSpaceDimension(%d, %d, %s)   %p\n", N, continuum, label, theSpace->freeBufferList);
 	theSpace->addDimension(N, continuum, label);
+	printf("🚀 🚀 🚀  addSpaceDimension(): freeBufferList: x%p\n", theSpace->freeBufferList);
 	return theSpace;
 }
 
 // call this from JS to finish the process
 qSpace *completeNewSpace(void) {
 	//printf("completeNewSpace() starts\n");
+	printf("🚀 🚀 🚀  JS completeNewSpace starts(%s)   theSpace=x%p, freeBufferList: x%p\n",
+		theSpace->label, theSpace, theSpace->freeBufferList);
 
 	// finish up all the dimensions now that we know them all
 	theSpace->initSpace();
@@ -179,28 +188,36 @@ qSpace *completeNewSpace(void) {
 	/* *********************************** allocate waves */
 	allocWaves();
 
-	//printf("   🚀 🚀 🚀 completeNewSpace After Creation but BEFORE"
-	//	" loadViewBuffer  theQViewBuffer=x%p  theQViewBuffer->viewBuffer=x%p\n",
-	//		theQViewBuffer, theQViewBuffer ?  theQViewBuffer->viewBuffer : NULL);
+	printf("   🚀 🚀 🚀 completeNewSpace After Creation but BEFORE loadViewBuffer  "
+		"theQViewBuffer=x%p  theQViewBuffer->viewBuffer=x%p  freeBufferList=%p\n",
+		theQViewBuffer, theQViewBuffer ?  theQViewBuffer->viewBuffer : NULL,
+		theSpace->freeBufferList);
+
 
 	// we make our own wave - static
 	theSpace->latestQWave = laosQWave;
 	qCx *wave = theSpace->latestQWave->wave;
 
+	printf("🚀 🚀 🚀  completeNewSpace():%d freeBufferList: x%p\n", __LINE__, theSpace->freeBufferList);
+
 	// a dopey default.  JS fills in the actual default.
 	qDimension *dims = theSpace->dimensions;
 	for (int ix = 0; ix < dims->start + dims->end; ix++)
 		wave[ix] = qCx(1., 0.);
+	printf("🚀 🚀 🚀  completeNewSpace():%d freeBufferList: x%p\n", __LINE__, theSpace->freeBufferList);
 
 	//printf("🚀 🚀 🚀 newly created wave, before norm:\n");
 	//theSpace->dumpThatWave(wave, true);
 
+	printf("🚀 🚀 🚀  completeNewSpace():%d freeBufferList: x%p\n", __LINE__, theSpace->freeBufferList);
 	theSpace->latestQWave->normalize();
+	printf("🚀 🚀 🚀  completeNewSpace():%d freeBufferList: x%p\n", __LINE__, theSpace->freeBufferList);
 	//printf("🚀 🚀 🚀 newly created wave, AFTER norm:\n");
 	//theSpace->dumpThatWave(wave, true);
 
 
 
+	printf("🚀 🚀 🚀  completeNewSpace():%d freeBufferList: x%p\n", __LINE__, theSpace->freeBufferList);
 	theQViewBuffer->loadViewBuffer();  // just so i can see the default if needed
 
 //	printf("   🚀 🚀 🚀 completeNewSpace AFTER loadViewBuffer  theQViewBuffer=x%p  "

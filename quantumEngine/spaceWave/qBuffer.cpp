@@ -22,7 +22,7 @@ qFlick - object that owns a list of waves, and points to its space
 #include "qWave.h"
 
 static bool debugNormalize = false;
-static bool debugAllocate = false;
+static bool debugAllocate = true;
 
 // just allocate a wave of whatever length
 // buffer is initialized to zero bytes therefore 0.0 everywhere
@@ -36,6 +36,10 @@ qCx *allocateWave(int nPoints) {
 }
 
 void freeWave(qCx *wave) {
+	if (debugAllocate) {
+		// we don't know hte length here, but you can search for the pointer value
+		printf("🍕 freeWave()  wave=x%p \n", wave);
+	}
 	free(wave);
 }
 
@@ -77,7 +81,7 @@ void qBuffer::initBuffer(int length, qCx *useThisBuffer) {
 		dynamicallyAllocated = true;
 	}
 	start = end = -1;  // wave / spectrum calculates these differently
-	nPoints = length;  // wave / spectrum calculates these differently
+	nPoints = length;
 	if (debugAllocate) {
 		printf("🍕 qBuffer::initBuffer this=x%p  wave=x%p  nPoints: %d\n",
 			this, wave, nPoints);

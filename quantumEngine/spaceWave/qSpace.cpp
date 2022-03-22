@@ -52,10 +52,14 @@ qSpace::qSpace(const char *lab) {
 }
 
 qSpace::~qSpace(void) {
-	//printf("🚀 🚀 qSpace destructor starting %s, this= x%p\n", label, (this));
+	printf("🚀 🚀 qSpace destructor starting %s, this= x%p  \n", label, (this));
+	printf("🧨 🧨    made it this far, %s:%d    freeBufferList=%p\n", __FILE__, __LINE__, theSpace->freeBufferList);
+
+
 	// these cached buffers need to go free
 	clearFreeBuffers();
-	//printf("🚀 🚀 qSpace destructor done this= x%p\n", (this));
+	printf("🚀 🚀 qSpace destructor done this= x%p\n", (this));
+	printf("🧨 🧨    made it this far, %s:%d  freeBufferList=%p\n", __FILE__, __LINE__, theSpace->freeBufferList);
 }
 
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
@@ -101,13 +105,13 @@ void qSpace::tallyDimensions(void) {
 
 	chooseSpectrumSize();
 
-	if (nPoints > spectrumSize)
+	if (nPoints > spectrumLength)
 		freeBufferLength = nPoints;
 	else
-		freeBufferLength = spectrumSize;
+		freeBufferLength = spectrumLength;
 	if (debugFreeBuffer) {
-		printf("🚀 🚀 qSpace::tallyDimensions, nPoints=x%x   spectrumSize=x%x   freeBufferLength=x%x   ",
-			nPoints, spectrumSize, freeBufferLength);
+		printf("🚀 🚀 qSpace::tallyDimensions, nPoints=x%x   spectrumLength=x%x   freeBufferLength=x%x   ",
+			nPoints, spectrumLength, freeBufferLength);
 	}
 
 	//printf("🚀 🚀  got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
@@ -284,13 +288,12 @@ void qSpace::returnBuffer(qCx *rentedBuffer) {
 // this is the only way they're freed; otherwise they just collect.
 // shouldn't be too many, though.  Called by destructor.
 void qSpace::clearFreeBuffers() {
-	//printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: x%p\n",
-	//	(freeBufferList));
+	printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: x%p\n",
+		(freeBufferList));
 	FreeBuffer *n = freeBufferList;
 	for (FreeBuffer *f = freeBufferList; f; f = n) {
 		n = f->next;
-	//printf("           🚀 🚀 about to free this one: x%p\n",
-	//(f));
+		printf("           🚀 🚀 about to free this one: f=x%p, n=x%p\n", f, n);
 		freeWave((qCx *) f);
 	}
 	freeBufferList = NULL;
