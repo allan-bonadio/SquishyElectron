@@ -23,7 +23,7 @@ allCpp=`cat building/allCpp.list`
 # note that main.cpp is NOT included in the .cpp files; that's for web use only
 # and makes all the diff.  Update list of test srcs as needed.
 # some of these options - dunno if I need them
-g++ -o cppuTestBin  -Wno-c++11-extensions  -fexceptions  \
+g++ -o cppuTestBin  -Wno-c++11-extensions  -fexceptions -g  -O0 \
 	-I$CPPUTEST_HOME/include \
 	-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h \
 	-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt \
@@ -39,7 +39,7 @@ echo
 if [ "$1" ]
 then
 	#  well, lldb at least.
-	lldb /dvl/squishyElectron/SquishyElectron/quantumEngine/cppuTestBin
+	lldb  -f /dvl/squishyElectron/SquishyElectron/quantumEngine/cppuTestBin
 else
 	# it's a real C++ program and I can use gdb!
 	./cppuTestBin
