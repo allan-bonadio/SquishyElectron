@@ -35,6 +35,14 @@ g++ -o cppuTestBin  -Wno-c++11-extensions  -fexceptions  \
 echo ====================== done compiling... start testing ==================================
 echo
 
-# it's a real C++ program and I can use gdb!
-./cppuTestBin
+
+if [ "$1" ]
+then
+	#  well, lldb at least.
+	lldb /dvl/squishyElectron/SquishyElectron/quantumEngine/cppuTestBin
+else
+	# it's a real C++ program and I can use gdb!
+	./cppuTestBin
+fi
+
 
