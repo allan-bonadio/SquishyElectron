@@ -37,7 +37,7 @@ qCx *allocateWave(int nPoints) {
 
 void freeWave(qCx *wave) {
 	if (debugAllocate) {
-		// we don't know hte length here, but you can search for the pointer value
+		// we don't know the length here, but you can search for the pointer value
 		printf("🍕 freeWave()  wave=x%p \n", wave);
 	}
 	free(wave);
@@ -91,16 +91,28 @@ void qBuffer::initBuffer(int length, qCx *useThisBuffer) {
 qBuffer::~qBuffer() {
 	if (debugAllocate)
 		printf("🍕  start the qBuffer instance destructor...\n");
+	if (space)
+		printf("🧨 🧨    start of qBuffer::~qBuffer, %s:%d  freeBufferList=%p  qBuf=%p\n",
+		__FILE__, __LINE__, space->freeBufferList);
+	if (debugAllocate)
+		printf("🍕  start the qBuffer instance destructor...\n");
 	if (dynamicallyAllocated) {
 		freeWave(wave);
 
+		printf("🧨 🧨     qBuffer::~qBuffer just after freeWave, %s:%d  freeBufferList=%p\n",
+		__FILE__, __LINE__, space->freeBufferList);
+
+
 		//space->returnBuffer(wave);
-		if (debugAllocate) printf("   🍕  freed buffer...\n");
+		printf("   🍕  freed buffer...\n");
 	}
 
 	space = NULL;
 	if (debugAllocate) printf("   🍕  setted buffer to null; done with qBuffer destructor.\n");
 
+	if (space)
+		printf("🧨 🧨    end of qBuffer::~qBuffer, %s:%d  freeBufferList=%p\n",
+		__FILE__, __LINE__, space->freeBufferList);
 }
 
 
