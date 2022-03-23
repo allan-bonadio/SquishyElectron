@@ -13,7 +13,7 @@
 // a 'qViewBuffer' is specifically to send coordinates to WebGL for display; very different
 // a 'qSpectrum' is like a qWave designed for FFT results.  Subclass of qBuffer.
 
-extern qCx *allocateWave(int nPoints);
+extern qCx *allocateWave(int nPoints = -1);
 extern void freeWave(struct qCx *wave);
 
 // a long array of qCx complex numbers, plus some other info
@@ -36,7 +36,9 @@ struct qBuffer {
 
 	void copyThatWave(qCx *dest, qCx *src, int length = -1);
 
-	int nPoints; int start; int end;  // should be the same as in the space, either the wave or the spectrum.
+	// should be the same as in the space, either the wave or the spectrum.
+	// We keep a copy here in case this loses track of its space.  EG see normalize.
+	int nPoints; int start; int end, continuum;
 
 	// if it used the first constructor
 	// this has, among other things, the count of points and states in all qWave buffers
@@ -55,8 +57,9 @@ struct qBuffer {
 		int start = 0, int end = -1, int continuum = 0);
 
 	double innerProduct(void);
-	virtual void normalize(void);
-	virtual void fixBoundaries(void);
+	void normalize(void);
+	void fixThoseBoundaries(qCx *targetWave);
+	void fixBoundaries(void) { fixThoseBoundaries(wave); }
 };
 
 
@@ -79,9 +82,6 @@ struct qWave : public virtual qBuffer {
 	// never even tried any of these
 	void forEachPoint(void (*callback)(qCx, int));
 	void forEachState(void (*callback)(qCx, int));
-
-	// only waves need this, bit everyone needs it for normalize
-	virtual void fixBoundaries(void);  // on this buffer
 
 	void prune(void);
 	void lowPassFilter(double dilution = 0.01);
