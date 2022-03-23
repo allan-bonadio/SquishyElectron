@@ -13,7 +13,7 @@
 
 // find next largest integer that we can fft these days
 // these days it's a power of 2
-void qSpace::chooseSpectrumSize() {
+void qSpace::chooseSpectrumLength() {
 	int powerOf2;
 	for (powerOf2 = 1; powerOf2 < nStates; powerOf2 += powerOf2)
 		continue;
@@ -106,7 +106,7 @@ void analyzeWaveFFT(qWave *inputQWave) {
 	// find power of 2 to pad it up to
 //	int j;
 //	for (j = 1; j < origDims->nStates; j += j) ;
-//	int nStates = chooseSpectrumSize(origDims->nStates);
+//	int nStates = chooseSpectrumLength(origDims->nStates);
 
 
 //	qCx *origWave = inputQWave->wave;

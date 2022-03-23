@@ -27,5 +27,5 @@ extern void paChineseIFFT(qCx *dest, qCx *src, int N);
 extern void analyzeWaveFFT(qWave *qw);
 
 // rounds up to the nearest power of two or whatever
-extern int chooseSpectrumSize(qSpace *);
+extern int chooseSpectrumLength(qSpace *);
 

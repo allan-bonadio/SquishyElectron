@@ -3,6 +3,8 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
+// old -- see cppuMain.h
+
 extern void run_qCx_tests(void);
 extern void run_rk2_tests(void);
 extern void run_wave_tests(void);
@@ -28,8 +30,8 @@ extern bool qtVerify(void *actual, void *expected, const char *msg);
 // works for any type that can be tested with ==
 #define qtVERIFY(a, b, msg)  if (a != b) printf("*** mismatch %s: #a ≠ #b\n", msg)
 
-extern struct qSpace *makeFull1dSpace(int N);  // handy
-extern struct qSpace *makeBare1dSpace(int N);
+extern struct qSpace *makeFullSpace(int N);  // handy
+extern struct qSpace *makeBareSpace(int N);
 extern void setCircularWave(struct qWave *target, double n = 1.);
 
 

@@ -108,7 +108,7 @@ export class qeBasicSpace {
 
 	// refresh the wraparound points for ANY WAVE subscribing to this space
 	// 'those' or 'that' means some wave other than this.wave
-	// modeled after qSpace::fixThoseBoundaries() pls keep in sync!
+	// modeled after fixThoseBoundaries() pls keep in sync!
 	fixThoseBoundaries(wave) {
 		if (this.nPoints <= 0) throw "🚀  qSpace::fixThoseBoundaries() with zero points";
 		const {end, continuum} = this.startEnd2;

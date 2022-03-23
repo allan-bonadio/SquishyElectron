@@ -107,7 +107,7 @@ bool qtVerify(qCx actual, qCx expected, const char *msg) {
 //// for Space*s, qSpace qCx pointers
 //bool qtVerify(qSpace *actual, qSpace *expected, const char *msg) {
 //	if (actual != expected) {
-//		qtMessage(" wasn't same object... x%p ≠ x%p: %s\n", actual, expected, msg);
+//		qtMessage(" wasn't same object... %p ≠ %p: %s\n", actual, expected, msg);
 //		return true;
 //	}
 //	return false;
@@ -117,7 +117,7 @@ bool qtVerify(qCx actual, qCx expected, const char *msg) {
 // all pointers, just compare the pointers
 bool qtVerify(void *actual, void *expected, const char *msg) {
 	if (actual != expected) {
-		printf("*** fail x%p  ≠  x%p: %s\n",
+		printf("*** fail %p  ≠  %p: %s\n",
 			actual, expected, msg);
 		return true;
 	}
@@ -126,7 +126,7 @@ bool qtVerify(void *actual, void *expected, const char *msg) {
 
 // make a new 1d space with N state locations along x.  Full setup.
 // using the JS interfaces.  Needed for most stuff.
-qSpace *make1dSpace(int N) {
+qSpace *makeSpace(int N) {
 	startNewSpace("a 1d Test space");
 	addSpaceDimension(N, contENDLESS, "x");
 	qSpace *space = completeNewSpace();
@@ -134,9 +134,9 @@ qSpace *make1dSpace(int N) {
 }
 
 // 1d space, not with all the crud from above
-qSpace *makeBare1dSpace(int N) {
-	qSpace *space = new qSpace("a makeBare1dSpace test space");
-	printf("🧨 🧨 sizeof(qSpace) = %ld   alignof(qSpace) = %ld  qSpace* = 0x%p\n",
+qSpace *makeBareSpace(int N) {
+	qSpace *space = new qSpace("a makeBareSpace test space");
+	printf("🧨 🧨 sizeof(qSpace) = %ld   alignof(qSpace) = %ld  qSpace* = 0%p\n",
 		sizeof(qSpace), alignof(qSpace), space);
 	space->addDimension(N, contENDLESS, "x");
 	space->initSpace();
@@ -158,7 +158,7 @@ void setCircularWave(qWave *target, double n) {
 		wave[ix] = qCx(cos(angle), sin(angle));
 	}
 
-	theSpace->fixThoseBoundaries(wave);
 	laosQWave->normalize();
+	theSpace->fixThoseBoundaries(wave);
 
 }
