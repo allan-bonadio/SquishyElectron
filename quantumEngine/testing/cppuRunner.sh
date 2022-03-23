@@ -39,10 +39,10 @@ echo
 if [ "$1" ]
 then
 	#  well, lldb at least.
-	lldb  -f /dvl/squishyElectron/SquishyElectron/quantumEngine/cppuTestBin
+	lldb  -f /dvl/squishyElectron/SquishyElectron/quantumEngine/cppuTestBin -- -v -c
 else
 	# it's a real C++ program and I can use gdb!
-	./cppuTestBin
+	./cppuTestBin -v -c
 fi
 
 
