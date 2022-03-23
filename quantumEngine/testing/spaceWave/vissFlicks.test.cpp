@@ -11,9 +11,9 @@
 
 static void makeASpaceAndIterate(void) {
 
-	qSpace *space = makeBare1dSpace(64);
+	qSpace *space = makeBareSpace(64);
 
-	//qSpace *space = make1dSpace(8);
+	//qSpace *space = makeSpace(8);
 	double dt = 0.001;
 	int dumpCycle = 100;
 	int nIterations = 1000;
