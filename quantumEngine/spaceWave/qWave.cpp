@@ -24,24 +24,25 @@ qWave::qWave(qSpace *space, qCx *useThisBuffer) {
 	magic = 'qWav';
 
 	if (traceConstDeconst) {
-		printf("🌊🌊 qWave::qWave(%s)  utb=x%p => this=x%p\n", space->label,
+		printf("🌊🌊 qWave::qWave(%s)  utb=%p => this=%p\n", space->label,
 			useThisBuffer, this);
-		printf("🌊🌊 qWave::qWave() wave's Space: x%p  nPoints:%d\n", (space), space->nPoints);
-		printf("      🌊🌊        qWave: x%p\n", (this));
+		printf("🌊🌊 qWave::qWave() wave's Space: %p  nPoints:%d\n", (space), space->nPoints);
+		printf("      🌊🌊        qWave: %p\n", (this));
 	}
 
 	this->space = space;
 	initBuffer(space->freeBufferLength, useThisBuffer);
 
 	if (traceConstDeconst)
-		printf("      🌊🌊  allocated wave: x%p\n", (wave));
+		printf("      🌊🌊  allocated wave: %p\n", (wave));
 	qDimension *dim = space->dimensions;
 	nPoints = dim->nPoints;
 	start = dim->start;
 	end = dim->end;
+	continuum = dim->continuum;
 
 	if (traceConstDeconst) {
-		printf("🌊🌊 allocated qWave::qWave resulting qWave obj: x%p   sizeof qWave = x%lx\n",
+		printf("🌊🌊 allocated qWave::qWave resulting qWave obj: %p   sizeof qWave = x%lx\n",
 			this, (long) sizeof(qWave));
 		printf("        sizeof(int):%ld   sizeof(void *):%ld\n", sizeof(int), sizeof(void *));
 	}
@@ -51,7 +52,7 @@ qWave::~qWave(void) {
 	// the qBuffer superclass frees the wave
 
 	if (traceConstDeconst) {
-		printf("🌊🌊 qWave::~qWave resulting qWave obj: x%p \n",
+		printf("🌊🌊 qWave::~qWave resulting qWave obj: %p \n",
 			this);
 		printf("        sizeof(int):%ld   sizeof(void *):%ld\n", sizeof(int), sizeof(void *));
 	}
@@ -114,45 +115,6 @@ void qWave::dumpWave(const char *title, bool withExtras) {
 
 
 
-
-/* ************************************************************ arithmetic */
-
-// refresh the wraparound points for ANY WAVE subscribing to this space
-// 'those' or 'that' means some wave other than this->wave
-void qSpace::fixThoseBoundaries(qCx *wave) {
-	if (nPoints <= 0) throw "🌊🌊 qSpace::fixThoseBoundaries() with zero points";
-
-	qDimension *dims = dimensions;
-	switch (dims->continuum) {
-	case contDISCRETE:
-		break;
-
-	case contWELL:
-		// the points on the end are ∞ potential, but the arithmetic goes bonkers
-		// if I actually set the voltage to ∞
-		wave[0] = qCx();
-		wave[dims->end] = qCx();
-		//printf("🌊🌊 contWELL cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", dims->continuum,
-		//wave[0].re, wave[0].im, wave[dims->end].re, wave[dims->end].im);
-		break;
-
-	case contENDLESS:
-		//printf("🌊🌊 Endless ye said: on the endless case, %d = %d, %d = %d\n", 0, dims->N, dims->end, 1 );
-		// the points on the end get set to the opposite side
-		wave[0] = wave[dims->N];
-		wave[dims->end] = wave[1];
-		//printf("🌊🌊 contENDLESS cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", dims->continuum,
-		//	wave[0].re, wave[0].im, wave[dims->end].re, wave[dims->end].im);
-		break;
-	}
-}
-
-// refresh the wraparound points on the ends of continuum dimensions
-// from their counterpoints or zerro or whatever they get set to.
-// 'those' or 'that' means some wave other than this->wave
-void qWave::fixBoundaries(void) {
-	space->fixThoseBoundaries(wave);
-}
 
 /* ************************************************* bad ideas I might revisit?  */
 
@@ -254,7 +216,6 @@ void qWave::nyquistFilter(void) {
 	qCx *wave = wave;
 	qDimension *dims = space->dimensions;
 
-	// not sure we need this prune();
 	fixBoundaries();
 
 	// this should zero out the nyquist frequency exactly

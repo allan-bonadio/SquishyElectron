@@ -26,7 +26,8 @@ extern void qeStarted(void);
 /* *************************************** one for each DIMENSION of the wave array */
 struct qDimension {
 public:
-	// possible  states, just for this  dimension.  start+end=datapoints
+	// possible  states, just for this  dimension.  end + start == datapoints=nPoints
+	// end - start == N.  always loop for (j=start; j < end; j++) for actual state 𝞇
 	int N;
 	int start;
 	int end;
@@ -125,14 +126,14 @@ public:
 
 
 	/* *********************************************** buffers */
-	void chooseSpectrumSize(void);
+	void chooseSpectrumLength(void);
 	int spectrumLength;
 
 	// will dump any wave that uses this space.  same as in qWave:: or qSpectrum::
 	void dumpThatWave(qCx *wave, bool withExtras = false);
 	void dumpThatSpectrum(qCx *wave, bool withExtras = false);
 
-	void fixThoseBoundaries(qCx *wave);  // like for qWave but on any wave
+	void fixThoseBoundaries(qCx *targetWave);  // like for qWave but on any wave
 
 	// the linked list of blocks available for rental.
 	// All contain (freeBufferLength) complex number slots.

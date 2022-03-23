@@ -33,7 +33,7 @@ static bool debugFreeBuffer = false;
 qSpace::qSpace(const char *lab) {
 	magic = 'qSpa';
 
-	printf("🚀 🚀 qSpace::qSpace() constructor starts label:%s  this= x%p\n", lab, (this));
+	//printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n", lab, (this));
 	nDimensions = 0;
 
 	resetCounters();
@@ -47,19 +47,19 @@ qSpace::qSpace(const char *lab) {
 
 	freeBufferList = NULL;
 
-	//printf("🚀 🚀 qSpace::qSpace() constructor done this= x%p, length %lx\n",
+	//printf("🚀 🚀 qSpace::qSpace() constructor done this= %p, length %lx\n",
 	//	(this), sizeof(qSpace));
 }
 
 qSpace::~qSpace(void) {
-	printf("🚀 🚀 qSpace destructor starting %s, this= x%p  \n", label, (this));
-	printf("🧨 🧨    made it this far, %s:%d    freeBufferList=%p\n", __FILE__, __LINE__, theSpace->freeBufferList);
+//	printf("🚀 🚀 qSpace destructor starting %s, this= %p  \n", label, (this));
+//	printf("🧨 🧨    made it this far, %s:%d    freeBufferList=%p\n", __FILE__, __LINE__, this->freeBufferList);
 
 
 	// these cached buffers need to go free
 	clearFreeBuffers();
-	printf("🚀 🚀 qSpace destructor done this= x%p\n", (this));
-	printf("🧨 🧨    made it this far, %s:%d  freeBufferList=%p\n", __FILE__, __LINE__, theSpace->freeBufferList);
+//	printf("🚀 🚀 qSpace destructor done this= %p\n", (this));
+//	printf("🧨 🧨    made it this far, %s:%d  freeBufferList=%p\n", __FILE__, __LINE__, this->freeBufferList);
 }
 
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
@@ -103,14 +103,14 @@ void qSpace::tallyDimensions(void) {
 		dims->nPoints = nPoints;
 	}
 
-	chooseSpectrumSize();
+	chooseSpectrumLength();
 
 	if (nPoints > spectrumLength)
 		freeBufferLength = nPoints;
 	else
 		freeBufferLength = spectrumLength;
 	if (debugFreeBuffer) {
-		printf("🚀 🚀 qSpace::tallyDimensions, nPoints=x%x   spectrumLength=x%x   freeBufferLength=x%x   ",
+		printf("🚀 🚀 qSpace::tallyDimensions, nPoints=%d   spectrumLength=%d   freeBufferLength=%d   ",
 			nPoints, spectrumLength, freeBufferLength);
 	}
 
@@ -257,7 +257,7 @@ qCx *qSpace::borrowBuffer(void) {
 	FreeBuffer *rentedCache = freeBufferList;
 	if (rentedCache) {
 		if (debugFreeBuffer) {
-			printf("🚀 🚀 qSpace::borrowBuffer() with some cached. freeBufferList: x%p\n",
+			printf("🚀 🚀 qSpace::borrowBuffer() with some cached. freeBufferList: %p\n",
 			(freeBufferList));
 		}
 
@@ -268,8 +268,8 @@ qCx *qSpace::borrowBuffer(void) {
 	else {
 		// must make a new one
 		if (debugFreeBuffer) {
-			printf("🚀 🚀 qSpace::borrowBuffer() with none cached. freeBufferList: x%p   freeBufferLength: %d\n",
-			(freeBufferList), freeBufferLength);
+			printf("🚀 🚀 qSpace::borrowBuffer() with none cached. freeBufferList: %p   freeBufferLength: %d\n",
+				freeBufferList, freeBufferLength);
 		}
 		return allocateWave(freeBufferLength);
 	}
@@ -278,7 +278,7 @@ qCx *qSpace::borrowBuffer(void) {
 // return the buffer to the free list.  Potentially endless but probably not.
 // do not return buffers that aren't the right size - freeBufferLength
 void qSpace::returnBuffer(qCx *rentedBuffer) {
-	printf("rentedBuffer: x%p  freeBufferList=x%p",
+	printf("rentedBuffer: %p  freeBufferList=%p",
 		rentedBuffer, freeBufferList);
 	FreeBuffer *rented = (FreeBuffer *) rentedBuffer;
 	rented->next = freeBufferList;
@@ -288,15 +288,15 @@ void qSpace::returnBuffer(qCx *rentedBuffer) {
 // this is the only way they're freed; otherwise they just collect.
 // shouldn't be too many, though.  Called by destructor.
 void qSpace::clearFreeBuffers() {
-	printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: x%p\n",
-		(freeBufferList));
+	//printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: %p\n",
+	//freeBufferList);
 	FreeBuffer *n = freeBufferList;
 	for (FreeBuffer *f = freeBufferList; f; f = n) {
 		n = f->next;
-		printf("           🚀 🚀 about to free this one: f=x%p, n=x%p\n", f, n);
+		printf("           🚀 🚀 about to free this one: f=%p, n=%p\n", f, n);
 		freeWave((qCx *) f);
 	}
 	freeBufferList = NULL;
-	//printf("              🚀 🚀 qSpace::clearFreeBuffers() done. freeBufferList=x%p\n",
+	//printf("              🚀 🚀 qSpace::clearFreeBuffers() done. freeBufferList=%p\n",
 	//	freeBufferList);
 }

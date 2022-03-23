@@ -15,14 +15,15 @@ qSpectrum::qSpectrum(qSpace *space, qCx *useThisBuffer) {
 	qBuffer();
 	magic = 'qSpe';
 
-	printf("🌈 🌈 qSpectrum::qSpectrum(%s)  utb=x%p => this x%p\n", space->label,
-		useThisBuffer, this);
+	//printf("🌈 🌈 qSpectrum::qSpectrum(%s)  utb=%p => this %p\n", space->label,
+	//	useThisBuffer, this);
 	this->space = space;
 	initBuffer(space->freeBufferLength, useThisBuffer);
 
 	nPoints = space->spectrumLength;
 	start = 0;
 	end = space->spectrumLength;
+	continuum = 0;
 }
 
 qSpectrum::~qSpectrum(void) {

@@ -16,8 +16,7 @@ TEST_GROUP(qSpace)
 
 TEST(qSpace, qSpace_BareGauntlet)
 {
-	printf("🧨 🧨  starting qSpace_BareGauntlet\n");
-	qSpace *space = makeBare1dSpace(4);
+	qSpace *space = makeBareSpace(4);
 	STRCMP_EQUAL(MAKEBARE1DSPACE_LABEL, space->label);
 
 	LONGS_EQUAL(1, space->dimensions->start);
@@ -42,7 +41,6 @@ TEST(qSpace, qSpace_BareGauntlet)
 // just the constructor; it's not even fully created
 TEST(qSpace, qSpace_ConstructorGauntlet)
 {
-	printf("🧨 🧨  starting qSpace_ConstructorGauntlet\n");
 	qSpace *space = new qSpace("ShowRoomDummies");
 	STRCMP_EQUAL("ShowRoomDummies", space->label);
 
@@ -57,11 +55,11 @@ TEST(qSpace, qSpace_ConstructorGauntlet)
 }
 
 // this tests the whole shebang, as created from JS
-void tryOneSpaceLength(int N, int expectedSpectrumLength, int expectedFreeBufferLength) {
-	printf("🧨 🧨 starting tryOneSpaceLength(N=%d, sl=%d, fbl=%d)\n",
-		N, expectedSpectrumLength, expectedFreeBufferLength);
-	qSpace *space = makeFull1dSpace(N);
-	printf("🧨 🧨       created the space and all the buffers; freeBufferList=%p\n", space->freeBufferList);
+void completeNewSpaceGauntlet(int N, int expectedSpectrumLength, int expectedFreeBufferLength) {
+//	printf("🧨 🧨 starting completeNewSpaceGauntlet(N=%d, sl=%d, fbl=%d)\n",
+//		N, expectedSpectrumLength, expectedFreeBufferLength);
+	qSpace *space = makeFullSpace(N);
+//	printf("🧨 🧨       created the space and all the buffers; freeBufferList=%p\n", space->freeBufferList);
 	int nPoints = space->nPoints;
 
 	STRCMP_EQUAL_TEXT(MAKEFULL1DSPACE_LABEL, space->label, "space label");
@@ -82,27 +80,22 @@ void tryOneSpaceLength(int N, int expectedSpectrumLength, int expectedFreeBuffer
 	LONGS_EQUAL_TEXT(1, space->nDimensions, "space nDimensions");
 
 	// lets see if the buffers are all large enough
-	printf("🧨 🧨       lets see if the buffers are all large enough freeBufferList=%p\n", space->freeBufferList);
+//	printf("🧨 🧨       lets see if the buffers are all large enough freeBufferList=%p\n", space->freeBufferList);
 	proveItsMine(laosWave, nPoints * sizeof(qCx));
 	proveItsMine(peruWave, nPoints * sizeof(qCx));
 	proveItsMine(theSpace->potential, nPoints * sizeof(double));
 	proveItsMine(theQViewBuffer->viewBuffer, nPoints * sizeof(float) * 8);
 
-	printf("🧨 🧨       we're done, deleting freeBufferList=%p\n", space->freeBufferList);
+//	printf("🧨 🧨       we're done, deleting freeBufferList=%p\n", space->freeBufferList);
 	deleteTheSpace();
-	printf("🧨 🧨       tryOneSpaceLength() completed\n");
+//	printf("🧨 🧨       completeNewSpaceGauntlet() completed\n");
 }
 
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet)
-{
-	printf("🧨 🧨  starting qSpace_CompleteNewSpaceGauntlet\n");
-
-	tryOneSpaceLength(4000, 4096, 4096);
-	tryOneSpaceLength(254, 256, 256);
-	tryOneSpaceLength(63, 64, 65);
-	tryOneSpaceLength(48, 64, 64);
-	tryOneSpaceLength(32, 32, 34);
-	tryOneSpaceLength(32, 32, 34);
-	tryOneSpaceLength(4, 4, 6);
-}
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4000) { completeNewSpaceGauntlet(4000, 4096, 4096); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet254) { completeNewSpaceGauntlet(254, 256, 256); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet63) { completeNewSpaceGauntlet(63, 64, 65); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet48) { completeNewSpaceGauntlet(48, 64, 64); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet32) { completeNewSpaceGauntlet(32, 32, 34); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet32x) { completeNewSpaceGauntlet(32, 32, 34); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4) { completeNewSpaceGauntlet(4, 4, 6); }
 

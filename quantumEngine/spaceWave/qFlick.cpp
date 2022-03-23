@@ -127,7 +127,7 @@ void qFlick::dumpAllWaves(const char *title) {
 void qFlick::dumpOverview(const char *title) {
 	printf("==== Flick Overview | %s\n", title);
 	for (int i = 0; i < nWaves; i++) {
-		printf("         waves[%d]=0x%p    sample @x=1: %lf,  %lf\n",
+		printf("         waves[%d]=0%p    sample @x=1: %lf,  %lf\n",
 			i, waves[i], waves[i][1].re, waves[i][1].im);
 	}
 	printf("==== Flick Overview End ====\n");
@@ -160,10 +160,10 @@ double qFlick::magnitude(int doubleAge, int ix) {
 	//printf("qFlick::magnitude: doubleAge[%d]   ix[%d] \n", doubleAge, ix);
 	// if doubleAge is 1 or 2, we should end up with it=0
 	const int it = (doubleAge-1) / 2;
-//	printf("qFlick::magnitude: it=%d  waves[%d]=0x%p \n", it, it, (int) waves[it]);
-//	printf("qFlick::magnitude: waves[0]=0x%p \n", (int) waves[0]);
-//	printf("qFlick::magnitude: waves[1]=0x%p \n", (int) waves[1]);
-//	printf("qFlick::magnitude: waves[2]=0x%p \n", (int) waves[2]);
+//	printf("qFlick::magnitude: it=%d  waves[%d]=0%p \n", it, it, (int) waves[it]);
+//	printf("qFlick::magnitude: waves[0]=0%p \n", (int) waves[0]);
+//	printf("qFlick::magnitude: waves[1]=0%p \n", (int) waves[1]);
+//	printf("qFlick::magnitude: waves[2]=0%p \n", (int) waves[2]);
 
 	if (! waves[it]) printf("*** no wave[it] in qf:magnitude!\n");
 	qCx newPoint = waves[it][ix];
@@ -244,8 +244,8 @@ void qFlick::setCurrent(int newIx) {
 
 
 void qFlick::fixBoundaries(void) {
-	space->fixThoseBoundaries(waves[0]);
-	space->fixThoseBoundaries(waves[1]);
+	fixThoseBoundaries(waves[0]);
+	fixThoseBoundaries(waves[1]);
 }
 
 
@@ -293,7 +293,7 @@ void qFlick::normalize(void) {
 
 	qCx *wave = waves[0];
 	qCx *older = waves[1];
-	printf("           wave = x%p   older x%p\r", wave, older);
+	printf("           wave = %p   older %p\r", wave, older);
 
 	if (inProd == 0.) {
 		// wtf is this zero wave?  never possible.  And, we can't divide by zero.

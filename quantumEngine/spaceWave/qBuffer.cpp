@@ -21,37 +21,42 @@ qFlick - object that owns a list of waves, and points to its space
 #include "qSpace.h"
 #include "qWave.h"
 
-static bool debugNormalize = false;
-static bool debugAllocate = true;
+static bool traceNormalize = false;
+static bool traceAllocate = false;
 
 // just allocate a wave of whatever length
 // buffer is initialized to zero bytes therefore 0.0 everywhere
 qCx *allocateWave(int nPoints) {
 	qCx *buf = (qCx *) malloc(nPoints * sizeof(qCx));
-	if (debugAllocate) {
-		printf("🍕 allocateWave()  wave=x%p  nPoints: %d bytelength=x%lx\n",
+	if (traceAllocate) {
+		printf("🍕 allocateWave()  wave=%p  nPoints: %d bytelength=x%lx\n",
 			buf, nPoints, nPoints * sizeof(qCx));
 	}
 	return buf;
 }
 
 void freeWave(qCx *wave) {
-	if (debugAllocate) {
+	if (traceAllocate) {
 		// we don't know the length here, but you can search for the pointer value
-		printf("🍕 freeWave()  wave=x%p \n", wave);
+		printf("🍕 freeWave()  wave=%p \n", wave);
 	}
 	free(wave);
 }
 
-// make one, the right size for this buffer's space, or nPoints long
+// make one, the right size for this buffer's space, or nPoints long if no space
 qCx *qBuffer::allocateWave(int nPoints) {
-	if (nPoints <= 0)
-		nPoints = space->freeBufferLength;
+	if (((long) space) & 0xFFFFFFFe00000000) nPoints = space->nPoints;  // crash me
+	if (nPoints <= 0) {
+		if (space)
+			nPoints = space->freeBufferLength;
+		else
+			throw "no nPoints and no space";
+	}
 
-	this->nPoints = nPoints;
-	if (debugAllocate)
-		printf("🍕 qBuffer::allocateWave this=x%p  wave=x%p  nPoints: %d   freeBufferLength: x%x\n",
-			this, wave, nPoints, space->freeBufferLength);
+	// ?? this is weird  this->nPoints = nPoints;
+	if (traceAllocate)
+		printf("🍕 qBuffer::allocateWave this=%p  wave=%p  nPoints: %d\n",
+			this, wave, nPoints);
 	qCx *buf =  (qCx *) malloc(nPoints * sizeof(qCx));
 	return buf;
 }
@@ -62,6 +67,7 @@ qCx *qBuffer::allocateWave(int nPoints) {
 qBuffer::qBuffer(void) {
 	magic = 'qBuf';
 	wave = NULL;
+	space = NULL;
 }
 
 // actually create the buffer that we need
@@ -81,38 +87,44 @@ void qBuffer::initBuffer(int length, qCx *useThisBuffer) {
 		dynamicallyAllocated = true;
 	}
 	start = end = -1;  // wave / spectrum calculates these differently
+	continuum = -1;
 	nPoints = length;
-	if (debugAllocate) {
-		printf("🍕 qBuffer::initBuffer this=x%p  wave=x%p  nPoints: %d\n",
+	space = NULL;  // subclasses will fill it in if needed
+
+	if (traceAllocate) {
+		printf("🍕 qBuffer::initBuffer this=%p  wave=%p  nPoints: %d\n",
 			this, wave, nPoints);
 	}
 }
 
 qBuffer::~qBuffer() {
-	if (debugAllocate)
-		printf("🍕  start the qBuffer instance destructor...\n");
-	if (space)
-		printf("🧨 🧨    start of qBuffer::~qBuffer, %s:%d  freeBufferList=%p  qBuf=%p\n",
-		__FILE__, __LINE__, space->freeBufferList);
-	if (debugAllocate)
-		printf("🍕  start the qBuffer instance destructor...\n");
+	if (traceAllocate)
+		printf("🍕  start the qBuffer instance destructor...space=%p\n", space);
+//	if (space && (qSpace *) 0xcdcdcdcdcdcdcdcd != space)
+//		printf("🧨 🧨    start of qBuffer::~qBuffer, %s:%d  freeBufferList=%p  qBuf=%p\n",
+//			__FILE__, __LINE__, space->freeBufferList, this);
+//	if (space)
+//		printf("🧨 🧨    start of qBuffer::~qBuffer, %s:%d  freeBufferList=%p  qBuf=%p\n",
+//			__FILE__, __LINE__, space->freeBufferList, this);
 	if (dynamicallyAllocated) {
 		freeWave(wave);
 
-		printf("🧨 🧨     qBuffer::~qBuffer just after freeWave, %s:%d  freeBufferList=%p\n",
-		__FILE__, __LINE__, space->freeBufferList);
+//		printf("🧨 🧨     qBuffer::~qBuffer just after freeWave, %s:%d  space=%p freeBufferList=%p\n",
+//		__FILE__, __LINE__, space, ((space && (qSpace *) 0xcdcdcdcdcdcdcdcd != space)) ? space->freeBufferList : (FreeBuffer *) 0x99);
 
 
 		//space->returnBuffer(wave);
-		printf("   🍕  freed buffer...\n");
+//		printf("   🍕  freed buffer...\n");
 	}
 
 	space = NULL;
-	if (debugAllocate) printf("   🍕  setted buffer to null; done with qBuffer destructor.\n");
+	if (traceAllocate) printf("   🍕  setted buffer to null; done with qBuffer destructor.\n");
 
-	if (space)
+	if (space) {
+		// ahem we just set space to null...
 		printf("🧨 🧨    end of qBuffer::~qBuffer, %s:%d  freeBufferList=%p\n",
-		__FILE__, __LINE__, space->freeBufferList);
+			__FILE__, __LINE__, space->freeBufferList);
+	}
 }
 
 
@@ -160,7 +172,7 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 
 // you can use this on waves or spectrums; for the latter, leave off the start and the rest
 void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int continuum) {
-	//printf("qBuffer::dumpSegment(x%p, %s)\n", wave, withExtras ? "with extras" : "without extras");
+	//printf("qBuffer::dumpSegment(%p, %s)\n", wave, withExtras ? "with extras" : "without extras");
 	//printf("      start:%d  end:%d  continuum: %d\n", start, end, continuum);
 
 	if (start >= end)
@@ -196,23 +208,61 @@ void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int co
 /* ************************************************************ arithmetic */
 // these are operations that are useful and analogous for both Waves and Spectrums
 
-// only does somethign for qWaves; and then only if continuum is true
-void qBuffer::fixBoundaries(void) {
+// refresh the wraparound points for ANY WAVE subscribing to this space
+// 'those' or 'that' means some wave other than this->wave
+static void fixSomeBoundaries(qCx *wave, int continuum, int start, int end) {
+	if (end <= 0) throw "🌊🌊 fixSomeBoundaries() with zero points";
+
+	switch (continuum) {
+	case contDISCRETE:
+		break;
+
+	case contWELL:
+		// the points on the end are ∞ potential, but the arithmetic goes bonkers
+		// if I actually set the voltage to ∞
+		wave[0] = qCx();
+		wave[end] = qCx();
+		//printf("🌊🌊 contWELL cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", continuum,
+		//wave[0].re, wave[0].im, wave[end].re, wave[end].im);
+		break;
+
+	case contENDLESS:
+		//printf("🌊🌊 Endless ye said: on the endless case, %d = %d, %d = %d\n", 0, N, end, 1 );
+		// the points on the end get set to the opposite side
+		wave[0] = wave[end-1];
+		wave[end] = wave[1];
+		//printf("🌊🌊 contENDLESS cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", continuum,
+		//	wave[0].re, wave[0].im, wave[end].re, wave[end].im);
+		break;
+	}
 }
 
+void qBuffer::fixThoseBoundaries(qCx *targetWave) {
+	if (!targetWave)
+		targetWave = wave;
+	qDimension *dims = space->dimensions;
+	fixSomeBoundaries(targetWave, continuum, start, end);
+}
+
+void qSpace::fixThoseBoundaries(qCx *targetWave) {
+	qDimension *dims = dimensions;
+	fixSomeBoundaries(targetWave, dims->continuum, dims->start, dims->end);
+}
 
 
 // calculate ⟨ψ | ψ⟩  'inner product'.  Non-visscher.
 double qBuffer::innerProduct(void) {
 	qCx *wave = this->wave;
-	qDimension *dims = space->dimensions;
 	double sum = 0.;
 
 	for (int ix = start; ix < end; ix++) {
 		qCx point = wave[ix];
-		double re = point.re;
-		double im = point.im;
-		sum += re * re + im * im;
+		sum += point.norm();
+
+//		double re = point.re;
+//		double im = point.im;
+//		sum += re * re + im * im;
+
 		//sum += wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im;
 // 		printf("innerProduct point %d (%lf,%lf) %lf\n", ix, wave[ix].re, wave[ix].im,
 // 			wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im);
@@ -234,32 +284,28 @@ void qBuffer::normalize(void) {
 	//qCx *wave = tempWave;
 	//qWave *tempQWave = qWave::newQWave(space, tempWave);
 	qCx *wave = this->wave;
-	qDimension *dims = space->dimensions;
+	//qDimension *dims = space->dimensions;
 	double mag = innerProduct();
-	if (debugNormalize)
+	if (traceNormalize)
 		printf("🍕 normalizing qBuffer.  magnitude=%lf\n", mag);
 	//tempQWave->dumpWave("The wave,before normalize", true);
 
 	if (mag == 0. || ! isfinite(mag)) {
 		// ALL ZEROES!??! this is bogus, shouldn't be happening
-		printf("🍕 ALL ZEROES ! ? ? ! not finite ! ? ? !  set them all to a constant, normalized\n");
-		const double f = 1e-9;
-		for (int ix = dims->start; ix < dims->end; ix++)
-			wave[ix] = qCx(ix & 1 ? -f : +f, ix & 2 ? -f : +f);
+		const double factor = pow(end + start, -0.5);
+		printf("🍕 🍕 🍕 🍕 🍕 🍕 ALL ZEROES ! ? ? ! not finite ! ? ? !  set them all to a constant, normalized\n");
+		for (int ix = start; ix < end; ix++)
+			wave[ix] = factor;
 	}
 	else {
 		const double factor = pow(mag, -0.5);
-		if (debugNormalize)
+		if (traceNormalize) {
 			printf("🍕 normalizing qBuffer.  factor=%lf, start=%d, end=%d, N=%d\n",
-			factor, dims->start, dims->end, dims->N);
-
-		for (int ix = dims->start; ix < dims->end; ix++) {
-			wave[ix] *= factor;
-			if (((uintptr_t) qViewBuffer_getViewBuffer()) & 3) {
-				printf("🍕 getViewBuffer() is odd: x%p at ix=%d\n",
-					qViewBuffer_getViewBuffer(), ix);
-			}
+			factor, start, end, end - start);
 		}
+
+		for (int ix = start; ix < end; ix++)
+			wave[ix] *= factor;
 	}
 	fixBoundaries();
 	//dumpWave("qWave::normalize done", true);

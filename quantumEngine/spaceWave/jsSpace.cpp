@@ -6,6 +6,10 @@
 #include "qSpace.h"
 #include "qWave.h"
 
+
+
+static bool traceSpaceCreation = false;
+
 /* ********************************************************** wave stuff */
 
 // after the initSpace() call, allocate the buffers.
@@ -15,29 +19,29 @@ void allocWaves(void) {
 	// the other buffers...
 	peruQWave = new qWave(theSpace);
 	laosQWave = new qWave(theSpace);
-	printf("🚀 🚀 🚀  %s:%d freeBufferList: x%p\n", __FILE__, __LINE__, theSpace->freeBufferList);
+//	printf("🚀 🚀 🚀  %s:%d freeBufferList: %p\n", __FILE__, __LINE__, theSpace->freeBufferList);
 
 	peruWave = peruQWave->wave;
 	laosWave = laosQWave->wave;
 
-	printf("🚀 🚀 🚀  %s:%d freeBufferList: x%p\n", __FILE__, __LINE__, theSpace->freeBufferList);
-	//printf("        🚀 🚀 🚀       peruQWave=x%p   peruWave=x%p   laosQWave=x%p   laosWave=x%p  \n",
+//	printf("🚀 🚀 🚀  %s:%d freeBufferList: %p\n", __FILE__, __LINE__, theSpace->freeBufferList);
+	//printf("        🚀 🚀 🚀       peruQWave=%p   peruWave=%p   laosQWave=%p   laosWave=%p  \n",
 	//	peruQWave, peruWave, laosQWave, laosWave);
 
 	/* *********************************** allocate other buffers */
 
 	// we make our own potential
 	theSpace->potential = thePotential = new double[theSpace->nPoints];
-	printf("🚀 🚀 🚀  %s:%d freeBufferList: x%p\n", __FILE__, __LINE__, theSpace->freeBufferList);
+//	printf("🚀 🚀 🚀  %s:%d freeBufferList: %p\n", __FILE__, __LINE__, theSpace->freeBufferList);
 
 
 	// our own view buffer - needs potential to be in place
 	theSpace->qViewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
-	printf("🚀 🚀 🚀  %s:%d freeBufferList: x%p\n", __FILE__, __LINE__, theSpace->freeBufferList);
+//	printf("🚀 🚀 🚀  %s:%d freeBufferList: %p\n", __FILE__, __LINE__, theSpace->freeBufferList);
 	//dumpViewBuffer("newly created");
 
-	//printf("   🚀 🚀 🚀 completeNewSpace BEFORE creation  theQViewBuffer=x%p  "
-	//	"theQViewBuffer->viewBuffer=x%p\n",
+	//printf("   🚀 🚀 🚀 completeNewSpace BEFORE creation  theQViewBuffer=%p  "
+	//	"theQViewBuffer->viewBuffer=%p\n",
 	//		theQViewBuffer,
 	//		theQViewBuffer ? theQViewBuffer->viewBuffer : NULL);
 }
@@ -72,9 +76,9 @@ extern "C" {
 
 // return a pointer to just the main wave for theSpace
 qCx *qSpace_getWaveBuffer(void) {
-	//printf("🚀 🚀 🚀 qSpace_getWaveBuffer() theSpace: x%p\n", (theSpace));
-	//printf("        🚀 🚀 🚀        the qWave x%p\n", (theSpace->latestQWave));
-	//printf("        🚀 🚀 🚀        the wave x%p\n", (theSpace->latestQWave->wave));
+	//printf("🚀 🚀 🚀 qSpace_getWaveBuffer() theSpace: %p\n", (theSpace));
+	//printf("        🚀 🚀 🚀        the qWave %p\n", (theSpace->latestQWave));
+	//printf("        🚀 🚀 🚀        the wave %p\n", (theSpace->latestQWave->wave));
 //	printf("        🚀 🚀 🚀     q=w %d   s=w %d   q=s %d\n",
 //		(uintptr_t) (theSpace->latestQWave) == (uintptr_t) (theSpace->latestQWave->wave),
 //		(uintptr_t) (theSpace) == (uintptr_t) (theSpace->latestQWave->wave),
@@ -117,7 +121,7 @@ void qSpace_setStepsPerIteration(int stepsPerIteration) {
 		throw buf;
 	}
 	theSpace->stepsPerIteration = stepsPerIteration;
-	//printf("🚀 🚀 🚀 qSpace_setStepsPerIteration result %d in theSpace=x%p\n",
+	//printf("🚀 🚀 🚀 qSpace_setStepsPerIteration result %d in theSpace=%p\n",
 	//	theSpace->stepsPerIteration, theSpace);
 }
 
@@ -130,7 +134,7 @@ void qSpace_setLowPassDilution(double dilution) {
 		throw buf;
 	}
 	theSpace->lowPassDilution = dilution;
-	//printf("🚀 🚀 🚀 qSpace_setLowPassDilution result %lf in theSpace=x%p\n",
+	//printf("🚀 🚀 🚀 qSpace_setLowPassDilution result %lf in theSpace=%p\n",
 	//	theSpace->lowPassDilution, theSpace);
 }
 
@@ -146,7 +150,8 @@ void qSpace_askForFFT(void) { theSpace->askForFFT(); }
 // it's tedious to send a real data structure thru the emscripten interface, so the JS
 // constructs the dimensions by repeated calls to addSpaceDimension()
 qSpace *startNewSpace(const char *label) {
-	//printf("🚀 🚀 🚀  startNewSpace(%s), theSpace=x%p (should be zero)\n", label, theSpace);
+	if (traceSpaceCreation)
+		printf("🚀 🚀 🚀  startNewSpace(%s), theSpace=%p (should be zero)\n", label, theSpace);
 
 	// use theSpace as a way of detecting if they were freed before.
 	if (theSpace) {
@@ -161,24 +166,27 @@ qSpace *startNewSpace(const char *label) {
 	}
 	//printf("🚀 🚀 🚀  startNewSpace: about to construct new space  itself '%s'\n", label);
 	theSpace = new qSpace(label);
-	printf("🚀 🚀 🚀  JS startNewSpace   done (%s == %s)   theSpace=x%p, freeBufferList: x%p\n",
-		theSpace->label, label, theSpace, theSpace->freeBufferList);
+
+	if (traceSpaceCreation) {
+		printf("🚀 🚀 🚀  JS startNewSpace   done (%s == %s)   theSpace=%p, freeBufferList: %p\n",
+			theSpace->label, label, theSpace, theSpace->freeBufferList);
+	}
 
 	return theSpace;
 }
 
 // call this from JS to add one or more dimensions
 qSpace *addSpaceDimension(int N, int continuum, const char *label) {
-	printf("addSpaceDimension(%d, %d, %s)   %p\n", N, continuum, label, theSpace->freeBufferList);
+	if (traceSpaceCreation) printf("addSpaceDimension(%d, %d, %s)   %p\n", N, continuum, label, theSpace->freeBufferList);
 	theSpace->addDimension(N, continuum, label);
-	printf("🚀 🚀 🚀  addSpaceDimension(): freeBufferList: x%p\n", theSpace->freeBufferList);
+	if (traceSpaceCreation) printf("🚀 🚀 🚀  addSpaceDimension(): freeBufferList: %p\n", theSpace->freeBufferList);
 	return theSpace;
 }
 
 // call this from JS to finish the process
 qSpace *completeNewSpace(void) {
-	//printf("completeNewSpace() starts\n");
-	printf("🚀 🚀 🚀  JS completeNewSpace starts(%s)   theSpace=x%p, freeBufferList: x%p\n",
+	//printf("jsSpace starts\n");
+	if (traceSpaceCreation) printf("🚀 🚀 🚀  JS completeNewSpace starts(%s)   theSpace=%p, freeBufferList: %p\n",
 		theSpace->label, theSpace, theSpace->freeBufferList);
 
 	// finish up all the dimensions now that we know them all
@@ -188,8 +196,8 @@ qSpace *completeNewSpace(void) {
 	/* *********************************** allocate waves */
 	allocWaves();
 
-	printf("   🚀 🚀 🚀 completeNewSpace After Creation but BEFORE loadViewBuffer  "
-		"theQViewBuffer=x%p  theQViewBuffer->viewBuffer=x%p  freeBufferList=%p\n",
+	if (traceSpaceCreation) printf("   🚀 🚀 🚀 completeNewSpace After Creation but BEFORE loadViewBuffer  "
+		"theQViewBuffer=%p  theQViewBuffer->viewBuffer=%p  freeBufferList=%p\n",
 		theQViewBuffer, theQViewBuffer ?  theQViewBuffer->viewBuffer : NULL,
 		theSpace->freeBufferList);
 
@@ -198,35 +206,35 @@ qSpace *completeNewSpace(void) {
 	theSpace->latestQWave = laosQWave;
 	qCx *wave = theSpace->latestQWave->wave;
 
-	printf("🚀 🚀 🚀  completeNewSpace():%d freeBufferList: x%p\n", __LINE__, theSpace->freeBufferList);
+	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
 
 	// a dopey default.  JS fills in the actual default.
 	qDimension *dims = theSpace->dimensions;
 	for (int ix = 0; ix < dims->start + dims->end; ix++)
 		wave[ix] = qCx(1., 0.);
-	printf("🚀 🚀 🚀  completeNewSpace():%d freeBufferList: x%p\n", __LINE__, theSpace->freeBufferList);
+	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
 
 	//printf("🚀 🚀 🚀 newly created wave, before norm:\n");
 	//theSpace->dumpThatWave(wave, true);
 
-	printf("🚀 🚀 🚀  completeNewSpace():%d freeBufferList: x%p\n", __LINE__, theSpace->freeBufferList);
+	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
 	theSpace->latestQWave->normalize();
-	printf("🚀 🚀 🚀  completeNewSpace():%d freeBufferList: x%p\n", __LINE__, theSpace->freeBufferList);
+	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
 	//printf("🚀 🚀 🚀 newly created wave, AFTER norm:\n");
 	//theSpace->dumpThatWave(wave, true);
 
 
 
-	printf("🚀 🚀 🚀  completeNewSpace():%d freeBufferList: x%p\n", __LINE__, theSpace->freeBufferList);
+	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
 	theQViewBuffer->loadViewBuffer();  // just so i can see the default if needed
 
-//	printf("   🚀 🚀 🚀 completeNewSpace AFTER loadViewBuffer  theQViewBuffer=x%p  "
-//		"theQViewBuffer->viewBuffer=x%p\n",
+//	printf("   🚀 🚀 🚀 completeNewSpace AFTER loadViewBuffer  theQViewBuffer=%p  "
+//		"theQViewBuffer->viewBuffer=%p\n",
 //			theQViewBuffer, theQViewBuffer ?  theQViewBuffer->viewBuffer : NULL);
 
 
 
-//	printf("   🚀 🚀 🚀 qSpace::completeNewSpace(): done\n");
+	if (traceSpaceCreation) printf("   🚀 🚀 🚀 qSpace::jsSpace: done\n");
 	return theSpace;
 }
 
