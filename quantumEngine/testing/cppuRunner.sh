@@ -23,14 +23,16 @@ allCpp=`cat building/allCpp.list`
 # note that main.cpp is NOT included in the .cpp files; that's for web use only
 # and makes all the diff.  Update list of test srcs as needed.
 # some of these options - dunno if I need them
-g++ -o cppuTestBin  -Wno-c++11-extensions  -fexceptions -g  -O0 \
+set -x
+g++ -o cppuTestBin -Wno-tautological-undefined-compare \
+	-std=c++11 -fexceptions -g  -O0 \
 	-I$CPPUTEST_HOME/include \
 	-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h \
 	-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt \
 	testing/cppuMain.cpp */*.spec.cpp \
 	$allCpp \
 	|| exit $?
-
+set +x
 
 echo ====================== done compiling... start testing ==================================
 echo
