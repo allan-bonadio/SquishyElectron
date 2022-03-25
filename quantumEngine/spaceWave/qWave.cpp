@@ -94,6 +94,7 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 // the complete set of states
 // one for the N+1 if continuum
 void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
+	if (NULL == this) throw "🌊🌊 qSpace::dumpThatWave() with null this";
 	if (nPoints <= 0) throw "🌊🌊 qSpace::dumpThatWave() with zero points";
 
 	const qDimension *dims = dimensions;
@@ -103,13 +104,15 @@ void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
 // any wave, probably shouldn't call this
 void qWave::dumpThatWave(qCx *wave, bool withExtras) {
 	//printf("🌊🌊 any wave, probably shouldn't call this\n");
-	space->dumpThatWave(wave, withExtras);
+	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
+	//space->dumpThatWave(wave, withExtras);
 }
 
 // this is the member function that dumps its own wave and space
 void qWave::dumpWave(const char *title, bool withExtras) {
 	printf("\n🌊🌊 ==== Wave | %s ", title);
-	space->dumpThatWave(wave, withExtras);
+	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
+	//space->dumpThatWave(wave, withExtras);
 	printf("\n🌊🌊 ==== end of Wave ====\n\n");
 }
 

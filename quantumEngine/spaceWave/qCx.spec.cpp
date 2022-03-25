@@ -4,9 +4,6 @@
 
 #include "CppUTest/TestHarness.h"
 
-// does this do anything?
-//using namespace std;
-
 
 TEST_GROUP(qCx)
 {
@@ -31,7 +28,7 @@ TEST(qCx, ConstructorComplex)
 
 TEST(qCx, ConstructorZero)
 {
-	CHECK_EQUAL(qCx(0), qCx(0));
+	CHECK_EQUAL(qCx(0), qCx(0.));
 	CHECK_EQUAL(qCx(0), qCx(0, 0));
 	CHECK_EQUAL(qCx(0, 0), qCx(0));
 	CHECK_EQUAL(qCx(0), qCx());
@@ -76,7 +73,10 @@ TEST(qCx, Division)
 
 	CHECK_EQUAL(qCx(30, 40) / qCx(0, 10), qCx(4, -3));
 	CHECK_EQUAL(qCx(30, 40) / -qCx(10), qCx(-3, -4));
+}
 
+TEST(qCx, AssignDivision)
+{
 	CHECK_EQUAL(qCx(0, 2) /= qCx(1, 1), qCx(1, 1));
 	CHECK_EQUAL(qCx(0, -2) /= qCx(1, 1), qCx(-1, -1));
 	CHECK_EQUAL(qCx(-2, 0) /= qCx(-1, 1), qCx(1, 1));
@@ -97,11 +97,7 @@ TEST(qCx, Horse)
 	// seems like arthemetic inside the method is bananas
 	qCx horse(30, 40);
 	qCx plus2 = qCx(2);
-	//printf("starting horse... horse=%lf %lf shdbe 30 40; plus2= %lf %lf shbe 2 0\n",
-	//	horse.re, horse.im, plus2.re, plus2.im);
 	qCx halfHorse = (horse /= plus2);
-	//printf("horse is %lf %lf, but the return value is %lf, %lf shdbe half\n",
-	//	horse.re, horse.im, halfHorse.re, halfHorse.im);
 	CHECK_EQUAL(horse, qCx(15, 20));
 }
 
@@ -109,11 +105,7 @@ TEST(qCx, Whale)
 {
 	qCx whale(30, 40);
 	qCx minus2 = -qCx(2);
-	//printf("starting whale=%lf %lf shbe 30 40; minus2= %lf %lf shbe -2\n",
-	//	whale.re, whale.im, minus2.re, minus2.im);
-	qCx halfMinusWhale = (whale /= minus2);
-	//printf("whale is %lf %lf, but the return value is %lf, %lf\n",
-	//	whale.re, whale.im, halfMinusWhale.re, halfMinusWhale.im);
+	whale /= minus2;
 	CHECK_EQUAL(whale, qCx(-15, -20));
 }
 
@@ -121,11 +113,7 @@ TEST(qCx, Giraffe)
 {
 	qCx giraffe(30, 40);
 	qCx minus10 = -qCx(10);
-	//printf("starting giraffe=%lf %lf; minus10= %lf %lf\n",
-	//	giraffe.re, giraffe.im, minus10.re, minus10.im);
-	qCx tenthMinusGiraffe = (giraffe /= minus10);
-	//printf("giraffe is %lf %lf, but the return value is %lf, %lf\n",
-	//	giraffe.re, giraffe.im, tenthMinusGiraffe.re, tenthMinusGiraffe.im);
+	giraffe /= minus10;
 	CHECK_EQUAL(giraffe, qCx(-3, -4));
 }
 

@@ -1,13 +1,8 @@
-//#include <string>
-//#include "../spaceWave/qCx.h"
 #include "../spaceWave/qSpace.h"
 #include "../spaceWave/qWave.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"
-
-// does this do anything?
-//using namespace std;
 
 
 TEST_GROUP(qSpace)
@@ -17,7 +12,7 @@ TEST_GROUP(qSpace)
 TEST(qSpace, qSpace_BareGauntlet)
 {
 	qSpace *space = makeBareSpace(4);
-	STRCMP_EQUAL(MAKEBARE1DSPACE_LABEL, space->label);
+	STRCMP_EQUAL(MAKEBARESPACE_LABEL, space->label);
 
 	LONGS_EQUAL(1, space->dimensions->start);
 	LONGS_EQUAL(5, space->dimensions->end);
@@ -62,7 +57,7 @@ void completeNewSpaceGauntlet(int N, int expectedSpectrumLength, int expectedFre
 //	printf("🧨 🧨       created the space and all the buffers; freeBufferList=%p\n", space->freeBufferList);
 	int nPoints = space->nPoints;
 
-	STRCMP_EQUAL_TEXT(MAKEFULL1DSPACE_LABEL, space->label, "space label");
+	STRCMP_EQUAL_TEXT(MAKEFULLSPACE_LABEL, space->label, "space label");
 
 	// these are for the dimension, of which there's only one
 	LONGS_EQUAL_TEXT(1, space->dimensions->start, "space start");
