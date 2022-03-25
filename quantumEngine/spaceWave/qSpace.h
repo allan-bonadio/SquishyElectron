@@ -27,7 +27,7 @@ extern void qeStarted(void);
 struct qDimension {
 public:
 	// possible  states, just for this  dimension.  end + start == datapoints=nPoints
-	// end - start == N.  always loop for (j=start; j < end; j++) for actual state 𝞇
+	// end - start == N.  always loop for (j=start; j < end; j++) for actual state 𝜓
 	int N;
 	int start;
 	int end;
@@ -86,8 +86,8 @@ public:
 
 	char label[LABEL_LEN+1];
 
-	// Dimensions are listed from outer to inner as with the resulting ψ array:
-	// ψ[outermost-dim][dim][dim][innermost-dim]
+	// Dimensions are listed from outer to inner as with the resulting 𝜓 array:
+	// 𝜓[outermost-dim][dim][dim][innermost-dim]
 	// always a fixed size, for simplicity.
 	qDimension dimensions[MAX_DIMENSIONS];
 

@@ -3,14 +3,14 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-// we have an N element array for the ψ values, indexed (sortof) by X,
+// we have an N element array for the 𝜓 values, indexed (sortof) by X,
 // whatever mins/maxes/increments, will be calculated.
 // Boundary conditions: each row will have N+2 elements, where the 0th and the
-// N+1-th element are the low and high boundaries.  They kindof have to be clamped to ψ =
-// zero, and the corresponding V must be infinite, to completely shut out any ψ
+// N+1-th element are the low and high boundaries.  They kindof have to be clamped to 𝜓 =
+// zero, and the corresponding V must be infinite, to completely shut out any 𝜓
 // off the ends.
 
-// the wave function ψ in a quantum-101 simiple potential energy well.
+// the wave function 𝜓 in a quantum-101 simiple potential energy well.
 // N is number of data points, including the boundaries
 
 import qCx from './qCx';
@@ -62,7 +62,7 @@ export class jSpace {
 
 }
 
-// ψ itself; can have more than one per jSpace
+// 𝜓 itself; can have more than one per jSpace
 export class jWave {
 	// N is the resolution of the jWave buffer; the array is 2 more cells
 	constructor(space) {
@@ -77,11 +77,11 @@ export class jWave {
 	}
 
 	dump(title = 'a jWave') {
-		console.info(`${title} ==> ⟨ψ | ψ⟩ = `, this.innerProduct());
-		this.psi.forEach((p, ix) => console.info(`   ψ[${ix}]: ${p.re.toFixed(6)}\t${p.im.toFixed(6)}`));
+		console.info(`${title} ==> ⟨𝜓 | 𝜓⟩ = `, this.innerProduct());
+		this.psi.forEach((p, ix) => console.info(`   𝜓[${ix}]: ${p.re.toFixed(6)}\t${p.im.toFixed(6)}`));
 	}
 
-	// just iterate over all.  ψ must be created already
+	// just iterate over all.  𝜓 must be created already
 	forEach(callback) {
 		let {space: {N}, psi} = this;
 		for (let ix = 1; ix <= N; ix++)
@@ -89,7 +89,7 @@ export class jWave {
 	}
 
 	// for in-place arithmetic on each point
-	// we can use this for original wavefunctions with no ψ existing;
+	// we can use this for original wavefunctions with no 𝜓 existing;
 	map(callback) {
 		let {space: {N}, psi} = this;
 		if (!psi)
@@ -125,7 +125,7 @@ export class jWave {
 		}
 	}
 
-	// calculate ⟨ψ | ψ⟩  'inner product' isn't the right name is it?
+	// calculate ⟨𝜓 | 𝜓⟩  'inner product' isn't the right name is it?
 	innerProduct() {
 		let tot = 0;  // always real
 		this.forEach(p => {
@@ -134,7 +134,7 @@ export class jWave {
 		return tot;
 	}
 
-	// enforce ⟨ψ | ψ⟩ = 1 by dividing out the current value
+	// enforce ⟨𝜓 | 𝜓⟩ = 1 by dividing out the current value
 	normalize() {
 		let t = this.innerProduct();
 

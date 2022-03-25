@@ -11,10 +11,10 @@ import PropTypes from 'prop-types';
 
 import PotentialArea from './PotentialArea';
 
-/* This draws the well, without the ψ wave (see draw.js).
+/* This draws the well, without the 𝜓 wave (see draw.js).
 coordinate systems:
 pixel = screen pixels; inside the svg
-wave = actual value of ⟨ψ | ψ⟩, average about 1/N, in y direction, positive is up
+wave = actual value of ⟨𝜓 | 𝜓⟩, average about 1/N, in y direction, positive is up
 			value of the index x, scaled to fit the area.  Inside g.waveArea
 
 Naming Conventon:

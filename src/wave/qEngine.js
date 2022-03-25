@@ -62,10 +62,10 @@ export const qeStartPromise = new Promise((succeed, fail) => {
 //		);
 //	}
 //
-//	qe.set1DWave = function set1DWave(ix, ψ) {
+//	qe.set1DWave = function set1DWave(ix, 𝜓) {
 //		const vPtr = qe.latestWaveBuffer + 8*2*ix;
-//		Module.setValue(vPtr, ψ, 'double');
-//		Module.setValue(vPtr + 8, ψ, 'double');
+//		Module.setValue(vPtr, 𝜓, 'double');
+//		Module.setValue(vPtr + 8, 𝜓, 'double');
 //	}
 //
 //	// tune into the most recently used wave and potential buffers

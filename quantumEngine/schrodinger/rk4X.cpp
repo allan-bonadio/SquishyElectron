@@ -76,7 +76,7 @@ void qSpace::oneRk4Step(void) {
 
 
 
-	// use egyptWave for all the first-try ψ values
+	// use egyptWave for all the first-try 𝜓 values
 	// for (int ix = dims->start; ix < dims->end; ix++) {
 	// 	laosWave[ix] = theWave[ix] + hamiltonian(theWave, ix) * halfDtOverI;
 	// 	qCheck(peruWave[ix]);

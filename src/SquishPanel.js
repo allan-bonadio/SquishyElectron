@@ -463,7 +463,7 @@ export class SquishPanel extends React.Component {
 	}
 	setLowPassDilution = this.setLowPassDilution.bind(this);
 
-	// completely wipe out the ψ wavefunction and replace it with one of our canned waveforms.
+	// completely wipe out the 𝜓 wavefunction and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon setWave in wave tab
 	setWave(waveParams) {
 // 		const wave = qe.qSpace_getWaveBuffer();

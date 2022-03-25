@@ -71,7 +71,7 @@ class qeWave {
 
 	/* ********************************************************************** calculatons */
 
-	// calculate ⟨ψ | ψ⟩  'inner product'
+	// calculate ⟨𝜓 | 𝜓⟩  'inner product'
 	innerProduct() {
 		const wave = this.wave;
 		const {start, end} = this.space.startEnd2;
@@ -82,7 +82,7 @@ class qeWave {
 		return tot;
 	}
 
-	// enforce ⟨ψ | ψ⟩ = 1 by dividing out the current value
+	// enforce ⟨𝜓 | 𝜓⟩ = 1 by dividing out the current value
 	normalize() {
 		const wave = this.wave;
 

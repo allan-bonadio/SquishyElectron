@@ -1,5 +1,5 @@
 /*
-** Hamiltonian -- calculate the energy of the wave, H | ψ >
+** Hamiltonian -- calculate the energy of the wave, H | 𝜓 >
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
@@ -15,9 +15,9 @@
 // btw, this is really Hψ not just H.  Isn't H supposed to be real?
 qCx hamiltonian(qCx *wave, int x) {
 	// so at location x, if dx = 1,
-	// the derivative would be (ψ[x+1] - ψ[x])
-	//                      or (ψ[x] - ψ[x-1])
-	// so second deriv would be ψ[x+1] + ψ[x-1] - 2* ψ[x]
+	// the derivative would be (𝜓[x+1] - 𝜓[x])
+	//                      or (𝜓[x] - 𝜓[x-1])
+	// so second deriv would be 𝜓[x+1] + 𝜓[x-1] - 2* 𝜓[x]
 	qCx d2 = wave[x-1] + wave[x+1] - wave[x] * 2;
 	qCheck("hamiltonian d2", d2);
 
