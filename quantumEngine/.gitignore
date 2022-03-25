@@ -7,4 +7,5 @@ quantumEngine.wasm
 quantumTest.js
 quantumTest.wasm
 cppuTestBin
+cppuTestBin.dSYM
 
