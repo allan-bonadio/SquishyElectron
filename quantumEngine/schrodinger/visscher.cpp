@@ -26,8 +26,8 @@ The present algorithm is motivated by writing the Schrodinger equation in terms
 of the real and imaginary parts R and I of the wave function.
 
 We will define
-		• R = ψ.re at times O,dt,2dt,..., and
-		• I = ψ.im at times .5dt, 1.5dt, ...
+		• R = 𝜓.re at times O,dt,2dt,..., and
+		• I = 𝜓.im at times .5dt, 1.5dt, ...
 so that in our buffers of complex numbers, the Im part is dt/2 ahead of the Re part:
 
             real components    imag components
@@ -65,7 +65,7 @@ void qSpace::stepReal(qCx *oldW, qCx *newW, double dt) {
 	//printf("⚛︎ stepReal start N States=(%d), dt=%lf\n",
 	//	dims->nStates, dt);
 
-	//printf("⚛︎ the hamiltonian ψ.re at ...\n");
+	//printf("⚛︎ the hamiltonian 𝜓.re at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		///double oldWr = oldW[ix].re;
 
@@ -85,7 +85,7 @@ void qSpace::stepReal(qCx *oldW, qCx *newW, double dt) {
 	//dumpThatWave(newW, true);
 }
 
-// second step: advance the Imaginaries of ψ a dt, from dt/2 to 3dt/2
+// second step: advance the Imaginaries of 𝜓 a dt, from dt/2 to 3dt/2
 // given the reals we just generated in stepReal() (usually)
 void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
 	qDimension *dims = dimensions;
@@ -93,16 +93,16 @@ void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
 	//dumpThatWave(oldW, true);
 	//printf("⚛︎ dt=%lf\n", dt);
 
-	double *potential = potential;
-	//printf("⚛︎ the hamiltonian ψ.im at ...\n");
+	//double *potential = potential;
+	//printf("⚛︎ the hamiltonian 𝜓.im at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
 
 		double d2ψr = oldW[ix-1].re + oldW[ix+1].re - oldW[ix].re * 2;
 
-		//printf("⚛︎ the hamiltonian ψ.im at x=%d  then dt=%lf d2x=%lf,%lf oldW1=%lf,%lf\n",
+		//printf("⚛︎ the hamiltonian 𝜓.im at x=%d  then dt=%lf d2x=%lf,%lf oldW1=%lf,%lf\n",
 		//	ix, dt, d2.re,d2.im, oldW1.re, oldW1.im);
 
-		double Hψ = d2ψr + potential[ix];
+		double Hψ = d2ψr; // + potential[ix];
 		//double Hψ = d2ψr;  // without potential
 
 		// note addition
