@@ -118,6 +118,7 @@ qBuffer::~qBuffer() {
 	}
 
 	space = NULL;
+	//wave = NULL;
 	if (traceAllocate) printf("   🍕  setted buffer to null; done with qBuffer destructor.\n");
 
 	if (space) {
@@ -204,6 +205,14 @@ void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int co
 	printf("    inner product=%11.8lf\n", innerProd);
 }
 
+// this is more for visscher steps to remember the floats
+void qBuffer::dumpHiRes(const char *title) {
+	printf("🍕 🍕  HIRES %s: s=%d e=%d continuum:%d nPoints:%d\n", title, start, end, continuum, nPoints);
+	for (int ix = 0; ix < nPoints; ix++) {
+		printf("🍕 [%d]  %18.12lf, %18.12lf\n", ix, wave[ix].re, wave[ix].im);
+	}
+}
+
 
 /* ************************************************************ arithmetic */
 // these are operations that are useful and analogous for both Waves and Spectrums
@@ -240,7 +249,6 @@ static void fixSomeBoundaries(qCx *wave, int continuum, int start, int end) {
 void qBuffer::fixThoseBoundaries(qCx *targetWave) {
 	if (!targetWave)
 		targetWave = wave;
-	qDimension *dims = space->dimensions;
 	fixSomeBoundaries(targetWave, continuum, start, end);
 }
 
@@ -250,7 +258,7 @@ void qSpace::fixThoseBoundaries(qCx *targetWave) {
 }
 
 
-// calculate ⟨ψ | ψ⟩  'inner product'.  Non-visscher.
+// calculate ⟨𝜓 | 𝜓⟩  'inner product'.  Non-visscher.
 double qBuffer::innerProduct(void) {
 	qCx *wave = this->wave;
 	double sum = 0.;
@@ -272,7 +280,7 @@ double qBuffer::innerProduct(void) {
 
 
 
-// enforce ⟨ψ | ψ⟩ = 1 by dividing out the current magnitude sum.
+// enforce ⟨𝜓 | 𝜓⟩ = 1 by dividing out the current magnitude sum.
 // BUffer must be installed as well as nPoints, start and end
 void qBuffer::normalize(void) {
 	// for visscher, we have to make it in a temp wave and copy back to our buffer

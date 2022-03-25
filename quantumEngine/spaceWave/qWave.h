@@ -36,8 +36,8 @@ struct qBuffer {
 
 	void copyThatWave(qCx *dest, qCx *src, int length = -1);
 
-	// should be the same as in the space, either the wave or the spectrum.
-	// We keep a copy here in case this loses track of its space.  EG see normalize.
+	// spectrums don't have wraparounds boundaries so spectrums calculate different numbers from waves.
+	// should be in accord with the space, sortof, depending on whether wave or spectrum.
 	int nPoints; int start; int end, continuum;
 
 	// if it used the first constructor
@@ -45,7 +45,7 @@ struct qBuffer {
 	// but for just a bare qBuffer, this can be null, for freelance buffers.
 	qSpace *space;
 
-	int dynamicallyAllocated: 1;
+	bool dynamicallyAllocated: 1;
 
 	// print one complex number, plus maybe some more calculated metrics for that point,
 	// on a line in the dump on stdout.
@@ -55,6 +55,8 @@ struct qBuffer {
 	// you can use this on waves or spectrums; for the latter, leave off the start and the rest
 	static void dumpSegment(qCx *wave, bool withExtras = false,
 		int start = 0, int end = -1, int continuum = 0);
+
+	void dumpHiRes(const char *title);
 
 	double innerProduct(void);
 	void normalize(void);
