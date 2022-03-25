@@ -3,9 +3,14 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include <math.h>
+#include <cmath>
 #include "qCx.h"
-//#include <stacktrace/call_stack.hpp>
+
+// Tolerance for ==.  Absolute, not relative, we're comparing 𝜓 values here.
+// all values are |𝜓| <1, and typically |𝜓| > roundoff error
+// these are not really the radius, it's more rectangular, but pretty much the same idea
+#define ERROR_RADIUS  1e-12
+
 
 qCx qCx::operator/(qCx b) {
 	double det = b.norm();
@@ -17,18 +22,20 @@ qCx qCx::operator/(qCx b) {
 
 // what is wrong with this?  this is handed in ÷ 10.
 qCx qCx::operator/=(qCx b) {
-	//printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
-	//printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
 	double det = b.norm();
-	//printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
-	//printf("÷ this=%lf %lf; b=%lf %lf\n", re, im, b.re, b.im);
-	//printf("÷ re * b.re=%lf; im * b.im=%lf\n", re * b.re, im * b.im);
 	double t = (re * b.re + im * b.im) / det;
-	//printf("÷ det=%lf; t=%lf\n", det, t);
 	im = (im * b.re - re * b.im) / det;
 	re = t;
-	//printf("÷ re=%lf  im=%lf\n", re, im);
 	return *this;
+}
+
+// these are also used in the CppUTest CHECK_EQUAL macro
+bool qCx::operator==(const qCx b) {
+	return fabs(re - b.re) + fabs(im - b.im) <= ERROR_RADIUS;
+}
+
+bool qCx::operator!=(const qCx b) {
+	return fabs(re - b.re) + fabs(im - b.im) > ERROR_RADIUS;
 }
 
 // more work than it's worth - should use the norm instead
@@ -41,6 +48,7 @@ double qCx::phase() {
 	return atan2(im, re) * 180 / PI;
 }
 
+// obsolete
 // check to make sure real and imag are finite and nice; warn if not
 void qCheck(const char *where, qCx aCx) {
 	// this is exactly the test I want: not NAN, not ∞

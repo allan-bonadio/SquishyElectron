@@ -79,8 +79,8 @@ public:
 
 
 	// // // // // // // // // // // // // equality
-	bool operator==(const qCx b) { return re == b.re && im == b.im; }
-	bool operator!=(const qCx b) { return re != b.re || im != b.im; }
+	bool operator==(const qCx b);
+	bool operator!=(const qCx b);
 
 	// // // // // // // // // // // // // other
 	// inline so faster
