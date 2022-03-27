@@ -3,8 +3,8 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
-
-#include <cmath>
+#include "../squish.h"
+//#include <cmath>
 #include "qSpace.h"
 #include "qWave.h"
 
@@ -35,7 +35,7 @@ qSpectrum::~qSpectrum(void) {
 
 // this is spectrum-independent.  This prints nPoints lines.
 void qSpace::dumpThatSpectrum(qCx *wave, bool withExtras) {
-	if (spectrumLength <= 0) throw "qSpace::dumpThatSpectrum() with zero points";
+	if (spectrumLength <= 0) throw std::runtime_error("qSpace::dumpThatSpectrum() with zero points");
 
 	qBuffer::dumpSegment(wave, withExtras, 0, spectrumLength, 0);
 }

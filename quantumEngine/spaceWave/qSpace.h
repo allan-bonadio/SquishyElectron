@@ -4,7 +4,7 @@
 */
 
 
-#include "qCx.h"
+//#include "qCx.h"
 
 // do not exceed these!  they are open ended arrays.
 // keep LABEL_LEN+1 a multiple of 4 or 8 for alignment.
@@ -165,8 +165,8 @@ public:
 	void stepImaginary(qCx *oldW, qCx *newW, double dt);
 	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);
 
-	char pleaseFFT;
-	char isIterating;
+	bool pleaseFFT;
+	bool isIterating;
 	void askForFFT(void);
 };
 

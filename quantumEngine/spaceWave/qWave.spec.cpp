@@ -1,6 +1,7 @@
 //#include <string>
 //#include "../spaceWave/qCx.h"
-#include <cmath>
+#include "../squish.h"
+//#include <cmath>
 #include "./qSpace.h"
 #include "./qWave.h"
 #include "../testing/cppuMain.h"

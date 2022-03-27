@@ -3,8 +3,9 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include <stdio.h>
-#include <cmath>
+#include "../squish.h"
+//#include <stdio.h>
+//#include <cmath>
 
 #include "spaceWave/qSpace.h"
 #include "fourier/fftMain.h"

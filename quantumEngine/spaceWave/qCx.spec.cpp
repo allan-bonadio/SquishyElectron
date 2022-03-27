@@ -1,5 +1,6 @@
+#include "../squish.h"
 //#include <string>
-#include "./qCx.h"
+//#include "./qCx.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"

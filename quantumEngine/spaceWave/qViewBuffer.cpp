@@ -3,7 +3,8 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include <cmath>
+#include "../squish.h"
+//#include <cmath>
 #include "qSpace.h"
 #include "qWave.h"
 
@@ -84,7 +85,7 @@ float qViewBuffer::loadViewBuffer(void) {
 		if (debugInDetail)
 			printf("📺 qViewBuffer::loadViewBuffer thePotential=%p\n", theSpace->potential);
 		double *potPtr = theSpace->potential + pointNum;
-		if (!potPtr) throw "📺 qViewBuffer::loadViewBuffer potPtr is null";
+		if (!potPtr) throw std::runtime_error("📺 qViewBuffer::loadViewBuffer potPtr is null");
 		if (debugInDetail)
 			printf("📺 qViewBuffer::loadViewBuffer potPtr=%p\n", potPtr);
 		double re = wavePtr->re;

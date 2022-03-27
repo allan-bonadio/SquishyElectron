@@ -5,7 +5,8 @@
 
 
 
-#include <cmath>
+#include "../squish.h"
+//#include <cmath>
 //#include "../spaceWave/qCx.h"
 #include "../spaceWave/qSpace.h"
 #include "../spaceWave/qWave.h"
@@ -70,7 +71,7 @@ qSpace *makeFullSpace(int N) {
 	qSpace *space = completeNewSpace();
 
 	if (traceMakeSpace) printf("        finished makeFullSpace(%d)\n", N);
-	return space;
+	return theSpace;
 }
 
 // 1d space, not with all the crud from above.
@@ -124,9 +125,9 @@ void proveItsMine(void *buf, size_t size) {
 	if (avoidProving) return;
 
 	if (size == 0)
-		throw "proveItsMine()- size is zero";
+		throw std::runtime_error("proveItsMine()- size is zero");
 	if (!buf)
-		throw "proveItsMine()- buf is NULL";
+		throw std::runtime_error("proveItsMine()- buf is NULL");
 
 	uint8_t *buffer = (uint8_t *) buf;
 	for (int i = 0; i < size; i++)

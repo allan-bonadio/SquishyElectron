@@ -3,8 +3,9 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include <cmath>
-#include "qCx.h"
+#include "../squish.h"
+//#include <cmath>
+//#include "qCx.h"
 
 // Tolerance for ==.  Absolute, not relative, we're comparing 𝜓 values here.
 // all values are |𝜓| <1, and typically |𝜓| > roundoff error

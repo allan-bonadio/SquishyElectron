@@ -3,6 +3,8 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
+#include <cstring>
+
 /*
 a long array of qCx complex numbers, plus some other info
 
@@ -16,8 +18,9 @@ qFlick - object that owns a list of waves, and points to its space
 	(not sure if i'll keep using qFlick)
 */
 
-
-#include <cmath>
+#include "../squish.h"
+//#include <stdexcept>
+//#include <cmath>
 #include "qSpace.h"
 #include "qWave.h"
 
@@ -50,7 +53,7 @@ qCx *qBuffer::allocateWave(int nPoints) {
 		if (space)
 			nPoints = space->freeBufferLength;
 		else
-			throw "no nPoints and no space";
+			throw std::runtime_error("qBuffer::allocateWave() - no nPoints and no space");
 	}
 
 	// ?? this is weird  this->nPoints = nPoints;
@@ -177,7 +180,7 @@ void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int co
 	//printf("      start:%d  end:%d  continuum: %d\n", start, end, continuum);
 
 	if (start >= end)
-		throw "qBuffer::dumpSegment() start >= end";
+		throw std::runtime_error("qBuffer::dumpSegment() start >= end");
 
 	int ix = 0;
 	char buf[200];
@@ -220,7 +223,7 @@ void qBuffer::dumpHiRes(const char *title) {
 // refresh the wraparound points for ANY WAVE subscribing to this space
 // 'those' or 'that' means some wave other than this->wave
 static void fixSomeBoundaries(qCx *wave, int continuum, int start, int end) {
-	if (end <= 0) throw "🌊🌊 fixSomeBoundaries() with zero points";
+	if (end <= 0) throw std::runtime_error("🌊🌊 fixSomeBoundaries() with zero points");
 
 	switch (continuum) {
 	case contDISCRETE:
@@ -291,7 +294,7 @@ void qBuffer::normalize(void) {
 
 	//qCx *wave = tempWave;
 	//qWave *tempQWave = qWave::newQWave(space, tempWave);
-	qCx *wave = this->wave;
+	//qCx *wave = this->wave;
 	//qDimension *dims = space->dimensions;
 	double mag = innerProduct();
 	if (traceNormalize)

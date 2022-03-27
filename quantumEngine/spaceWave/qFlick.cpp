@@ -3,8 +3,10 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include <cmath>
-#include <string>
+#include "../squish.h"
+//#include <cmath>
+//#include <string>
+#include <cstring>
 #include "qSpace.h"
 #include "qWave.h"
 
@@ -19,8 +21,8 @@ const double gapFactor = .01;
 qFlick::qFlick(qSpace *space, int maxWaves) :
 	qWave(space), maxWaves(maxWaves), nWaves(2), currentIx(0)
 {
-	if (maxWaves < 2) throw "maxwaves must be at least 2";
-	if (maxWaves > 1000) throw "maxwaves is too big, sure you want that?";
+	if (maxWaves < 2) throw std::runtime_error("maxwaves must be at least 2");
+	if (maxWaves > 1000) throw std::runtime_error("maxwaves is too big, sure you want that?");
 
 	// array of waves
 	waves = (qCx **) malloc(maxWaves * sizeof(int *));
@@ -264,7 +266,7 @@ double qFlick::innerProduct(void) {
 	double sum = 0.;
 	int end = dims->end;
 	if (doubleAge <= 0)
-		throw "Error in qFlick::innerProduct: doubleAge is negative";
+		throw std::runtime_error("Error in qFlick::innerProduct: doubleAge is negative");
 //	const int t = doubleAge / 2;
 //	const bool even = (doubleAge & 1) == 0;
 //	qCx *newWave = waves[t];
@@ -321,7 +323,7 @@ void qFlick::normalize(void) {
 // pass negative to make it go backward.
 // the first point here is like x=0 as far as the trig functions, and the last like x=-1
 //void qFlick::setCircularWave(double n) {
-//	if (space->nPoints <= 0) throw "qFlick::setCircularWave() with zero points";
+//	if (space->nPoints <= 0) throw std::runtime_error("qFlick::setCircularWave() with zero points");
 //
 //	qCx tempWave[space->nPoints];
 //	qWave tqWave(space, tempWave);

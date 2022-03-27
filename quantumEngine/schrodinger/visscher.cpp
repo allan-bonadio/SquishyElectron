@@ -4,8 +4,9 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include <stdio.h>
-#include <ctime>
+#include "../squish.h"
+//#include <stdio.h>
+//#include <ctime>
 #include "../spaceWave/qSpace.h"
 #include "../spaceWave/qWave.h"
 
@@ -127,10 +128,6 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 	qDimension *dims = dimensions;
 	oldQW->fixBoundaries();
 	if (debugVisscher) oldQW->dumpWave("starting oneVisscherStep", true);
-
-	// see if this makes a diff
-//	for (int i = dims->start; i < dims->end; i++)
-//		newW[i] = qCx(i);
 
 	stepReal(oldW, newW, dt);
 	if (debugHalfway) newQWave->dumpWave("Visscher wave after the Re step", true);

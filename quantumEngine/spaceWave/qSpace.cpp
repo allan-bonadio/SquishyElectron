@@ -4,8 +4,9 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include <cmath>
-#include <chrono>
+#include "../squish.h"
+//#include <cmath>
+//#include <chrono>
 #include <cstring>
 #include "qSpace.h"
 #include "qWave.h"
@@ -17,7 +18,7 @@ double *thePotential = NULL;
 
 
 static bool debugIterSummary = false;
-static bool debugIteration = false;
+static bool debugIteration = true;
 static bool debugJustWave = false;
 static bool debugJustInnerProduct = false;
 static bool debugFreeBuffer = false;
@@ -30,7 +31,8 @@ static bool debugFreeBuffer = false;
 
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
-qSpace::qSpace(const char *lab) {
+qSpace::qSpace(const char *lab)
+	: dt(1.0), stepsPerIteration(100) {
 	magic = 'qSpa';
 
 	//printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n", lab, (this));
@@ -66,7 +68,7 @@ qSpace::~qSpace(void) {
 void qSpace::addDimension(int N, int continuum, const char *label) {
 	if (nDimensions >= MAX_DIMENSIONS) {
 		printf("🚀 🚀 Error dimensions: %d\n", nDimensions);
-		throw "🚀 🚀 too many dimensions";
+		throw std::runtime_error("🚀 🚀 too many dimensions");
 	}
 
 	qDimension *dims = dimensions + nDimensions;
@@ -174,7 +176,7 @@ void qSpace::setValleyPotential(double power = 1, double scale = 1, double offse
 /* ********************************************************** integration */
 
 
-// does several visscher steps, we'll call that two 'steps'
+// does several visscher steps (eg 100 or 500)
 void qSpace::oneIteration() {
 	int ix;
 

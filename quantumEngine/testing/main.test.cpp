@@ -3,9 +3,10 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include <stdio.h>
-#include <cmath>
-#include <stdarg.h>
+#include "../squish.h"
+//#include <stdio.h>
+//#include <cmath>
+//#include <stdarg.h>
 #include "../spaceWave/qSpace.h"
 #include "../spaceWave/qWave.h"
 #include "test.h"

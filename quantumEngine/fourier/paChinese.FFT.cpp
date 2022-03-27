@@ -7,7 +7,8 @@
 // All I remember was some chinese writing as I was downloading it.
 
 /* *************************************************** only powers of 2 */
-#include <cmath>
+#include "../squish.h"
+//#include <cmath>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -154,7 +155,7 @@ void paChineseFFT(qCx *StoreResult, qCx *input, const int length)
 		tempWave = laosQWave->allocateWave();
 		fourier = laosQWave->allocateWave();
 	}
-	if (allocLength != length) throw "allocLength !== length";
+	if (allocLength != length) throw std::runtime_error("allocLength !== length");
 
     //Get the number of sequence lengths in binary
     int nBits = log2(length);

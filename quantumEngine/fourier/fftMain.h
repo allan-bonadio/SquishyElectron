@@ -4,10 +4,6 @@
 */
 
 
-// #include <valarray>
-
-//typedef std::valarray<qCx> CArray;
-
 extern "C" {
 
 	void testFFT(void);

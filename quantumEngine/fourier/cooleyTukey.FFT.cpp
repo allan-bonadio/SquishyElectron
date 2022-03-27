@@ -8,7 +8,8 @@
 // https://tfetimes.com/c-fast-fourier-transform/
 
 /* *************************************************** only powers of 2 */
-#include <cmath>
+//#include <cmath>
+#include "../squish.h"
 #include "../spaceWave/qSpace.h"
 #include "../spaceWave/qWave.h"
 #include "fftMain.h"

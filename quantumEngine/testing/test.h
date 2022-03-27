@@ -3,8 +3,6 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-// old -- see cppuMain.h
-
 extern void run_qCx_tests(void);
 extern void run_rk2_tests(void);
 extern void run_wave_tests(void);

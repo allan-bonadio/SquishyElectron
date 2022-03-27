@@ -3,6 +3,7 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
+#include "../squish.h"
 #include "qSpace.h"
 #include "qWave.h"
 
@@ -93,12 +94,12 @@ double *qSpace_getPotentialBuffer(void) {
 }
 
 double qSpace_getElapsedTime(void) {
-	if (!theSpace) throw "🚀 🚀 🚀 null space in getElapsedTime()";
+	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getElapsedTime()");
 	return theSpace->elapsedTime;
 }
 
 double qSpace_getIterateSerial(void) {
-	if (!theSpace) throw "🚀 🚀 🚀 null space in getIterateSerial()";
+	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getIterateSerial()");
 	return theSpace->iterateSerial;
 }
 

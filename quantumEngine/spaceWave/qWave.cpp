@@ -4,7 +4,8 @@
 */
 
 
-#include <cmath>
+#include "../squish.h"
+//#include <cmath>
 #include "qSpace.h"
 #include "qWave.h"
 
@@ -94,8 +95,8 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 // the complete set of states
 // one for the N+1 if continuum
 void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
-	if (NULL == this) throw "🌊🌊 qSpace::dumpThatWave() with null this";
-	if (nPoints <= 0) throw "🌊🌊 qSpace::dumpThatWave() with zero points";
+	if (NULL == this) throw std::runtime_error("🌊🌊 qSpace::dumpThatWave() with null this");
+	if (nPoints <= 0) throw std::runtime_error("🌊🌊 qSpace::dumpThatWave() with zero points");
 
 	const qDimension *dims = dimensions;
 	qBuffer::dumpSegment(wave, withExtras, dims->start, dims->end, dims->continuum);
@@ -209,20 +210,20 @@ void qWave::lowPassFilter(double dilution) {
 
 }
 
-// this is kindof a notch filter for frequency N/2
+// this is kindof a notch filter for frequency N/2 .  I'm losing confidence that this makes a diff.
 void qWave::nyquistFilter(void) {
 	if (traceLowPassFilter) printf("🌊🌊 qWave::nyquistFilter()\n");
 
 	if (!scratchBuffer)
-		scratchBuffer = allocateWave();  // this won't work if space changes resolution!
+		scratchBuffer = allocateWave(nPoints);  // this won't work if space changes resolution!
 
-	qCx *wave = wave;
+//	qCx *wave = wave;
 	qDimension *dims = space->dimensions;
 
 	fixBoundaries();
 
 	// this should zero out the nyquist frequency exactly
-	for (int ix = dims->start; ix < dims->end; ix++) {
+	for (int ix = start; ix < end; ix++) {
 		scratchBuffer[ix] = (wave[ix] + wave[ix] - wave[ix-1] - wave[ix+1]) / 4.;
 
 //		printf("🌊🌊 %d scratchBuf=(%lf %lf) wave-1=(%lf %lf) wave0=(%lf %lf) wave+1=(%lf %lf)\n",
