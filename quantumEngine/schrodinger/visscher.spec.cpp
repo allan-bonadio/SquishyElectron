@@ -1,9 +1,18 @@
+#include "../squish.h"
 #include "../spaceWave/qSpace.h"
 #include "../spaceWave/qWave.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"
 
+
+TEST_GROUP(Visscher)
+{
+};
+
+
+
+/* ****************************************************************** one step */
 
 // created once and never freed
 qSpace *space4 = makeBareSpace(4);
@@ -18,10 +27,6 @@ qCx ex4Wave[6] = {
 };
 qWave *expectedWave4 = new qWave(space4, ex4Wave);
 
-TEST_GROUP(Visscher)
-{
-};
-
 
 TEST(Visscher, VisscherOneStep)
 {
@@ -35,5 +40,27 @@ TEST(Visscher, VisscherOneStep)
 	//oldWave4->dumpHiRes("oldWave4");
 	//newWave4->dumpHiRes("newWave4");
 	compareWaves(expectedWave4, newWave4);
+}
+
+/* ****************************************************************** one iteration */
+
+TEST(Visscher, VisscherOneIteration)
+{
+	// simulate the app starting up
+	makeFullSpace(32);
+
+	theSpace->stepsPerIteration = 100;
+
+	setCircularWave(oldWave4, 1.);
+
+
+
+	// simulate the app taking one step
+	theSpace->oneIteration();
+
+	// simulate the app ... tearing down, although probably not done much in reality
+	deleteTheSpace();
+
+	// anhything i'm forgetting?
 }
 
