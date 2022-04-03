@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
+#include "squish.h"
 //#include <stdio.h>
 //#include <cmath>
 
@@ -26,13 +26,18 @@ EM_JS(void, qeStarted, (int mDimensions, int mLabel),
 
 // emscripten calls main() when the whole C++ is all set up.  Tell the JS guys.
 int main() {
-	printf("bonjour le monde! sizeof(qDimension) = x%lx, sizeof(qSpace) = x%lx\n",
+	printf("bonjour le monde! sizeof(qDimension) = %lx, sizeof(qSpace) = %lx\n",
 		sizeof(qDimension), sizeof(qSpace));
 
 	// call the above function with arbitrary numbers to keep everybody amused
 	qeStarted(180, 18);
+
+
 	return 0;
 }
+
+
+
 
 /* ************************************************* error handling */
 
