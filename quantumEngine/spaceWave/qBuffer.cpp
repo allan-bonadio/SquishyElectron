@@ -24,11 +24,11 @@ qFlick - object that owns a list of waves, and points to its space
 #include "qSpace.h"
 #include "qWave.h"
 
-static bool traceNormalize = false;
+static bool traceNormalize = true;
 static bool traceAllocate = false;
 
 // just allocate a wave of whatever length
-// buffer is initialized to zero bytes therefore 0.0 everywhere
+// buffer is (often but ? reliably) initialized to zero bytes therefore 0.0 everywhere
 qCx *allocateWave(int nPoints) {
 	qCx *buf = (qCx *) malloc(nPoints * sizeof(qCx));
 	if (traceAllocate) {
@@ -303,7 +303,7 @@ void qBuffer::normalize(void) {
 
 	if (mag == 0. || ! isfinite(mag)) {
 		// ALL ZEROES!??! this is bogus, shouldn't be happening
-		const double factor = pow(end + start, -0.5);
+		const double factor = pow(end - start, -0.5);
 		printf("🍕 🍕 🍕 🍕 🍕 🍕 ALL ZEROES ! ? ? ! not finite ! ? ? !  set them all to a constant, normalized\n");
 		for (int ix = start; ix < end; ix++)
 			wave[ix] = factor;
