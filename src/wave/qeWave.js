@@ -7,8 +7,33 @@
 //import {qe} from './qe';
 import cxToRgb from '../view/cxToRgb';
 
-/* **************************************************************** dumping */
 
+// this is also called by C++ so it's easier as a standalone function
+// see also qeWave method by same name (but different args)
+function rainbowDump(wave, start, end, nPoints, title) {
+	start *= 2;
+	end *= 2;
+	if (isNaN(start) || isNaN(end))
+		debugger;
+
+// 	const wave = this.wave;
+// 	const {start, end} = this.space.startEnd2;
+
+	console.log(`%c rainbowDump    🌊   ${title}   ${start}...${end}  with ${nPoints} pts`,
+		`font: times 16px italic; color: #222; background-color: #fff; padding-right: 70%; font: 14px Palatino;`);
+
+	let tot = 0;  // always real
+	for (let ix = start; ix < end; ix += 2) {
+		let mag = (wave[ix] ** 2 + wave[ix + 1] ** 2) * 10000;
+		tot += mag;
+		let color = cxToRgb({re: wave[ix], im: wave[ix + 1]});
+		console.log(`%c🌊  `, `background-color: ${color}; padding-right: ${mag+5}px; `);
+	}
+	return tot;
+}
+window.rainbowDump = rainbowDump;
+
+/* **************************************************************** qewave */
 
 // this is just a 1D wave.  someday...
 class qeWave {
@@ -20,9 +45,10 @@ class qeWave {
 	// • Or absent/null, in which case it's dynamially allocated to space.nPoints; JS only
 	constructor(space, waveArg) {
 		this.space = space;
-		this.start = space.start;
-		this.end = space.end;
-		this.nPoints = space.nPoints;
+		let {start, end, nPoints} = this.space.startEnd;
+		this.start = start;
+		this.end = end;
+		this.nPoints = nPoints;
 
 		// now for the buffer
 		if (!waveArg) {
@@ -46,6 +72,8 @@ class qeWave {
 			throw `call to construct qeWave failed cuz bad waveArg=${waveArg}`;
 	}
 
+	/* **************************************************************** dumping */
+
 	// dump out wave content.  Modeled after qWave::dumpWave() pls keep in sync!
 	dumpWave(title) {
 		console.log(`\n🌊 ==== Wave | ${title} `+
@@ -54,20 +82,9 @@ class qeWave {
 	}
 
 	rainbowDump(title) {
-		const wave = this.wave;
-		const {start, end} = this.space.startEnd2;
-
-		console.log(`%c rainbow dump    🌊   ${title}`,
-			`font: times 16px italic; color: #222; background-color: #fff; padding-right: 70%; font: 14px Palatino;`);
-
-		let tot = 0;  // always real
-		for (let ix = start; ix < end; ix += 2) {
-			let mag = (wave[ix] ** 2 + wave[ix + 1] ** 2) * 10000;
-			let color = cxToRgb({re: wave[ix], im: wave[ix + 1]});
-			console.log(`%c🌊  `, `background-color: ${color}; padding-right: ${mag}px; `);
-		}
-		return tot;
+		rainbowDump(this.wave, this.start, this.end, this.nPoints, title);
 	}
+
 
 	/* ********************************************************************** calculatons */
 

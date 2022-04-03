@@ -47,10 +47,27 @@ qWave::qWave(qSpace *space, qCx *useThisBuffer) {
 			this, (long) sizeof(qWave));
 		printf("        sizeof(int):%ld   sizeof(void *):%ld\n", sizeof(int), sizeof(void *));
 	}
+
+
+
+
+
+
+
+
+printf("about to rainbowDump this from qWave::qWave\n");
+	this->rainbowDump("my first rinaninboe");
+printf("done with rainbowDump this from qWave::qWave\n");
+
+
+
+
+
+
 }
 
 qWave::~qWave(void) {
-	// the qBuffer superclass frees the wave
+	// the qBuffer superclass frees the wave just like it allocates it
 
 	if (traceConstDeconst) {
 		printf("🌊🌊 qWave::~qWave resulting qWave obj: %p \n",
@@ -95,8 +112,11 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 // the complete set of states
 // one for the N+1 if continuum
 void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
-	if (NULL == this) throw std::runtime_error("🌊🌊 qSpace::dumpThatWave() with null this");
+	qSpace *ss = this;
+	if (NULL == ss) throw std::runtime_error("🌊🌊 qSpace::dumpThatWave() with null this");
 	if (nPoints <= 0) throw std::runtime_error("🌊🌊 qSpace::dumpThatWave() with zero points");
+
+
 
 	const qDimension *dims = dimensions;
 	qBuffer::dumpSegment(wave, withExtras, dims->start, dims->end, dims->continuum);
@@ -118,6 +138,27 @@ void qWave::dumpWave(const char *title, bool withExtras) {
 }
 
 
+
+// calls the JS dumpRainbow method of qeWave.  Note we can't compile this for
+// straight C++ specs cuz there's no emscripten or JS.  So the app,
+// or node with emscripten
+void qBuffer::rainbowDump(const char *title) {
+printf("about to rainbowDump EM_ASM %p %d %d %d %s\n\n", wave, start, end, nPoints, title);
+	// this also has to compile for standard C++ with no emscripten
+	#ifdef EM_ASM
+	EM_ASM({
+		console.log('rainbowDump: starting the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n', $1, $2, $3, $4);
+		let waveJS = new Float64Array(window.Module.HEAPF64.buffer, $0, 2 * $3);
+
+		//rainbowDump(wave, start, end, nPoints, title);
+		rainbowDump(waveJS, $1, $2, $3, $4);
+
+
+		console.log("rainbowDump: done the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n", $1, $2, $3, $4);
+	}, wave, start, end, nPoints, title);
+	#endif
+printf("done with rainbowDump EM_ASM\n\n");
+}
 
 
 /* ************************************************* bad ideas I might revisit?  */
