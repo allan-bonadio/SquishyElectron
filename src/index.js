@@ -1,18 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import ErrorBoundary from './widgets/ErrorBoundary';
+//import ErrorBoundary from './widgets/ErrorBoundary';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
 	<React.StrictMode>
-		<ErrorBoundary howToRecover={errorMsg => {
-			// just reload the page, dude
-			debugger;
-			//window.location = window.location;  // reload page??
-		}}>
 			<App />
-		</ErrorBoundary>
 	</React.StrictMode>,
 	document.getElementById('root')
 );
@@ -23,3 +17,28 @@ ReactDOM.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
+function getRidofThisSomedAY()
+{
+/*
+		//<ErrorBoundary howToRecover={errorMsg => {
+			// just reload the page, dude
+			debugger;
+			//window.location = window.location;  // reload page??
+		}}>
+			<App />
+		//</ErrorBoundary>
+
+
+
+
+			// just reload the page, dude
+			debugger;
+			//window.location = window.location;  // reload page??
+		}}>
+*/
+
+}
+getRidofThisSomedAY();
+
+
