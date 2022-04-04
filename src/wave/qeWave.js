@@ -7,10 +7,14 @@
 //import {qe} from './qe';
 import cxToRgb from '../view/cxToRgb';
 
+// emscripten sabotages this?  the log & info, but not error & warn?
+const consoleLog = console.log.bind(console);
+
 
 // this is also called by C++ so it's easier as a standalone function
 // see also qeWave method by same name (but different args)
-function rainbowDump(wave, start, end, nPoints, title) {
+function rainbowDump(wave, start, end, nPoints) {
+	let title = "temporary title qeWave.js:17";
 	start *= 2;
 	end *= 2;
 	if (isNaN(start) || isNaN(end))
@@ -19,15 +23,33 @@ function rainbowDump(wave, start, end, nPoints, title) {
 // 	const wave = this.wave;
 // 	const {start, end} = this.space.startEnd2;
 
-	console.log(`%c rainbowDump    🌊   ${title}   ${start}...${end}  with ${nPoints} pts`,
+	console.log(`%c rainbowDump    🌊   ${title}   ${start/2}...${end/2}  with ${nPoints} pts`,
 		`font: times 16px italic; color: #222; background-color: #fff; padding-right: 70%; font: 14px Palatino;`);
 
 	let tot = 0;  // always real
 	for (let ix = start; ix < end; ix += 2) {
 		let mag = (wave[ix] ** 2 + wave[ix + 1] ** 2) * 10000;
+
+
 		tot += mag;
 		let color = cxToRgb({re: wave[ix], im: wave[ix + 1]});
+
+		//console.log doesn't work here, dunnowhy, unless you stick in either extra console.log()
+		// or streatch these out?  makes no sense.
+// 		console.log(`%c rich `, "font-family: palatino");
+// 		console.log(`%c🌊  `, `background-color: ${color}; padding-right: ${mag+5}px; `);
 		console.log(`%c🌊  `, `background-color: ${color}; padding-right: ${mag+5}px; `);
+		//console.log(`zitgoin purdy good`);
+
+		ix += 2;
+		tot += mag;
+		color = cxToRgb({re: wave[ix], im: wave[ix + 1]});
+
+		//console.log doesn't work here, dunnowhy, unless you stick in either extra console.log()
+// 		console.log(`%c rich `, "font-family: palatino");
+// 		console.log(`%c🌊  `, `background-color: ${color}; padding-right: ${mag+5}px; `);
+		console.log(`%c🌊  `, `background-color: ${color}; padding-right: ${mag+5}px; `);
+		//console.log(`zitgoin purdy good`);
 	}
 	return tot;
 }

@@ -147,15 +147,15 @@ printf("about to rainbowDump EM_ASM %p %d %d %d %s\n\n", wave, start, end, nPoin
 	// this also has to compile for standard C++ with no emscripten
 	#ifdef EM_ASM
 	EM_ASM({
-		console.log('rainbowDump: starting the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n', $1, $2, $3, $4);
+		console.log('rainbowDump: starting the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n', $1, $2, $3);
 		let waveJS = new Float64Array(window.Module.HEAPF64.buffer, $0, 2 * $3);
 
 		//rainbowDump(wave, start, end, nPoints, title);
-		rainbowDump(waveJS, $1, $2, $3, $4);
+		rainbowDump(waveJS, $1, $2, $3);
 
 
 		console.log("rainbowDump: done the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n", $1, $2, $3, $4);
-	}, wave, start, end, nPoints, title);
+	}, wave, start, end, nPoints);
 	#endif
 printf("done with rainbowDump EM_ASM\n\n");
 }
