@@ -29,7 +29,7 @@ import drawingViewDef from './view/drawingViewDef';
 import {setFamiliarPotential} from './widgets/utils';
 
 // runtime debugging flags - you can change in the debugger or here
-let areBenchmarking = false;
+let areBenchmarking = true;
 let dumpingTheViewBuffer = false;
 
 
@@ -121,7 +121,7 @@ export class SquishPanel extends React.Component {
 
 			// defaults for sliders for dt & spi
 			dt: .001,
-			stepsPerIteration: 1000,
+			stepsPerIteration: 100,
 			lowPassDilution: .02,
 
 			runningCycleElapsedTime: 0,
@@ -135,7 +135,7 @@ export class SquishPanel extends React.Component {
 		const now = performance.now();
 		this.prevStart  = now;
 		this.timeForNextTic = now + 10;  // default so we can get rolling
-		this.lastAniFrame = now;
+		this.lastAniIteration = now;
 
 		console.log(`SquishPanel constructor done`);
 	}
@@ -241,27 +241,27 @@ export class SquishPanel extends React.Component {
 	}
 
 	// take one integration iteration
-	crunchOneFrame() {
+	crunchOneIteration() {
 		// (actually many visscher steps)
 		qe.qSpace_oneIteration();
 
 		//qe.createQEWaveFromCBuf();
 
 		if (dumpingTheViewBuffer)
-			this.dumpViewBuffer('crunchOneFrame()');
+			this.dumpViewBuffer('crunchOneIteration()');
 	}
 
 	// Integrate the ODEs by one 'step', or not.  and then display.
 	// called every so often in animateHeartbeat() so it's called as often as the menu setting says
 	// so if needsRepaint false or absent, it'll only repaint if an iteration has been done.
-	iterateOneFrame(isTimeAdvancing, needsRepaint) {
-		//console.log(`time since last tic: ${now - startFrame}ms`)
+	iterateOneIteration(isTimeAdvancing, needsRepaint) {
+		//console.log(`time since last tic: ${now - startIteration}ms`)
 // 		this.endCalc = this.startReloadVarsBuffers = this.endReloadVarsBuffers =
 // 			this.endIteration = 0;
 		this.startIteration = performance.now();  // absolute beginning of integrate iteration
 		// could be slow.
 		if (isTimeAdvancing) {
-			this.crunchOneFrame();
+			this.crunchOneIteration();
 			needsRepaint = true;
 		}
 		this.endCalc = performance.now();
@@ -305,7 +305,7 @@ export class SquishPanel extends React.Component {
 
 	// This gets called once each animation period according to requestAnimationFrame(), usually 60/sec
 	// and maintaining that as long as the website is running.  Even if there's no apparent motion.
-	// it will advance one heartbeat in animation time, which every so often calls iterateOneFrame()
+	// it will advance one heartbeat in animation time, which every so often calls iterateOneIteration()
 	animateHeartbeat(now) {
 		const s = this.state;
 
@@ -313,16 +313,16 @@ export class SquishPanel extends React.Component {
 		if (now >= this.timeForNextTic) {
 			// no point in calling it continuously if it's not doing anything
 			if (s.isTimeAdvancing)
-				this.iterateOneFrame(true, true);
-			//this.iterateOneFrame(s.isTimeAdvancing, false);
+				this.iterateOneIteration(true, true);
+			//this.iterateOneIteration(s.isTimeAdvancing, false);
 
-			// remember (now) is the one passed in, before iterateOneFrame(),
+			// remember (now) is the one passed in, before iterateOneIteration(),
 			// so periods are exactly timed (unless it's so slow that we get behind)
 			this.timeForNextTic = now + s.iteratePeriod;
 		}
 
 		// this is in milliseconds
-		const timeSince = now - this.lastAniFrame;
+		const timeSince = now - this.lastAniIteration;
 //		if (timeSince < 8) {
 //			console.info(` skipping an ani frame cuz we got too much: ${timeSince} ms`)
 //			return;  // we might have more than one cycle in here... this should fix it
@@ -330,7 +330,7 @@ export class SquishPanel extends React.Component {
 
 		if (isNaN(timeSince)) debugger;
 		//console.info(` maintaining the ReqAniFra cycle: ${timeSince.toFixed(1)} ms`)
-		this.lastAniFrame = now;
+		this.lastAniIteration = now;
 
 		requestAnimationFrame(this.animateHeartbeat);
 	}
@@ -431,7 +431,7 @@ export class SquishPanel extends React.Component {
 	startStop = this.startStop.bind(this);
 
 	singleStep() {
-		this.iterateOneFrame(true);
+		this.iterateOneIteration(true);
 	}
 	singleStep = this.singleStep.bind(this);
 
@@ -469,8 +469,8 @@ export class SquishPanel extends React.Component {
 // 		const wave = qe.qSpace_getWaveBuffer();
 		const qewave = this.state.space.qewave;
 		qewave.setFamiliarWave(waveParams);
-		this.iterateOneFrame(true, true);
-		//this.iterateOneFrame(false, true);
+		this.iterateOneIteration(true, true);
+		//this.iterateOneIteration(false, true);
 		//qe.qViewBuffer_getViewBuffer();
 		//qe.createQEWaveFromCBuf();
 	}
@@ -480,7 +480,7 @@ export class SquishPanel extends React.Component {
 	// (but do not change N or anything in the state)  Called upon set potential in potential tab
 	setPotential(potentialParams) {
 		setFamiliarPotential(this.state.space, this.state.space.potentialBuffer, potentialParams);
-		this.iterateOneFrame(true, true);  // ???
+		this.iterateOneIteration(true, true);  // ???
 		if (dumpingTheViewBuffer)
 			qe.qViewBuffer_getViewBuffer();
 

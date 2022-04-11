@@ -8,7 +8,7 @@
 import cxToRgb from '../view/cxToRgb';
 
 // emscripten sabotages this?  the log & info, but not error & warn?
-const consoleLog = console.log.bind(console);
+//const consoleLog = console.log.bind(console);
 
 
 // this is also called by C++ so it's easier as a standalone function
@@ -214,7 +214,7 @@ class qeWave {
 		this.space.fixThoseBoundaries(wave);
 		this.normalize();
 		//this.dumpWave('qeWave.setPulseWave() done');
-		this.rainbowDump('qeWave.setPulseWave() done');
+		//this.rainbowDump('qeWave.setPulseWave() done');
 	}
 
 
@@ -262,7 +262,7 @@ class qeWave {
 		//		this.space.fixThoseBoundaries(wave);
 		//		this.normalize();
 		//		//this.dumpWave('qeWave.setPulseWave() done');
-		this.rainbowDump('qeWave.setChordWave() done');
+		//this.rainbowDump('qeWave.setChordWave() done');
 	}
 
 	// set one of the above canned waveforms, according to the waveParams object's values

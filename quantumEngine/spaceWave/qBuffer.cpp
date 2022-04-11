@@ -24,7 +24,7 @@ qFlick - object that owns a list of waves, and points to its space
 #include "qSpace.h"
 #include "qWave.h"
 
-static bool traceNormalize = true;
+static bool traceNormalize = false;
 static bool traceAllocate = false;
 
 // just allocate a wave of whatever length
@@ -164,12 +164,12 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 		if (dPhase >= 360.) dPhase -= 360.;
 
 		// if this or the previous point was (0,0) then the phase and dPhase will be NAN, and they print that way
-		//sprintf(buf, "[%d] (%8.4lf,%8.4lf) | %8.3lf %8.3lf %8.4lf",
-		//	ix, re, im, phase, dPhase, mag);
+		snprintf(buf, 200, "[%d] (%8.4lf,%8.4lf) | %8.3lf %8.3lf %8.4lf",
+			ix, re, im, phase, dPhase, mag);
 		*pPrevPhase = phase;
 	}
 	else {
-		sprintf(buf,"[%d] (%8.4lf,%8.4lf)", ix, re, im);
+		snprintf(buf,200, "[%d] (%8.4lf,%8.4lf)", ix, re, im);
 	}
 	return mag;
 }

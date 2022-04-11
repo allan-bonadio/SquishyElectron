@@ -53,7 +53,7 @@ exportsSrc  = [
 	{name: 'qViewBuffer_dumpViewBuffer', retType: null, args: ['string']},
 
 	// FFT
- 	{name: 'testFFT', retType: null, args: []},
+ 	//{name: 'testFFT', retType: null, args: []},
 	{name: 'qSpace_askForFFT', retType: null, args: []},
 ];
 

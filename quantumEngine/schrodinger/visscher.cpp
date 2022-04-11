@@ -13,6 +13,7 @@
 
 static bool debugVisscher = false;
 static bool debugHalfway = false;  // confusing, not reccommended
+static bool traceVischerBench = true;
 
 /*
 A fast explicit algorithm for the time-dependent Schrodinger equation
@@ -81,6 +82,7 @@ void qSpace::stepReal(qCx *oldW, qCx *newW, double dt) {
 		newW[ix].re = oldW[ix].re - dt * Hψ;
 		qCheck("vischer stepReal", newW[ix]);
 	}
+	if (traceVischerBench) printf("      stepReal, on to fix boundaries: time=%lf\n", getTimeDouble());
 	fixThoseBoundaries(newW);
 	//printf("⚛️ end of stepReal:");
 	//dumpThatWave(newW, true);
@@ -113,6 +115,8 @@ void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
 		//newW[ix].im = oldW1.im - dt * H.im * newW[ix].re;
 		qCheck("vischer stepImaginary", newW[ix]);
 	}
+	if (traceVischerBench) printf("      stepImaginary, on to fix boundaries: time=%lf\n", getTimeDouble());
+
 	fixThoseBoundaries(newW);
 	//printf("⚛️ end of stepImaginary - result wave:");
 	//dumpThatWave(newW, true);
@@ -125,14 +129,19 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 	qWave *newQW = newQWave;
 	qCx *newW = newQWave->wave;
 
+	if (traceVischerBench) printf("❇️ oneVisscherStep, start: time=%lf\n", getTimeDouble());
+	if (traceVischerBench) printf("❇️ oneVisscherStep, consecutive: time=%lf\n", getTimeDouble());
+
 	qDimension *dims = dimensions;
 	oldQW->fixBoundaries();
 	if (debugVisscher) oldQW->dumpWave("starting oneVisscherStep", true);
 
+	if (traceVischerBench) printf("         oneVisscherStep, about to stepReal: time=%lf\n", getTimeDouble());
 	stepReal(oldW, newW, dt);
 	if (debugHalfway) newQWave->dumpWave("Visscher wave after the Re step", true);
 	// now at an half-odd fraction of dt
 
+	if (traceVischerBench) printf("         oneVisscherStep, about to stepImaginary: time=%lf\n", getTimeDouble());
 	stepImaginary(oldW, newW, dt);
 	// now at an integer fraction of dt
 
@@ -143,9 +152,10 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 
 	if (debugVisscher) {
 		char atVisscher[100];
-		sprintf(atVisscher, "at end of Visscher frame %1.0lf | ", iterateSerial);
+		snprintf(atVisscher, 100, "at end of Visscher frame %1.0lf | ", iterateSerial);
 		newQW->dumpWave(atVisscher, true);
 	}
+	if (traceVischerBench) printf("         oneVisscherStep, done: time=%lf\n", getTimeDouble());
 }
 
 // can I make this useful?  Is it needed ? when I get viss working,

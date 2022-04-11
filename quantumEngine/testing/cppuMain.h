@@ -9,7 +9,7 @@ extern struct SimpleString StringFrom(const qCx value);
 extern void setCircularWave(struct qWave *target, double n = 1.);
 
 // make JUST a new qSpace() with minimal everything.  No buffers.
-extern struct qSpace *makeBareSpace(int N);
+extern struct qSpace *makeBareSpace(int N, int continuum = contENDLESS);
 #define MAKEBARESPACE_LABEL "makeBareSpace"
 #define MAKEBARE1DDIM_LABEL "make bare dim label"
 

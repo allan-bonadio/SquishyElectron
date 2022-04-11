@@ -48,21 +48,9 @@ qWave::qWave(qSpace *space, qCx *useThisBuffer) {
 		printf("        sizeof(int):%ld   sizeof(void *):%ld\n", sizeof(int), sizeof(void *));
 	}
 
-
-
-
-
-
-
-
-printf("about to rainbowDump this from qWave::qWave\n");
-	this->rainbowDump("my first rinaninboe");
-printf("done with rainbowDump this from qWave::qWave\n");
-
-
-
-
-
+	//printf("justTesting...about to rainbowDump this from qWave::qWave\n");
+	//this->rainbowDump("my first rinaninboe");
+	//printf("justTesting...done with rainbowDump this from qWave::qWave\n");
 
 }
 
@@ -134,7 +122,7 @@ void qWave::dumpWave(const char *title, bool withExtras) {
 	printf("\n🌊🌊 ==== Wave | %s ", title);
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
 	//space->dumpThatWave(wave, withExtras);
-	printf("\n🌊🌊 ==== end of Wave ====\n\n");
+	printf("\n        ==== end of Wave ====\n\n");
 }
 
 

@@ -148,8 +148,14 @@ struct qSpectrum : public virtual  qBuffer {
 
 	~qSpectrum();
 
-	void dumpThatSpectrum(qCx *wave, bool withExtras);
-	void dumpSpectrum(const char *title, bool withExtras);
+	void dumpThatSpectrum(qCx *wave, bool withExtras = false);
+	void dumpSpectrum(const char *title, bool withExtras = false);
+
+	// do fft
+	void generateSpectrum(qWave *inputQWave);
+
+	// do inverse fft
+	void generateWave(qWave *outputWave);
 };
 
 

@@ -58,11 +58,6 @@ public:
 
 };
 
-// continuum values - same as in qeBasicSpace in qeSpace.js; pls synchronize them
-const int contDISCRETE = 0;
-const int contWELL = 1;
-const int contENDLESS = 2;
-
 //coerce your buffers into being one of these and you link them into a list
 struct FreeBuffer {
 	struct FreeBuffer *next;

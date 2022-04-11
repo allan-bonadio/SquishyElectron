@@ -55,7 +55,7 @@ TEST(Visscher, VisscherOneIteration)
 
 
 
-	// simulate the app taking one step
+	// simulate the app taking one iter = 100 steps
 	theSpace->oneIteration();
 
 	// simulate the app ... tearing down, although probably not done much in reality

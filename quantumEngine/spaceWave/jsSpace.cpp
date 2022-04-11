@@ -118,7 +118,7 @@ void qSpace_setStepsPerIteration(int stepsPerIteration) {
 	//printf("🚀 🚀 🚀 qSpace_setStepsPerIteration(%d)\n", stepsPerIteration);
 	if (stepsPerIteration < 1 || stepsPerIteration > 1e8) {
 		char buf[100];
-		sprintf(buf, "qSpace_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
+		snprintf(buf, 100, "qSpace_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
 		throw buf;
 	}
 	theSpace->stepsPerIteration = stepsPerIteration;
@@ -131,7 +131,7 @@ void qSpace_setLowPassDilution(double dilution) {
 	//printf("🚀 🚀 🚀 qSpace_setLowPassDilution(%lf)\n", dilution);
 	if (dilution >= 1. || dilution <= 0.) {
 		char buf[100];
-		sprintf(buf, "🚀 🚀 🚀qSpace_setLowPassDilution, %lf, must be between 0 and 1\n", dilution);
+		snprintf(buf, 100, "🚀 🚀 🚀 qSpace_setLowPassDilution, %lf, must be between 0 and 1\n", dilution);
 		throw buf;
 	}
 	theSpace->lowPassDilution = dilution;

@@ -45,8 +45,8 @@ int main(int ac, char** av)
 // CHECK_EQUAL() figures complex equality using our == operator.
 // this only displays complex if a failure, for the message.
 SimpleString StringFrom(const qCx value) {
-	char buffer[60];
-	sprintf(buffer, "%15.12lf %+15.12lf•i", value.re, value.im);
+	char buffer[100];
+	snprintf(buffer, 100, "%15.12lf %+15.12lf•i", value.re, value.im);
 	SimpleString buf = SimpleString(buffer);
 	return buf;
 }
@@ -77,12 +77,12 @@ qSpace *makeFullSpace(int N) {
 // 1d space, not with all the crud from above.
 // qSpace returned; you are responsible for deleting it and allocating buffers.
 // this space, you should be able to delete it directly with: delete space;
-qSpace *makeBareSpace(int N) {
+qSpace *makeBareSpace(int N, int continuum) {
 	if (traceMakeSpace) printf("🧨 🧨 makeBareSpace(%d)\n", N);
 
 	qSpace *space = new qSpace(MAKEBARESPACE_LABEL);
 	if (traceMakeSpace) printf("    makeBareSpace: sizeof(qSpace) = %ld    space* = %p\n", sizeof(qSpace), space);
-	space->addDimension(N, contENDLESS, MAKEBARE1DDIM_LABEL);
+	space->addDimension(N, continuum, MAKEBARE1DDIM_LABEL);
 	if (traceMakeSpace) printf("    makeBareSpace: did Add, about to Init\n");
 	space->initSpace();
 

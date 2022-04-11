@@ -64,12 +64,11 @@ void cooleyTukeyIFFT(qCx *dest, qCx *src, int N)
 	// forward cooleyTukeyFFT
 	cooleyTukeyFFT(dest, src, N);
 
-	// conjugate the qCx numbers again
-	for (int i = 0; i < N; i++)
-		dest[i].im = -dest[i].im;
-
-	// scale the numbers
-//	x /= x.size();
+	// conjugate the qCx numbers again, and scale (fft+ifft multiplies by N)
+	for (int i = 0; i < N; i++) {
+		dest[i].re = dest[i].re / N;
+		dest[i].im = -dest[i].im / N;
+	}
 }
 
 

@@ -6,7 +6,7 @@
 
 #include "../squish.h"
 //#include <cmath>
-//#include <chrono>
+#include <ctime>
 #include <cstring>
 #include "qSpace.h"
 #include "qWave.h"
@@ -17,11 +17,13 @@ class qSpace *theSpace = NULL;
 double *thePotential = NULL;
 
 
-static bool debugIterSummary = false;
-static bool debugIteration = true;
-static bool debugJustWave = false;
-static bool debugJustInnerProduct = false;
-static bool debugFreeBuffer = false;
+static bool traceIterSummary = true;
+static bool traceIteration = true;
+static bool traceIterSteps = false;
+
+static bool traceJustWave = false;
+static bool traceJustInnerProduct = false;
+static bool traceFreeBuffer = false;
 
 
 // someday I need an C++ error handling layer.  See
@@ -111,7 +113,7 @@ void qSpace::tallyDimensions(void) {
 		freeBufferLength = nPoints;
 	else
 		freeBufferLength = spectrumLength;
-	if (debugFreeBuffer) {
+	if (traceFreeBuffer) {
 		printf("🚀 🚀 qSpace::tallyDimensions, nPoints=%d   spectrumLength=%d   freeBufferLength=%d   ",
 			nPoints, spectrumLength, freeBufferLength);
 	}
@@ -175,33 +177,56 @@ void qSpace::setValleyPotential(double power = 1, double scale = 1, double offse
 
 /* ********************************************************** integration */
 
+//static double getTimeDouble() {
+//    return std::chrono::duration_cast
+//    	<std::chrono::duration<float, std::milli>
+//    	>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() / 1000;
+//
+//}
+//
+
+double getTimeDouble()
+{
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return ts.tv_sec + ts.tv_nsec / 1e9;
+}
+
+
+
 
 // does several visscher steps (eg 100 or 500)
 void qSpace::oneIteration() {
 	int ix;
 
-	if (debugIteration)
+	printf("the ttime: %lf\n", getTimeDouble());
+
+	if (traceIteration)
 		printf("🚀 🚀 qSpace::oneIteration() - dt=%lf   stepsPerIteration=%d\n",
 			dt, stepsPerIteration);
 
-	int steps = stepsPerIteration / 2;
-	if (debugIteration)
-		printf("🚀 🚀 qSpace::oneIteration() - steps=%d   stepsPerIteration=%d\n",
-			steps, stepsPerIteration);
+	int doubleSteps = stepsPerIteration / 2;
+	if (traceIteration)
+		printf("      doubleSteps=%d   stepsPerIteration=%d\n",
+			doubleSteps, stepsPerIteration);
 
 	isIterating = true;
-	for (ix = 0; ix < steps; ix++) {
+	for (ix = 0; ix < doubleSteps; ix++) {
 		// this seems to have a resolution of 100µs on Panama
 		//auto start = std::chrono::steady_clock::now();////
 
 		oneVisscherStep(laosQWave, peruQWave);
 		oneVisscherStep(peruQWave, laosQWave);
-		if (debugIteration && 0 == ix % 100)
-			printf("🚀 🚀  step every hundred, step %d\n", ix * 2);
+
+		if (traceIteration && 0 == ix % 100) {
+			printf("       step every hundred, step %d; elapsed time: %lf\n", ix * 2, getTimeDouble());
+		}
 
 		//auto end = std::chrono::steady_clock::now();////
 		//std::chrono::duration<double> elapsed_seconds = end-start;////
-		//printf("elapsed time: %lf \n", elapsed_seconds.count());////
+		if (traceIterSteps) {
+			printf("step done %d; elapsed time: %lf \n", ix*2, getTimeDouble());////
+		}
 	}
 	isIterating = false;
 
@@ -213,30 +238,28 @@ void qSpace::oneIteration() {
 
 	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
 	//	latestQWave->lowPassFilter(lowPassDilution);
-	latestQWave->nyquistFilter();
-	latestQWave->normalize();
+//	latestQWave->nyquistFilter();
+//	latestQWave->normalize();
 
 
 	// need it; somehow? not done in JS
 	theQViewBuffer->loadViewBuffer();
 
-	if (debugIterSummary) {
-		char buf[100];
-		sprintf(buf, "🚀 🚀 finished one iteration (%d steps, N=%d), inner product: %lf",
+	if (traceIterSummary) {
+		printf("🚀 🚀 finished one iteration (%d steps, N=%d), inner product: %lf",
 			stepsPerIteration, dimensions->N, latestQWave->innerProduct());
 	}
 
-	if (debugJustWave) {
-		char buf[100];
-		latestQWave->dumpWave(buf, true);
+	if (traceJustWave) {
+		latestQWave->dumpWave("      at end of iteration", true);
 	}
-	if (debugJustInnerProduct) {
-		printf("🚀 🚀 finished one integration iteration (%d steps, N=%d), inner product: %lf\n",
+	if (traceJustInnerProduct) {
+		printf("      finished one integration iteration (%d steps, N=%d), inner product: %lf\n",
 			stepsPerIteration, dimensions->N, latestQWave->innerProduct());
 	}
 
 	if (pleaseFFT) {
-		analyzeWaveFFT(latestQWave);
+		//analyzeWaveFFT(latestQWave);
 		pleaseFFT = false;
 	}
 }
@@ -247,7 +270,7 @@ void qSpace::askForFFT(void) {
 	if (isIterating)
 		pleaseFFT = true;
 	else
-		analyzeWaveFFT(latestQWave);
+		;//analyzeWaveFFT(latestQWave);
 }
 
 
@@ -258,7 +281,7 @@ void qSpace::askForFFT(void) {
 qCx *qSpace::borrowBuffer(void) {
 	FreeBuffer *rentedCache = freeBufferList;
 	if (rentedCache) {
-		if (debugFreeBuffer) {
+		if (traceFreeBuffer) {
 			printf("🚀 🚀 qSpace::borrowBuffer() with some cached. freeBufferList: %p\n",
 			(freeBufferList));
 		}
@@ -269,7 +292,7 @@ qCx *qSpace::borrowBuffer(void) {
 	}
 	else {
 		// must make a new one
-		if (debugFreeBuffer) {
+		if (traceFreeBuffer) {
 			printf("🚀 🚀 qSpace::borrowBuffer() with none cached. freeBufferList: %p   freeBufferLength: %d\n",
 				freeBufferList, freeBufferLength);
 		}
