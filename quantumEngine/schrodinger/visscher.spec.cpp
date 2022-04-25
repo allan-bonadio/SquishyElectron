@@ -1,3 +1,8 @@
+/*
+** visscher integration testing
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+*/
+
 
 #include "../spaceWave/qSpace.h"
 #include "../spaceWave/qWave.h"
@@ -58,9 +63,10 @@ TEST(Visscher, VisscherOneIteration)
 	// simulate the app taking one iter = 100 steps
 	theSpace->oneIteration();
 
+
+
 	// simulate the app ... tearing down, although probably not done much in reality
 	deleteTheSpace();
 
 	// anhything i'm forgetting?
 }
-
