@@ -13,7 +13,7 @@
 
 static bool debugVisscher = false;
 static bool debugHalfway = false;  // confusing, not reccommended
-static bool traceVischerBench = true;
+static bool traceVischerBench = false;
 
 /*
 A fast explicit algorithm for the time-dependent Schrodinger equation
@@ -56,11 +56,11 @@ and for now omit the potential
 
 
 // first step: advance the ψr a dt, from t to t + dt
-// oldW points to buffers[1] with real = ψr(t)    imag = ψi(t + dt/2)
-// newW points to buffers[0] with real = ψr(t + dt)   imag = ψi(t + 3dt/2)
+// oldW points to buffer with real = ψr(t)    imag = ψi(t + dt/2)
+// newW points to buffer with real = ψr(t + dt)   imag unchanged = ψi(t + dt/2)
 // here we will calculate the ψr(t + dt) values in buffer 0 only, and fill them in.
 // the ψi values in buffer 0 are still uncalculated
-void qSpace::stepReal(qCx *oldW, qCx *newW, double dt) {
+void qSpace::stepReal(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = dimensions;
 	//printf("⚛️ start of stepReal");
 	//dumpThatWave(oldW, true);
@@ -89,8 +89,8 @@ void qSpace::stepReal(qCx *oldW, qCx *newW, double dt) {
 }
 
 // second step: advance the Imaginaries of 𝜓 a dt, from dt/2 to 3dt/2
-// given the reals we just generated in stepReal() (usually)
-void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
+// given the reals we just generated in stepReal() but don't change them
+void qSpace::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = dimensions;
 	//printf("⚛︎ start of stepImaginary(), oldWave=");
 	//dumpThatWave(oldW, true);
@@ -123,7 +123,7 @@ void qSpace::stepImaginary(qCx *oldW, qCx *newW, double dt) {
 }
 
 // form the new wave from the old wave, in separate buffers, chosen by our caller.
-void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
+void qSpace::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
 	qWave *oldQW = oldQWave;
 	qCx *oldW = oldQWave->wave;
 	qWave *newQW = newQWave;
@@ -160,11 +160,12 @@ void qSpace::oneVisscherStep(qWave *oldQWave, qWave *newQWave) {
 
 // can I make this useful?  Is it needed ? when I get viss working,
 // I should know.
+// NO.  this is done in qSpace::oneIteration()
 // shift the Im components of the old wave a half tick forward and store in newQWave.
 // if we're using visscher, we need to initialize waves with the
 // im component a half dt ahead.  This does it for newly created stuff, like set waves.
 // If not visscher, returns harmlessly.
-void qSpace::visscherHalfStep(qWave *oldQWave, qWave *newQWave) {
+void qSpace::visscherHalfStep(qWave *newQWave, qWave *oldQWave) {
 	qDimension *dims = dimensions;
 	qCx *oldW = oldQWave->wave;
 	qCx *newW = newQWave->wave;

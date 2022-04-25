@@ -150,15 +150,17 @@ public:
 	void setValleyPotential(double power, double scale, double offset);
 
 	/* *********************************************** iteration */
+	// multiple steps; stepsPerIteration+1
 	void oneIteration(void);
+
 	void oneRk2Step(qWave *oldQWave, qWave *newQWave);  // obsolete
 	void oneRk4Step(qWave *oldQWave, qWave *newQWave);  // obsolete
-	void oneVisscherStep(qWave *oldQWave, qWave *newQWave);  // obsolete
+	void oneVisscherStep(qWave *oldQWave, qWave *newQWave);
 
 	// visscher
-	void stepReal(qCx *oldW, qCx *newW, double dt);
-	void stepImaginary(qCx *oldW, qCx *newW, double dt);
-	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);
+	void stepReal(qCx *newW, qCx *oldW, double dt);
+	void stepImaginary(qCx *newW, qCx *oldW, double dt);
+	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);  // obsolete
 
 	bool pleaseFFT;
 	bool isIterating;
