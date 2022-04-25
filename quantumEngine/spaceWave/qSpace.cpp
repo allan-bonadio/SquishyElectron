@@ -18,13 +18,12 @@ double *thePotential = NULL;
 
 
 static bool traceIterSummary = true;
-static bool traceIteration = true;
+static bool traceIteration = false;
 static bool traceIterSteps = false;
 
 static bool traceJustWave = false;
 static bool traceJustInnerProduct = false;
 static bool traceFreeBuffer = false;
-
 
 // someday I need an C++ error handling layer.  See
 // https://emscripten.org/docs/porting/Debugging.html?highlight=assertions#handling-c-exceptions-from-javascript
@@ -196,6 +195,7 @@ double getTimeDouble()
 
 
 // does several visscher steps (eg 100 or 500)
+// actually does stepsPerIteration+1 steps; half steps at start and finish
 void qSpace::oneIteration() {
 	int ix;
 
@@ -204,13 +204,22 @@ void qSpace::oneIteration() {
 	if (traceIteration)
 		printf("🚀 🚀 qSpace::oneIteration() - dt=%lf   stepsPerIteration=%d\n",
 			dt, stepsPerIteration);
+	isIterating = true;
+
+	// half step in beginning to move Im forward dt/2
+	// cuz outside of here, re and im are for the same time
+	// and stored in laosWave
+	stepReal(peruQWave->wave, laosQWave->wave, 0);
+	stepImaginary(peruQWave->wave, laosQWave->wave, dt/2);
+
+
+
 
 	int doubleSteps = stepsPerIteration / 2;
 	if (traceIteration)
 		printf("      doubleSteps=%d   stepsPerIteration=%d\n",
 			doubleSteps, stepsPerIteration);
 
-	isIterating = true;
 	for (ix = 0; ix < doubleSteps; ix++) {
 		// this seems to have a resolution of 100µs on Panama
 		//auto start = std::chrono::steady_clock::now();////
@@ -228,6 +237,13 @@ void qSpace::oneIteration() {
 			printf("step done %d; elapsed time: %lf \n", ix*2, getTimeDouble());////
 		}
 	}
+
+
+	// half step at completion to move Re forward dt/2
+	// and copy back to Laos
+	stepReal(laosQWave->wave, peruQWave->wave, dt/2);
+	stepImaginary(laosQWave->wave, peruQWave->wave, 0);
+
 	isIterating = false;
 
 	iterateSerial++;
