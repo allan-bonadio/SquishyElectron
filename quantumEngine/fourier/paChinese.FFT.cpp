@@ -6,8 +6,11 @@
 // found on programmerall.com but I can't find it again.
 // All I remember was some chinese writing as I was downloading it.
 
+this file is no longer used
+
+
 /* *************************************************** only powers of 2 */
-#include "../squish.h"
+
 //#include <cmath>
 #include <string>
 #include <vector>

@@ -3,13 +3,14 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
 //#include <stdio.h>
 //#include <cmath>
 //#include <stdarg.h>
 #include "../spaceWave/qSpace.h"
 #include "../spaceWave/qWave.h"
 #include "test.h"
+
+this is not used anymore
 
 
 const char *redAnsiStyle = "\e[1;101;97m";

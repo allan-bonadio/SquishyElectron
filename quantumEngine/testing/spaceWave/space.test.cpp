@@ -3,10 +3,13 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
 //#include <stdio.h>
 #include "../test.h"
 #include "../../spaceWave/qSpace.h"
+
+
+this is not used anymore
+
 
 // test the JS calls to create a space
 

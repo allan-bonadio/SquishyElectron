@@ -21,7 +21,7 @@ export CPPUTEST_HOME=/dvl/cpputest/cpputest-3.8
 allCpp=`cat building/allCpp.list`
 
 # note that main.cpp is NOT included in the .cpp files; that's for web use only
-# and makes all the diff.  Update list of test srcs as needed.
+# and makes all the diff.  cppuMain.cpp is the main instead.  Update list of test srcs as needed.
 # some of these options - dunno if I need them
 set -x
 g++ -o cppuTestBin -Wno-tautological-undefined-compare  \

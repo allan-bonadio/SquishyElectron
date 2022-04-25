@@ -4,7 +4,7 @@
 */
 
 
-#include "../squish.h"
+
 //#include <cmath>
 #include "qSpace.h"
 #include "qWave.h"

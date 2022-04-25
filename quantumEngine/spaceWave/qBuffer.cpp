@@ -22,7 +22,7 @@ qFlick - object that owns a list of waves, and points to its space
 //#include <stdexcept>
 //#include <cmath>
 #include "qSpace.h"
-#include "qWave.h"
+#include "qBuffer.h"
 
 static bool traceNormalize = false;
 static bool traceAllocate = false;

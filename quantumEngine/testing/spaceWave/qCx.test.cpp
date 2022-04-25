@@ -3,10 +3,12 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
 //#include <stdio.h>
 #include "../../spaceWave/qCx.h"
 #include "../test.h"
+
+this is not used anymore
+
 
 static void cxVerify(qCx actual, qCx expected, const char *msg) {
 	printf("testing %s\n", msg);

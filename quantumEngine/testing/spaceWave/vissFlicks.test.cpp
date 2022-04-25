@@ -9,6 +9,9 @@
 #include "../test.h"
 
 
+this is not used anymore
+
+
 static void makeASpaceAndIterate(void) {
 
 	qSpace *space = makeBareSpace(64);

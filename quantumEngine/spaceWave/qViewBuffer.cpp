@@ -3,10 +3,10 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
-//#include <cmath>
+
 #include "qSpace.h"
 #include "qWave.h"
+#include "qViewBuffer.h"
 
 static const bool debugViewBuffer = false;
 static const bool debugInDetail = false;

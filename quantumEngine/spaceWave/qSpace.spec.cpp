@@ -1,6 +1,12 @@
-#include "../squish.h"
+/*
+** quantum space tests
+** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+*/
+
+
 #include "../spaceWave/qSpace.h"
 #include "../spaceWave/qWave.h"
+#include "../spaceWave/qViewBuffer.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"

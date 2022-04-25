@@ -4,7 +4,7 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
+
 //#include <stdio.h>
 //#include <ctime>
 #include "../spaceWave/qSpace.h"

@@ -4,7 +4,7 @@
 */
 
 
-//#include "qCx.h"
+#include "../squish.h"
 
 // do not exceed these!  they are open ended arrays.
 // keep LABEL_LEN+1 a multiple of 4 or 8 for alignment.

@@ -1,10 +1,11 @@
 //#include <string>
 //#include "../spaceWave/qCx.h"
-#include "../squish.h"
+
 #include <cmath>
 //#include <cstdlib>
 #include "../spaceWave/qSpace.h"
 #include "../spaceWave/qWave.h"
+#include "qSpectrum.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"

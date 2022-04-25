@@ -4,15 +4,15 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
-//#include <cmath>
+
 #include <ctime>
 #include <cstring>
 #include "qSpace.h"
 #include "qWave.h"
-#include "../fourier/fftMain.h"
+#include "qViewBuffer.h"
+//#include "../fourier/fftMain.h"
 
-extern void analyzeWaveFFT(qWave *qw);
+//extern void analyzeWaveFFT(qWave *qw);
 class qSpace *theSpace = NULL;
 double *thePotential = NULL;
 

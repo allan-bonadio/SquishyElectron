@@ -8,6 +8,9 @@
 #include "../test.h"
 
 
+this is not used anymore
+
+
 void handleEachPt(qCx psi, int ix) {
 	printf("each pt:  %d: %lf %lf   norm: %lf\n", ix, psi.re, psi.im, psi.norm());
 }

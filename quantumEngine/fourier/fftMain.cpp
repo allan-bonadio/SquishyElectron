@@ -3,9 +3,9 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
 #include "../spaceWave/qSpace.h"
 #include "../spaceWave/qWave.h"
+#include "qSpectrum.h"
 #include "fftMain.h"
 
 static bool trace = false;
@@ -49,7 +49,7 @@ void qSpectrum::generateWave(qWave *outputWave) {
 
 
 void analyzeWaveFFT(qWave *original) {
-	qSpectrum *spect = new qSpectrum(original->space);
+	qSpectrum *spect = new qSpectrum(original->space, NULL);
 	spect->generateSpectrum(original);
 	spect->dumpSpectrum("🌈 analyzeWaveFFT: generated spectrum");
 	delete spect;

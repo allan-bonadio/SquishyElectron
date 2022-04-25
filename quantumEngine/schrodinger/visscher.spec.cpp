@@ -1,4 +1,4 @@
-#include "../squish.h"
+
 #include "../spaceWave/qSpace.h"
 #include "../spaceWave/qWave.h"
 #include "../testing/cppuMain.h"

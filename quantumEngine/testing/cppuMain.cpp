@@ -5,7 +5,6 @@
 
 
 
-#include "../squish.h"
 //#include <cmath>
 //#include "../spaceWave/qCx.h"
 #include "../spaceWave/qSpace.h"

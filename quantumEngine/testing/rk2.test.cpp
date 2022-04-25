@@ -9,6 +9,7 @@
 #include "../spaceWave/qSpace.h"
 #include "../spaceWave/qWave.h"
 
+this is not used anymore
 
 // how to check these: for 5 states, calculate the phase and the magnitude of each.
 //  Magnitudes should average 1/N or about .2 for a 5-state wave. Phases should be

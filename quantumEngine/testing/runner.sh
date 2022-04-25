@@ -3,6 +3,11 @@
 cd `dirname $0`
 cd ..
 
+
+this is not used anymore
+exit 1
+
+
 echo "q test runner. Just run it from any directory, no args needed"
 echo "Read src to verify.  (must add new test srcs to this file)"
 echo "Add in argument of --inspect or --inspect-brk or any other "

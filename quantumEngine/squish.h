@@ -3,10 +3,12 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-//include this in almost all C++ sources
+// include this in almost all C++ sources
+#ifndef __SQUISH_H__
+#define __SQUISH_H__
 
 #include <cmath>
-#include <stdio.h>
+#include <cstdio>
 #include <stdexcept>
 
 //?#include <string>
@@ -21,3 +23,5 @@ const int contWELL = 1;
 const int contENDLESS = 2;
 
 extern double getTimeDouble();
+
+#endif
