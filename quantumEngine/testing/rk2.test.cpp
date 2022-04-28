@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "test.h"
 #include "../spaceWave/qSpace.h"
+#include "../schrodinger/Manifestation.h"
 #include "../spaceWave/qWave.h"
 
 this is not used anymore
@@ -44,11 +45,11 @@ static void firstRK2(void) {
 	// }
 
 //makeNewSpace(5, contENDLESS, "x");
-	theSpace->dt = 0.1;  // to make the numbers come out right
+	theSpace->mani->dt = 0.1;  // to make the numbers come out right
 	setCircularWave(laosQWave);
 
 	//theSpace->doLowPass = false;  // to make the numbers come out right
-	printf("First Test - &&&&& dt is %lf\n", theSpace->dt);
+	printf("First Test - &&&&& dt is %lf\n", theSpace->mani->dt);
 	laosQWave->dumpWave("before rk2 test", true);
 
 	theSpace->oneRk2Step(laosQWave, otherQWave);

@@ -4,9 +4,10 @@
 */
 
 
-#include "../spaceWave/qSpace.h"
-#include "../spaceWave/qWave.h"
-#include "../spaceWave/qViewBuffer.h"
+#include "qSpace.h"
+#include "../schrodinger/Manifestation.h"
+#include "qWave.h"
+#include "qViewBuffer.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"
@@ -47,10 +48,10 @@ TEST(qSpace, qSpace_ConstructorGauntlet)
 	STRCMP_EQUAL("ShowRoomDummies", space->label);
 
 	LONGS_EQUAL(0, space->nDimensions);
-	LONGS_EQUAL(0.5, space->lowPassDilution);
+	LONGS_EQUAL(0.5, space->mani->lowPassDilution);
 
-	LONGS_EQUAL(false, space->pleaseFFT);
-	LONGS_EQUAL(false, space->isIterating);
+	LONGS_EQUAL(false, space->mani->pleaseFFT);
+	LONGS_EQUAL(false, space->mani->isIterating);
 
 
 	delete space;
@@ -86,7 +87,7 @@ void completeNewSpaceGauntlet(int N, int expectedSpectrumLength, int expectedFre
 	proveItsMine(laosWave, nPoints * sizeof(qCx));
 	proveItsMine(peruWave, nPoints * sizeof(qCx));
 	proveItsMine(theSpace->potential, nPoints * sizeof(double));
-	proveItsMine(theQViewBuffer->viewBuffer, nPoints * sizeof(float) * 8);
+	proveItsMine(theQViewBuffer->buffer, nPoints * sizeof(float) * 8);
 
 //	printf("🧨 🧨       we're done, deleting freeBufferList=%p\n", space->freeBufferList);
 	deleteTheSpace();

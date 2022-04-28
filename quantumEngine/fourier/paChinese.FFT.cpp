@@ -16,6 +16,7 @@ this file is no longer used
 #include <vector>
 #include <iostream>
 #include "../spaceWave/qSpace.h"
+#include "../schrodinger/Manifestation.h"
 #include "../spaceWave/qWave.h"
 #include "fftMain.h"
 

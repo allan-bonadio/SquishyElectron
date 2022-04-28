@@ -151,9 +151,9 @@ export class SquishPanel extends React.Component {
 				DEFAULT_RESOLUTION, DEFAULT_CONTINUUM, DEFAULT_VIEW_CLASS_NAME);
 
 			// vital properties of the space
-			qe.qSpace_setDt(this.state.dt);
-			qe.qSpace_setStepsPerIteration(this.state.stepsPerIteration);
-			qe.qSpace_setLowPassDilution(this.state.lowPassDilution);
+			qe.Manifestation_setDt(this.state.dt);
+			qe.Manifestatation_setStepsPerIteration(this.state.stepsPerIteration);
+			qe.Manifestatation_askForFFT(this.state.lowPassDilution);
 
 			// this should be the only place animateHeartbeat() should be called
 			// except for inside the function itself
@@ -236,14 +236,14 @@ export class SquishPanel extends React.Component {
 
 	showTimeNIteration() {
 		// need them instantaneously - react is too slow
-		document.querySelector('.voNorthWest').innerHTML = qe.qSpace_getElapsedTime().toFixed(2);
-		document.querySelector('.voNorthEast').innerHTML = qe.qSpace_getIterateSerial();
+		document.querySelector('.voNorthWest').innerHTML = qe.Manifestation_getElapsedTime().toFixed(2);
+		document.querySelector('.voNorthEast').innerHTML = qe.Manifestation_getIterateSerial();
 	}
 
 	// take one integration iteration
 	crunchOneIteration() {
 		// (actually many visscher steps)
-		qe.qSpace_oneIteration();
+		qe.Manifestation_oneIteration();
 
 		//qe.createQEWaveFromCBuf();
 
@@ -344,8 +344,8 @@ export class SquishPanel extends React.Component {
 	// button handler
 	startRunningOneCycle() {
 		this.runningOneCycle = true;
-		this.runningCycleStartingTime = qe.qSpace_getElapsedTime();
-		this.runningCycleStartingSerial = qe.qSpace_getIterateSerial();
+		this.runningCycleStartingTime = qe.Manifestation_getElapsedTime();
+		this.runningCycleStartingSerial = qe.Manifestation_getIterateSerial();
 		this.startIterating();
 	}
 	startRunningOneCycle = this.startRunningOneCycle.bind(this);
@@ -366,8 +366,8 @@ export class SquishPanel extends React.Component {
 					this.stopIterating();
 
 					this.setState({
-						runningCycleElapsedTime: qe.qSpace_getElapsedTime() - this.runningCycleStartingTime,
-						runningCycleElapsedSerial: qe.qSpace_getIterateSerial() - this.runningCycleStartingSerial,
+						runningCycleElapsedTime: qe.Manifestation_getElapsedTime() - this.runningCycleStartingTime,
+						runningCycleElapsedSerial: qe.Manifestation_getIterateSerial() - this.runningCycleStartingSerial,
 					});
 
 					this.goingDown = false;
@@ -436,7 +436,7 @@ export class SquishPanel extends React.Component {
 	singleStep = this.singleStep.bind(this);
 
 	resetCounters(ev) {
-		qe.qSpace_resetCounters();
+		qe.Manifestation_resetCounters();
 		this.showTimeNIteration();
 	}
 	resetCounters = this.resetCounters.bind(this);
@@ -445,21 +445,21 @@ export class SquishPanel extends React.Component {
 
 	setDt(dt) {
 		this.setState({dt});
-		qe.qSpace_setDt(dt);
+		qe.Manifestation_setDt(dt);
 	}
 	setDt = this.setDt.bind(this);
 
 	setStepsPerIteration(stepsPerIteration) {
 		console.info(`js setStepsPerIteration(${stepsPerIteration})`)
 		this.setState({stepsPerIteration});
-		qe.qSpace_setStepsPerIteration(stepsPerIteration);
+		qe.Manifestatation_setStepsPerIteration(stepsPerIteration);
 	}
 	setStepsPerIteration = this.setStepsPerIteration.bind(this);
 
 	setLowPassDilution(lowPassDilution) {
 		console.info(`js setLowPassDilution(${lowPassDilution})`)
 		this.setState({lowPassDilution});
-		qe.qSpace_setLowPassDilution(lowPassDilution);
+		qe.Manifestation_setLowPassDilution(lowPassDilution);
 	}
 	setLowPassDilution = this.setLowPassDilution.bind(this);
 

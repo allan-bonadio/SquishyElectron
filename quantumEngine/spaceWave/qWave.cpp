@@ -7,6 +7,7 @@
 
 //#include <cmath>
 #include "qSpace.h"
+#include "../schrodinger/Manifestation.h"
 #include "qWave.h"
 
 // a transitional kind of thing from raw wave arrays to the new qWave buffer obj

@@ -7,6 +7,7 @@
 //#include <cmath>
 //#include <stdarg.h>
 #include "../spaceWave/qSpace.h"
+#include "../schrodinger/Manifestation.h"
 #include "../spaceWave/qWave.h"
 #include "test.h"
 

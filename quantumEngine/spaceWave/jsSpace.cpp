@@ -5,6 +5,7 @@
 
 
 #include "qSpace.h"
+#include "../schrodinger/Manifestation.h"
 #include "qWave.h"
 #include "qViewBuffer.h"
 
@@ -38,7 +39,7 @@ void allocWaves(void) {
 
 
 	// our own view buffer - needs potential to be in place
-	theSpace->qViewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
+	theSpace->mani->viewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
 //	printf("🚀 🚀 🚀  %s:%d freeBufferList: %p\n", __FILE__, __LINE__, theSpace->freeBufferList);
 	//dumpViewBuffer("newly created");
 
@@ -77,31 +78,31 @@ static void freeWaves(void) {
 extern "C" {
 
 // return a pointer to just the main wave for theSpace
-qCx *qSpace_getWaveBuffer(void) {
-	//printf("🚀 🚀 🚀 qSpace_getWaveBuffer() theSpace: %p\n", (theSpace));
-	//printf("        🚀 🚀 🚀        the qWave %p\n", (theSpace->latestQWave));
-	//printf("        🚀 🚀 🚀        the wave %p\n", (theSpace->latestQWave->wave));
+qCx *Manifestation_getWaveBuffer(void) {
+	//printf("🚀 🚀 🚀 Manifestation_getWaveBuffer() theSpace: %p\n", (theSpace));
+	//printf("        🚀 🚀 🚀        the qWave %p\n", (theSpace->mani->latestQWave));
+	//printf("        🚀 🚀 🚀        the wave %p\n", (theSpace->mani->latestQWave->wave));
 //	printf("        🚀 🚀 🚀     q=w %d   s=w %d   q=s %d\n",
-//		(uintptr_t) (theSpace->latestQWave) == (uintptr_t) (theSpace->latestQWave->wave),
-//		(uintptr_t) (theSpace) == (uintptr_t) (theSpace->latestQWave->wave),
-//		(uintptr_t) (theSpace->latestQWave) == (uintptr_t) (theSpace)
+//		(uintptr_t) (theSpace->mani->latestQWave) == (uintptr_t) (theSpace->mani->latestQWave->wave),
+//		(uintptr_t) (theSpace) == (uintptr_t) (theSpace->mani->latestQWave->wave),
+//		(uintptr_t) (theSpace->mani->latestQWave) == (uintptr_t) (theSpace)
 //	);
 
-	return theSpace->latestQWave->wave;
+	return theSpace->mani->latestQWave->wave;
 }
 
 double *qSpace_getPotentialBuffer(void) {
 	return thePotential;
 }
 
-double qSpace_getElapsedTime(void) {
+double Manifestation_getElapsedTime(void) {
 	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getElapsedTime()");
-	return theSpace->elapsedTime;
+	return theSpace->mani->elapsedTime;
 }
 
-double qSpace_getIterateSerial(void) {
+double Manifestation_getIterateSerial(void) {
 	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getIterateSerial()");
-	return theSpace->iterateSerial;
+	return theSpace->mani->iterateSerial;
 }
 
 void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
@@ -110,40 +111,40 @@ void qSpace_setValleyPotential(double power, double scale, double offset) {
 	theSpace->setValleyPotential(power, scale, offset);
 }
 
-void qSpace_setDt(double dt) {
-	theSpace->dt = dt;
+void Manifestation_setDt(double dt) {
+	theSpace->mani->dt = dt;
 }
 
 // iterations are what the user sees.  steps are what Visscher does repeatedly.
-void qSpace_setStepsPerIteration(int stepsPerIteration) {
-	//printf("🚀 🚀 🚀 qSpace_setStepsPerIteration(%d)\n", stepsPerIteration);
+void Manifestatation_setStepsPerIteration(int stepsPerIteration) {
+	//printf("🚀 🚀 🚀 Manifestatation_setStepsPerIteration(%d)\n", stepsPerIteration);
 	if (stepsPerIteration < 1 || stepsPerIteration > 1e8) {
 		char buf[100];
-		snprintf(buf, 100, "qSpace_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
+		snprintf(buf, 100, "Manifestatation_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
 		throw buf;
 	}
-	theSpace->stepsPerIteration = stepsPerIteration;
-	//printf("🚀 🚀 🚀 qSpace_setStepsPerIteration result %d in theSpace=%p\n",
-	//	theSpace->stepsPerIteration, theSpace);
+	theSpace->mani->stepsPerIteration = stepsPerIteration;
+	//printf("🚀 🚀 🚀 Manifestatation_setStepsPerIteration result %d in theSpace=%p\n",
+	//	theSpace->mani->stepsPerIteration, theSpace);
 }
 
 // low pass filter.
-void qSpace_setLowPassDilution(double dilution) {
-	//printf("🚀 🚀 🚀 qSpace_setLowPassDilution(%lf)\n", dilution);
+void Manifestatation_setLowPassDilution(double dilution) {
+	//printf("🚀 🚀 🚀 Manifestatation_setLowPassDilution(%lf)\n", dilution);
 	if (dilution >= 1. || dilution <= 0.) {
 		char buf[100];
-		snprintf(buf, 100, "🚀 🚀 🚀 qSpace_setLowPassDilution, %lf, must be between 0 and 1\n", dilution);
+		snprintf(buf, 100, "🚀 🚀 🚀 Manifestatation_setLowPassDilution, %lf, must be between 0 and 1\n", dilution);
 		throw buf;
 	}
-	theSpace->lowPassDilution = dilution;
-	//printf("🚀 🚀 🚀 qSpace_setLowPassDilution result %lf in theSpace=%p\n",
-	//	theSpace->lowPassDilution, theSpace);
+	theSpace->mani->lowPassDilution = dilution;
+	//printf("🚀 🚀 🚀 Manifestatation_setLowPassDilution result %lf in theSpace=%p\n",
+	//	theSpace->mani->lowPassDilution, theSpace);
 }
 
-void qSpace_oneIteration(void) { theSpace->oneIteration(); }
-void qSpace_resetCounters(void) { theSpace->resetCounters(); }
+void Manifestation_oneIteration(void) { theSpace->mani->oneIteration(); }
+void Manifestation_resetCounters(void) { theSpace->mani->resetCounters(); }
 
-void qSpace_askForFFT(void) { theSpace->askForFFT(); }
+void Manifestation_askForFFT(void) { theSpace->mani->askForFFT(); }
 
 
 /* ******************************************************** space creation from JS */
@@ -200,13 +201,13 @@ qSpace *completeNewSpace(void) {
 
 	if (traceSpaceCreation) printf("   🚀 🚀 🚀 completeNewSpace After Creation but BEFORE loadViewBuffer  "
 		"theQViewBuffer=%p  theQViewBuffer->viewBuffer=%p  freeBufferList=%p\n",
-		theQViewBuffer, theQViewBuffer ?  theQViewBuffer->viewBuffer : NULL,
+		theQViewBuffer, theQViewBuffer ?  theQViewBuffer->buffer : NULL,
 		theSpace->freeBufferList);
 
 
 	// we make our own wave - static
-	theSpace->latestQWave = laosQWave;
-	qCx *wave = theSpace->latestQWave->wave;
+	theSpace->mani->latestQWave = laosQWave;
+	qCx *wave = theSpace->mani->latestQWave->wave;
 
 	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
 
@@ -220,7 +221,7 @@ qSpace *completeNewSpace(void) {
 	//theSpace->dumpThatWave(wave, true);
 
 	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
-	theSpace->latestQWave->normalize();
+	theSpace->mani->latestQWave->normalize();
 	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
 	//printf("🚀 🚀 🚀 newly created wave, AFTER norm:\n");
 	//theSpace->dumpThatWave(wave, true);

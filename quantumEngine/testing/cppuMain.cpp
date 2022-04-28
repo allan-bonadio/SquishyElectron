@@ -8,6 +8,7 @@
 //#include <cmath>
 //#include "../spaceWave/qCx.h"
 #include "../spaceWave/qSpace.h"
+#include "../schrodinger/Manifestation.h"
 #include "../spaceWave/qWave.h"
 
 #include "CppUTest/TestHarness.h"

@@ -9,7 +9,7 @@ struct qViewBuffer {
 	uint32_t magic;
 
 	// always dynamically allocated
-	float *viewBuffer;
+	float *buffer;
 
 	qSpace *space;
 

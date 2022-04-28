@@ -5,6 +5,7 @@
 
 #include "qSpectrum.h"
 #include "../spaceWave/qSpace.h"
+#include "../schrodinger/Manifestation.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"
