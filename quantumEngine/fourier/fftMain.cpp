@@ -16,11 +16,10 @@ static bool trace = false;
 
 // find next largest integer that we can fft these days
 // these days it's a power of 2.  called by qSpace constructor.
-void qSpace::chooseSpectrumLength() {
+void qDimension::chooseSpectrumLength(void) {
 	int powerOf2;
 	for (powerOf2 = 1; powerOf2 < nStates; powerOf2 += powerOf2)
 		continue;
-	dimensions->spectrumLength = powerOf2;
 	spectrumLength = powerOf2;
 }
 
@@ -50,12 +49,14 @@ void qSpectrum::generateWave(qWave *outputWave) {
 
 
 void analyzeWaveFFT(qWave *original) {
+	if (!original || !original->space)
+		throw std::runtime_error(original ? "null space in analyzeWaveFFT"
+			: "null original in analyzeWaveFFT");
 	qSpectrum *spect = new qSpectrum(original->space, NULL);
 	spect->generateSpectrum(original);
 	spect->dumpSpectrum("🌈 analyzeWaveFFT: generated spectrum");
 	delete spect;
 }
-
 
 /* ********************************************************* old demo */
 //
