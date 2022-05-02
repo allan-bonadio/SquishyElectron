@@ -7,8 +7,9 @@
 #ifndef __SQUISH_H__
 #define __SQUISH_H__
 
-#include <cmath>
 #include <cstdio>
+//#include <cstdlib>
+#include <cmath>
 #include <stdexcept>
 
 //?#include <string>
@@ -16,8 +17,8 @@
 
 #include "spaceWave/qCx.h"
 
-// continuum values - same as in qeBasicSpace in qeSpace.js; pls synchronize them
-// wanted this to be in qSpace.h but the testing software ... ugh
+// continuum values - same as in qeBasicSpace in qeSpace.js; pls synchronize them!
+// also used in qBuffers and subclasses
 const int contDISCRETE = 0;
 const int contWELL = 1;
 const int contENDLESS = 2;

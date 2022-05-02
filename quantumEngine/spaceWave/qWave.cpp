@@ -20,10 +20,11 @@ int traceConstDeconst = false;
 /* ************************************************************ birth & death & basics */
 
 // This produces a wave ready to hold an electron
-qWave::qWave(qSpace *space, qCx *useThisBuffer) {
-	qBuffer();
-
+qWave::qWave(qSpace *sp, qCx *useThisBuffer) {
+	if (! sp)
+		throw "qWave::qWave null space";
 	magic = 'qWav';
+	space = sp;
 
 	if (traceConstDeconst) {
 		printf("🌊🌊 qWave::qWave(%s)  utb=%p => this=%p\n", space->label,
@@ -32,7 +33,6 @@ qWave::qWave(qSpace *space, qCx *useThisBuffer) {
 		printf("      🌊🌊        qWave: %p\n", (this));
 	}
 
-	this->space = space;
 	initBuffer(space->freeBufferLength, useThisBuffer);
 
 	if (traceConstDeconst)
@@ -52,7 +52,6 @@ qWave::qWave(qSpace *space, qCx *useThisBuffer) {
 	//printf("justTesting...about to rainbowDump this from qWave::qWave\n");
 	//this->rainbowDump("my first rinaninboe");
 	//printf("justTesting...done with rainbowDump this from qWave::qWave\n");
-
 }
 
 qWave::~qWave(void) {

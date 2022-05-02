@@ -21,7 +21,7 @@ const colorNodes = [
 //let cppWave;
 //
 //function latestWave() {
-//	cppWave = qe.qSpace_getWaveBuffer();
+//	cppWave = qe.Manifestation_getWaveBuffer();
 //}
 //
 //// get the complex value from this one point, by index

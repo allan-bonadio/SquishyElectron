@@ -54,14 +54,10 @@ TEST(Visscher, VisscherOneIteration)
 {
 	// simulate the app starting up
 	makeFullSpace(32);
-
-	theSpace->mani->stepsPerIteration = 100;
-
 	setCircularWave(oldWave4, 1.);
 
-
-
 	// simulate the app taking one iter = 100 steps
+	theSpace->mani->stepsPerIteration = 100;
 	theSpace->mani->oneIteration();
 
 
