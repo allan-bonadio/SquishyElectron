@@ -4,11 +4,15 @@
 */
 
 #include <ctime>
+#include <limits>
+#include <cfenv>
 
 #include "../spaceWave/qSpace.h"
 #include "../schrodinger/Manifestation.h"
 #include "../spaceWave/qWave.h"
 #include "../spaceWave/qViewBuffer.h"
+#include "../fourier/fftMain.h"
+
 
 static bool traceIterSummary = false;
 static bool traceIteration = false;
@@ -17,19 +21,29 @@ static bool traceIterSteps = false;
 static bool traceJustWave = false;
 static bool traceJustInnerProduct = false;
 
-Manifestation::Manifestation(qSpace *sp)
-	: dt(1.0), stepsPerIteration(100) {
-	lowPassDilution = 0.5;
-	space = sp;
-	space->mani = this;  // until I get this straightened out
-	magic = 'Mani';
-	pleaseFFT = false;
-	isIterating = false;
+const double sNAN99999 = std::numeric_limits<double>::signaling_NaN();
 
+Manifestation::Manifestation(qSpace *sp)
+	: dt(sNAN99999), stepsPerIteration(100), lowPassDilution(0.5), space(sp),
+		magic('Mani'), pleaseFFT(false), isIterating(false) {
+
+	space->mani = this;  // until I get this straightened out
+
+	mainQWave = new qWave(space);
+	scratchQWave = new qWave(space);
+
+	resetCounters();
 };
 
 Manifestation::~Manifestation(void) {
+	delete mainQWave;
+	delete scratchQWave;
 };
+
+void Manifestation::resetCounters(void) {
+	elapsedTime = 0.;
+	iterateSerial = 0;
+}
 
 /* ********************************************************** integration */
 
@@ -58,12 +72,13 @@ void Manifestation::oneIteration() {
 
 	// half step in beginning to move Im forward dt/2
 	// cuz outside of here, re and im are for the same time
-	// and stored in laosWave
-	stepReal(peruQWave->wave, laosQWave->wave, 0);
-	stepImaginary(peruQWave->wave, laosQWave->wave, dt/2);
+	stepReal(scratchQWave->wave, mainQWave->wave, 0);
+	stepImaginary(scratchQWave->wave, mainQWave->wave, dt/2);
 
 
-
+//	mainQWave = new qWave(theSpace);
+//	scratchQWave = new qWave(theSpace);
+//
 
 	int doubleSteps = stepsPerIteration / 2;
 	if (traceIteration)
@@ -74,8 +89,8 @@ void Manifestation::oneIteration() {
 		// this seems to have a resolution of 100µs on Panama
 		//auto start = std::chrono::steady_clock::now();////
 
-		oneVisscherStep(laosQWave, peruQWave);
-		oneVisscherStep(peruQWave, laosQWave);
+		oneVisscherStep(mainQWave, scratchQWave);
+		oneVisscherStep(scratchQWave, mainQWave);
 
 		if (traceIteration && 0 == ix % 100) {
 			printf("       step every hundred, step %d; elapsed time: %lf\n", ix * 2, getTimeDouble());
@@ -91,8 +106,8 @@ void Manifestation::oneIteration() {
 
 	// half step at completion to move Re forward dt/2
 	// and copy back to Laos
-	stepReal(laosQWave->wave, peruQWave->wave, dt/2);
-	stepImaginary(laosQWave->wave, peruQWave->wave, 0);
+	stepReal(mainQWave->wave, scratchQWave->wave, dt/2);
+	stepImaginary(mainQWave->wave, scratchQWave->wave, 0);
 
 	isIterating = false;
 
@@ -100,12 +115,12 @@ void Manifestation::oneIteration() {
 
 	// printf("Manifestation::oneIteration(): viewBuffer %ld and latestWave=%ld\n",
 	// 	(long) viewBuffer, (long) latestWave);
-	latestQWave = laosQWave;
+	//mainQWave = mainQWave;
 
 	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
-	//	latestQWave->lowPassFilter(lowPassDilution);
-//	latestQWave->nyquistFilter();
-//	latestQWave->normalize();
+	//	mainQWave->lowPassFilter(lowPassDilution);
+//	mainQWave->nyquistFilter();
+//	mainQWave->normalize();
 
 
 	// need it; somehow? not done in JS
@@ -113,21 +128,21 @@ void Manifestation::oneIteration() {
 
 	if (traceIterSummary) {
 		printf("🚀 🚀 finished one iteration (%d steps, N=%d), inner product: %lf",
-			stepsPerIteration, space->nStates, latestQWave->innerProduct());
+			stepsPerIteration, space->nStates, mainQWave->innerProduct());
 	}
 
 	if (traceJustWave) {
-		latestQWave->dumpWave("      at end of iteration", true);
+		mainQWave->dumpWave("      at end of iteration", true);
 	}
 	if (traceJustInnerProduct) {
 		printf("      finished one integration iteration (%d steps, N=%d), inner product: %lf\n",
-			stepsPerIteration, space->nStates, latestQWave->innerProduct());
+			stepsPerIteration, space->nStates, mainQWave->innerProduct());
 	}
 
-	if (pleaseFFT) {
-		//analyzeWaveFFT(latestQWave);
+	//if (pleaseFFT) {
+		analyzeWaveFFT(mainQWave);
 		pleaseFFT = false;
-	}
+	//}
 }
 
 
@@ -136,14 +151,9 @@ void Manifestation::askForFFT(void) {
 	if (isIterating)
 		pleaseFFT = true;
 	else
-		;//analyzeWaveFFT(latestQWave);
+		analyzeWaveFFT(mainQWave);
 }
 
 /* **********************************************************  */
-
-void Manifestation::resetCounters(void) {
-	elapsedTime = 0.;
-	iterateSerial = 0;
-}
 
 /* **********************************************************  */

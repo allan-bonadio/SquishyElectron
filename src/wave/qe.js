@@ -18,8 +18,8 @@ export function defineQEngineFuncs() {
 	qe.qSpace_setZeroPotential = cwrap('qSpace_setZeroPotential', 'number', []);
 	qe.qSpace_setValleyPotential = cwrap('qSpace_setValleyPotential', 'number', ['number','number','number']);
 	qe.Manifestation_setDt = cwrap('Manifestation_setDt', null, ['number']);
-	qe.Manifestatation_setStepsPerIteration = cwrap('Manifestatation_setStepsPerIteration', null, ['number']);
-	qe.Manifestatation_setLowPassDilution = cwrap('Manifestatation_setLowPassDilution', null, ['number']);
+	qe.Manifestation_setStepsPerIteration = cwrap('Manifestation_setStepsPerIteration', null, ['number']);
+	qe.Manifestation_setLowPassDilution = cwrap('Manifestation_setLowPassDilution', null, ['number']);
 	qe.Manifestation_oneIteration = cwrap('Manifestation_oneIteration', 'number', []);
 	qe.Manifestation_resetCounters = cwrap('Manifestation_resetCounters', null, []);
 	qe.qViewBuffer_getViewBuffer = cwrap('qViewBuffer_getViewBuffer', 'number', []);

@@ -20,16 +20,14 @@ void allocWaves(void) {
 
 //printf(" got past new qFlick\n");
 	// the other buffers...
-	peruQWave = new qWave(theSpace);
-	laosQWave = new qWave(theSpace);
 //	printf("🚀 🚀 🚀  %s:%d freeBufferList: %p\n", __FILE__, __LINE__, theSpace->freeBufferList);
 
-	peruWave = peruQWave->wave;
-	laosWave = laosQWave->wave;
+//	peruWave = peruQWave->wave;
+//	laosWave = laosQWave->wave;
 
 //	printf("🚀 🚀 🚀  %s:%d freeBufferList: %p\n", __FILE__, __LINE__, theSpace->freeBufferList);
-	//printf("        🚀 🚀 🚀       peruQWave=%p   peruWave=%p   laosQWave=%p   laosWave=%p  \n",
-	//	peruQWave, peruWave, laosQWave, laosWave);
+	//printf("        🚀 🚀 🚀       peruQWave=%p   peruWave=%p   mainQWave=%p   laosWave=%p  \n",
+	//	peruQWave, peruWave, mainQWave, laosWave);
 
 	/* *********************************** allocate other buffers */
 
@@ -52,11 +50,11 @@ void allocWaves(void) {
 // call to destroy them
 static void freeWaves(void) {
 	//printf("🚀 🚀 🚀 about to delete qWaves:peruQWave\n");
-	delete peruQWave;
-	peruQWave = NULL;
-	//printf("🚀 🚀 🚀 about to delete qWaves:laosQWave\n");
-	delete laosQWave;
-	laosQWave = NULL;
+//	delete peruQWave;
+//	peruQWave = NULL;
+	//printf("🚀 🚀 🚀 about to delete qWaves:mainQWave\n");
+//	delete laosQWave;
+//	laosQWave = NULL;
 
 
 	//printf("       delete thePotential:\n");
@@ -80,15 +78,15 @@ extern "C" {
 // return a pointer to just the main wave for theSpace
 qCx *Manifestation_getWaveBuffer(void) {
 	//printf("🚀 🚀 🚀 Manifestation_getWaveBuffer() theSpace: %p\n", (theSpace));
-	//printf("        🚀 🚀 🚀        the qWave %p\n", (theSpace->mani->latestQWave));
-	//printf("        🚀 🚀 🚀        the wave %p\n", (theSpace->mani->latestQWave->wave));
+	//printf("        🚀 🚀 🚀        the qWave %p\n", (theSpace->mani->mainQWave));
+	//printf("        🚀 🚀 🚀        the wave %p\n", (theSpace->mani->mainQWave->wave));
 //	printf("        🚀 🚀 🚀     q=w %d   s=w %d   q=s %d\n",
-//		(uintptr_t) (theSpace->mani->latestQWave) == (uintptr_t) (theSpace->mani->latestQWave->wave),
-//		(uintptr_t) (theSpace) == (uintptr_t) (theSpace->mani->latestQWave->wave),
-//		(uintptr_t) (theSpace->mani->latestQWave) == (uintptr_t) (theSpace)
+//		(uintptr_t) (theSpace->mani->mainQWave) == (uintptr_t)  (theSpace->mani->mainQWave->wave),
+//		(uintptr_t) (theSpace) == (uintptr_t) (theSpace->mani->mainQWave->wave),
+//		(uintptr_t) (theSpace->mani->mainQWave) == (uintptr_t) (theSpace)
 //	);
 
-	return theSpace->mani->latestQWave->wave;
+	return theSpace->mani->mainQWave->wave;
 }
 
 double *qSpace_getPotentialBuffer(void) {
@@ -116,28 +114,28 @@ void Manifestation_setDt(double dt) {
 }
 
 // iterations are what the user sees.  steps are what Visscher does repeatedly.
-void Manifestatation_setStepsPerIteration(int stepsPerIteration) {
-	//printf("🚀 🚀 🚀 Manifestatation_setStepsPerIteration(%d)\n", stepsPerIteration);
+void Manifestation_setStepsPerIteration(int stepsPerIteration) {
+	//printf("🚀 🚀 🚀 Manifestation_setStepsPerIteration(%d)\n", stepsPerIteration);
 	if (stepsPerIteration < 1 || stepsPerIteration > 1e8) {
 		char buf[100];
-		snprintf(buf, 100, "Manifestatation_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
-		throw buf;
+		snprintf(buf, 100, "Manifestation_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
+		throw std::runtime_error(buf);
 	}
 	theSpace->mani->stepsPerIteration = stepsPerIteration;
-	//printf("🚀 🚀 🚀 Manifestatation_setStepsPerIteration result %d in theSpace=%p\n",
+	//printf("🚀 🚀 🚀 Manifestation_setStepsPerIteration result %d in theSpace=%p\n",
 	//	theSpace->mani->stepsPerIteration, theSpace);
 }
 
 // low pass filter.
-void Manifestatation_setLowPassDilution(double dilution) {
-	//printf("🚀 🚀 🚀 Manifestatation_setLowPassDilution(%lf)\n", dilution);
+void Manifestation_setLowPassDilution(double dilution) {
+	//printf("🚀 🚀 🚀 Manifestation_setLowPassDilution(%lf)\n", dilution);
 	if (dilution >= 1. || dilution <= 0.) {
 		char buf[100];
-		snprintf(buf, 100, "🚀 🚀 🚀 Manifestatation_setLowPassDilution, %lf, must be between 0 and 1\n", dilution);
-		throw buf;
+		snprintf(buf, 100, "🚀 🚀 🚀 Manifestation_setLowPassDilution, %lf, must be between 0 and 1\n", dilution);
+		throw std::runtime_error(buf);
 	}
 	theSpace->mani->lowPassDilution = dilution;
-	//printf("🚀 🚀 🚀 Manifestatation_setLowPassDilution result %lf in theSpace=%p\n",
+	//printf("🚀 🚀 🚀 Manifestation_setLowPassDilution result %lf in theSpace=%p\n",
 	//	theSpace->mani->lowPassDilution, theSpace);
 }
 
@@ -206,8 +204,8 @@ qSpace *completeNewSpace(void) {
 
 
 	// we make our own wave - static
-	theSpace->mani->latestQWave = laosQWave;
-	qCx *wave = theSpace->mani->latestQWave->wave;
+	//theSpace->mani->mainQWave = laosQWave;
+	qCx *wave = theSpace->mani->mainQWave->wave;
 
 	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
 
@@ -221,7 +219,7 @@ qSpace *completeNewSpace(void) {
 	//theSpace->dumpThatWave(wave, true);
 
 	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
-	theSpace->mani->latestQWave->normalize();
+	theSpace->mani->mainQWave->normalize();
 	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
 	//printf("🚀 🚀 🚀 newly created wave, AFTER norm:\n");
 	//theSpace->dumpThatWave(wave, true);

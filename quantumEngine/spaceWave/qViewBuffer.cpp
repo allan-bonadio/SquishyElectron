@@ -12,13 +12,16 @@
 static const bool debugViewBuffer = false;
 static const bool debugInDetail = false;
 
+// August Ferdinand Möbius invented homogenous coordinates
 
 // 'the' being the only one sometimes.  set in jsSpace completeNewSpace
 qViewBuffer *theQViewBuffer;
 
-qViewBuffer::qViewBuffer(qSpace *space) {
+qViewBuffer::qViewBuffer(qSpace *space)
+	: space(space){
+	if (! space)
+		throw std::runtime_error("qViewBuffer::qViewBuffer null space");
 	// 4 floats per vertex, two verts per point
-	this->space = space;
 	buffer = new float[space->nPoints * 8];
 	if (debugViewBuffer) printf("📺 buffer(): buffer ptr %p \n",
 		buffer);
@@ -41,10 +44,10 @@ float qViewBuffer::loadViewBuffer(void) {
 	if (debugViewBuffer) printf("📺 loadViewBuffer() starts: buffer = %p \n",
 		buffer);
 //	printf("qViewBuffer::loadViewBuffer space ptr %p\n", space);
-//	printf("qViewBuffer::loadViewBuffer latestQWave ptr %p\n", space->mani->latestQWave);
-	qWave *latestQWave = space->mani->latestQWave;
-//	printf("qViewBuffer::loadViewBuffer latestWave ptr %p\n", mani->latestQWave->wave);
-	qCx *latestWave = latestQWave->wave;
+//	printf("qViewBuffer::loadViewBuffer mainQWave ptr %p\n", space->mani->mainQWave);
+	qWave *mainQWave = space->mani->mainQWave;
+//	printf("qViewBuffer::loadViewBuffer latestWave ptr %p\n", mani->mainQWave->wave);
+	qCx *latestWave = mainQWave->wave;
 
 //	printf("qViewBuffer::loadViewBuffer space->nPoints %d\n", space->nPoints);
 	int nPoints = space->nPoints;
@@ -54,14 +57,14 @@ float qViewBuffer::loadViewBuffer(void) {
 	if (debugInDetail) {
 		printf("loadViewBuffer(P): thePotential=%p\n",
 			thePotential);
-		printf("loadViewBuffer(B): space->mani->latestQWave->wave=%p->%p->%p->%p\n",
+		printf("loadViewBuffer(B): space->mani->mainQWave->wave=%p->%p->%p->%p\n",
 			this,
 			space,
-			space->mani->latestQWave,
-			space->mani->latestQWave->wave);
-		printf("loadViewBuffer(vb,lqw): buffer %p and mani->latestQWave->wave=%p\n",
+			space->mani->mainQWave,
+			space->mani->mainQWave->wave);
+		printf("loadViewBuffer(vb,lqw): buffer %p and mani->mainQWave->wave=%p\n",
 			buffer, latestWave);
-		latestQWave->dumpWave("📺 at start of loadViewBuffer()");
+		mainQWave->dumpWave("📺 at start of loadViewBuffer()");
 	}
 
 	// this is index into the complex point, which translates to 2 GL points

@@ -8,7 +8,6 @@ struct Manifestation {
 	Manifestation(qSpace *);
 	~Manifestation(void);
 
-
 	int magic;
 	qSpace *space;
 
@@ -26,9 +25,9 @@ struct Manifestation {
 	void resetCounters(void);
 
 
-	// our main qWave housing our main wave, doing iterations and being displayed.
-	// Technically, the one that got the most recent integration iteration
-	struct qWave *latestQWave;
+	// our main qWave and a scratch wave for stepping
+	struct qWave *mainQWave;
+	struct qWave *scratchQWave;
 
 	struct qViewBuffer *viewBuffer;
 
@@ -54,10 +53,6 @@ struct Manifestation {
 	bool pleaseFFT;
 	bool isIterating;
 	void askForFFT(void);
-
-
-
-
 
 };
 

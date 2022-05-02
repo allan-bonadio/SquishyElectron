@@ -41,8 +41,8 @@ exportsSrc  = [
 
 	// params
 	{name: 'Manifestation_setDt', retType: null, args: ['number']},
-	{name: 'Manifestatation_setStepsPerIteration', retType: null, args: ['number']},
-	{name: 'Manifestatation_setLowPassDilution', retType: null, args: ['number']},
+	{name: 'Manifestation_setStepsPerIteration', retType: null, args: ['number']},
+	{name: 'Manifestation_setLowPassDilution', retType: null, args: ['number']},
 
 	{name: 'Manifestation_oneIteration', retType: 'number', args: []},
 	{name: 'Manifestation_resetCounters', retType: null, args: []},
