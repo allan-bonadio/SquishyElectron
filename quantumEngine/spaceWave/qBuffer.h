@@ -63,8 +63,8 @@ struct qBuffer {
 	static void dumpSegment(qCx *wave, bool withExtras = false,
 		int start = 0, int end = -1, int continuum = 0);
 
-	void dumpHiRes(const char *title);
-	void rainbowDump(const char *title);  // calls JS to do it
+	void dumpHiRes(const char *title = "a buffer");
+	void rainbowDump(const char *title = "a buffer");  // calls JS to do it
 
 	double innerProduct(void);
 	void normalize(void);
