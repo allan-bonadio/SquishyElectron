@@ -9,6 +9,9 @@ cd `dirname $0`
 # omit those, so testing can compile & run itself.
 allCpp=`cat allCpp.list`
 
+# keep LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 32
+LABEL_LEN=15
+
 cd ..
 
 # https://emscripten.org/docs/tools_reference/emcc.html
@@ -17,6 +20,7 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \
 	-sEXPORTED_FUNCTIONS=@building/exports.json \
 	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","getValue","setValue"]' \
+	-DLABEL_LEN=$LABEL_LEN \
 	-I/dvl/emscripten/emsdk/upstream/emscripten/cache/sysroot/include \
 	-include emscripten.h \
 	main.cpp $allCpp || exit 99

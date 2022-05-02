@@ -152,8 +152,8 @@ export class SquishPanel extends React.Component {
 
 			// vital properties of the space
 			qe.Manifestation_setDt(this.state.dt);
-			qe.Manifestatation_setStepsPerIteration(this.state.stepsPerIteration);
-			qe.Manifestatation_askForFFT(this.state.lowPassDilution);
+			qe.Manifestation_setStepsPerIteration(this.state.stepsPerIteration);
+			//qe.Manifestation_askForFFT();
 
 			// this should be the only place animateHeartbeat() should be called
 			// except for inside the function itself
@@ -452,7 +452,7 @@ export class SquishPanel extends React.Component {
 	setStepsPerIteration(stepsPerIteration) {
 		console.info(`js setStepsPerIteration(${stepsPerIteration})`)
 		this.setState({stepsPerIteration});
-		qe.Manifestatation_setStepsPerIteration(stepsPerIteration);
+		qe.Manifestation_setStepsPerIteration(stepsPerIteration);
 	}
 	setStepsPerIteration = this.setStepsPerIteration.bind(this);
 
@@ -466,7 +466,7 @@ export class SquishPanel extends React.Component {
 	// completely wipe out the 𝜓 wavefunction and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon setWave in wave tab
 	setWave(waveParams) {
-// 		const wave = qe.qSpace_getWaveBuffer();
+// 		const wave = qe.Manifestation_getWaveBuffer();
 		const qewave = this.state.space.qewave;
 		qewave.setFamiliarWave(waveParams);
 		this.iterateOneIteration(true, true);

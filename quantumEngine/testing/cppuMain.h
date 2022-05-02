@@ -10,13 +10,15 @@ extern void setCircularWave(struct qWave *target, double n = 1.);
 
 // make JUST a new qSpace() with minimal everything.  No buffers.
 extern struct qSpace *makeBareSpace(int N, int continuum = contENDLESS);
-#define MAKEBARESPACE_LABEL "makeBareSpace"
-#define MAKEBARE1DDIM_LABEL "make bare dim label"
+
+// these labels are limited to 7 chars, see runner
+#define MAKEBARESPACE_LABEL "makeBar"
+#define MAKEBARE1DDIM_LABEL "makeDim"
 
 // use the jsSpace functions to make a js-callable qSpace in theSpace,
 // with all of the buffers allocated.
 extern struct qSpace *makeFullSpace(int N);  // handy
-#define MAKEFULLSPACE_LABEL "makeFullSpace"
+#define MAKEFULLSPACE_LABEL "makeFul"
 
 // make sure we own all the bytes in this buffer by reading and writing each byte
 extern void proveItsMine(void *buf, size_t size);

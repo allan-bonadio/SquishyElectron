@@ -11,9 +11,8 @@
 #include "../schrodinger/Manifestation.h"
 #include "qWave.h"
 #include "qViewBuffer.h"
-//#include "../fourier/fftMain.h"
+#include "../fourier/fftMain.h"
 
-//extern void analyzeWaveFFT(qWave *qw);
 class qSpace *theSpace = NULL;
 double *thePotential = NULL;
 
@@ -28,19 +27,16 @@ static bool traceFreeBuffer = false;
 
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
-qSpace::qSpace(const char *lab) {
-	magic = 'qSpa';
-	mani = new Manifestation(this);
+qSpace::qSpace(const char *lab)
+	: magic('qSpa'), nDimensions(0), freeBufferList(NULL) {
 
 	//printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n", lab, (this));
-	nDimensions = 0;
-
-	mani->resetCounters();
 
 	strncpy(label, lab, LABEL_LEN);
 	label[LABEL_LEN] = 0;
 
-	freeBufferList = NULL;
+	if (LABEL_LEN != 7 && LABEL_LEN != 15 && LABEL_LEN != 31)
+		throw std::runtime_error("🚀 🚀 bad value for LABEL_LEN defined at compiler");
 
 	//printf("🚀 🚀 qSpace::qSpace() constructor done this= %p, length %lx\n",
 	//	(this), sizeof(qSpace));
@@ -91,17 +87,19 @@ void qSpace::tallyDimensions(void) {
 	nStates = 1;
 
 	int ix;
-	// finish up all the dimensions now that we know them all
+	// finish up all the dimensions now that we know them all - inside out
 	for (ix = nDimensions-1; ix >= 0; ix--) {
-		qDimension *dims = dimensions + ix;
+		qDimension *dim = dimensions + ix;
 
-		nStates *= dims->N;
-		dims->nStates = nStates;
-		nPoints *= dims->start + dims->end;
-		dims->nPoints = nPoints;
+		nStates *= dim->N;
+		dim->nStates = nStates;
+		nPoints *= dim->start + dim->end;
+		dim->nPoints = nPoints;
+
+		dim->chooseSpectrumLength();
 	}
 
-	chooseSpectrumLength();
+	spectrumLength = dimensions[0].spectrumLength;
 
 	if (nPoints > spectrumLength)
 		freeBufferLength = nPoints;
@@ -119,6 +117,9 @@ void qSpace::tallyDimensions(void) {
 // If nPoints is still zero, initSpace hasn't been called yet; failure
 void qSpace::initSpace() {
 	tallyDimensions();
+
+	// this allocates the qwaves so must call this after sizes have been decided
+	mani = new Manifestation(this);
 
 	// try out different formulas here.  Um, this is actually set manually in CP
 	mani->dt = 1. / (nStates * nStates);

@@ -8,14 +8,16 @@
 
 // do not exceed these!  they are open ended arrays.
 // keep LABEL_LEN+1 a multiple of 4 or 8 for alignment.
-#define LABEL_LEN  31
+// now defined in buildDev.sh, buildProd.sh or cppuRunner.sh
+//#define LABEL_LEN  7
+//#define LABEL_LEN  31
 
 #define MAX_DIMENSIONS  2
 
 extern class qSpace *theSpace;
-extern class qCx *peruWave, *laosWave;
+//extern class qCx *peruWave, *laosWave;
 
-extern class qWave *peruQWave, *laosQWave;
+//extern class qWave *peruQWave, *laosQWave;
 
 extern double *thePotential;
 //extern float *viewBuffer;
@@ -45,8 +47,8 @@ public:
 	int continuum;
 
 	// size for Fourier transforms, or zero if not yet calculated.  ON THIS DIMENSION ONLY!
-	// Often a power of two.
-	// no boundaries.
+	// Often a power of two.  no boundaries.
+	void chooseSpectrumLength(void);
 	int spectrumLength;
 
 	// 'x', 'y' or 'z' - two particles will have x1, x2 but one in 2d will have x, y.
@@ -101,7 +103,6 @@ public:
 
 
 	/* *********************************************** buffers */
-	void chooseSpectrumLength(void);
 	int spectrumLength;
 
 	// some of these might go away as the buffers now have the essential numbers
