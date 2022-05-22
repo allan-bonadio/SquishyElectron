@@ -1,6 +1,6 @@
 /*
 ** manifestation -- the integration and simulation of a quantum mechanical wave/space
-** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
 #include <ctime>
