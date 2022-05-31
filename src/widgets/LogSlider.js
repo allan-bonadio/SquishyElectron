@@ -1,5 +1,5 @@
 /*
-** Log Slider -- just like an input slider, but on a logarithmic scale
+** Log Slider -- just like an <input slider, but on a logarithmic scale
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 

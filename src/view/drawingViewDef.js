@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** drawing view def -- A viewDef for drawing individual subclasses of abstractDrawing
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 

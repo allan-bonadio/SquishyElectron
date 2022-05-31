@@ -1,4 +1,7 @@
 #!/bin/bash
+# build for development -- script to compile emscripten/C++ sources into WebAssembly
+# Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+
 
 cd `dirname $0`
 

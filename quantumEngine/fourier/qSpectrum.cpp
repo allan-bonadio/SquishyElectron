@@ -1,5 +1,5 @@
 /*
-** quantum Spectrum -- quantum Spectrum buffer
+** quantum Spectrum -- quantum Spectrum buffer, for FFTs
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 

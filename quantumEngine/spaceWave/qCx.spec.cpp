@@ -1,6 +1,10 @@
+/*
+** qCx test -- complex arithmetic unit tests for Squishy Electron
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+*/
+
+// this already has qCx defined in it
 #include "../squish.h"
-//#include <string>
-//#include "./qCx.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"

@@ -1,5 +1,5 @@
 /*
-** flatDrawingViewDef -- Main drawer for 2d image of 1d space
+** flatDrawingViewDef -- main viewDef for 2d image of 1d space
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 

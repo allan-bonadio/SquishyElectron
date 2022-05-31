@@ -1,5 +1,5 @@
 /*
-** qeWave -- JS access to a qWave.
+** qeWave -- JS equivalent to a qWave (roughly)
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
@@ -10,7 +10,7 @@ import cxToRgb from '../view/cxToRgb';
 // emscripten sabotages this?  the log & info, but not error & warn?
 //const consoleLog = console.log.bind(console);
 
-
+// Dump a wave buffer as a colored bargraph in the JS console
 // this is also called by C++ so it's easier as a standalone function
 // see also qeWave method by same name (but different args)
 function rainbowDump(wave, start, end, nPoints) {
@@ -74,6 +74,7 @@ class qeWave {
 
 		// now for the buffer
 		if (!waveArg) {
+			// zeroes.  if you're lucky.
 			this.wave = new Float64Array(2 * space.nPoints);
 		}
 		else if (Array.isArray(waveArg)) {
@@ -81,7 +82,7 @@ class qeWave {
 			this.wave = waveArg;
 		}
 		else if (Number.isInteger(waveArg)) {
-			// from C++
+			// Mapped from C++; waveArg is integer offset from start of C++ space
 			const wave = new Float64Array(window.Module.HEAPF64.buffer, waveArg, 2 * space.nPoints);
 			//space.waveBuffer = qe.waveBuffer = wave;
 			this.wave = wave;
@@ -96,7 +97,7 @@ class qeWave {
 
 	/* **************************************************************** dumping */
 
-	// dump out wave content.  Modeled after qWave::dumpWave() pls keep in sync!
+	// dump out wave content.  Actually just calls qWave::dumpWave()
 	dumpWave(title) {
 		console.log(`\n🌊 ==== Wave | ${title} `+
 			this.space.dumpThatWave(this.wave) +
@@ -110,7 +111,7 @@ class qeWave {
 
 	/* ********************************************************************** calculatons */
 
-	// calculate ⟨𝜓 | 𝜓⟩  'inner product'
+	// calculate ⟨𝜓 | 𝜓⟩  'inner product'.  See also C++ function of same name.
 	innerProduct() {
 		const wave = this.wave;
 		const {start, end} = this.space.startEnd2;
@@ -121,7 +122,7 @@ class qeWave {
 		return tot;
 	}
 
-	// enforce ⟨𝜓 | 𝜓⟩ = 1 by dividing out the current value
+	// enforce ⟨𝜓 | 𝜓⟩ = 1 by dividing out the current value.  See also C++ func of same name.
 	normalize() {
 		const wave = this.wave;
 

@@ -264,7 +264,7 @@ export class abstractViewDef {
 //${fSrc}
 //`);
 
-		// also try this URL in chrome...    chrome://internals/web-app
+		// also try this URL in chrome...    chrome://web-app-internals/
 		// after enabling it here: chrome://flags/#enable-webgl-draft-extensions
 		// or is it heree??!?!    chrome://flags/#record-web-app-debug-info
 		// firefox: webgl.enable-draft-extensions in Firefox

@@ -1,3 +1,8 @@
+/*
+** fft spec - testing FFT code for Squishy Electron
+** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+*/
+
 //#include <string>
 //#include "../spaceWave/qCx.h"
 

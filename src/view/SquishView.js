@@ -1,5 +1,5 @@
 /*
-** squish View -- a webgl image of the quantum wave
+** squish View -- a webgl image of the quantum wave (or whatever)
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 

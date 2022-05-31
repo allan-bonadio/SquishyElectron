@@ -6,11 +6,6 @@
 // this is rewritten from cxToColor.glsl to be the JS implementation.
 // (I tried to automatically translate it but it was too hard.)
 
-// um... but we're not using qCx anywhere... yes we are...
-import qCx from '../wave/qCx';
-
-// sortof...
-export let aComplex = new qCx(1,1);
 
 const sqrtOneThird = Math.sqrt(1. / 3.);  // 0.57735..
 //const sqrtThreeOver2 = Math.sqrt(3.) / 2.;  // .8660...

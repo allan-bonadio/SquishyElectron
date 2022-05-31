@@ -1,5 +1,5 @@
 /*
-** view Buffer -- interface to webGL
+** view Buffer -- interface buffer to webGL
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 

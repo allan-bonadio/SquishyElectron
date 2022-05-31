@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
-** blah blah -- like a source file for Squishy Electron
+** generate exports -- generate files for emscripten compiler, for JS calling C++ code
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 

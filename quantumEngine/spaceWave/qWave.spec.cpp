@@ -1,3 +1,8 @@
+/*
+** quantum Wave buffer testing -- an organized wave that represents a QM state
+** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+*/
+
 //#include <string>
 //#include "../spaceWave/qCx.h"
 //#include <cmath>

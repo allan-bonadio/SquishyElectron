@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** potential drawing -- a drawing for the potential function for a 1d quantum wave
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 

@@ -1,9 +1,8 @@
 /*
 ** visscher -- schrodinger ODE integration by staggering re and im
-**			by half dx, Visscher second order accuracy
+**			by half dt, Visscher second order accuracy
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
-
 
 #include "../spaceWave/qSpace.h"
 #include "Incarnation.h"
@@ -31,9 +30,9 @@ We will define
 		• I = 𝜓.im at times .5dt, 1.5dt, ...
 so that in our buffers of complex numbers, the Im part is dt/2 ahead of the Re part:
 
-            real components    imag components
-new wave 0:  ψr(t + dt)         ψi(t + 3dt/2)
-old wave 1:  ψr(t)              ψi(t + dt/2)
+              real components    imag components
+initial wave:   ψr(t)              ψi(t + dt/2)
+1st iter wave:  ψr(t + dt)         ψi(t + 3dt/2)
 
 The natural discretization of Eqs. (6) is therefore
 	ψr(t + dt) = ψr(t) + dt H ψi(t + dt/2)
@@ -48,16 +47,15 @@ We do the hamiltonian custom here instead of using the function in hamiltonian.c
 and for now omit the potential
  */
 
-
+// this is our second derivative wrt x:
 // 	qCx d2 = wave[x-1] + wave[x+1] - wave[x] * 2;
-// 	qCheck(d2);
 
 
 
 // first step: advance the ψr a dt, from t to t + dt
 // oldW points to buffer with real = ψr(t)    imag = ψi(t + dt/2)
 // newW points to buffer with real = ψr(t + dt)   imag unchanged = ψi(t + dt/2)
-// here we will calculate the ψr(t + dt) values in buffer 0 only, and fill them in.
+// here we will calculate the ψr(t + dt) values in a new buffer only, and fill them in.
 // the ψi values in buffer 0 are still uncalculated
 void Incarnation::stepReal(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
@@ -156,28 +154,4 @@ void Incarnation::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
 	}
 	if (traceVischerBench) printf("         oneVisscherStep, done: time=%lf\n", getTimeDouble());
 }
-
-// can I make this useful?  Is it needed ? when I get viss working,
-// I should know.
-// NO.  this is done in Incarnation::oneIteration()
-// shift the Im components of the old wave a half tick forward and store in newQWave.
-// if we're using visscher, we need to initialize waves with the
-// im component a half dt ahead.  This does it for newly created stuff, like set waves.
-// If not visscher, returns harmlessly.
-//void Incarnation::visscherHalfStep(qWave *newQWave, qWave *oldQWave) {
-//	qDimension *dims = dimensions;
-//	qCx *oldW = oldQWave->wave;
-//	qCx *newW = newQWave->wave;
-//
-//	// let's try moving the im forward dt/2 for the next wave.
-//	// the current wave here is corrupt (being at the same time re/im) so add new one
-//	double halfDt = dt / 2;
-//
-//	// fake stepReal() by just copying over the real values
-//	for (int ix = dims->start; ix < dims->end; ix++)
-//		newW[ix].re = oldW[ix].re;
-//
-//	stepImaginary(oldQWave->wave, newQWave->wave, halfDt);
-//	fixThoseBoundaries(newW);
-//}
 

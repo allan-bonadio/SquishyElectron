@@ -1,3 +1,7 @@
+/*
+** bugs -- bugs and wishlist items for Squishy Electron
+** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+*/
 
 ------------------------------------------- done
 - Emscripten engine in C - definitely

@@ -1,5 +1,5 @@
 /*
-** q Engine - main interface in JS to the quantumEngine
+** q Engine - main interface in JS to the quantumEngine in C++ and Emscripten
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 

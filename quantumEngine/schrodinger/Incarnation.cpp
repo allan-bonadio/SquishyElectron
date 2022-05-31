@@ -1,5 +1,5 @@
 /*
-** incarnation -- the integration and simulation of a quantum mechanical wave/space
+** Incarnation -- the instance and simulation of a quantum mechanical wave in a space
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
