@@ -1,12 +1,12 @@
 /*
-** timeline -- the integration and simulation of a quantum mechanical wave/space
+** incarnation -- the integration and simulation of a quantum mechanical wave/space
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 
-struct Timeline {
-	Timeline(qSpace *);
-	~Timeline(void);
+struct Incarnation {
+	Incarnation(qSpace *);
+	~Incarnation(void);
 
 	int magic;
 	qSpace *space;
@@ -62,12 +62,12 @@ struct Timeline {
 // for JS to call
 extern "C" {
 
-	qCx *Timeline_getWaveBuffer(void);
+	qCx *Incarnation_getWaveBuffer(void);
 	float *qViewBuffer_getViewBuffer();
-	double Timeline_getElapsedTime(void);
-	double Timeline_getIterateSerial(void);
+	double Incarnation_getElapsedTime(void);
+	double Incarnation_getIterateSerial(void);
 
-	void Timeline_oneIteration(void);
+	void Incarnation_oneIteration(void);
 
 
 	int manyRk2Steps(void);

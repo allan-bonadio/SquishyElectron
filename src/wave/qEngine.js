@@ -52,7 +52,7 @@ export const qeStartPromise = new Promise((succeed, fail) => {
 function qeDefineAccess() {
 	qe.createQEWaveFromCBuf = function createQEWaveFromCBuf() {
 		// make this thing which is the wave buffer, as a nice TypedArray of doubles (pairs making up cx numbers)
-		const wave = new Float64Array(window.Module.HEAPF64.buffer, qe.Timeline_getWaveBuffer(), 2 * qe.space.nPoints);
+		const wave = new Float64Array(window.Module.HEAPF64.buffer, qe.Incarnation_getWaveBuffer(), 2 * qe.space.nPoints);
 		qe.space.waveBuffer = qe.waveBuffer = wave;
 	}
 

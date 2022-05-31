@@ -1,5 +1,5 @@
 /*
-** timeline -- the integration and simulation of a quantum mechanical wave/space
+** incarnation -- the integration and simulation of a quantum mechanical wave/space
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
@@ -8,7 +8,7 @@
 #include <cfenv>
 
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Timeline.h"
+#include "../schrodinger/Incarnation.h"
 #include "../spaceWave/qWave.h"
 #include "../spaceWave/qViewBuffer.h"
 #include "../fourier/fftMain.h"
@@ -23,11 +23,11 @@ static bool traceJustInnerProduct = false;
 
 const double sNAN99999 = std::numeric_limits<double>::signaling_NaN();
 
-Timeline::Timeline(qSpace *sp)
+Incarnation::Incarnation(qSpace *sp)
 	: dt(sNAN99999), stepsPerIteration(100), lowPassDilution(0.5), space(sp),
 		magic('Mani'), pleaseFFT(false), isIterating(false) {
 
-	space->tline = this;  // until I get this straightened out
+	space->incarn = this;  // until I get this straightened out
 
 	mainQWave = new qWave(space);
 	scratchQWave = new qWave(space);
@@ -35,12 +35,12 @@ Timeline::Timeline(qSpace *sp)
 	resetCounters();
 };
 
-Timeline::~Timeline(void) {
+Incarnation::~Incarnation(void) {
 	delete mainQWave;
 	delete scratchQWave;
 };
 
-void Timeline::resetCounters(void) {
+void Incarnation::resetCounters(void) {
 	elapsedTime = 0.;
 	iterateSerial = 0;
 }
@@ -56,16 +56,15 @@ double getTimeDouble()
 }
 
 
-
 // does several visscher steps (eg 100 or 500)
 // actually does stepsPerIteration+1 steps; half steps at start and finish
-void Timeline::oneIteration() {
+void Incarnation::oneIteration() {
 	int ix;
 
 	printf("the ttime: %lf\n", getTimeDouble());
 
 	if (traceIteration)
-		printf("🚀 🚀 Timeline::oneIteration() - dt=%lf   stepsPerIteration=%d\n",
+		printf("🚀 🚀 Incarnation::oneIteration() - dt=%lf   stepsPerIteration=%d\n",
 			dt, stepsPerIteration);
 	isIterating = true;
 
@@ -112,7 +111,7 @@ void Timeline::oneIteration() {
 
 	iterateSerial++;
 
-	// printf("Timeline::oneIteration(): viewBuffer %ld and latestWave=%ld\n",
+	// printf("Incarnation::oneIteration(): viewBuffer %ld and latestWave=%ld\n",
 	// 	(long) viewBuffer, (long) latestWave);
 	//mainQWave = mainQWave;
 
@@ -146,7 +145,7 @@ void Timeline::oneIteration() {
 
 
 // user button to print it out now, or at end of the next iteration
-void Timeline::askForFFT(void) {
+void Incarnation::askForFFT(void) {
 	if (isIterating)
 		pleaseFFT = true;
 	else

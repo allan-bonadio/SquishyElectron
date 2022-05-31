@@ -166,7 +166,7 @@ export class qeSpace extends qeBasicSpace {
 		qe.completeNewSpace();
 
 		// the qSpace already has allocated a wave, wrap as a nice TypedArray of doubles (pairs making up cx numbers)
-// 		this.wave = new Float64Array(window.Module.HEAPF64.buffer, qe.Timeline_getWaveBuffer(), 2 * this.nPoints);
+// 		this.wave = new Float64Array(window.Module.HEAPF64.buffer, qe.Incarnation_getWaveBuffer(), 2 * this.nPoints);
 
 // 		let dim = dims[0];
 // 		this.start = dim.start;
@@ -176,7 +176,7 @@ export class qeSpace extends qeBasicSpace {
 
 		//qe.space.waveBuffer = qe.waveBuffer = wave;
 		//console.info(`the wave we're createQEWaveFromCBuf():`, wave);
-		this.qewave = new qeWave(this, qe.Timeline_getWaveBuffer());
+		this.qewave = new qeWave(this, qe.Incarnation_getWaveBuffer());
 		this.wave = this.qewave.wave;
 
 		//console.log(`🚀  qViewBuffer_getViewBuffer 176: 🛸`, qe.qViewBuffer_getViewBuffer());

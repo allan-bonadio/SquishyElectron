@@ -28,7 +28,7 @@ function setPT() {
 
 function clickOnFFR()
 {
-	qe.Timeline_askForFFT()
+	qe.Incarnation_askForFFT()
 }
 
 

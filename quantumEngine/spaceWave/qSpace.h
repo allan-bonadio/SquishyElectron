@@ -72,7 +72,7 @@ public:
 	qSpace(const char *label);
 	~qSpace(void);
 
-	struct Timeline *tline;
+	struct Incarnation *incarn;
 
 	// additional for space creation
 	void addDimension(int N, int continuum, const char *label);
@@ -98,7 +98,7 @@ public:
 	int nStates;
 	int nPoints;
 
-	// should this be part of the space or the timeline?
+	// should this be part of the space or the incarnation?
 	double *potential;
 
 

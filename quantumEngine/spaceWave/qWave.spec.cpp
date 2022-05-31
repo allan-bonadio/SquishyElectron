@@ -2,7 +2,7 @@
 //#include "../spaceWave/qCx.h"
 //#include <cmath>
 #include "qSpace.h"
-#include "../schrodinger/Timeline.h"
+#include "../schrodinger/Incarnation.h"
 #include "qWave.h"
 #include "../testing/cppuMain.h"
 

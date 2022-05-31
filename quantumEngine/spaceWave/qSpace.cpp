@@ -8,7 +8,7 @@
 //#include <ctime>
 #include <cstring>
 #include "qSpace.h"
-#include "../schrodinger/Timeline.h"
+#include "../schrodinger/Incarnation.h"
 #include "qWave.h"
 #include "qViewBuffer.h"
 #include "../fourier/fftMain.h"
@@ -50,7 +50,7 @@ qSpace::~qSpace(void) {
 	// these cached buffers need to go free
 	clearFreeBuffers();
 
-	delete tline;
+	delete incarn;
 
 //	printf("🚀 🚀 qSpace destructor done this= %p\n", (this));
 //	printf("🧨 🧨    made it this far, %s:%d  freeBufferList=%p\n", __FILE__, __LINE__, this->freeBufferList);
@@ -119,10 +119,10 @@ void qSpace::initSpace() {
 	tallyDimensions();
 
 	// this allocates the qwaves so must call this after sizes have been decided
-	tline = new Timeline(this);
+	incarn = new Incarnation(this);
 
 	// try out different formulas here.  Um, this is actually set manually in CP
-	tline->dt = 1. / (nStates * nStates);
+	incarn->dt = 1. / (nStates * nStates);
 	//double dt = dt = nStates * 0.02;  // try out different factors here
 
 	// used only for the RKs - therefore obsolete

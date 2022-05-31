@@ -4,7 +4,7 @@
 */
 
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Timeline.h"
+#include "../schrodinger/Incarnation.h"
 #include "../spaceWave/qWave.h"
 #include "qSpectrum.h"
 #include "fftMain.h"

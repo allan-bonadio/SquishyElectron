@@ -5,7 +5,7 @@
 
 
 #include "qSpace.h"
-#include "../schrodinger/Timeline.h"
+#include "../schrodinger/Incarnation.h"
 #include "qWave.h"
 #include "qViewBuffer.h"
 
@@ -44,9 +44,9 @@ float qViewBuffer::loadViewBuffer(void) {
 	if (debugViewBuffer) printf("📺 loadViewBuffer() starts: buffer = %p \n",
 		buffer);
 //	printf("qViewBuffer::loadViewBuffer space ptr %p\n", space);
-//	printf("qViewBuffer::loadViewBuffer mainQWave ptr %p\n", space->tline->mainQWave);
-	qWave *mainQWave = space->tline->mainQWave;
-//	printf("qViewBuffer::loadViewBuffer latestWave ptr %p\n", tline->mainQWave->wave);
+//	printf("qViewBuffer::loadViewBuffer mainQWave ptr %p\n", space->incarn->mainQWave);
+	qWave *mainQWave = space->incarn->mainQWave;
+//	printf("qViewBuffer::loadViewBuffer latestWave ptr %p\n", incarn->mainQWave->wave);
 	qCx *latestWave = mainQWave->wave;
 
 //	printf("qViewBuffer::loadViewBuffer space->nPoints %d\n", space->nPoints);
@@ -57,12 +57,12 @@ float qViewBuffer::loadViewBuffer(void) {
 	if (debugInDetail) {
 		printf("loadViewBuffer(P): thePotential=%p\n",
 			thePotential);
-		printf("loadViewBuffer(B): space->tline->mainQWave->wave=%p->%p->%p->%p\n",
+		printf("loadViewBuffer(B): space->incarn->mainQWave->wave=%p->%p->%p->%p\n",
 			this,
 			space,
-			space->tline->mainQWave,
-			space->tline->mainQWave->wave);
-		printf("loadViewBuffer(vb,lqw): buffer %p and tline->mainQWave->wave=%p\n",
+			space->incarn->mainQWave,
+			space->incarn->mainQWave->wave);
+		printf("loadViewBuffer(vb,lqw): buffer %p and incarn->mainQWave->wave=%p\n",
 			buffer, latestWave);
 		mainQWave->dumpWave("📺 at start of loadViewBuffer()");
 	}
@@ -138,7 +138,7 @@ void dumpViewBuffer(const char *title) {
 //	printf("dumpViewBuffer theSpace %p\n", theSpace);
 //	printf("dumpViewBuffer qViewBuffer ptr %p\n", theSpace->qViewBuffer);
 //	printf("dumpViewBuffer buffer %p\n", theSpace->qViewBuffer->buffer);
-	float *buffer = theSpace->tline->viewBuffer->buffer;
+	float *buffer = theSpace->incarn->viewBuffer->buffer;
 	printf("📺 The buffer = %p\n", buffer);
 	double prevRe = buffer[0];
 	double prevIm = buffer[1];
@@ -171,7 +171,7 @@ void dumpViewBuffer(const char *title) {
 		}
 	}
 	printf("    qViewBuffer::at end of dumpViewBuffer qViewBuffer=%p  qViewBuffer->buffer=%p  local buffer=%p\n",
-			theSpace->tline->viewBuffer, theSpace->tline->viewBuffer->buffer, buffer);
+			theSpace->incarn->viewBuffer, theSpace->incarn->viewBuffer->buffer, buffer);
 }
 
 

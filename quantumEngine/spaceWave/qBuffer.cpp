@@ -22,7 +22,7 @@ qFlick - object that owns a list of waves, and points to its space
 //#include <stdexcept>
 //#include <cmath>
 #include "qSpace.h"
-//#include "../schrodinger/Timeline.h"
+//#include "../schrodinger/Incarnation.h"
 #include "qBuffer.h"
 
 static bool traceNormalize = false;
@@ -271,10 +271,6 @@ double qBuffer::innerProduct(void) {
 	for (int ix = start; ix < end; ix++) {
 		qCx point = wave[ix];
 		sum += point.norm();
-
-//		double re = point.re;
-//		double im = point.im;
-//		sum += re * re + im * im;
 
 		//sum += wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im;
 // 		printf("innerProduct point %d (%lf,%lf) %lf\n", ix, wave[ix].re, wave[ix].im,
