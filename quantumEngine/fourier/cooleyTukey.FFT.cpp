@@ -11,7 +11,7 @@
 //#include <cmath>
 
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Manifestation.h"
+#include "../schrodinger/Timeline.h"
 #include "../spaceWave/qWave.h"
 #include "qSpectrum.h"
 #include "fftMain.h"

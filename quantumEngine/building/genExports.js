@@ -27,12 +27,12 @@ exportsSrc  = [
 
 
 	// gets
-	{name: 'Manifestation_getWaveBuffer', retType: 'number', args: []},
+	{name: 'Timeline_getWaveBuffer', retType: 'number', args: []},
 	{name: 'qSpace_getPotentialBuffer', retType: 'number', args: []},
 
 	// the qSpace ones act on theSpace in the c++ code
-	{name: 'Manifestation_getElapsedTime', retType: 'number', args: []},
-	{name: 'Manifestation_getIterateSerial', retType: 'number', args: []},
+	{name: 'Timeline_getElapsedTime', retType: 'number', args: []},
+	{name: 'Timeline_getIterateSerial', retType: 'number', args: []},
 
 	// the potential
 	{name: 'qSpace_dumpPotential', retType: 'number', args: ['string']},
@@ -40,12 +40,12 @@ exportsSrc  = [
 	{name: 'qSpace_setValleyPotential', retType: 'number', args: ['number', 'number', 'number']},
 
 	// params
-	{name: 'Manifestation_setDt', retType: null, args: ['number']},
-	{name: 'Manifestation_setStepsPerIteration', retType: null, args: ['number']},
-	{name: 'Manifestation_setLowPassDilution', retType: null, args: ['number']},
+	{name: 'Timeline_setDt', retType: null, args: ['number']},
+	{name: 'Timeline_setStepsPerIteration', retType: null, args: ['number']},
+	{name: 'Timeline_setLowPassDilution', retType: null, args: ['number']},
 
-	{name: 'Manifestation_oneIteration', retType: 'number', args: []},
-	{name: 'Manifestation_resetCounters', retType: null, args: []},
+	{name: 'Timeline_oneIteration', retType: 'number', args: []},
+	{name: 'Timeline_resetCounters', retType: null, args: []},
 
 	// views
 	{name: 'qViewBuffer_getViewBuffer', retType: 'number', args: []},
@@ -54,7 +54,7 @@ exportsSrc  = [
 
 	// FFT
  	//{name: 'testFFT', retType: null, args: []},
-	{name: 'Manifestation_askForFFT', retType: null, args: []},
+	{name: 'Timeline_askForFFT', retType: null, args: []},
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():

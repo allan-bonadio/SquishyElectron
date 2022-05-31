@@ -6,6 +6,11 @@
 // this is rewritten from cxToColor.glsl to be the JS implementation.
 // (I tried to automatically translate it but it was too hard.)
 
+// um... but we're not using qCx anywhere... yes we are...
+import qCx from '../wave/qCx';
+
+// sortof...
+export let aComplex = new qCx(1,1);
 
 const sqrtOneThird = Math.sqrt(1. / 3.);  // 0.57735..
 //const sqrtThreeOver2 = Math.sqrt(3.) / 2.;  // .8660...
@@ -14,7 +19,9 @@ const vec3 = (r, b, g) => `rgb(${(r*256).toFixed(0)},${(g*256).toFixed(0)},${(b*
 console.info(`vec3: `, vec3(.5, .5, .5), vec3(1, 1, 1), vec3(0, 0, 0), vec3(.6, .7, .8));
 
 // convert a complex number into a color, whose hue is based on the
-// complex phase of the number.  Piecewise linear.  Visualize a hexagon
+// complex phase of the number.  Input is a qCx object.
+
+// Piecewise linear.  Visualize a hexagon
 // 1+0i is on the far right, 0°, and is Red.  x is real part, y is imaginary part
 // 1/2 + √3/2i is Yellow at 60°; -1/2 + √3/2i is Green at 120°, and so on through the hues.
 // All result colors are opaque, and are at 100% saturation, except for zero, which is black.

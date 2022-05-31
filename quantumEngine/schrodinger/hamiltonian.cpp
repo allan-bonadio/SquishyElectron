@@ -5,7 +5,7 @@
 
 
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Manifestation.h"
+#include "../schrodinger/Timeline.h"
 
 
 // this is the slope, not the increment, so dt is irrelevant

@@ -4,7 +4,7 @@
 #include <cmath>
 //#include <cstdlib>
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Manifestation.h"
+#include "../schrodinger/Timeline.h"
 #include "../spaceWave/qWave.h"
 #include "qSpectrum.h"
 #include "../testing/cppuMain.h"

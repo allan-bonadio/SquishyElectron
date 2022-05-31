@@ -6,7 +6,7 @@
 
 
 #include "../spaceWave/qSpace.h"
-#include "Manifestation.h"
+#include "Timeline.h"
 #include "../spaceWave/qWave.h"
 
 
@@ -59,12 +59,12 @@ and for now omit the potential
 // newW points to buffer with real = ψr(t + dt)   imag unchanged = ψi(t + dt/2)
 // here we will calculate the ψr(t + dt) values in buffer 0 only, and fill them in.
 // the ψi values in buffer 0 are still uncalculated
-void Manifestation::stepReal(qCx *newW, qCx *oldW, double dt) {
+void Timeline::stepReal(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
 	//printf("⚛️ start of stepReal");
 	//dumpThatWave(oldW, true);
 	//printf("⚛︎ stepReal start N States=(%d), dt=%lf\n",
-	//	dims->nStates, mani->dt);
+	//	dims->nStates, tline->dt);
 
 	//printf("⚛︎ the hamiltonian 𝜓.re at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
@@ -89,7 +89,7 @@ void Manifestation::stepReal(qCx *newW, qCx *oldW, double dt) {
 
 // second step: advance the Imaginaries of 𝜓 a dt, from dt/2 to 3dt/2
 // given the reals we just generated in stepReal() but don't change them
-void Manifestation::stepImaginary(qCx *newW, qCx *oldW, double dt) {
+void Timeline::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
 	//printf("⚛︎ start of stepImaginary(), oldWave=");
 	//dumpThatWave(oldW, true);
@@ -122,7 +122,7 @@ void Manifestation::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 }
 
 // form the new wave from the old wave, in separate buffers, chosen by our caller.
-void Manifestation::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
+void Timeline::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
 	qWave *oldQW = oldQWave;
 	qCx *oldW = oldQWave->wave;
 	qWave *newQW = newQWave;
@@ -159,12 +159,12 @@ void Manifestation::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
 
 // can I make this useful?  Is it needed ? when I get viss working,
 // I should know.
-// NO.  this is done in Manifestation::oneIteration()
+// NO.  this is done in Timeline::oneIteration()
 // shift the Im components of the old wave a half tick forward and store in newQWave.
 // if we're using visscher, we need to initialize waves with the
 // im component a half dt ahead.  This does it for newly created stuff, like set waves.
 // If not visscher, returns harmlessly.
-//void Manifestation::visscherHalfStep(qWave *newQWave, qWave *oldQWave) {
+//void Timeline::visscherHalfStep(qWave *newQWave, qWave *oldQWave) {
 //	qDimension *dims = dimensions;
 //	qCx *oldW = oldQWave->wave;
 //	qCx *newW = newQWave->wave;

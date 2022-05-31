@@ -10,22 +10,22 @@ export function defineQEngineFuncs() {
 	qe.addSpaceDimension = cwrap('addSpaceDimension', 'number', ['number','number','string']);
 	qe.completeNewSpace = cwrap('completeNewSpace', 'number', []);
 	qe.deleteTheSpace = cwrap('deleteTheSpace', null, []);
-	qe.Manifestation_getWaveBuffer = cwrap('Manifestation_getWaveBuffer', 'number', []);
+	qe.Timeline_getWaveBuffer = cwrap('Timeline_getWaveBuffer', 'number', []);
 	qe.qSpace_getPotentialBuffer = cwrap('qSpace_getPotentialBuffer', 'number', []);
-	qe.Manifestation_getElapsedTime = cwrap('Manifestation_getElapsedTime', 'number', []);
-	qe.Manifestation_getIterateSerial = cwrap('Manifestation_getIterateSerial', 'number', []);
+	qe.Timeline_getElapsedTime = cwrap('Timeline_getElapsedTime', 'number', []);
+	qe.Timeline_getIterateSerial = cwrap('Timeline_getIterateSerial', 'number', []);
 	qe.qSpace_dumpPotential = cwrap('qSpace_dumpPotential', 'number', ['string']);
 	qe.qSpace_setZeroPotential = cwrap('qSpace_setZeroPotential', 'number', []);
 	qe.qSpace_setValleyPotential = cwrap('qSpace_setValleyPotential', 'number', ['number','number','number']);
-	qe.Manifestation_setDt = cwrap('Manifestation_setDt', null, ['number']);
-	qe.Manifestation_setStepsPerIteration = cwrap('Manifestation_setStepsPerIteration', null, ['number']);
-	qe.Manifestation_setLowPassDilution = cwrap('Manifestation_setLowPassDilution', null, ['number']);
-	qe.Manifestation_oneIteration = cwrap('Manifestation_oneIteration', 'number', []);
-	qe.Manifestation_resetCounters = cwrap('Manifestation_resetCounters', null, []);
+	qe.Timeline_setDt = cwrap('Timeline_setDt', null, ['number']);
+	qe.Timeline_setStepsPerIteration = cwrap('Timeline_setStepsPerIteration', null, ['number']);
+	qe.Timeline_setLowPassDilution = cwrap('Timeline_setLowPassDilution', null, ['number']);
+	qe.Timeline_oneIteration = cwrap('Timeline_oneIteration', 'number', []);
+	qe.Timeline_resetCounters = cwrap('Timeline_resetCounters', null, []);
 	qe.qViewBuffer_getViewBuffer = cwrap('qViewBuffer_getViewBuffer', 'number', []);
 	qe.qViewBuffer_loadViewBuffer = cwrap('qViewBuffer_loadViewBuffer', null, []);
 	qe.qViewBuffer_dumpViewBuffer = cwrap('qViewBuffer_dumpViewBuffer', null, ['string']);
-	qe.Manifestation_askForFFT = cwrap('Manifestation_askForFFT', null, []);
+	qe.Timeline_askForFFT = cwrap('Timeline_askForFFT', null, []);
 }
 
 window.defineQEngineFuncs = defineQEngineFuncs;  // just in case

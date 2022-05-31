@@ -5,7 +5,7 @@
 
 
 #include "../spaceWave/qSpace.h"
-#include "Manifestation.h"
+#include "Timeline.h"
 #include "../spaceWave/qWave.h"
 #include "../testing/cppuMain.h"
 
@@ -38,8 +38,8 @@ TEST(Visscher, VisscherOneStep)
 {
 	setCircularWave(oldWave4, 1.);
 
-	space4->mani->dt = 0.01;
-	space4->mani->oneVisscherStep(oldWave4, newWave4);
+	space4->tline->dt = 0.01;
+	space4->tline->oneVisscherStep(oldWave4, newWave4);
 
 	//newWave4->dumpWave("VisscherOneStep");
 	//expectedWave4->dumpHiRes("expectedWave4");
@@ -57,8 +57,8 @@ TEST(Visscher, VisscherOneIteration)
 	setCircularWave(oldWave4, 1.);
 
 	// simulate the app taking one iter = 100 steps
-	theSpace->mani->stepsPerIteration = 100;
-	theSpace->mani->oneIteration();
+	theSpace->tline->stepsPerIteration = 100;
+	theSpace->tline->oneIteration();
 
 
 

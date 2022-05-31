@@ -1,12 +1,12 @@
 /*
-** manifestation -- the integration and simulation of a quantum mechanical wave/space
+** timeline -- the integration and simulation of a quantum mechanical wave/space
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 
-struct Manifestation {
-	Manifestation(qSpace *);
-	~Manifestation(void);
+struct Timeline {
+	Timeline(qSpace *);
+	~Timeline(void);
 
 	int magic;
 	qSpace *space;
@@ -62,12 +62,12 @@ struct Manifestation {
 // for JS to call
 extern "C" {
 
-	qCx *Manifestation_getWaveBuffer(void);
+	qCx *Timeline_getWaveBuffer(void);
 	float *qViewBuffer_getViewBuffer();
-	double Manifestation_getElapsedTime(void);
-	double Manifestation_getIterateSerial(void);
+	double Timeline_getElapsedTime(void);
+	double Timeline_getIterateSerial(void);
 
-	void Manifestation_oneIteration(void);
+	void Timeline_oneIteration(void);
 
 
 	int manyRk2Steps(void);

@@ -22,7 +22,7 @@ qFlick - object that owns a list of waves, and points to its space
 //#include <stdexcept>
 //#include <cmath>
 #include "qSpace.h"
-//#include "../schrodinger/Manifestation.h"
+//#include "../schrodinger/Timeline.h"
 #include "qBuffer.h"
 
 static bool traceNormalize = false;

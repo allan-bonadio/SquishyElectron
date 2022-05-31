@@ -1,5 +1,5 @@
 /*
-** manifestation -- the integration and simulation of a quantum mechanical wave/space
+** timeline -- the integration and simulation of a quantum mechanical wave/space
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
@@ -8,7 +8,7 @@
 #include <cfenv>
 
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Manifestation.h"
+#include "../schrodinger/Timeline.h"
 #include "../spaceWave/qWave.h"
 #include "../spaceWave/qViewBuffer.h"
 #include "../fourier/fftMain.h"
@@ -23,11 +23,11 @@ static bool traceJustInnerProduct = false;
 
 const double sNAN99999 = std::numeric_limits<double>::signaling_NaN();
 
-Manifestation::Manifestation(qSpace *sp)
+Timeline::Timeline(qSpace *sp)
 	: dt(sNAN99999), stepsPerIteration(100), lowPassDilution(0.5), space(sp),
 		magic('Mani'), pleaseFFT(false), isIterating(false) {
 
-	space->mani = this;  // until I get this straightened out
+	space->tline = this;  // until I get this straightened out
 
 	mainQWave = new qWave(space);
 	scratchQWave = new qWave(space);
@@ -35,12 +35,12 @@ Manifestation::Manifestation(qSpace *sp)
 	resetCounters();
 };
 
-Manifestation::~Manifestation(void) {
+Timeline::~Timeline(void) {
 	delete mainQWave;
 	delete scratchQWave;
 };
 
-void Manifestation::resetCounters(void) {
+void Timeline::resetCounters(void) {
 	elapsedTime = 0.;
 	iterateSerial = 0;
 }
@@ -57,16 +57,15 @@ double getTimeDouble()
 
 
 
-
 // does several visscher steps (eg 100 or 500)
 // actually does stepsPerIteration+1 steps; half steps at start and finish
-void Manifestation::oneIteration() {
+void Timeline::oneIteration() {
 	int ix;
 
 	printf("the ttime: %lf\n", getTimeDouble());
 
 	if (traceIteration)
-		printf("🚀 🚀 Manifestation::oneIteration() - dt=%lf   stepsPerIteration=%d\n",
+		printf("🚀 🚀 Timeline::oneIteration() - dt=%lf   stepsPerIteration=%d\n",
 			dt, stepsPerIteration);
 	isIterating = true;
 
@@ -113,7 +112,7 @@ void Manifestation::oneIteration() {
 
 	iterateSerial++;
 
-	// printf("Manifestation::oneIteration(): viewBuffer %ld and latestWave=%ld\n",
+	// printf("Timeline::oneIteration(): viewBuffer %ld and latestWave=%ld\n",
 	// 	(long) viewBuffer, (long) latestWave);
 	//mainQWave = mainQWave;
 
@@ -147,7 +146,7 @@ void Manifestation::oneIteration() {
 
 
 // user button to print it out now, or at end of the next iteration
-void Manifestation::askForFFT(void) {
+void Timeline::askForFFT(void) {
 	if (isIterating)
 		pleaseFFT = true;
 	else

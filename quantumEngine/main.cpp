@@ -8,7 +8,7 @@
 //#include <cmath>
 
 #include "spaceWave/qSpace.h"
-#include "schrodinger/Manifestation.h"
+#include "schrodinger/Timeline.h"
 #include "fourier/fftMain.h"
 
 
