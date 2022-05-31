@@ -1,5 +1,5 @@
 # makefile for quantum engine
-xxxSOURCES = $(shell echo *.h *.cpp) building/exports.json
+#xxxSOURCES = $(shell echo *.h *.cpp) building/exports.json
 
 quantumEngine.js : *.cpp */*.h */*.cpp building/exports.json building/buildDev.sh building/allCpp.list
 	building/buildDev.sh
@@ -16,4 +16,4 @@ clean : quantumEngine.js quantumEngine.wasm
 
 
 test :
-	testing/runner.sh
+	testing/cppuRunner.sh
