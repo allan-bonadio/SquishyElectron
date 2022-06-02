@@ -24,8 +24,8 @@ static bool traceJustInnerProduct = false;
 const double sNAN99999 = std::numeric_limits<double>::signaling_NaN();
 
 Incarnation::Incarnation(qSpace *sp)
-	: dt(sNAN99999), stepsPerIteration(100), lowPassDilution(0.5), space(sp),
-		magic('Mani'), pleaseFFT(false), isIterating(false) {
+	: dt(sNAN99999), stepsPerIteration(100), lowPassDilution(0.5),
+		space(sp), magic('Inca'), pleaseFFT(false), isIterating(false) {
 
 	space->incarn = this;  // until I get this straightened out
 
@@ -69,7 +69,9 @@ void Incarnation::oneIteration() {
 	isIterating = true;
 
 	// half step in beginning to move Im forward dt/2
-	// cuz outside of here, re and im are for the same time
+	// cuz outside of here, re and im are for the same time.
+	// Note here the latest is in scratch; iterate continues this,
+	// and the halfwave at the end moves it back to main.
 	stepReal(scratchQWave->wave, mainQWave->wave, 0);
 	stepImaginary(scratchQWave->wave, mainQWave->wave, dt/2);
 
@@ -137,17 +139,17 @@ void Incarnation::oneIteration() {
 			stepsPerIteration, space->nStates, mainQWave->innerProduct());
 	}
 
-	//if (pleaseFFT) {
+	if (this->pleaseFFT) {
 		analyzeWaveFFT(mainQWave);
-		pleaseFFT = false;
-	//}
+		this->pleaseFFT = false;
+	}
 }
 
 
 // user button to print it out now, or at end of the next iteration
 void Incarnation::askForFFT(void) {
 	if (isIterating)
-		pleaseFFT = true;
+		this->pleaseFFT = true;
 	else
 		analyzeWaveFFT(mainQWave);
 }

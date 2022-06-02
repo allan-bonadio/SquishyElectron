@@ -47,6 +47,10 @@ struct qBuffer {
 	// should be in accord with the space, sortof, depending on whether wave or spectrum.
 	int nPoints; int start; int end, continuum;
 
+	// maximum magnitude of all the points in this buffer; calculated in .innerProduct()
+	// which is called by .normalize()
+	double maxNorm;
+
 	// if it used the first constructor
 	// this has, among other things, the count of points and states in all qWave buffers
 	// but for just a bare qBuffer, this can be null, for freelance buffers.
@@ -67,7 +71,7 @@ struct qBuffer {
 	void rainbowDump(const char *title = "a buffer");  // calls JS to do it
 
 	double innerProduct(void);
-	void normalize(void);
+	void normalize(void);  // returns inner product
 	void fixThoseBoundaries(qCx *targetWave);
 	void fixBoundaries(void) { fixThoseBoundaries(wave); }
 };

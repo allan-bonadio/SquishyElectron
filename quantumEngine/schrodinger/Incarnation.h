@@ -31,6 +31,8 @@ struct Incarnation {
 
 	struct qViewBuffer *viewBuffer;
 
+	// a result recalculated every iteration or so (?)
+	//double innerProduct;
 
 	// params that the user can set
 	double dt;
@@ -50,8 +52,12 @@ struct Incarnation {
 	void stepImaginary(qCx *newW, qCx *oldW, double dt);
 	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);  // obsolete
 
-	bool pleaseFFT;
 	bool isIterating;
+
+	// please do an FFT after the current iteration ends
+	bool pleaseFFT;
+
+	// set pleaseFFt from JS (only if in the middle of an iteration)
 	void askForFFT(void);
 
 };
@@ -66,6 +72,8 @@ extern "C" {
 	float *qViewBuffer_getViewBuffer();
 	double Incarnation_getElapsedTime(void);
 	double Incarnation_getIterateSerial(void);
+	double Incarnation_getMaxNorm(void);
+
 
 	void Incarnation_oneIteration(void);
 

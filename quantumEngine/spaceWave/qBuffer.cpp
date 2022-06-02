@@ -19,10 +19,7 @@ qFlick - object that owns a list of waves, and points to its space
 */
 
 #include "../squish.h"
-//#include <stdexcept>
-//#include <cmath>
 #include "qSpace.h"
-//#include "../schrodinger/Incarnation.h"
 #include "qBuffer.h"
 
 static bool traceNormalize = false;
@@ -90,6 +87,7 @@ void qBuffer::initBuffer(int length, qCx *useThisBuffer) {
 	}
 
 	nPoints = length;
+	maxNorm = 0;
 
 	// don't mess with these; subclass may have already set them
 	//start = end = -1;  // wave / spectrum calculates these differently
@@ -171,7 +169,7 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 		*pPrevPhase = phase;
 	}
 	else {
-		snprintf(buf,200, "[%d] (%8.4lf,%8.4lf)", ix, re, im);
+		snprintf(buf,200, "[%3d] (%8.4lf,%8.4lf)", ix, re, im);
 	}
 	return mag;
 }
@@ -263,14 +261,19 @@ void qSpace::fixThoseBoundaries(qCx *targetWave) {
 }
 
 
-// calculate ⟨𝜓 | 𝜓⟩  'inner product'.  Non-visscher.
+// calculate ⟨𝜓 | 𝜓⟩  'inner product'.  Non-visscher; do not use it during an iteration.
+// Also calculate maxNorm and save it in qBuffer object.
 double qBuffer::innerProduct(void) {
 	qCx *wave = this->wave;
 	double sum = 0.;
+	maxNorm = 0;
 
 	for (int ix = start; ix < end; ix++) {
 		qCx point = wave[ix];
-		sum += point.norm();
+		double norm = point.norm();
+		sum += norm;
+		if (maxNorm < norm)
+			maxNorm = norm;
 
 		//sum += wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im;
 // 		printf("innerProduct point %d (%lf,%lf) %lf\n", ix, wave[ix].re, wave[ix].im,

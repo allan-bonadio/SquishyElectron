@@ -30,9 +30,10 @@ exportsSrc  = [
 	{name: 'Incarnation_getWaveBuffer', retType: 'number', args: []},
 	{name: 'qSpace_getPotentialBuffer', retType: 'number', args: []},
 
-	// the qSpace ones act on theSpace in the c++ code
+	// the Incarnation ones act on theIncarn in the c++ code
 	{name: 'Incarnation_getElapsedTime', retType: 'number', args: []},
 	{name: 'Incarnation_getIterateSerial', retType: 'number', args: []},
+	{name: 'Incarnation_getMaxNorm', retType: 'number', args: []},
 
 	// the potential
 	{name: 'qSpace_dumpPotential', retType: 'number', args: ['string']},

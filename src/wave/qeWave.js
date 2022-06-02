@@ -111,14 +111,20 @@ class qeWave {
 
 	/* ********************************************************************** calculatons */
 
-	// calculate ⟨𝜓 | 𝜓⟩  'inner product'.  See also C++ function of same name.
+	// calculate ⟨𝜓 | 𝜓⟩  'inner product'.  Also calculate maxNorm; save it in qeWave.
+	// See also C++ function of same name.
 	innerProduct() {
 		const wave = this.wave;
 		const {start, end} = this.space.startEnd2;
 
-		let tot = 0;  // always real
-		for (let ix = start; ix < end; ix += 2)
-			tot += wave[ix] ** 2 + wave[ix + 1] ** 2;
+		let tot = 0, max = 0;  // always real
+		for (let ix = start; ix < end; ix += 2) {
+			let norm = wave[ix] ** 2 + wave[ix + 1] ** 2;
+			tot += norm;
+			if (norm > max)
+				max = norm;
+		}
+		this.maxNorm = max;
 		return tot;
 	}
 
@@ -127,14 +133,16 @@ class qeWave {
 		const wave = this.wave;
 
 		// now adjust it so the norm comes out 1
-		let t = this.innerProduct();
-		let factor = Math.pow(t, -.5);
+		let iProd = this.innerProduct();
+		let factor = Math.pow(iProd, -.5);
 
 		// treat ALL points, including border ones.
 		// And real and imaginary, go by ones
 		let {nPoints} = this.space.startEnd2;
 		for (let ix = 0; ix < nPoints; ix++)
 			wave[ix] *= factor;
+
+		return iProd
 	}
 
 	/* ********************************************************************** set wave */
@@ -155,8 +163,6 @@ class qeWave {
 			wave[ix + 1] = Math.sin(angle);
 		}
 
-		this.space.fixThoseBoundaries(wave);
-		this.normalize();
 		//this.dumpWave('qeWave.setCircularWave() done');
 		//this.rainbowDump('🌊  qeWave.setCircularWave() done');
 	}
@@ -183,8 +189,6 @@ class qeWave {
 			wave[ix + 1] = 0;
 		}
 
-		this.space.fixThoseBoundaries(wave);
-		this.normalize();
 		//this.dumpWave('qeWave.setStandingWave() done');
 		//this.rainbowDump('🌊  qeWave.setStandingWave() done');
 	}
@@ -212,8 +216,6 @@ class qeWave {
 			wave[ix + 1] *= stretch;
 		}
 
-		this.space.fixThoseBoundaries(wave);
-		this.normalize();
 		//this.dumpWave('qeWave.setPulseWave() done');
 		//this.rainbowDump('qeWave.setPulseWave() done');
 	}
@@ -260,8 +262,6 @@ class qeWave {
 		//
 		}
 
-		//		this.space.fixThoseBoundaries(wave);
-		//		this.normalize();
 		//		//this.dumpWave('qeWave.setPulseWave() done');
 		//this.rainbowDump('qeWave.setChordWave() done');
 	}
@@ -286,6 +286,9 @@ class qeWave {
 			this.setChordWave(+waveParams.waveFrequency, +waveParams.stdDev, +waveParams.pulseOffset);
 			break;
 		}
+
+		this.normalize();
+		this.space.fixThoseBoundaries(this.wave);
 	}
 }
 

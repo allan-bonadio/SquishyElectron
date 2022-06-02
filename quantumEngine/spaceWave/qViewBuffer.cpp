@@ -14,9 +14,6 @@ static const bool debugInDetail = false;
 
 // August Ferdinand Möbius invented homogenous coordinates
 
-// 'the' being the only one sometimes.  set in jsSpace completeNewSpace
-qViewBuffer *theQViewBuffer;
-
 qViewBuffer::qViewBuffer(qSpace *space)
 	: space(space){
 	if (! space)
@@ -34,7 +31,7 @@ qViewBuffer::~qViewBuffer() {
 	delete[] buffer;
 }
 
-// copy the numbers in our space's qWave into buffer
+// copy the numbers in our incarnation's qWave into buffer
 // one row per vertex, two rows per wave datapoint.
 // each row of 4 floats looks like this:
 //     real   imaginary    potential    serial

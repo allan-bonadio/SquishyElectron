@@ -13,6 +13,17 @@
 
 static bool traceSpaceCreation = false;
 
+
+// 'the' globals are for the one and only SquishPanel being displayed on this
+// curent, preliminary version of SquishyElectron.  Along with various other
+// important objects.  Someday we'll get the JS to hold these.
+class qSpace *theSpace = NULL;
+double *thePotential = NULL;
+class Incarnation *theIncarn;
+qViewBuffer *theQViewBuffer;
+
+
+
 /* ********************************************************** wave stuff */
 
 // after the initSpace() call, allocate the buffers.
@@ -103,6 +114,12 @@ double Incarnation_getIterateSerial(void) {
 	return theSpace->incarn->iterateSerial;
 }
 
+double Incarnation_getMaxNorm(void) {
+	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in Incarnation_getMaxNorm()");
+	return theSpace->incarn->mainQWave->maxNorm;
+}
+
+
 void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
 void qSpace_setZeroPotential(void) { theSpace->setZeroPotential(); }
 void qSpace_setValleyPotential(double power, double scale, double offset) {
@@ -142,6 +159,7 @@ void Incarnation_setLowPassDilution(double dilution) {
 void Incarnation_oneIteration(void) { theSpace->incarn->oneIteration(); }
 void Incarnation_resetCounters(void) { theSpace->incarn->resetCounters(); }
 
+// if iterating, FFT after the current iterate finishes.  If stopped, fft current wave.
 void Incarnation_askForFFT(void) { theSpace->incarn->askForFFT(); }
 
 
@@ -192,6 +210,7 @@ qSpace *completeNewSpace(void) {
 
 	// finish up all the dimensions now that we know them all
 	theSpace->initSpace();
+	theIncarn = theSpace->incarn;
 	//printf("did initSpace\n");
 
 	/* *********************************** allocate waves */

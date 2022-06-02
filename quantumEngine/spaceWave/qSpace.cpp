@@ -13,9 +13,6 @@
 #include "qViewBuffer.h"
 #include "../fourier/fftMain.h"
 
-class qSpace *theSpace = NULL;
-double *thePotential = NULL;
-
 
 
 static bool traceFreeBuffer = false;
