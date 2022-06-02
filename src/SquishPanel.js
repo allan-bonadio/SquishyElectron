@@ -26,11 +26,13 @@ import flatViewDef from './view/flatViewDef';
 import flatDrawingViewDef from './view/flatDrawingViewDef';
 import drawingViewDef from './view/drawingViewDef';
 
+import storeSettings from './utils/storeSettings';
+
 import {setFamiliarPotential} from './widgets/utils';
 
 // runtime debugging flags - you can change in the debugger or here
 let areBenchmarking = true;
-let dumpingTheViewBuffer = false;
+let dumpingTheViewBuffer = true;
 
 
 
@@ -41,7 +43,8 @@ export const listOfViewClassNames = {
 	flatViewDef,
 
 	drawingViewDef,
-	flatDrawingViewDef, };
+	flatDrawingViewDef,
+};
 
 
 const DEFAULT_VIEW_CLASS_NAME =
@@ -52,12 +55,7 @@ const DEFAULT_VIEW_CLASS_NAME =
 //'flatViewDef';
 'flatDrawingViewDef';
 
-//const DEFAULT_RESOLUTION = 100;
-//const DEFAULT_RESOLUTION = 60;
-//const DEFAULT_RESOLUTION = 25;
-const DEFAULT_RESOLUTION = 32;
-//const DEFAULT_RESOLUTION = 5;
-//const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 25;
+const DEFAULT_RESOLUTION = 64;
 const DEFAULT_CONTINUUM = qeBasicSpace.contENDLESS;
 
 const defaultWaveParams = {
@@ -80,12 +78,6 @@ export class SquishPanel extends React.Component {
 		////showResolutionDialog: PropTypes.func.isRequired,
 	};
 
-	// if you subclass abstractViewDef, call this to join the 'in' crowd
-	// and be listed
-	//static addMeToYourList(aViewClass) {
-	//listOfViewClassNames[aViewClass.viewClassName] = aViewClass;
-	//}
-
 	static getListOfViews() {
 		return listOfViewClassNames;
 	}
@@ -94,19 +86,17 @@ export class SquishPanel extends React.Component {
 	constructor(props) {
 		super(props);
 
+		const space0 = storeSettings.retrieveSettings('space0');
+
 		this.state = {
 			// THE N and continuum for THE space we're currently doing
-			N: DEFAULT_RESOLUTION,
-			continuum: DEFAULT_CONTINUUM,
+			N: storeSettings.ratify(space0.N, DEFAULT_RESOLUTION, [4,8,16,32,64,128,256,502,1024]),
+			continuum: storeSettings.ratify(space0.N, DEFAULT_CONTINUUM,
+				[qeBasicSpace.contDISCRETE, qeBasicSpace.contWELL, qeBasicSpace.contENDLESS]),
 			viewClassName: DEFAULT_VIEW_CLASS_NAME,
 
 			// the qeSpace
 			space: null,  // set in setNew1DResolution()
-			// space: new qeSpace([{
-			// 	N: DEFAULT_RESOLUTION,
-			// 	continuum: qeBasicSpace.contENDLESS,
-			// 	label: 'x', coord: 'x'
-			// }]),
 
 			// see the view dir
 			currentView: null,
@@ -124,8 +114,11 @@ export class SquishPanel extends React.Component {
 			stepsPerIteration: 100,
 			lowPassDilution: .02,
 
+			// advance forward with each iter
 			runningCycleElapsedTime: 0,
-			runningCycleElapsedSerial: 0,
+			runningCycleIterateSerial: 0,
+
+			canvasSize: {width: 800, height: 400}
 		};
 
 		// never changes once set
@@ -147,8 +140,8 @@ export class SquishPanel extends React.Component {
 		qeStartPromise.then((arg) => {
 			// done in qEngine qeDefineAccess();
 
-			this.setNew1DResolution(
-				DEFAULT_RESOLUTION, DEFAULT_CONTINUUM, DEFAULT_VIEW_CLASS_NAME);
+			const s = this.state;
+			this.setNew1DResolution(s.N, s.continuum, s.viewClassName);
 
 			// vital properties of the space
 			qe.Incarnation_setDt(this.state.dt);
@@ -223,6 +216,8 @@ export class SquishPanel extends React.Component {
 				this.setNew1DResolution(
 					finalParams.N, finalParams.continuum, finalParams.viewClassName);
 				this.setState({isTimeAdvancing: timeWasAdvancing});
+
+				localStorage.space0 = JSON.stringify({N: finalParams.N, continuum: finalParams.continuum});
 			},
 
 			// cancel callback
@@ -240,18 +235,19 @@ export class SquishPanel extends React.Component {
 		document.querySelector('.voNorthEast').innerHTML = qe.Incarnation_getIterateSerial();
 	}
 
-	// take one integration iteration
+	// do one integration iteration
 	crunchOneIteration() {
 		// (actually many visscher steps)
 		qe.Incarnation_oneIteration();
 
 		//qe.createQEWaveFromCBuf();
 
+		console.info(`📶  Incarnation_getMaxNorm=`, qe.Incarnation_getMaxNorm());
 		if (dumpingTheViewBuffer)
 			this.dumpViewBuffer('crunchOneIteration()');
 	}
 
-	// Integrate the ODEs by one 'step', or not.  and then display.
+	// Integrate the ODEs by one 'iteration', or not.  and then display.
 	// called every so often in animateHeartbeat() so it's called as often as the menu setting says
 	// so if needsRepaint false or absent, it'll only repaint if an iteration has been done.
 	iterateOneIteration(isTimeAdvancing, needsRepaint) {
@@ -367,7 +363,7 @@ export class SquishPanel extends React.Component {
 
 					this.setState({
 						runningCycleElapsedTime: qe.Incarnation_getElapsedTime() - this.runningCycleStartingTime,
-						runningCycleElapsedSerial: qe.Incarnation_getIterateSerial() - this.runningCycleStartingSerial,
+						runningCycleIterateSerial: qe.Incarnation_getIterateSerial() - this.runningCycleStartingSerial,
 					});
 
 					this.goingDown = false;
@@ -393,7 +389,7 @@ export class SquishPanel extends React.Component {
 
 		// you can turn this on in the debugger anytime
 		return <div className='runningOneCycle' style={{display: 'block'}}>
-			<span>total iterations: {s.runningCycleElapsedSerial.toFixed(0)} &nbsp;
+			<span>total iterations: {s.runningCycleIterateSerial.toFixed(0)} &nbsp;
 				elapsed vtime: {s.runningCycleElapsedTime.toFixed(3)} &nbsp;</span>
 			<button onClick={this.startRunningOneCycle}>start running 1 cycle</button>
 		</div>
@@ -520,7 +516,8 @@ export class SquishPanel extends React.Component {
 		return (
 			<div className="SquishPanel">
 				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
-				<SquishView setGLCanvas={canvas => this.setGLCanvas(canvas)} />
+				<SquishView setGLCanvas={canvas => this.setGLCanvas(canvas)}
+					width={s.canvasSize.width} height={s.canvasSize.height}/>
 				<ControlPanel
 					iterateAnimate={(shouldAnimate, freq) => this.iterateAnimate(shouldAnimate, freq)}
 					isTimeAdvancing={s.isTimeAdvancing}
@@ -554,6 +551,3 @@ export class SquishPanel extends React.Component {
 
 export default SquishPanel;
 
-// do these work?  becha not.
-//SquishPanel.addMeToYourList(abstractViewDef);
-//SquishPanel.addMeToYourList(flatViewDef);

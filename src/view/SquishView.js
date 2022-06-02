@@ -19,7 +19,10 @@ import './view.scss';
 export class SquishView extends React.Component {
 	static propTypes = {
 //		innerActiveWidth: PropTypes.number,
-	setGLCanvas: PropTypes.func,
+		setGLCanvas: PropTypes.func,
+
+		height: PropTypes.number,
+		widrh: PropTypes.number
 	};
 
 	constructor(props) {
@@ -27,14 +30,13 @@ export class SquishView extends React.Component {
 
 		this.state = {
 //			vertPotStretch: INITIAL_POT_STRETCH
-			width: 800,
-			height: 400,
+// 			width: 800,
+// 			height: 400,
 		};
 	}
 
-
 	render() {
-		const s = this.state;
+		const p = this.props;
 
 		// if c++ isn't initialized yet, we can assume the time and frame serial
 		let et = '0';
@@ -51,8 +53,7 @@ export class SquishView extends React.Component {
 		// voNorthWest/East are populated during drawing, so this here is just for yucks
 		return (<div className='SquishView' >
 			<aside className='viewOverlay'
-				style={{width: `${s.width}px`, height: `${s.height}px`}}>
-
+				style={{width: `${p.width}px`, height: `${p.height}px`}}>
 
 				<div className='northWestWrapper'>
 					<span className='voNorthWest'>{et}</span> ps
@@ -64,17 +65,11 @@ export class SquishView extends React.Component {
 				{spinner}
 			</aside>
 			<canvas className='squishCanvas'
-				width={s.width} height={s.height}
+				width={p.width} height={p.height}
 				ref={element => this.props.setGLCanvas(element)}
-				style={{width: `${s.width}px`, height: `${s.height}px`}}>
+				style={{width: `${p.width}px`, height: `${p.height}px`}}>
 			</canvas>
 		</div>);
-
-		// , border: '1px #aaa solid'
-
-	}
-
-	componentDidMount() {
 	}
 }
 
