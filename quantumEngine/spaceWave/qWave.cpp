@@ -114,7 +114,6 @@ void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
 void qWave::dumpThatWave(qCx *wave, bool withExtras) {
 	//printf("🌊🌊 any wave, probably shouldn't call this\n");
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
-	//space->dumpThatWave(wave, withExtras);
 }
 
 // this is the member function that dumps its own wave and space

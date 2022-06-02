@@ -7,10 +7,8 @@
 #include "../spaceWave/qSpace.h"
 #include "../schrodinger/Incarnation.h"
 
-# not used right now, hopefullly soon
+// not used right now, hopefullly soon
 
-// this is the slope, not the increment, so dt is irrelevant
-//double DEFAULT_DT = 0.1;
 
 // this is only for continuum dimension.  Ultimately, these should be per-dimension,
 // and each dimension should have a function that does the honors.

@@ -54,7 +54,7 @@ void analyzeWaveFFT(qWave *original) {
 			: "null original in analyzeWaveFFT");
 	qSpectrum *spect = new qSpectrum(original->space, NULL);
 	spect->generateSpectrum(original);
-	spect->dumpSpectrum("🌈 analyzeWaveFFT: generated spectrum");
+	spect->dumpSpectrum("🌈  spectrum");
 	delete spect;
 }
 

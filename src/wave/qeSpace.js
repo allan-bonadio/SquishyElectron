@@ -6,7 +6,7 @@ import qe from './qe';
 import qeWave from './qeWave';
 import {setFamiliarPotential, getWrappedPotential} from '../widgets/utils';
 
-let debugSpace = true;
+let debugSpace = false;
 
 
 const _ = num => num.toFixed(4).padStart(9);
