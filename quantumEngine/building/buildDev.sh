@@ -19,7 +19,7 @@ cd ..
 
 # https://emscripten.org/docs/tools_reference/emcc.html
 emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
-	-gsource-map --source-map-base \
+	-gsource-map --source-map-base / \
 	-sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 \
 	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \
 	-sEXPORTED_FUNCTIONS=@building/exports.json \
@@ -29,8 +29,10 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-include emscripten.h \
 	main.cpp $allCpp || exit 99
 # changed -g to -g4 to -gsource-map --source-map-base
+#  --source-map-base expects an arg so I put the wasm.map file name
+#  --source-map-base quantumEngine.wasm.map
 
-cp quantumEngine.wasm quantumEngine.js ../public
+cp quantumEngine.wasm quantumEngine.js quantumEngine.wasm.map ../public
 
 exit $?
 
