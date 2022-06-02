@@ -196,7 +196,7 @@ export class ControlPanel extends React.Component {
 					<li  className={s.showingTab == 'potential' ? 'selected' : ''} key='potential'
 						onClick={ev => this.setState({showingTab: 'potential'})}>Potential</li>
 					<li  className={s.showingTab == 'resolution' ? 'selected' : ''} key='resolution'
-						onClick={ev => this.setState({showingTab: 'resolution'})}>Universe</li>
+						onClick={ev => this.setState({showingTab: 'resolution'})}>Space</li>
 				</ul>
 				<div className='tabFrame'>
 					{showingTabHtml}
