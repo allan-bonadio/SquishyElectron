@@ -24,7 +24,11 @@ export class abstractViewDef {
 		this.canvas = canvas;
 		this.initCanvas();
 
-		this.space = space;  // optional
+		this.space = space;
+
+		// all of the drawings in this view
+		// they get prepared, and drawn, in this same order
+		this.drawings = [];
 
 		// really a global, for this file and all descenden tviews and drawings
 		// and variables, so this is how you turn this one way
@@ -43,6 +47,7 @@ export class abstractViewDef {
 
 		if (!gl) throw `Sorry this browser doesn't do WebGL!  You might be able to turn it on ...`;
 		this.gl = gl;
+
 		/*
 		Can be enabled in Firefox by setting the about:config preference
 		webgl.enable-prototype-webgl2 to true
@@ -139,8 +144,22 @@ export class abstractViewDef {
 		throw `Error linking program for ${this.viewName}: ${msg}`;
 	}
 
-	// abstract supermethod: write your setShaders() function to compile your two GLSL sources
+	// this does shaders and inputs, iterating thru the list of drawings
 	setShaders() {
+		//console.log('setShaders drawings', this.drawings);
+		//console.dir(this.drawings);
+
+		this.drawings.forEach(drawing => {
+			//console.log('drawing.setShaders', drawing);
+			//console.dir(drawing);
+
+			drawing.setShaders();
+		});
+	}
+
+
+	// wrong: abstract supermethod: write your setShaders() function to compile your two GLSL sources
+	originalSetShaders() {
 		this.vertexShaderSrc = `
 		attribute vec4 corner;
 
@@ -162,9 +181,22 @@ export class abstractViewDef {
 	}
 
 	/* ************************************************** buffers & variables */
-	// abstract supermethod: all subclasses should write their own setInputs() method.
-	// mostly, creating viewVariables that can be dynamically changed
 	setInputs() {
+		//console.log('setInputs drawings', this.drawings);
+		//console.dir(this.drawings);
+
+		this.drawings.forEach(drawing => {
+			//console.log('drawing.setInputs', drawing);
+			//console.dir(drawing);
+
+			drawing.setInputs();
+		});
+	}
+
+
+	// wrong: abstract supermethod: all subclasses should write their own setInputs() method.
+	// mostly, creating viewVariables that can be dynamically changed
+	originalSetInputs() {
 //		const {gl, canvas} = this;
 
 		new viewUniform('cornerColor', this,
@@ -185,9 +217,7 @@ export class abstractViewDef {
 		]);
 		cornerAttr.attachArray(corners, 2);
 
-//		also try gl.DYNAMIC_DRAW here
-//		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), this.bufferDataDrawMode);
-//
+// i think this is for webgl 2:
 //		var vao = this.vaoExt.createVertexArrayOES();
 //		this.vaoExt.bindVertexArrayOES(vao);
 //		this.vao = vao;
@@ -219,8 +249,26 @@ export class abstractViewDef {
 	}
 
 	/* ************************************************** drawing */
-	// abstract supermethod: another dummy submethod... write yer  own
+
+	// this should be made pluggable at some point...
+	drawBackground() {
+		const gl = this.gl;
+
+		// solid opaque black
+		gl.clearColor(0, 0, 0, 1);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+	}
+
 	draw() {
+		this.drawBackground();
+
+		this.drawings.forEach(drawing => {
+			drawing.draw();
+		});
+	}
+
+	// abstract supermethod: another dummy submethod... write yer  own
+	originaDraw() {
 		const gl = this.gl;
 
 		gl.clearColor(0, 0, 0, 0);
@@ -240,11 +288,14 @@ export class abstractViewDef {
 	/* ************************************************** dom interactivity */
 
 	domSetup(canvas) {
-		console.log(`abstract viewdef does an abstract domSetup.`)
+		this.drawings.forEach(drawing => {
+			drawing.domSetup(canvas);
+		});
+
 	}
 
+	/* ******************************************************* debugging tips  */
 
-	/* ************************************************** debugging */
 //	debug1() {
 //		const gl = this.gl
 //
@@ -277,6 +328,9 @@ export class abstractViewDef {
 //		console.log(`--- available GL extensions:\n${available_extensions.join('\n')}`);
 //	}
 
+	/* ********************************************************************************************************  */
+	/* ************************************************** you can ignore the rest except for the very bottom */
+	/* ********************************************************************************************************  */
 	/* ************************************* crawling out of the wreckage */
 	// pass in the actual DOM element.
 	// do EXACTLY THE SAME as
@@ -286,7 +340,7 @@ export class abstractViewDef {
 		vd.cftw(canvas);
 	}
 
-//CFTW
+	//CFTW - crawl from the wreckage - the result of some disaster where i couldn't get gl going again...
 	cftw(canvas) {
 		var gl;
 		if (false) {
@@ -426,8 +480,6 @@ export class abstractViewDef {
 
 
 //CFTW
-
-
 
 
 

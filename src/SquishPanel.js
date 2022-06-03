@@ -24,7 +24,7 @@ import manualViewDef from './view/manualViewDef';
 import viewVariableViewDef from './view/viewVariableViewDef';
 import flatViewDef from './view/flatViewDef';
 import flatDrawingViewDef from './view/flatDrawingViewDef';
-import drawingViewDef from './view/drawingViewDef';
+//import drawingViewDef from './view/drawingViewDef';
 
 import storeSettings from './utils/storeSettings';
 
@@ -32,7 +32,7 @@ import {setFamiliarPotential} from './widgets/utils';
 
 // runtime debugging flags - you can change in the debugger or here
 let areBenchmarking = true;
-let dumpingTheViewBuffer = true;
+let dumpingTheViewBuffer = false;
 
 
 
@@ -42,7 +42,7 @@ export const listOfViewClassNames = {
 	manualViewDef, abstractViewDef, viewVariableViewDef,
 	flatViewDef,
 
-	drawingViewDef,
+	//drawingViewDef,
 	flatDrawingViewDef,
 };
 
@@ -155,7 +155,7 @@ export class SquishPanel extends React.Component {
 			// use this.currentView rather than state.currentView - we just set it
 			// and it takes a while.
 			// Make sure you call the new view's domSetup method.
-			this.currentView.domSetup(this.canvas);
+			this.curView.domSetup(this.canvas);
 		}).catch(ex => {
 			console.error(`error in SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
 			debugger;
@@ -179,11 +179,10 @@ export class SquishPanel extends React.Component {
 
 	// init or re-init the space and the panel
 	setNew1DResolution(N, continuum, viewClassName) {
-		qe.theCurrentView =  null;
-
 		qe.space = new qeSpace([{N, continuum, label: 'x'}], defaultWaveParams, defaultPotentialParams);
 
-		// now create the view class instance as described by the space
+		// now create the draw view class instance as described by the space
+		// this is the flatDrawingViewDef class, not a CSS class or React class component
 		const vClass = listOfViewClassNames[viewClassName];
 		if (! vClass)
 			throw `no vClass! see for yerself! ${JSON.stringify(listOfViewClassNames)}`;
@@ -193,10 +192,6 @@ export class SquishPanel extends React.Component {
 
 		// we've now got a qeSpace etc all set up
 		this.setState({N, continuum, space: qe.space, currentView});
-		this.currentView = currentView;  // this set before the setState finishes
-
-		// kinda paranoid?  this should be deprecated.
-		qe.theCurrentView = currentView;
 	}
 
 	// puts up the resolution dialog, starting with the values from this.state
@@ -274,7 +269,7 @@ export class SquishPanel extends React.Component {
 			this.endReloadVarsBuffers = performance.now();
 
 			// draw
-			qe.theCurrentView.draw();
+			this.curView.draw();
 
 			// populate the on-screen numbers
 			this.showTimeNIteration();
