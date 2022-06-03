@@ -261,7 +261,6 @@ export class SquishPanel extends React.Component {
 		// or if this is a one shot step
 		this.startReloadVarsBuffers = performance.now();
 		if (needsRepaint) {
-			// reload all variables
 			this.curView.reloadAllVariables();
 
 			// copy from latest wave to view buffer (c++)
@@ -269,6 +268,7 @@ export class SquishPanel extends React.Component {
 			this.endReloadVarsBuffers = performance.now();
 
 			// draw
+			this.curView.setInputs();
 			this.curView.draw();
 
 			// populate the on-screen numbers

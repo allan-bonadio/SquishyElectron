@@ -10,36 +10,7 @@ import {viewUniform, viewAttribute} from './viewVariable';
 //import SquishPanel from '../SquishPanel';
 //import {qeStartPromise} from '../wave/qEngine';
 
-let debug = false;
-
-/* ******************************************************* unit height management */
-
-// wait, do I need this?  what if I try without any scaling, just fixed.
-
-// adjust the target unitHeight.  The currentUnitHeight will relax to the target value.
-export function adjustUnitHeight(highest) {
-	const highestHeight = highest * this.targetUnitHeight;
-	if (highestHeight > 1.)
-		this.targetUnitHeight /= 2;
-	else if (highestHeight < .25)
-		this.targetUnitHeight *= 2;
-}
-
-export function coastUnitHeight() {
-	if (this.curUnitHeight != this.targetUnitHeight) {
-		if (Math.abs((this.curUnitHeight - this.targetUnitHeight) / this.targetUnitHeight) < .01) {
-			//ok we're done.  close enough.
-			this.curUnitHeight = this.targetUnitHeight;
-			//this.onceMore = true;  // just to make sure it paints
-			return;
-		}
-
-		// exponential relaxation towards the target
-		this.curUnitHeight = (15 * this.curUnitHeight + this.targetUnitHeight) / 16;
-	}
-}
-
-
+let dumpViewBufAfterDrawing = false;
 
 /* ******************************************************* flat drawing */
 
@@ -129,8 +100,12 @@ class flatDrawing extends abstractDrawing {
 		barWidthUniform.setValue(barWidth, '1f');
 
 		let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
-		let nStates = this.nStates = this.space ? this.space.nStates : 10;
-		this.unitHeight = nStates / 4;
+
+		// a bit crude but.. scale it based on the max magnitude of the wave as it is now
+		let maxNorm = qe.Incarnation_getMaxNorm();
+		this.unitHeight = 1. / maxNorm;
+// 		let nStates = this.nStates = this.space ? this.space.nStates : 10;
+// 		this.unitHeight = nStates / 4;
 		unitHeightUniform.setValue(this.unitHeight, '1f');
 
 		this.rowAttr = new viewAttribute('row', this);
@@ -161,13 +136,9 @@ class flatDrawing extends abstractDrawing {
 		if (alsoDrawPoints)
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 
-		if (debug)
+		if (dumpViewBufAfterDrawing)
 			qe.qViewBuffer_dumpViewBuffer(`finished drawing in flatDrawing.js; drew buf:`);
 	}
-
-
-	adjustUnitHeight = adjustUnitHeight;
-	coastUnitHeight = coastUnitHeight;
 }
 
 export default flatDrawing;
