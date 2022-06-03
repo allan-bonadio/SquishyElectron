@@ -8,6 +8,7 @@ import {viewUniform, viewAttribute} from './viewVariable';
 // superclass of all drawings.  A drawing is a piece of code that draws one thing on
 // a GL canvas.  It's got v&f shaders, a source of data, and a Draw function.
 // But it does NOT own the canvas or gl object - that's shared among all drawings on a view.
+// THat's why drawings are not the same thing as ViewDefs: a viewDef has zero or more drawings.
 export class abstractDrawing {
 	static drawingName: 'abstractDrawing';
 
@@ -106,7 +107,7 @@ export class abstractDrawing {
 	// abstract supermethod: all subclasses should write their own setInputs() method.
 	// mostly, creating viewVariables that can be dynamically changed
 	setInputs() {
-		// gotta have at least one attr?
+		// gotta have at least one attr?  this is just a dummy.
 		this.aPointAttr = new viewAttribute('aPoint', this);
 		this.aPoint = new Float32Array([0, 0, 0., 1.]);
 		this.aPointAttr.attachArray(this.aPoint, 4);
