@@ -1,10 +1,10 @@
 /*
-** q Engine - main interface in JS to the quantumEngine
+** q Engine - main interface in JS to the quantumEngine in C++ and Emscripten
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 import {qe, defineQEngineFuncs} from './qe';
-import qCx from './qCx';
+// import qCx from './qCx';
 //import qeWave from './qeWave';
 //import qeSpace from './qeSpace';
 
@@ -33,83 +33,38 @@ function quantumEngineHasStarted(mDimensions, mLabel) {
 	//console.log(`quantumEngineHasStarted:  resolving qeStartPromise`);
 	qeStartPromiseSucceed({mDimensions, mLabel});
 };
+
+// this is how enscripten/C++ gets to it
 window.quantumEngineHasStarted = quantumEngineHasStarted;
 
+
+// this resolves when emscripten starts up.
+// Also, importing this (in SquishPanel) guarantees this file is included in the build!
 export const qeStartPromise = new Promise((succeed, fail) => {
 	qeStartPromiseSucceed = succeed;
 	//console.info(`qeStartPromise created:`, succeed, fail);
 });
 
 
-/* ****************************************************** space buffer */
-// see qeSpace.js
-
 /* ***************************************** data access */
 
-// must be called after qe is created
-//function qeDefineAccess() {
-//	// tune into the most recently used wave and potential buffers
-//	qe.latestWave = function latestWave() {
-//		qe.latestWaveBuffer = qe.qSpace_getWaveBuffer();
-//	}
-//
-//	// get the complex wave value at this point
-//	qe.get1DWave = function get1DWave(ix) {
-//		const vPtr = qe.latestWaveBuffer + 8*2*ix;
-//		return qCx(
-//			Module.getValue(vPtr, 'double'),
-//			Module.getValue(vPtr + 8, 'double')
-//		);
-//	}
-//
-//	qe.set1DWave = function set1DWave(ix, 𝜓) {
-//		const vPtr = qe.latestWaveBuffer + 8*2*ix;
-//		Module.setValue(vPtr, 𝜓, 'double');
-//		Module.setValue(vPtr + 8, 𝜓, 'double');
-//	}
-//
-//	// tune into the most recently used wave and potential buffers
-//	qe.latestPotential = function latestPotential() {
-//		qe.latestPotentialBuffer = qe.qSpace_getPotentialBuffer();
-//	}
-//
-//	// get the real potential value at this point
-//	qe.get1DPotential = function get1DPotential(ix) {
-//		const vPtr = qe.latestPotentialBuffer + 8*ix;
-//		return Module.getValue(vPtr, 'double');
-//	}
-//
-//	qe.set1DPotential = function set1DPotential(ix, pot) {
-//		const vPtr = qe.latestPotentialBuffer + 8*ix;
-//		return Module.setValue(vPtr, pot, 'double');
-//	}
-export function qeDefineAccess() {
-
-	// what a disaster...
-
-	// nobody uses this anymore
-	// tune into the most recently used wave buffer.  The iteration algorithm can sometimes leave the
-	// results in different buffers, depending.  No, not any more!
+// these can't be defined until emscripten is alive
+function qeDefineAccess() {
 	qe.createQEWaveFromCBuf = function createQEWaveFromCBuf() {
 		// make this thing which is the wave buffer, as a nice TypedArray of doubles (pairs making up cx numbers)
-		const wave = new Float64Array(window.Module.HEAPF64.buffer, qe.qSpace_getWaveBuffer(), 2 * qe.space.nPoints);
+		const wave = new Float64Array(window.Module.HEAPF64.buffer, qe.Incarnation_getWaveBuffer(), 2 * qe.space.nPoints);
 		qe.space.waveBuffer = qe.waveBuffer = wave;
 	}
 
 	// get the complex wave value at this point in the wave
 	// not used very much now
-	qe.get1DWave = function get1DWave(ixPoint) {
-		const ix = 2*ixPoint;
-		return qCx(
-			qe.waveBuffer[ix],
-			qe.waveBuffer[ix+1]
-		);
-	}
-
-
-
-// 	qe.testFFT();
-
+	// qe.get1DWave = function get1DWave(ixPoint) {
+	// 	const ix = 2*ixPoint;
+	// 	return qCx(
+	// 		qe.waveBuffer[ix],
+	// 		qe.waveBuffer[ix+1]
+	// 	);
+	// }
 }
 
 

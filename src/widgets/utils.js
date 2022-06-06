@@ -8,8 +8,9 @@ import {qeBasicSpace} from '../wave/qeSpace';
 
 
 /* ********************************** toSiPieces() */
+// SI suffixes, as in milli, micro, nano, pico, .... kilo, mega, giga, ...
 
-const prefixes = [
+const suffixes = [
 	// e-24 thru e-3
 	'y', 'z', 'a', 'f', 'p', 'n', 'µ', 'm',
 
@@ -18,24 +19,24 @@ const prefixes = [
 	// e3, kilo, to e24,
 	'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y',
 ];
-const prefixMid = prefixes.indexOf('');
+const suffixMid = suffixes.indexOf('');
 
 // return a string for this real number, with greek/roman suffixes for the exponent
 export function toSiPieces(f) {
 	const thousands = Math.log10(f) / 3;
 	const iThous = Math.floor(thousands);
-	let prefix = prefixes[iThous + prefixMid];
-	if (prefix === undefined)
-		prefix = `e${iThous > 0 ? '+' : ''}${iThous * 3}`;
+	let suffix = suffixes[iThous + suffixMid];
+	if (suffix === undefined)
+		suffix = `e${iThous > 0 ? '+' : ''}${iThous * 3}`;
 	const mantissa = f / (1000 ** iThous);
-	return {mantissa, prefix, iThous};
+	return {mantissa, suffix, iThous};
 }
 
 // return a string for this real number, with greek/roman suffixes instead of exponent
-export function toSiPrefix(f, nDigits) {
+export function toSiSuffix(f, nDigits) {
 	const pieces = toSiPieces(f);
 
-	return pieces.mantissa.toPrecision(nDigits) + pieces.prefix;
+	return pieces.mantissa.toPrecision(nDigits) + pieces.suffix;
 }
 
 // testing
@@ -44,7 +45,7 @@ export function toSiPrefix(f, nDigits) {
 //}
 
 /* ********************************** thousands() */
-
+// I didn't realize when I wrote this that the Intl functions can do this too
 const doesLocaleStuff = !!(window.Intl && Intl.NumberFormat);
 
 export function thousands(n) {

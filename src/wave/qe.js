@@ -1,4 +1,4 @@
-// this file generated Sat Apr 02 2022 18:00:56 GMT-0700 (Pacific Daylight Time)
+// this file generated Wed Apr 27 2022 22:19:46 GMT-0700 (Pacific Daylight Time)
 // by the file SquishyElectron/quantumEngine/building/genExports.js
 let cwrap;
 export const qe = {};
@@ -10,23 +10,22 @@ export function defineQEngineFuncs() {
 	qe.addSpaceDimension = cwrap('addSpaceDimension', 'number', ['number','number','string']);
 	qe.completeNewSpace = cwrap('completeNewSpace', 'number', []);
 	qe.deleteTheSpace = cwrap('deleteTheSpace', null, []);
-	qe.qSpace_getWaveBuffer = cwrap('qSpace_getWaveBuffer', 'number', []);
+	qe.Incarnation_getWaveBuffer = cwrap('Incarnation_getWaveBuffer', 'number', []);
 	qe.qSpace_getPotentialBuffer = cwrap('qSpace_getPotentialBuffer', 'number', []);
-	qe.qSpace_getElapsedTime = cwrap('qSpace_getElapsedTime', 'number', []);
-	qe.qSpace_getIterateSerial = cwrap('qSpace_getIterateSerial', 'number', []);
+	qe.Incarnation_getElapsedTime = cwrap('Incarnation_getElapsedTime', 'number', []);
+	qe.Incarnation_getIterateSerial = cwrap('Incarnation_getIterateSerial', 'number', []);
 	qe.qSpace_dumpPotential = cwrap('qSpace_dumpPotential', 'number', ['string']);
 	qe.qSpace_setZeroPotential = cwrap('qSpace_setZeroPotential', 'number', []);
 	qe.qSpace_setValleyPotential = cwrap('qSpace_setValleyPotential', 'number', ['number','number','number']);
-	qe.qSpace_setDt = cwrap('qSpace_setDt', null, ['number']);
-	qe.qSpace_setStepsPerIteration = cwrap('qSpace_setStepsPerIteration', null, ['number']);
-	qe.qSpace_setLowPassDilution = cwrap('qSpace_setLowPassDilution', null, ['number']);
-	qe.qSpace_oneIteration = cwrap('qSpace_oneIteration', 'number', []);
-	qe.qSpace_resetCounters = cwrap('qSpace_resetCounters', null, []);
+	qe.Incarnation_setDt = cwrap('Incarnation_setDt', null, ['number']);
+	qe.Incarnation_setStepsPerIteration = cwrap('Incarnation_setStepsPerIteration', null, ['number']);
+	qe.Incarnation_setLowPassDilution = cwrap('Incarnation_setLowPassDilution', null, ['number']);
+	qe.Incarnation_oneIteration = cwrap('Incarnation_oneIteration', 'number', []);
+	qe.Incarnation_resetCounters = cwrap('Incarnation_resetCounters', null, []);
 	qe.qViewBuffer_getViewBuffer = cwrap('qViewBuffer_getViewBuffer', 'number', []);
 	qe.qViewBuffer_loadViewBuffer = cwrap('qViewBuffer_loadViewBuffer', null, []);
 	qe.qViewBuffer_dumpViewBuffer = cwrap('qViewBuffer_dumpViewBuffer', null, ['string']);
-	qe.testFFT = cwrap('testFFT', null, []);
-	qe.qSpace_askForFFT = cwrap('qSpace_askForFFT', null, []);
+	qe.Incarnation_askForFFT = cwrap('Incarnation_askForFFT', null, []);
 }
 
 window.defineQEngineFuncs = defineQEngineFuncs;  // just in case

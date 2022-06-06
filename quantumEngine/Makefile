@@ -1,5 +1,10 @@
-# makefile for quantum engine
-xxxSOURCES = $(shell echo *.h *.cpp) building/exports.json
+/*
+** Makefile -- makefile for quantum engine, for compiling the C++
+** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+*/
+
+# makefile for
+#xxxSOURCES = $(shell echo *.h *.cpp) building/exports.json
 
 quantumEngine.js : *.cpp */*.h */*.cpp building/exports.json building/buildDev.sh building/allCpp.list
 	building/buildDev.sh
@@ -16,4 +21,4 @@ clean : quantumEngine.js quantumEngine.wasm
 
 
 test :
-	testing/runner.sh
+	testing/cppuRunner.sh

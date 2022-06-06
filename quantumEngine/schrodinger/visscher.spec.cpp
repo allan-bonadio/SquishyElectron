@@ -1,5 +1,11 @@
-#include "../squish.h"
+/*
+** visscher integration testing
+** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+*/
+
+
 #include "../spaceWave/qSpace.h"
+#include "Incarnation.h"
 #include "../spaceWave/qWave.h"
 #include "../testing/cppuMain.h"
 
@@ -32,8 +38,8 @@ TEST(Visscher, VisscherOneStep)
 {
 	setCircularWave(oldWave4, 1.);
 
-	space4->dt = 0.01;
-	space4->oneVisscherStep(oldWave4, newWave4);
+	space4->incarn->dt = 0.01;
+	space4->incarn->oneVisscherStep(oldWave4, newWave4);
 
 	//newWave4->dumpWave("VisscherOneStep");
 	//expectedWave4->dumpHiRes("expectedWave4");
@@ -48,15 +54,13 @@ TEST(Visscher, VisscherOneIteration)
 {
 	// simulate the app starting up
 	makeFullSpace(32);
-
-	theSpace->stepsPerIteration = 100;
-
 	setCircularWave(oldWave4, 1.);
 
+	// simulate the app taking one iter = 100 steps
+	theSpace->incarn->stepsPerIteration = 100;
+	theSpace->incarn->oneIteration();
 
 
-	// simulate the app taking one step
-	theSpace->oneIteration();
 
 	// simulate the app ... tearing down, although probably not done much in reality
 	deleteTheSpace();
@@ -64,3 +68,4 @@ TEST(Visscher, VisscherOneIteration)
 	// anhything i'm forgetting?
 }
 
+/* ******************************************************************     */

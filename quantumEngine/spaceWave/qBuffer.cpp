@@ -22,15 +22,16 @@ qFlick - object that owns a list of waves, and points to its space
 //#include <stdexcept>
 //#include <cmath>
 #include "qSpace.h"
-#include "qWave.h"
+//#include "../schrodinger/Incarnation.h"
+#include "qBuffer.h"
 
-static bool traceNormalize = true;
+static bool traceNormalize = false;
 static bool traceAllocate = false;
 
 // just allocate a wave of whatever length
-// buffer is (often but ? reliably) initialized to zero bytes therefore 0.0 everywhere
+// buffer is unreliably initialized to zero bytes only first time it's allocated; hence calloc
 qCx *allocateWave(int nPoints) {
-	qCx *buf = (qCx *) malloc(nPoints * sizeof(qCx));
+	qCx *buf = (qCx *) calloc(nPoints, sizeof(qCx));
 	if (traceAllocate) {
 		printf("🍕 allocateWave()  wave=%p  nPoints: %d bytelength=x%lx\n",
 			buf, nPoints, nPoints * sizeof(qCx));
@@ -67,10 +68,8 @@ qCx *qBuffer::allocateWave(int nPoints) {
 
 
 // create one
-qBuffer::qBuffer(void) {
-	magic = 'qBuf';
-	wave = NULL;
-	space = NULL;
+qBuffer::qBuffer(void)
+	: magic('qBuf'), wave(NULL), space(NULL) {
 }
 
 // actually create the buffer that we need
@@ -89,10 +88,13 @@ void qBuffer::initBuffer(int length, qCx *useThisBuffer) {
 		wave = allocateWave(length);
 		dynamicallyAllocated = true;
 	}
-	start = end = -1;  // wave / spectrum calculates these differently
-	continuum = -1;
+
 	nPoints = length;
-	space = NULL;  // subclasses will fill it in if needed
+
+	// don't mess with these; subclass may have already set them
+	//start = end = -1;  // wave / spectrum calculates these differently
+	//continuum = -1;
+	//space = NULL;  // subclasses will fill it in if needed
 
 	if (traceAllocate) {
 		printf("🍕 qBuffer::initBuffer this=%p  wave=%p  nPoints: %d\n",
@@ -164,12 +166,12 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 		if (dPhase >= 360.) dPhase -= 360.;
 
 		// if this or the previous point was (0,0) then the phase and dPhase will be NAN, and they print that way
-		//sprintf(buf, "[%d] (%8.4lf,%8.4lf) | %8.3lf %8.3lf %8.4lf",
-		//	ix, re, im, phase, dPhase, mag);
+		snprintf(buf, 200, "[%d] (%8.4lf,%8.4lf) | %8.3lf %8.3lf %8.4lf",
+			ix, re, im, phase, dPhase, mag);
 		*pPrevPhase = phase;
 	}
 	else {
-		sprintf(buf,"[%d] (%8.4lf,%8.4lf)", ix, re, im);
+		snprintf(buf,200, "[%d] (%8.4lf,%8.4lf)", ix, re, im);
 	}
 	return mag;
 }
@@ -269,10 +271,6 @@ double qBuffer::innerProduct(void) {
 	for (int ix = start; ix < end; ix++) {
 		qCx point = wave[ix];
 		sum += point.norm();
-
-//		double re = point.re;
-//		double im = point.im;
-//		sum += re * re + im * im;
 
 		//sum += wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im;
 // 		printf("innerProduct point %d (%lf,%lf) %lf\n", ix, wave[ix].re, wave[ix].im,

@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** view variable -- maintaining and attaching webgl Attribute and Uniform variables
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 

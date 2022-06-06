@@ -1,49 +1,53 @@
 /*
-** view Buffer -- interface to webGL
+** view Buffer -- interface buffer to webGL
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
-//#include <cmath>
+
 #include "qSpace.h"
+#include "../schrodinger/Incarnation.h"
 #include "qWave.h"
+#include "qViewBuffer.h"
 
 static const bool debugViewBuffer = false;
 static const bool debugInDetail = false;
 
+// August Ferdinand Möbius invented homogenous coordinates
 
 // 'the' being the only one sometimes.  set in jsSpace completeNewSpace
 qViewBuffer *theQViewBuffer;
 
-qViewBuffer::qViewBuffer(qSpace *space) {
+qViewBuffer::qViewBuffer(qSpace *space)
+	: space(space){
+	if (! space)
+		throw std::runtime_error("qViewBuffer::qViewBuffer null space");
 	// 4 floats per vertex, two verts per point
-	this->space = space;
-	viewBuffer = new float[space->nPoints * 8];
-	if (debugViewBuffer) printf("📺 viewBuffer(): viewBuffer ptr %p \n",
-		viewBuffer);
-	//printf("📺 qViewBuffer constructor done: this=%p   viewBuffer=%p\n",
-	//this, viewBuffer);
+	buffer = new float[space->nPoints * 8];
+	if (debugViewBuffer) printf("📺 buffer(): buffer ptr %p \n",
+		buffer);
+	//printf("📺 qViewBuffer constructor done: this=%p   buffer=%p\n",
+	//this, buffer);
 	// done in completeNewSpace    theQViewBuffer = this;
 }
 
 qViewBuffer::~qViewBuffer() {
-	delete[] viewBuffer;
+	delete[] buffer;
 }
 
-// copy the numbers in our space's qWave into viewBuffer
+// copy the numbers in our space's qWave into buffer
 // one row per vertex, two rows per wave datapoint.
 // each row of 4 floats looks like this:
 //     real   imaginary    potential    serial
 // Two vertices per datapoint: bottom then top, same data.
 // also converts from doubles to floats for GL.
 float qViewBuffer::loadViewBuffer(void) {
-	if (debugViewBuffer) printf("📺 loadViewBuffer() starts: viewBuffer = %p \n",
-		viewBuffer);
+	if (debugViewBuffer) printf("📺 loadViewBuffer() starts: buffer = %p \n",
+		buffer);
 //	printf("qViewBuffer::loadViewBuffer space ptr %p\n", space);
-//	printf("qViewBuffer::loadViewBuffer latestQWave ptr %p\n", space->latestQWave);
-	qWave *latestQWave = space->latestQWave;
-//	printf("qViewBuffer::loadViewBuffer latestWave ptr %p\n", latestQWave->wave);
-	qCx *latestWave = latestQWave->wave;
+//	printf("qViewBuffer::loadViewBuffer mainQWave ptr %p\n", space->incarn->mainQWave);
+	qWave *mainQWave = space->incarn->mainQWave;
+//	printf("qViewBuffer::loadViewBuffer latestWave ptr %p\n", incarn->mainQWave->wave);
+	qCx *latestWave = mainQWave->wave;
 
 //	printf("qViewBuffer::loadViewBuffer space->nPoints %d\n", space->nPoints);
 	int nPoints = space->nPoints;
@@ -53,26 +57,26 @@ float qViewBuffer::loadViewBuffer(void) {
 	if (debugInDetail) {
 		printf("loadViewBuffer(P): thePotential=%p\n",
 			thePotential);
-		printf("loadViewBuffer(B): space->latestQWave->wave=%p->%p->%p->%p\n",
+		printf("loadViewBuffer(B): space->incarn->mainQWave->wave=%p->%p->%p->%p\n",
 			this,
 			space,
-			space->latestQWave,
-			space->latestQWave->wave);
-		printf("loadViewBuffer(vb,lqw): viewBuffer %p and latestQWave->wave=%p\n",
-			viewBuffer, latestWave);
-		latestQWave->dumpWave("📺 at start of loadViewBuffer()");
+			space->incarn->mainQWave,
+			space->incarn->mainQWave->wave);
+		printf("loadViewBuffer(vb,lqw): buffer %p and incarn->mainQWave->wave=%p\n",
+			buffer, latestWave);
+		mainQWave->dumpWave("📺 at start of loadViewBuffer()");
 	}
 
 	// this is index into the complex point, which translates to 2 GL points
 //	printf("qViewBuffer::loadViewBuffer about to do all the pts\n");
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
 		if (debugInDetail) {
-			printf("📺 qViewBuffer::loadViewBuffer viewBuffer %p\n",
-				viewBuffer);
-			printf("📺 qViewBuffer::loadViewBuffer viewBuffer + pointNum * 8=%p\n",
-				viewBuffer + pointNum * 8);
+			printf("📺 qViewBuffer::loadViewBuffer buffer %p\n",
+				buffer);
+			printf("📺 qViewBuffer::loadViewBuffer buffer + pointNum * 8=%p\n",
+				buffer + pointNum * 8);
 		}
-		float *twoRowPtr = viewBuffer + pointNum * 8;
+		float *twoRowPtr = buffer + pointNum * 8;
 		if (debugInDetail)
 			printf("📺 qViewBuffer::loadViewBuffer twoRowPtr =%p\n", twoRowPtr);
 		qCx *wavePtr = latestWave + pointNum;
@@ -116,9 +120,9 @@ float qViewBuffer::loadViewBuffer(void) {
 	}
 
 	if (debugViewBuffer) {
-		printf("    qViewBuffer::at end of loadViewBuffer this=%p  viewBuffer=%p\n",
-				this, viewBuffer);
-		//printf("  ===  📺  viewBuffer.cpp done, as written to view buffer:\n");
+		printf("    qViewBuffer::at end of loadViewBuffer this=%p  buffer=%p\n",
+				this, buffer);
+		//printf("  ===  📺  buffer.cpp done, as written to view buffer:\n");
 		//dumpViewBuffer("loadViewBuffer done");
 	}
 
@@ -127,24 +131,24 @@ float qViewBuffer::loadViewBuffer(void) {
 
 // prep wave & potential  data for GL.  For rows of floats in a big Float32Array,
 // will be fed directly into gl.  This is allocated in qSpace.cpp & depends on nPoints
-//float *viewBuffer;
+//float *buffer;
 
 // dump the view buffer just before it heads off to webgl.
 void dumpViewBuffer(const char *title) {
 //	printf("dumpViewBuffer theSpace %p\n", theSpace);
 //	printf("dumpViewBuffer qViewBuffer ptr %p\n", theSpace->qViewBuffer);
-//	printf("dumpViewBuffer viewBuffer %p\n", theSpace->qViewBuffer->viewBuffer);
-	float *viewBuffer = theSpace->qViewBuffer->viewBuffer;
-	printf("📺 The viewBuffer = %p\n", viewBuffer);
-	double prevRe = viewBuffer[0];
-	double prevIm = viewBuffer[1];
+//	printf("dumpViewBuffer buffer %p\n", theSpace->qViewBuffer->buffer);
+	float *buffer = theSpace->incarn->viewBuffer->buffer;
+	printf("📺 The buffer = %p\n", buffer);
+	double prevRe = buffer[0];
+	double prevIm = buffer[1];
 
 	if (!title) title = "";
-	printf("==== 📺 dump ViewBuffer | %s\n", title);
+	printf("==== 📺 dump buffer | %s\n", title);
 	printf("   ix  |    re      im     pot    serial  |   phase    magn\n");
 	for (int i = 0; i < theSpace->nPoints*2; i++) {
-		double re = viewBuffer[i*4];
-		double im = viewBuffer[i*4+1];
+		double re = buffer[i*4];
+		double im = buffer[i*4+1];
 		if (i & 1) {
 			double dRe = re - prevRe;
 			double dIm = im - prevIm;
@@ -154,7 +158,7 @@ void dumpViewBuffer(const char *title) {
 			magn = im * im + re * re;
 			printf("%6d |  %6.3f  %6.3f  %6.3f  %6.3f  |  %6.3f  %6.3f\n",
 				i,
-				re, im, viewBuffer[i*4+2], viewBuffer[i*4+3],
+				re, im, buffer[i*4+2], buffer[i*4+3],
 				phase, magn);
 
 			prevRe = re;
@@ -163,11 +167,11 @@ void dumpViewBuffer(const char *title) {
 		else {
 			printf("%6d |  %6.3f  %6.3f  %6.3f  %6.3f \n",
 				i,
-				re, im, viewBuffer[i*4+2], viewBuffer[i*4+3]);
+				re, im, buffer[i*4+2], buffer[i*4+3]);
 		}
 	}
-	printf("    qViewBuffer::at end of dumpViewBuffer qViewBuffer=%p  qViewBuffer->viewBuffer=%p  local viewBuffer=%p\n",
-			theSpace->qViewBuffer, theSpace->qViewBuffer->viewBuffer, viewBuffer);
+	printf("    qViewBuffer::at end of dumpViewBuffer qViewBuffer=%p  qViewBuffer->buffer=%p  local buffer=%p\n",
+			theSpace->incarn->viewBuffer, theSpace->incarn->viewBuffer->buffer, buffer);
 }
 
 
@@ -180,10 +184,10 @@ extern "C" {
 	float *qViewBuffer_getViewBuffer(void) {
 //		printf("📺 qViewBuffer_getViewBuffer: theQViewBuffer=%p \n",
 //			theQViewBuffer);
-//		printf("📺                    theQViewBuffer->viewBuffer=%p\n",
-//			theQViewBuffer ? theQViewBuffer->viewBuffer : 0);
+//		printf("📺                    theQViewBuffer->buffer=%p\n",
+//			theQViewBuffer ? theQViewBuffer->buffer : 0);
 		if (! theQViewBuffer) return NULL;
-		return theQViewBuffer->viewBuffer;
+		return theQViewBuffer->buffer;
 	}
 
 	void qViewBuffer_loadViewBuffer(void) {

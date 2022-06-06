@@ -9,7 +9,7 @@
 cd `dirname $0`
 cd ..
 
-echo CppUTest Test runner
+echo "CppUTest Test runner: arg db=debugger; all others are assumed to be test name segments"
 
 # https://cpputest.github.io
 export CPPUTEST_HOME=/dvl/cpputest/cpputest-3.8
@@ -20,12 +20,18 @@ export CPPUTEST_HOME=/dvl/cpputest/cpputest-3.8
 # create a space-sep list of ALL the runtime cpp files (almost all)
 allCpp=`cat building/allCpp.list`
 
+# keep LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 32
+LABEL_LEN=7
+
 # note that main.cpp is NOT included in the .cpp files; that's for web use only
-# and makes all the diff.  Update list of test srcs as needed.
+# and makes all the diff.  cppuMain.cpp is the main instead.
+# Update list of test srcs as needed.
+# keep LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 32
 # some of these options - dunno if I need them
 set -x
-g++ -o cppuTestBin -Wno-tautological-undefined-compare \
+g++ -o cppuTestBin -Wno-tautological-undefined-compare  \
 	-std=c++11 -fexceptions -g  -O0 \
+	-DLABEL_LEN=$LABEL_LEN \
 	-I$CPPUTEST_HOME/include \
 	-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h \
 	-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt \
@@ -37,14 +43,23 @@ set +x
 echo ====================== done compiling... start testing ==================================
 echo
 
+debug=false
+while [ "$1" ]
+do
+	case $1 in
+	db) debug=true ;;
+	*) moreArgs="$moreArgs -n $1" ;;
+	esac
+	shift
+done
 
-if [ "$1" ]
+if $debug
 then
 	#  well, lldb at least.
-	lldb  -f /dvl/squishyElectron/SquishyElectron/quantumEngine/cppuTestBin -- -v -c
+	lldb  -f /dvl/squishyElectron/SquishyElectron/quantumEngine/cppuTestBin -- -v -c $moreArgs
 else
 	# it's a real C++ program and I can use gdb!
-	./cppuTestBin -v -c
+	./cppuTestBin -v -c  $moreArgs
 fi
 
 

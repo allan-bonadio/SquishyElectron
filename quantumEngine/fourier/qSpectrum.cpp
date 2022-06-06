@@ -1,29 +1,30 @@
 /*
-** quantum Spectrum -- quantum Spectrum buffer
+** quantum Spectrum -- quantum Spectrum buffer, for FFTs
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
+
 //#include <cmath>
-#include "qSpace.h"
-#include "qWave.h"
+#include "../spaceWave/qSpace.h"
+#include "../schrodinger/Incarnation.h"
+#include "qSpectrum.h"
 
 /* ************************************************************ birth & death & basics */
 
 // This produces a spectrum ready to hold an FFT transformed wave
-qSpectrum::qSpectrum(qSpace *space, qCx *useThisBuffer) {
-	qBuffer();
+qSpectrum::qSpectrum(qSpace *sp, qCx *useThisBuffer) {
+	space = sp;
 	magic = 'qSpe';
+	continuum = 0;
+	start = 0;
+	end = nPoints = sp->spectrumLength;
+
+	if (! space)
+		throw std::runtime_error("qSpectrum::qSpectrum null space");
 
 	//printf("🌈 🌈 qSpectrum::qSpectrum(%s)  utb=%p => this %p\n", space->label,
 	//	useThisBuffer, this);
-	this->space = space;
-	initBuffer(space->freeBufferLength, useThisBuffer);
-
-	nPoints = space->spectrumLength;
-	start = 0;
-	end = space->spectrumLength;
-	continuum = 0;
+	initBuffer(space->spectrumLength, useThisBuffer);
 }
 
 qSpectrum::~qSpectrum(void) {

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
-** blah blah -- like a source file for Squishy Electron
+** generate exports -- generate files for emscripten compiler, for JS calling C++ code
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
@@ -27,12 +27,12 @@ exportsSrc  = [
 
 
 	// gets
-	{name: 'qSpace_getWaveBuffer', retType: 'number', args: []},
+	{name: 'Incarnation_getWaveBuffer', retType: 'number', args: []},
 	{name: 'qSpace_getPotentialBuffer', retType: 'number', args: []},
 
 	// the qSpace ones act on theSpace in the c++ code
-	{name: 'qSpace_getElapsedTime', retType: 'number', args: []},
-	{name: 'qSpace_getIterateSerial', retType: 'number', args: []},
+	{name: 'Incarnation_getElapsedTime', retType: 'number', args: []},
+	{name: 'Incarnation_getIterateSerial', retType: 'number', args: []},
 
 	// the potential
 	{name: 'qSpace_dumpPotential', retType: 'number', args: ['string']},
@@ -40,12 +40,12 @@ exportsSrc  = [
 	{name: 'qSpace_setValleyPotential', retType: 'number', args: ['number', 'number', 'number']},
 
 	// params
-	{name: 'qSpace_setDt', retType: null, args: ['number']},
-	{name: 'qSpace_setStepsPerIteration', retType: null, args: ['number']},
-	{name: 'qSpace_setLowPassDilution', retType: null, args: ['number']},
+	{name: 'Incarnation_setDt', retType: null, args: ['number']},
+	{name: 'Incarnation_setStepsPerIteration', retType: null, args: ['number']},
+	{name: 'Incarnation_setLowPassDilution', retType: null, args: ['number']},
 
-	{name: 'qSpace_oneIteration', retType: 'number', args: []},
-	{name: 'qSpace_resetCounters', retType: null, args: []},
+	{name: 'Incarnation_oneIteration', retType: 'number', args: []},
+	{name: 'Incarnation_resetCounters', retType: null, args: []},
 
 	// views
 	{name: 'qViewBuffer_getViewBuffer', retType: 'number', args: []},
@@ -53,8 +53,8 @@ exportsSrc  = [
 	{name: 'qViewBuffer_dumpViewBuffer', retType: null, args: ['string']},
 
 	// FFT
- 	{name: 'testFFT', retType: null, args: []},
-	{name: 'qSpace_askForFFT', retType: null, args: []},
+ 	//{name: 'testFFT', retType: null, args: []},
+	{name: 'Incarnation_askForFFT', retType: null, args: []},
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():

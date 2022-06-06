@@ -3,9 +3,11 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
-#include "../spaceWave/qSpace.h"
 
+#include "../spaceWave/qSpace.h"
+#include "../schrodinger/Incarnation.h"
+
+# not used right now, hopefullly soon
 
 // this is the slope, not the increment, so dt is irrelevant
 //double DEFAULT_DT = 0.1;

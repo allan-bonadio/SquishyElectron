@@ -1,4 +1,8 @@
 #!/bin/bash
+# build for Production -- script to compile emscripten/C++ sources into WebAssembly
+# Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+
+# I haven't looked at this since early in the project; it's nowhere near production quality
 
 # according to informal benchmarks run June 5, 2021, the C++
 # version of RK2 is 5x or 6x faster than the JS version.  ha.

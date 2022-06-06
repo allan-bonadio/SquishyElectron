@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** Main -- top level source file for running Squishy Electron
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
@@ -8,6 +8,7 @@
 //#include <cmath>
 
 #include "spaceWave/qSpace.h"
+#include "schrodinger/Incarnation.h"
 #include "fourier/fftMain.h"
 
 

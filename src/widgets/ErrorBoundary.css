@@ -1,4 +1,4 @@
-
+/* css for ErrorBoundary.  get it going someday! */
 
 
 #g2 .ErrorBoundaryReport {
@@ -22,7 +22,7 @@
 		}
 	}
 
-	// src code pointers in tracebacks
+	/* src code pointers in tracebacks */
 	a {
 		color: #ff8;
 	}

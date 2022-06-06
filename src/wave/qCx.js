@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** qa complex -- complex numbers in JS.  (Actually we don't use this much - often easier to just handle an array)
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 

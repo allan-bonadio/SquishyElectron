@@ -4,18 +4,20 @@
 */
 
 
-//#include "qCx.h"
+#include "../squish.h"
 
 // do not exceed these!  they are open ended arrays.
 // keep LABEL_LEN+1 a multiple of 4 or 8 for alignment.
-#define LABEL_LEN  31
+// now defined in buildDev.sh, buildProd.sh or cppuRunner.sh
+//#define LABEL_LEN  7
+//#define LABEL_LEN  31
 
 #define MAX_DIMENSIONS  2
 
 extern class qSpace *theSpace;
-extern class qCx *peruWave, *laosWave;
+//extern class qCx *peruWave, *laosWave;
 
-extern class qWave *peruQWave, *laosQWave;
+//extern class qWave *peruQWave, *laosQWave;
 
 extern double *thePotential;
 //extern float *viewBuffer;
@@ -45,8 +47,8 @@ public:
 	int continuum;
 
 	// size for Fourier transforms, or zero if not yet calculated.  ON THIS DIMENSION ONLY!
-	// Often a power of two.
-	// no boundaries.
+	// Often a power of two.  no boundaries.
+	void chooseSpectrumLength(void);
 	int spectrumLength;
 
 	// 'x', 'y' or 'z' - two particles will have x1, x2 but one in 2d will have x, y.
@@ -58,12 +60,7 @@ public:
 
 };
 
-// continuum values - same as in qeBasicSpace in qeSpace.js; pls synchronize them
-const int contDISCRETE = 0;
-const int contWELL = 1;
-const int contENDLESS = 2;
-
-//coerce your buffers into being one of these and you link them into a list
+// coerce your buffers into being one of these and you link them into a list
 struct FreeBuffer {
 	struct FreeBuffer *next;
 };
@@ -74,6 +71,8 @@ struct qSpace {
 public:
 	qSpace(const char *label);
 	~qSpace(void);
+
+	struct Incarnation *incarn;
 
 	// additional for space creation
 	void addDimension(int N, int continuum, const char *label);
@@ -91,18 +90,6 @@ public:
 	// always a fixed size, for simplicity.
 	qDimension dimensions[MAX_DIMENSIONS];
 
-	// how much time we've iterated, from creation.  pseudo-seconds.  Since we've eliminated
-	// all the actual physical constants from the math, why not choose our own definition
-	// of what a second is?  Resets to zero every so often.
-	double elapsedTime;
-
-	// total number of times thru the number cruncher. (should always be an integer;
-	// it's a double cuz I don't know how big it'll get)
-	double iterateSerial;
-
-	// set the elapsedTime and iterateSerial to zero
-	void resetCounters(void);
-
 	// number of  dimensions actually used, always <= MAX_DIMENSIONS
 	// do not confuse with nStates or nPoints
 	int nDimensions;
@@ -111,29 +98,22 @@ public:
 	int nStates;
 	int nPoints;
 
-	// our main qWave housing our main wave, doing iterations and being displayed.
-	// Technically, the one that got the most recent integration iteration
-	struct qWave *latestQWave;
-
-	struct qViewBuffer *qViewBuffer;
+	// should this be part of the space or the incarnation?
 	double *potential;
-
-	// params that the user can set
-	double dt;
-	int stepsPerIteration;
-	double lowPassDilution;
-
 
 
 	/* *********************************************** buffers */
-	void chooseSpectrumLength(void);
 	int spectrumLength;
+
+	// some of these might go away as the buffers now have the essential numbers
 
 	// will dump any wave that uses this space.  same as in qWave:: or qSpectrum::
 	void dumpThatWave(qCx *wave, bool withExtras = false);
 	void dumpThatSpectrum(qCx *wave, bool withExtras = false);
 
 	void fixThoseBoundaries(qCx *targetWave);  // like for qWave but on any wave
+
+	/* *********************************************** FreeBuffers */
 
 	// the linked list of blocks available for rental.
 	// All contain (freeBufferLength) complex number slots.
@@ -147,27 +127,13 @@ public:
 	// returning might lead to it being used as if it was.
 	qCx *borrowBuffer(void);
 	void returnBuffer(qCx *abuffer);
-	void clearFreeBuffers(void);
+	void clearFreeBuffers(void);  // delete them all
 
 	/* *********************************************** potential */
 	void dumpPotential(const char *title);
 	void setZeroPotential(void);
 	void setValleyPotential(double power, double scale, double offset);
 
-	/* *********************************************** iteration */
-	void oneIteration(void);
-	void oneRk2Step(qWave *oldQWave, qWave *newQWave);  // obsolete
-	void oneRk4Step(qWave *oldQWave, qWave *newQWave);  // obsolete
-	void oneVisscherStep(qWave *oldQWave, qWave *newQWave);  // obsolete
-
-	// visscher
-	void stepReal(qCx *oldW, qCx *newW, double dt);
-	void stepImaginary(qCx *oldW, qCx *newW, double dt);
-	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);
-
-	bool pleaseFFT;
-	bool isIterating;
-	void askForFFT(void);
 };
 
 /* ************************************************************ JS interface */
@@ -180,16 +146,6 @@ extern "C" {
 	void deleteTheSpace(void);
 
 
-	qCx *qSpace_getWaveBuffer(void);
 	double *qSpace_getPotentialBuffer(void);
-	float *qViewBuffer_getViewBuffer();
-	double qSpace_getElapsedTime(void);
-	double qSpace_getIterateSerial(void);
-
-	void qSpace_oneIteration(void);
-
-
-	int manyRk2Steps(void);
-
 }
 

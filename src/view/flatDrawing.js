@@ -1,5 +1,5 @@
 /*
-** flat drawing -- like a source file for Squishy Electron
+** flat drawing -- draw a 1d quantum wave as a 2d bargraph (band across top)
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 

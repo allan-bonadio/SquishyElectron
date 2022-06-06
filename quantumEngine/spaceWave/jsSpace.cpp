@@ -3,9 +3,11 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
+
 #include "qSpace.h"
+#include "../schrodinger/Incarnation.h"
 #include "qWave.h"
+#include "qViewBuffer.h"
 
 
 
@@ -18,16 +20,14 @@ void allocWaves(void) {
 
 //printf(" got past new qFlick\n");
 	// the other buffers...
-	peruQWave = new qWave(theSpace);
-	laosQWave = new qWave(theSpace);
 //	printf("🚀 🚀 🚀  %s:%d freeBufferList: %p\n", __FILE__, __LINE__, theSpace->freeBufferList);
 
-	peruWave = peruQWave->wave;
-	laosWave = laosQWave->wave;
+//	peruWave = peruQWave->wave;
+//	laosWave = laosQWave->wave;
 
 //	printf("🚀 🚀 🚀  %s:%d freeBufferList: %p\n", __FILE__, __LINE__, theSpace->freeBufferList);
-	//printf("        🚀 🚀 🚀       peruQWave=%p   peruWave=%p   laosQWave=%p   laosWave=%p  \n",
-	//	peruQWave, peruWave, laosQWave, laosWave);
+	//printf("        🚀 🚀 🚀       peruQWave=%p   peruWave=%p   mainQWave=%p   laosWave=%p  \n",
+	//	peruQWave, peruWave, mainQWave, laosWave);
 
 	/* *********************************** allocate other buffers */
 
@@ -37,7 +37,7 @@ void allocWaves(void) {
 
 
 	// our own view buffer - needs potential to be in place
-	theSpace->qViewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
+	theSpace->incarn->viewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
 //	printf("🚀 🚀 🚀  %s:%d freeBufferList: %p\n", __FILE__, __LINE__, theSpace->freeBufferList);
 	//dumpViewBuffer("newly created");
 
@@ -50,11 +50,11 @@ void allocWaves(void) {
 // call to destroy them
 static void freeWaves(void) {
 	//printf("🚀 🚀 🚀 about to delete qWaves:peruQWave\n");
-	delete peruQWave;
-	peruQWave = NULL;
-	//printf("🚀 🚀 🚀 about to delete qWaves:laosQWave\n");
-	delete laosQWave;
-	laosQWave = NULL;
+//	delete peruQWave;
+//	peruQWave = NULL;
+	//printf("🚀 🚀 🚀 about to delete qWaves:mainQWave\n");
+//	delete laosQWave;
+//	laosQWave = NULL;
 
 
 	//printf("       delete thePotential:\n");
@@ -76,31 +76,31 @@ static void freeWaves(void) {
 extern "C" {
 
 // return a pointer to just the main wave for theSpace
-qCx *qSpace_getWaveBuffer(void) {
-	//printf("🚀 🚀 🚀 qSpace_getWaveBuffer() theSpace: %p\n", (theSpace));
-	//printf("        🚀 🚀 🚀        the qWave %p\n", (theSpace->latestQWave));
-	//printf("        🚀 🚀 🚀        the wave %p\n", (theSpace->latestQWave->wave));
+qCx *Incarnation_getWaveBuffer(void) {
+	//printf("🚀 🚀 🚀 Incarnation_getWaveBuffer() theSpace: %p\n", (theSpace));
+	//printf("        🚀 🚀 🚀        the qWave %p\n", (theSpace->incarn->mainQWave));
+	//printf("        🚀 🚀 🚀        the wave %p\n", (theSpace->incarn->mainQWave->wave));
 //	printf("        🚀 🚀 🚀     q=w %d   s=w %d   q=s %d\n",
-//		(uintptr_t) (theSpace->latestQWave) == (uintptr_t) (theSpace->latestQWave->wave),
-//		(uintptr_t) (theSpace) == (uintptr_t) (theSpace->latestQWave->wave),
-//		(uintptr_t) (theSpace->latestQWave) == (uintptr_t) (theSpace)
+//		(uintptr_t) (theSpace->incarn->mainQWave) == (uintptr_t)  (theSpace->incarn->mainQWave->wave),
+//		(uintptr_t) (theSpace) == (uintptr_t) (theSpace->incarn->mainQWave->wave),
+//		(uintptr_t) (theSpace->incarn->mainQWave) == (uintptr_t) (theSpace)
 //	);
 
-	return theSpace->latestQWave->wave;
+	return theSpace->incarn->mainQWave->wave;
 }
 
 double *qSpace_getPotentialBuffer(void) {
 	return thePotential;
 }
 
-double qSpace_getElapsedTime(void) {
+double Incarnation_getElapsedTime(void) {
 	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getElapsedTime()");
-	return theSpace->elapsedTime;
+	return theSpace->incarn->elapsedTime;
 }
 
-double qSpace_getIterateSerial(void) {
+double Incarnation_getIterateSerial(void) {
 	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getIterateSerial()");
-	return theSpace->iterateSerial;
+	return theSpace->incarn->iterateSerial;
 }
 
 void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
@@ -109,40 +109,40 @@ void qSpace_setValleyPotential(double power, double scale, double offset) {
 	theSpace->setValleyPotential(power, scale, offset);
 }
 
-void qSpace_setDt(double dt) {
-	theSpace->dt = dt;
+void Incarnation_setDt(double dt) {
+	theSpace->incarn->dt = dt;
 }
 
 // iterations are what the user sees.  steps are what Visscher does repeatedly.
-void qSpace_setStepsPerIteration(int stepsPerIteration) {
-	//printf("🚀 🚀 🚀 qSpace_setStepsPerIteration(%d)\n", stepsPerIteration);
+void Incarnation_setStepsPerIteration(int stepsPerIteration) {
+	//printf("🚀 🚀 🚀 Incarnation_setStepsPerIteration(%d)\n", stepsPerIteration);
 	if (stepsPerIteration < 1 || stepsPerIteration > 1e8) {
 		char buf[100];
-		sprintf(buf, "qSpace_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
-		throw buf;
+		snprintf(buf, 100, "Incarnation_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
+		throw std::runtime_error(buf);
 	}
-	theSpace->stepsPerIteration = stepsPerIteration;
-	//printf("🚀 🚀 🚀 qSpace_setStepsPerIteration result %d in theSpace=%p\n",
-	//	theSpace->stepsPerIteration, theSpace);
+	theSpace->incarn->stepsPerIteration = stepsPerIteration;
+	//printf("🚀 🚀 🚀 Incarnation_setStepsPerIteration result %d in theSpace=%p\n",
+	//	theSpace->incarn->stepsPerIteration, theSpace);
 }
 
 // low pass filter.
-void qSpace_setLowPassDilution(double dilution) {
-	//printf("🚀 🚀 🚀 qSpace_setLowPassDilution(%lf)\n", dilution);
+void Incarnation_setLowPassDilution(double dilution) {
+	//printf("🚀 🚀 🚀 Incarnation_setLowPassDilution(%lf)\n", dilution);
 	if (dilution >= 1. || dilution <= 0.) {
 		char buf[100];
-		sprintf(buf, "🚀 🚀 🚀qSpace_setLowPassDilution, %lf, must be between 0 and 1\n", dilution);
-		throw buf;
+		snprintf(buf, 100, "🚀 🚀 🚀 Incarnation_setLowPassDilution, %lf, must be between 0 and 1\n", dilution);
+		throw std::runtime_error(buf);
 	}
-	theSpace->lowPassDilution = dilution;
-	//printf("🚀 🚀 🚀 qSpace_setLowPassDilution result %lf in theSpace=%p\n",
-	//	theSpace->lowPassDilution, theSpace);
+	theSpace->incarn->lowPassDilution = dilution;
+	//printf("🚀 🚀 🚀 Incarnation_setLowPassDilution result %lf in theSpace=%p\n",
+	//	theSpace->incarn->lowPassDilution, theSpace);
 }
 
-void qSpace_oneIteration(void) { theSpace->oneIteration(); }
-void qSpace_resetCounters(void) { theSpace->resetCounters(); }
+void Incarnation_oneIteration(void) { theSpace->incarn->oneIteration(); }
+void Incarnation_resetCounters(void) { theSpace->incarn->resetCounters(); }
 
-void qSpace_askForFFT(void) { theSpace->askForFFT(); }
+void Incarnation_askForFFT(void) { theSpace->incarn->askForFFT(); }
 
 
 /* ******************************************************** space creation from JS */
@@ -199,13 +199,13 @@ qSpace *completeNewSpace(void) {
 
 	if (traceSpaceCreation) printf("   🚀 🚀 🚀 completeNewSpace After Creation but BEFORE loadViewBuffer  "
 		"theQViewBuffer=%p  theQViewBuffer->viewBuffer=%p  freeBufferList=%p\n",
-		theQViewBuffer, theQViewBuffer ?  theQViewBuffer->viewBuffer : NULL,
+		theQViewBuffer, theQViewBuffer ?  theQViewBuffer->buffer : NULL,
 		theSpace->freeBufferList);
 
 
 	// we make our own wave - static
-	theSpace->latestQWave = laosQWave;
-	qCx *wave = theSpace->latestQWave->wave;
+	//theSpace->incarn->mainQWave = laosQWave;
+	qCx *wave = theSpace->incarn->mainQWave->wave;
 
 	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
 
@@ -219,7 +219,7 @@ qSpace *completeNewSpace(void) {
 	//theSpace->dumpThatWave(wave, true);
 
 	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
-	theSpace->latestQWave->normalize();
+	theSpace->incarn->mainQWave->normalize();
 	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
 	//printf("🚀 🚀 🚀 newly created wave, AFTER norm:\n");
 	//theSpace->dumpThatWave(wave, true);

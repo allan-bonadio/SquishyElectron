@@ -1,4 +1,7 @@
 #!/bin/bash
+# build for development -- script to compile emscripten/C++ sources into WebAssembly
+# Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+
 
 cd `dirname $0`
 
@@ -9,17 +12,23 @@ cd `dirname $0`
 # omit those, so testing can compile & run itself.
 allCpp=`cat allCpp.list`
 
+# keep LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 32
+LABEL_LEN=15
+
 cd ..
 
 # https://emscripten.org/docs/tools_reference/emcc.html
 emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
-	-g -sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 \
+	-gsource-map --source-map-base \
+	-sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 \
 	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \
 	-sEXPORTED_FUNCTIONS=@building/exports.json \
 	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","getValue","setValue"]' \
+	-DLABEL_LEN=$LABEL_LEN \
 	-I/dvl/emscripten/emsdk/upstream/emscripten/cache/sysroot/include \
 	-include emscripten.h \
 	main.cpp $allCpp || exit 99
+# changed -g to -g4 to -gsource-map --source-map-base
 
 cp quantumEngine.wasm quantumEngine.js ../public
 
@@ -58,5 +67,6 @@ exit $?
 # allow exception catching but there's overhead each throw.
 # in the short term i'm using -fexceptions
 
+# Hey!  Should try out the sanitizers for more debug checks!
 # tried this in testing but I got all these alignment problems (or maybe just messages)
 # -fsanitize=undefined  \

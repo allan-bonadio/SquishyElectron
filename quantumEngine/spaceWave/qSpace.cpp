@@ -1,28 +1,24 @@
 /*
 ** quantum Space -- where an electron (or whatever) lives and moves around
-**		and the forces that impact it's motion and time evolution
+**		and the forces that impact its motion and time evolution
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
-//#include <cmath>
-//#include <chrono>
+
+//#include <ctime>
 #include <cstring>
 #include "qSpace.h"
+#include "../schrodinger/Incarnation.h"
 #include "qWave.h"
+#include "qViewBuffer.h"
 #include "../fourier/fftMain.h"
 
-extern void analyzeWaveFFT(qWave *qw);
 class qSpace *theSpace = NULL;
 double *thePotential = NULL;
 
 
-static bool debugIterSummary = false;
-static bool debugIteration = true;
-static bool debugJustWave = false;
-static bool debugJustInnerProduct = false;
-static bool debugFreeBuffer = false;
 
+static bool traceFreeBuffer = false;
 
 // someday I need an C++ error handling layer.  See
 // https://emscripten.org/docs/porting/Debugging.html?highlight=assertions#handling-c-exceptions-from-javascript
@@ -32,22 +28,15 @@ static bool debugFreeBuffer = false;
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
 qSpace::qSpace(const char *lab)
-	: dt(1.0), stepsPerIteration(100) {
-	magic = 'qSpa';
+	: magic('qSpa'), nDimensions(0), freeBufferList(NULL) {
 
 	//printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n", lab, (this));
-	nDimensions = 0;
-
-	resetCounters();
-	lowPassDilution = 0.5;
-
-	pleaseFFT = false;
-	isIterating = false;
 
 	strncpy(label, lab, LABEL_LEN);
 	label[LABEL_LEN] = 0;
 
-	freeBufferList = NULL;
+	if (LABEL_LEN != 7 && LABEL_LEN != 15 && LABEL_LEN != 31)
+		throw std::runtime_error("🚀 🚀 bad value for LABEL_LEN defined at compiler");
 
 	//printf("🚀 🚀 qSpace::qSpace() constructor done this= %p, length %lx\n",
 	//	(this), sizeof(qSpace));
@@ -60,6 +49,9 @@ qSpace::~qSpace(void) {
 
 	// these cached buffers need to go free
 	clearFreeBuffers();
+
+	delete incarn;
+
 //	printf("🚀 🚀 qSpace destructor done this= %p\n", (this));
 //	printf("🧨 🧨    made it this far, %s:%d  freeBufferList=%p\n", __FILE__, __LINE__, this->freeBufferList);
 }
@@ -95,23 +87,25 @@ void qSpace::tallyDimensions(void) {
 	nStates = 1;
 
 	int ix;
-	// finish up all the dimensions now that we know them all
+	// finish up all the dimensions now that we know them all - inside out
 	for (ix = nDimensions-1; ix >= 0; ix--) {
-		qDimension *dims = dimensions + ix;
+		qDimension *dim = dimensions + ix;
 
-		nStates *= dims->N;
-		dims->nStates = nStates;
-		nPoints *= dims->start + dims->end;
-		dims->nPoints = nPoints;
+		nStates *= dim->N;
+		dim->nStates = nStates;
+		nPoints *= dim->start + dim->end;
+		dim->nPoints = nPoints;
+
+		dim->chooseSpectrumLength();
 	}
 
-	chooseSpectrumLength();
+	spectrumLength = dimensions[0].spectrumLength;
 
 	if (nPoints > spectrumLength)
 		freeBufferLength = nPoints;
 	else
 		freeBufferLength = spectrumLength;
-	if (debugFreeBuffer) {
+	if (traceFreeBuffer) {
 		printf("🚀 🚀 qSpace::tallyDimensions, nPoints=%d   spectrumLength=%d   freeBufferLength=%d   ",
 			nPoints, spectrumLength, freeBufferLength);
 	}
@@ -124,8 +118,11 @@ void qSpace::tallyDimensions(void) {
 void qSpace::initSpace() {
 	tallyDimensions();
 
+	// this allocates the qwaves so must call this after sizes have been decided
+	incarn = new Incarnation(this);
+
 	// try out different formulas here.  Um, this is actually set manually in CP
-	double dt = dt = 1. / (nStates * nStates);
+	incarn->dt = 1. / (nStates * nStates);
 	//double dt = dt = nStates * 0.02;  // try out different factors here
 
 	// used only for the RKs - therefore obsolete
@@ -134,11 +131,6 @@ void qSpace::initSpace() {
 //	bufferNum = 0;
 }
 
-
-void qSpace::resetCounters(void) {
-	elapsedTime = 0.;
-	iterateSerial = 0;
-}
 
 /* ********************************************************** potential */
 
@@ -173,83 +165,6 @@ void qSpace::setValleyPotential(double power = 1, double scale = 1, double offse
 }
 
 
-/* ********************************************************** integration */
-
-
-// does several visscher steps (eg 100 or 500)
-void qSpace::oneIteration() {
-	int ix;
-
-	if (debugIteration)
-		printf("🚀 🚀 qSpace::oneIteration() - dt=%lf   stepsPerIteration=%d\n",
-			dt, stepsPerIteration);
-
-	int steps = stepsPerIteration / 2;
-	if (debugIteration)
-		printf("🚀 🚀 qSpace::oneIteration() - steps=%d   stepsPerIteration=%d\n",
-			steps, stepsPerIteration);
-
-	isIterating = true;
-	for (ix = 0; ix < steps; ix++) {
-		// this seems to have a resolution of 100µs on Panama
-		//auto start = std::chrono::steady_clock::now();////
-
-		oneVisscherStep(laosQWave, peruQWave);
-		oneVisscherStep(peruQWave, laosQWave);
-		if (debugIteration && 0 == ix % 100)
-			printf("🚀 🚀  step every hundred, step %d\n", ix * 2);
-
-		//auto end = std::chrono::steady_clock::now();////
-		//std::chrono::duration<double> elapsed_seconds = end-start;////
-		//printf("elapsed time: %lf \n", elapsed_seconds.count());////
-	}
-	isIterating = false;
-
-	iterateSerial++;
-
-	// printf("qSpace::oneIteration(): viewBuffer %ld and latestWave=%ld\n",
-	// 	(long) viewBuffer, (long) latestWave);
-	latestQWave = laosQWave;
-
-	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
-	//	latestQWave->lowPassFilter(lowPassDilution);
-	latestQWave->nyquistFilter();
-	latestQWave->normalize();
-
-
-	// need it; somehow? not done in JS
-	theQViewBuffer->loadViewBuffer();
-
-	if (debugIterSummary) {
-		char buf[100];
-		sprintf(buf, "🚀 🚀 finished one iteration (%d steps, N=%d), inner product: %lf",
-			stepsPerIteration, dimensions->N, latestQWave->innerProduct());
-	}
-
-	if (debugJustWave) {
-		char buf[100];
-		latestQWave->dumpWave(buf, true);
-	}
-	if (debugJustInnerProduct) {
-		printf("🚀 🚀 finished one integration iteration (%d steps, N=%d), inner product: %lf\n",
-			stepsPerIteration, dimensions->N, latestQWave->innerProduct());
-	}
-
-	if (pleaseFFT) {
-		analyzeWaveFFT(latestQWave);
-		pleaseFFT = false;
-	}
-}
-
-
-// user button to print it out now, or at end of the next iteration
-void qSpace::askForFFT(void) {
-	if (isIterating)
-		pleaseFFT = true;
-	else
-		analyzeWaveFFT(latestQWave);
-}
-
 
 /* ********************************************************** FreeBuffer */
 
@@ -258,7 +173,7 @@ void qSpace::askForFFT(void) {
 qCx *qSpace::borrowBuffer(void) {
 	FreeBuffer *rentedCache = freeBufferList;
 	if (rentedCache) {
-		if (debugFreeBuffer) {
+		if (traceFreeBuffer) {
 			printf("🚀 🚀 qSpace::borrowBuffer() with some cached. freeBufferList: %p\n",
 			(freeBufferList));
 		}
@@ -269,7 +184,7 @@ qCx *qSpace::borrowBuffer(void) {
 	}
 	else {
 		// must make a new one
-		if (debugFreeBuffer) {
+		if (traceFreeBuffer) {
 			printf("🚀 🚀 qSpace::borrowBuffer() with none cached. freeBufferList: %p   freeBufferLength: %d\n",
 				freeBufferList, freeBufferLength);
 		}

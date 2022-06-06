@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** cooley-tuckey fft algorithm -- spectral analysis for Squishy Electron
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
@@ -9,9 +9,11 @@
 
 /* *************************************************** only powers of 2 */
 //#include <cmath>
-#include "../squish.h"
+
 #include "../spaceWave/qSpace.h"
+#include "../schrodinger/Incarnation.h"
 #include "../spaceWave/qWave.h"
+#include "qSpectrum.h"
 #include "fftMain.h"
 
 
@@ -64,12 +66,11 @@ void cooleyTukeyIFFT(qCx *dest, qCx *src, int N)
 	// forward cooleyTukeyFFT
 	cooleyTukeyFFT(dest, src, N);
 
-	// conjugate the qCx numbers again
-	for (int i = 0; i < N; i++)
-		dest[i].im = -dest[i].im;
-
-	// scale the numbers
-//	x /= x.size();
+	// conjugate the qCx numbers again, and scale (fft+ifft multiplies by N)
+	for (int i = 0; i < N; i++) {
+		dest[i].re = dest[i].re / N;
+		dest[i].im = -dest[i].im / N;
+	}
 }
 
 

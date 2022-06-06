@@ -1,5 +1,5 @@
 /*
-** squish View -- a webgl image of the quantum wave
+** squish View -- a webgl image of the quantum wave (or whatever)
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
@@ -42,7 +42,7 @@ export class SquishView extends React.Component {
 		if (qe.getElapsedTime) {
 			// after qe has been initialized
 			et = thousands(qe.getElapsedTime().toFixed(4));
-			iser = thousands(qe.qSpace_getIterateSerial());
+			iser = thousands(qe.Incarnation_getIterateSerial());
 		}
 
 		const spinner = qe.cppLoaded ? ''

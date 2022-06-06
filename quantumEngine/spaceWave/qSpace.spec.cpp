@@ -1,6 +1,13 @@
-#include "../squish.h"
-#include "../spaceWave/qSpace.h"
-#include "../spaceWave/qWave.h"
+/*
+** quantum space tests
+** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+*/
+
+
+#include "qSpace.h"
+#include "../schrodinger/Incarnation.h"
+#include "qWave.h"
+#include "qViewBuffer.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"
@@ -37,14 +44,43 @@ TEST(qSpace, qSpace_BareGauntlet)
 // just the constructor; it's not even fully created
 TEST(qSpace, qSpace_ConstructorGauntlet)
 {
-	qSpace *space = new qSpace("ShowRoomDummies");
-	STRCMP_EQUAL("ShowRoomDummies", space->label);
+	qSpace *space = new qSpace("ShowRoo");
+	STRCMP_EQUAL("ShowRoo", space->label);
 
 	LONGS_EQUAL(0, space->nDimensions);
-	LONGS_EQUAL(0.5, space->lowPassDilution);
+	// hmm must be something else to test...
 
-	LONGS_EQUAL(false, space->pleaseFFT);
-	LONGS_EQUAL(false, space->isIterating);
+	// should change one of these to discrete someday or
+	// make a func to try combinations
+	space->addDimension(16, contENDLESS, "x");
+	LONGS_EQUAL(1, space->nDimensions);
+
+	space->addDimension(8, contENDLESS, "y");
+	LONGS_EQUAL(2, space->nDimensions);
+
+	space->initSpace();
+
+	LONGS_EQUAL(128, space->nStates);
+	LONGS_EQUAL(180, space->nPoints);
+
+	qDimension *dims = space->dimensions;
+
+	LONGS_EQUAL(128, dims[0].nStates);
+	LONGS_EQUAL(180, dims[0].nPoints);
+	LONGS_EQUAL(16, dims[0].N);
+	LONGS_EQUAL(1, dims[0].start);
+	LONGS_EQUAL(17, dims[0].end);
+	LONGS_EQUAL(contENDLESS, dims[0].continuum);
+	STRCMP_EQUAL("x", dims[0].label);
+
+	LONGS_EQUAL(8, dims[1].nStates);
+	LONGS_EQUAL(10, dims[1].nPoints);
+	LONGS_EQUAL(8, dims[1].N);
+	LONGS_EQUAL(1, dims[1].start);
+	LONGS_EQUAL(9, dims[1].end);
+	LONGS_EQUAL(contENDLESS, dims[1].continuum);
+	STRCMP_EQUAL("y", dims[1].label);
+
 
 
 	delete space;
@@ -70,17 +106,13 @@ void completeNewSpaceGauntlet(int N, int expectedSpectrumLength, int expectedFre
 	STRCMP_EQUAL_TEXT("x", space->dimensions->label, "space label");
 	LONGS_EQUAL_TEXT(expectedSpectrumLength, space->dimensions->spectrumLength, "space spectrumLength");
 
-	LONGS_EQUAL_TEXT(expectedSpectrumLength, space->spectrumLength, "space spectrumLength");
 	LONGS_EQUAL_TEXT(expectedFreeBufferLength, space->freeBufferLength, "space freeBufferLength");
 
 	LONGS_EQUAL_TEXT(1, space->nDimensions, "space nDimensions");
 
 	// lets see if the buffers are all large enough
 //	printf("🧨 🧨       lets see if the buffers are all large enough freeBufferList=%p\n", space->freeBufferList);
-	proveItsMine(laosWave, nPoints * sizeof(qCx));
-	proveItsMine(peruWave, nPoints * sizeof(qCx));
 	proveItsMine(theSpace->potential, nPoints * sizeof(double));
-	proveItsMine(theQViewBuffer->viewBuffer, nPoints * sizeof(float) * 8);
 
 //	printf("🧨 🧨       we're done, deleting freeBufferList=%p\n", space->freeBufferList);
 	deleteTheSpace();

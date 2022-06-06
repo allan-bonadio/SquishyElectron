@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** flat view def -- experimental viewdef before I had the whole 'drawing' thing in place
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 

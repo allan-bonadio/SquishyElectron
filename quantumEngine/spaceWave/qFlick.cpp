@@ -3,9 +3,8 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
-//#include <cmath>
-//#include <string>
+// not used much anymore...
+
 #include <cstring>
 #include "qSpace.h"
 #include "qWave.h"
@@ -21,6 +20,8 @@ const double gapFactor = .01;
 qFlick::qFlick(qSpace *space, int maxWaves) :
 	qWave(space), maxWaves(maxWaves), nWaves(2), currentIx(0)
 {
+	if (! space)
+		throw std::runtime_error("qSpectrum::qSpectrum null space");
 	if (maxWaves < 2) throw std::runtime_error("maxwaves must be at least 2");
 	if (maxWaves > 1000) throw std::runtime_error("maxwaves is too big, sure you want that?");
 

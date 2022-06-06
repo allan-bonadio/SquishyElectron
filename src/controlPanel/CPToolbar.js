@@ -28,7 +28,7 @@ function setPT() {
 
 function clickOnFFR()
 {
-	qe.qSpace_askForFFT()
+	qe.Incarnation_askForFFT()
 }
 
 
