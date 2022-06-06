@@ -29,10 +29,8 @@ struct Incarnation {
 	struct qWave *mainQWave;
 	struct qWave *scratchQWave;
 
+	// the buffer to be passed to webgl
 	struct qViewBuffer *viewBuffer;
-
-	// a result recalculated every iteration or so (?)
-	//double innerProduct;
 
 	// params that the user can set
 	double dt;
@@ -51,6 +49,9 @@ struct Incarnation {
 	void stepReal(qCx *newW, qCx *oldW, double dt);
 	void stepImaginary(qCx *newW, qCx *oldW, double dt);
 	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);  // obsolete
+
+	// kill high frequencies via FFTs
+	void fourierFilter(void);
 
 	bool isIterating;
 

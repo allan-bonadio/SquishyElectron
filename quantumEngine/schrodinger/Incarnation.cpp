@@ -10,6 +10,7 @@
 #include "../spaceWave/qSpace.h"
 #include "../schrodinger/Incarnation.h"
 #include "../spaceWave/qWave.h"
+#include "../fourier/qSpectrum.h"
 #include "../spaceWave/qViewBuffer.h"
 #include "../fourier/fftMain.h"
 
@@ -122,8 +123,7 @@ void Incarnation::oneIteration() {
 //	mainQWave->nyquistFilter();
 
 
-	mainQWave->normalize();
-
+	fourierFilter();
 
 	// need it; somehow? not done in JS
 	theQViewBuffer->loadViewBuffer();
@@ -146,6 +146,30 @@ void Incarnation::oneIteration() {
 		this->pleaseFFT = false;
 	}
 }
+
+
+
+// FFT the wave, cut down the high frequencies, then iFFT it back
+void Incarnation::fourierFilter(void) {
+	qSpectrum *spect = new qSpectrum(space);
+	spect->generateSpectrum(mainQWave);
+
+	// the high frequencies are in the middle; the nyquist freq is at N/2
+	int nyquist = spect->nPoints/2;
+	double widest = nyquist / 4;  // number of freqs we'll attenuate
+	qCx *s = spect->wave;
+	s[nyquist] = 0;
+	for (int k = 1; k < widest; k++) {
+		double factor = 1. - k / widest;
+		s[nyquist + k] *= factor;
+		s[nyquist - k] *= factor;
+	}
+
+
+	spect->generateWave(mainQWave);
+	mainQWave->normalize();
+}
+
 
 
 // user button to print it out now, or at end of the next iteration
