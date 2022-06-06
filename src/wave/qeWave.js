@@ -4,7 +4,7 @@
 */
 
 // import {qeBasicSpace} from './qeSpace';
-//import {qe} from './qe';
+import {qe} from './qe';
 import cxToRgb from '../view/cxToRgb';
 
 // emscripten sabotages this?  the log & info, but not error & warn?
@@ -242,8 +242,8 @@ class qeWave {
 		let freqHighHigh = freqHigh + 1.;
 
 		// FIve neighboring frequencies, weighting, where the middle freq has weight 1.0
-		let nearWeight = 0.9;
-		let farWeight = .8
+		let nearWeight = 0.5;
+		let farWeight = .25
 
 		for (let ix = start; ix < end; ix += 2) {
 			const angle = dAngle * (ix - start - offset);
@@ -287,7 +287,8 @@ class qeWave {
 			break;
 		}
 
-		this.normalize();
+		qe.Incarnation_normalize();  // also sets maxNorm
+		//this.normalize();
 		this.space.fixThoseBoundaries(this.wave);
 	}
 }
