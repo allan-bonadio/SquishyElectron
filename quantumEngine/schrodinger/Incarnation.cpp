@@ -59,7 +59,7 @@ double getTimeDouble()
 // does several visscher steps (eg 100 or 500)
 // actually does stepsPerIteration+1 steps; half steps at start and finish
 void Incarnation::oneIteration() {
-	int ix;
+	int tt;
 
 	printf("the ttime: %lf\n", getTimeDouble());
 
@@ -85,21 +85,21 @@ void Incarnation::oneIteration() {
 		printf("      doubleSteps=%d   stepsPerIteration=%d\n",
 			doubleSteps, stepsPerIteration);
 
-	for (ix = 0; ix < doubleSteps; ix++) {
+	for (tt = 0; tt < doubleSteps; tt++) {
 		// this seems to have a resolution of 100µs on Panama
 		//auto start = std::chrono::steady_clock::now();////
 
 		oneVisscherStep(mainQWave, scratchQWave);
 		oneVisscherStep(scratchQWave, mainQWave);
 
-		if (traceIteration && 0 == ix % 100) {
-			printf("       step every hundred, step %d; elapsed time: %lf\n", ix * 2, getTimeDouble());
+		if (traceIteration && 0 == tt % 100) {
+			printf("       step every hundred, step %d; elapsed time: %lf\n", tt * 2, getTimeDouble());
 		}
 
 		//auto end = std::chrono::steady_clock::now();////
 		//std::chrono::duration<double> elapsed_seconds = end-start;////
 		if (traceIterSteps) {
-			printf("step done %d; elapsed time: %lf \n", ix*2, getTimeDouble());////
+			printf("step done %d; elapsed time: %lf \n", tt*2, getTimeDouble());////
 		}
 	}
 
@@ -120,7 +120,9 @@ void Incarnation::oneIteration() {
 	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
 	//	mainQWave->lowPassFilter(lowPassDilution);
 //	mainQWave->nyquistFilter();
-//	mainQWave->normalize();
+
+
+	mainQWave->normalize();
 
 
 	// need it; somehow? not done in JS

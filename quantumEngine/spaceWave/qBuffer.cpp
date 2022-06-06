@@ -275,10 +275,13 @@ double qBuffer::innerProduct(void) {
 		if (maxNorm < norm)
 			maxNorm = norm;
 
+		//printf("in qBuffer::innerProduct()   re=%lf  im=%lf  norm=%lf and maxnorm=%lf\n", point.re, point.im, norm, maxNorm);
 		//sum += wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im;
-// 		printf("innerProduct point %d (%lf,%lf) %lf\n", ix, wave[ix].re, wave[ix].im,
-// 			wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im);
+		//printf("innerProduct point %d (%lf,%lf) %lf\n", ix, wave[ix].re, wave[ix].im,
+		//	wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im);
 	}
+
+	//printf("final maxnorm in qBuffer::innerProduct=%lf\n", maxNorm);
 	return sum;
 }
 
@@ -286,6 +289,7 @@ double qBuffer::innerProduct(void) {
 
 // enforce ⟨𝜓 | 𝜓⟩ = 1 by dividing out the current magnitude sum.
 // BUffer must be installed as well as nPoints, start and end
+// innerProduct() will calculate maxNorm for you.
 void qBuffer::normalize(void) {
 	// for visscher, we have to make it in a temp wave and copy back to our buffer
 	// huh?  this is never copied back.  normalize here does nothing.
@@ -321,7 +325,9 @@ void qBuffer::normalize(void) {
 	}
 	fixBoundaries();
 	//dumpWave("qWave::normalize done", true);
-	///space->visscherHalfStep(wave, this);
+
+	// you know that maxNorm calculated in innerProduct?  adjust that too.
+	maxNorm /= mag;
 }
 
 

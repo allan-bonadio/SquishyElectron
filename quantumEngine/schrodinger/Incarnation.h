@@ -77,6 +77,8 @@ extern "C" {
 
 	void Incarnation_oneIteration(void);
 
+	void Incarnation_askForFFT(void);
+	void Incarnation_normalize(void);
 
 	int manyRk2Steps(void);
 

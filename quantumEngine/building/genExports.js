@@ -15,7 +15,7 @@ const fs = require('fs');
 // also must call defineQEngineFuncs after C++ is initialized
 exportsSrc  = [
 	// args and retType can be 'number', 'string', 'array' (of bytes), or null meaning void.
-	// That's all.  Anything more complex, you have to make up out of those with multiple calls.
+	// That's all.  Anything more complex, you have to make up out of those with multiple calls or a typed array.
 	{name: 'main', retType: 'number', args: []},
 
 	// recreating the space
@@ -56,6 +56,7 @@ exportsSrc  = [
 	// FFT
  	//{name: 'testFFT', retType: null, args: []},
 	{name: 'Incarnation_askForFFT', retType: null, args: []},
+	{name: 'Incarnation_normalize', retType: null, args: []},
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():

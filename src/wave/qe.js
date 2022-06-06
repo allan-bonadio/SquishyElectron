@@ -1,4 +1,4 @@
-// this file generated Thu Jun 02 2022 00:39:56 GMT-0700 (Pacific Daylight Time)
+// this file generated Fri Jun 03 2022 23:15:24 GMT-0700 (Pacific Daylight Time)
 // by the file SquishyElectron/quantumEngine/building/genExports.js
 let cwrap;
 export const qe = {};
@@ -27,10 +27,10 @@ export function defineQEngineFuncs() {
 	qe.qViewBuffer_loadViewBuffer = cwrap('qViewBuffer_loadViewBuffer', null, []);
 	qe.qViewBuffer_dumpViewBuffer = cwrap('qViewBuffer_dumpViewBuffer', null, ['string']);
 	qe.Incarnation_askForFFT = cwrap('Incarnation_askForFFT', null, []);
+	qe.Incarnation_normalize = cwrap('Incarnation_normalize', null, []);
 }
 
 window.defineQEngineFuncs = defineQEngineFuncs;  // just in case
 window.qe = qe;
 
 export default qe;
-
