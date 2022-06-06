@@ -5,6 +5,7 @@
 
 
 // attr arrays and uniforms that can change on every frame.
+// you can set a static value or a function that'll return it
 
 // superclass for all of these.
 export class viewVariable {
@@ -34,6 +35,7 @@ export class viewVariable {
 
 /* ************************************************** uniforms */
 
+// uniforms don't vary from one vertex to another
 // create this as many times as you have uniforms as input to either or both shaders
 export class viewUniform extends viewVariable {
 	constructor(varName, owner) {
@@ -73,17 +75,18 @@ export class viewUniform extends viewVariable {
 
 	// set the uniform to it - upload latest value to GPU
 	// call this when the uniform's value changes, to reload it into the GPU
+	// call abstractViewDef::reloadAllVariables() for all
 	reloadVariable() {
 		let value = this.staticValue;
 		let type = this.staticType;
 		if (this.getFunc) {
-			let v = this.getFunc();
+			const v = this.getFunc();
 			value = v.value;
 			type = v.type;
 		}
 
 		// you can't pass null or undefined
-		if ((! value && value !== 0) || ! type)
+		if ((! value && value !== 0 && value !== '' && value !== false) || ! type)
 			throw `uniform variable has no value(${value}) or no type(${type})`;
 		const gl = this.gl;
 		const pgm = this.owner.program;
@@ -113,6 +116,10 @@ export class viewUniform extends viewVariable {
 }
 
 /* *********************************************** attributes for arrays */
+// attributes DO change from one vertex to another; each row of the attr array
+// is given to the vertex shader, which crunches whatever and decides upon the
+// coordinates and color for that point
+
 // create this as many times as you have buffers as input to either shader
 export class viewAttribute extends viewVariable {
 	constructor(varName, owner) {
@@ -174,7 +181,8 @@ export class viewAttribute extends viewVariable {
 		this.reloadVariable();
 	}
 
-	// call this when the array's values change, to reload them into the GPU
+	// call this when the array's values change, to reload them into the GPU.
+	// No function; the original array must change its values.
 	reloadVariable() {
 		const gl = this.gl;
 		//console.log(`reload Array variable ${this.varName} : `, this.float32TypedArray);

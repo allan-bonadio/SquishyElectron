@@ -181,6 +181,8 @@ export class abstractViewDef {
 	}
 
 	/* ************************************************** buffers & variables */
+
+	// go and call setInputs on each of the drawings
 	setInputs() {
 		//console.log('setInputs drawings', this.drawings);
 		//console.dir(this.drawings);

@@ -99,14 +99,20 @@ class flatDrawing extends abstractDrawing {
 		let barWidth = 1 / (nPoints - 1);
 		barWidthUniform.setValue(barWidth, '1f');
 
-		let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
+		//let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
 
 		// a bit crude but.. scale it based on the max magnitude of the wave as it is now
-		let maxNorm = qe.Incarnation_getMaxNorm();
-		this.unitHeight = 1. / maxNorm;
-// 		let nStates = this.nStates = this.space ? this.space.nStates : 10;
-// 		this.unitHeight = nStates / 4;
-		unitHeightUniform.setValue(this.unitHeight, '1f');
+		//let maxNorm = qe.Incarnation_getMaxNorm();
+		let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
+		//let unitHeight = 1;
+		unitHeightUniform.setValue(() => {
+			return {value: 1 / qe.Incarnation_getMaxNorm(), type: '1f'};
+		});
+
+// 		this.unitHeight = 1. / maxNorm;
+// // 		let nStates = this.nStates = this.space ? this.space.nStates : 10;
+// // 		this.unitHeight = nStates / 4;
+// 		unitHeightUniform.setValue(this.unitHeight, '1f');
 
 		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
