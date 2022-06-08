@@ -4,7 +4,6 @@
 */
 
 import PropTypes from 'prop-types';
-import LogSlider from '../widgets/LogSlider';
 import qe from '../wave/qe';
 
 function setPT() {
@@ -16,13 +15,7 @@ function setPT() {
 
 		iterateFrequency: PropTypes.number.isRequired,
 		setIterateFrequency: PropTypes.func.isRequired,
-
-		dt: PropTypes.number.isRequired,
-		setDt: PropTypes.func.isRequired,
-		stepsPerIteration: PropTypes.number.isRequired,
-		setStepsPerIteration: PropTypes.func.isRequired,
-		lowPassDilution: PropTypes.number.isRequired,
-		setLowPassDilution: PropTypes.func.isRequired,
+		N: PropTypes.number.isRequired,
 	};
 }
 
@@ -84,64 +77,13 @@ function CPToolbar(props) {
 			<big>►</big> ▌
 		</button>
 
+		<div className='toolbarThing'>
+			{props.N} states
+		</div>
 
-		<LogSlider
-			unique='dtSlider'
-			className='dtSlider'
-			label='dt'
-			minLabel='.0001'
-			maxLabel='1.0'
-
-			current={props.dt}
-			sliderMin={.0001}
-			sliderMax={1}
-			stepsPerDecade={6}
-
-			handleChange={(power, ix) => {
-				console.info(`handleChange jj   ix=${ix}  power=${power}`);
-				props.setDt(power);
-			}}
-		/>
-		<LogSlider
-			unique='stepsPerIterationSlider'
-			className='stepsPerIterationSlider dtSlider'
-			label='steps Per Iteration'
-			minLabel='faster'
-			maxLabel='smoother'
-
-			current={props.stepsPerIteration}
-			sliderMin={100}
-			sliderMax={10000}
-			stepsPerDecade={3}
-
-			handleChange={(power, ix) => {
-				console.info(`handleChange stepsPerIteration::  ix=${ix}  power=${power}`);
-				props.setStepsPerIteration(power);
-			}}
-		/>
-		<LogSlider
-			unique='lowPassDilutionSlider'
-			className='lowPassDilutionSlider dtSlider'
-			label='Low Pass Dilution'
-			minLabel='0.001'
-			maxLabel='.999'
-
-			current={props.lowPassDilution}
-			sliderMin={0.001}
-			sliderMax={.999}
-			stepsPerDecade={6}
-
-			handleChange={(power, ix) => {
-				console.info(`handleChange Low Pass Dilution::  ix=${ix}  `, power);
-				props.setLowPassDilution(power);
-			}}
-		/>
 		<button onClick={clickOnFFR}>
 			FFT
 		</button>
-
-
-
 		<button onClick={props.resetCounters}>Reset Counters</button>
 
 	</div>;
