@@ -101,10 +101,7 @@ class flatDrawing extends abstractDrawing {
 
 		//let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
 
-		// a bit crude but.. scale it based on the max magnitude of the wave as it is now
-		//let maxNorm = qe.Incarnation_getMaxNorm();
 		let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
-		//let unitHeight = 1;
 		unitHeightUniform.setValue(() => {
 			return {value: 1 / qe.Incarnation_getMaxNorm(), type: '1f'};
 		});
@@ -119,7 +116,7 @@ class flatDrawing extends abstractDrawing {
 		this.rowFloats = 4;
 		this.rowAttr.attachArray(qe.space.viewBuffer, this.rowFloats);
 
-		console.log(`just set inputs in flatDrawing.js.  :`);
+		//console.log(`just set inputs in flatDrawing.js.  :`);
 	}
 
 

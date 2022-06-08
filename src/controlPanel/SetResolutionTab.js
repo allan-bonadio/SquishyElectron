@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** Resolution/Space tab -- lets user choose a new nStates
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 

@@ -204,6 +204,8 @@ export class qeSpace extends qeBasicSpace {
 // isn't the viewBuffer itself suipposed to do rthat?  oh ytean that's C++.  Here we make our own.
 		let emscriptenMemory = window.Module.HEAPF32.buffer;
 		let address = qe.qViewBuffer_getViewBuffer();
+
+		// display also the boundary points?  if not, use nStates instead
 		let np = this.nPoints * 16;  // 16 = sizeof(qCx)
 
 		this.viewBuffer = qe.viewBuffer =
