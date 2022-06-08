@@ -287,7 +287,7 @@ class qeWave {
 			break;
 		}
 
-		qe.Incarnation_normalize();  // also sets maxNorm
+		qe.Avatar_normalize();  // also sets maxNorm
 		//this.normalize();
 		this.space.fixThoseBoundaries(this.wave);
 	}

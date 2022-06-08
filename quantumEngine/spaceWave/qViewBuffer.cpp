@@ -5,7 +5,7 @@
 
 
 #include "qSpace.h"
-#include "../schrodinger/Incarnation.h"
+#include "../schrodinger/Avatar.h"
 #include "qWave.h"
 #include "qViewBuffer.h"
 
@@ -31,7 +31,7 @@ qViewBuffer::~qViewBuffer() {
 	delete[] buffer;
 }
 
-// copy the numbers in our incarnation's qWave into buffer
+// copy the numbers in our Avatar's qWave into buffer
 // one row per vertex, two rows per wave datapoint.
 // each row of 4 floats looks like this:
 //     real   imaginary    potential    serial
@@ -41,9 +41,9 @@ float qViewBuffer::loadViewBuffer(void) {
 	if (debugViewBuffer) printf("📺 loadViewBuffer() starts: buffer = %p \n",
 		buffer);
 //	printf("qViewBuffer::loadViewBuffer space ptr %p\n", space);
-//	printf("qViewBuffer::loadViewBuffer mainQWave ptr %p\n", space->incarn->mainQWave);
-	qWave *mainQWave = space->incarn->mainQWave;
-//	printf("qViewBuffer::loadViewBuffer latestWave ptr %p\n", incarn->mainQWave->wave);
+//	printf("qViewBuffer::loadViewBuffer mainQWave ptr %p\n", space->avatar->mainQWave);
+	qWave *mainQWave = space->avatar->mainQWave;
+//	printf("qViewBuffer::loadViewBuffer latestWave ptr %p\n", avatar->mainQWave->wave);
 	qCx *latestWave = mainQWave->wave;
 
 //	printf("qViewBuffer::loadViewBuffer space->nPoints %d\n", space->nPoints);
@@ -54,12 +54,12 @@ float qViewBuffer::loadViewBuffer(void) {
 	if (debugInDetail) {
 		printf("loadViewBuffer(P): thePotential=%p\n",
 			thePotential);
-		printf("loadViewBuffer(B): space->incarn->mainQWave->wave=%p->%p->%p->%p\n",
+		printf("loadViewBuffer(B): space->avatar->mainQWave->wave=%p->%p->%p->%p\n",
 			this,
 			space,
-			space->incarn->mainQWave,
-			space->incarn->mainQWave->wave);
-		printf("loadViewBuffer(vb,lqw): buffer %p and incarn->mainQWave->wave=%p\n",
+			space->avatar->mainQWave,
+			space->avatar->mainQWave->wave);
+		printf("loadViewBuffer(vb,lqw): buffer %p and avatar->mainQWave->wave=%p\n",
 			buffer, latestWave);
 		mainQWave->dumpWave("📺 at start of loadViewBuffer()");
 	}
@@ -135,7 +135,7 @@ void dumpViewBuffer(const char *title) {
 //	printf("dumpViewBuffer theSpace %p\n", theSpace);
 //	printf("dumpViewBuffer qViewBuffer ptr %p\n", theSpace->qViewBuffer);
 //	printf("dumpViewBuffer buffer %p\n", theSpace->qViewBuffer->buffer);
-	float *buffer = theSpace->incarn->viewBuffer->buffer;
+	float *buffer = theSpace->avatar->viewBuffer->buffer;
 	printf("📺 The buffer = %p\n", buffer);
 	double prevRe = buffer[0];
 	double prevIm = buffer[1];
@@ -168,7 +168,7 @@ void dumpViewBuffer(const char *title) {
 		}
 	}
 	printf("    qViewBuffer::at end of dumpViewBuffer qViewBuffer=%p  qViewBuffer->buffer=%p  local buffer=%p\n",
-			theSpace->incarn->viewBuffer, theSpace->incarn->viewBuffer->buffer, buffer);
+			theSpace->avatar->viewBuffer, theSpace->avatar->viewBuffer->buffer, buffer);
 }
 
 

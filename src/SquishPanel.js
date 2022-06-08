@@ -144,9 +144,9 @@ export class SquishPanel extends React.Component {
 			this.setNew1DResolution(s.N, s.continuum, s.viewClassName);
 
 			// vital properties of the space
-			qe.Incarnation_setDt(this.state.dt);
-			qe.Incarnation_setStepsPerIteration(this.state.stepsPerIteration);
-			//qe.Incarnation_askForFFT();
+			qe.Avatar_setDt(this.state.dt);
+			qe.Avatar_setStepsPerIteration(this.state.stepsPerIteration);
+			//qe.Avatar_askForFFT();
 
 			// this should be the only place animateHeartbeat() should be called
 			// except for inside the function itself
@@ -226,16 +226,16 @@ export class SquishPanel extends React.Component {
 
 	showTimeNIteration() {
 		// need them instantaneously - react is too slow
-		document.querySelector('.voNorthWest').innerHTML = qe.Incarnation_getElapsedTime().toFixed(2);
-		document.querySelector('.voNorthEast').innerHTML = qe.Incarnation_getIterateSerial();
+		document.querySelector('.voNorthWest').innerHTML = qe.Avatar_getElapsedTime().toFixed(2);
+		document.querySelector('.voNorthEast').innerHTML = qe.Avatar_getIterateSerial();
 	}
 
 	// do one integration iteration
 	crunchOneIteration() {
 		// (actually many visscher steps)
-		qe.Incarnation_oneIteration();
+		qe.Avatar_oneIteration();
 
-		//console.info(`📶  Incarnation_getMaxNorm=`, qe.Incarnation_getMaxNorm());
+		//console.info(`📶  Avatar_getMaxNorm=`, qe.Avatar_getMaxNorm());
 		if (dumpingTheViewBuffer)
 			this.dumpViewBuffer('crunchOneIteration()');
 	}
@@ -333,8 +333,8 @@ export class SquishPanel extends React.Component {
 	// button handler
 	startRunningOneCycle() {
 		this.runningOneCycle = true;
-		this.runningCycleStartingTime = qe.Incarnation_getElapsedTime();
-		this.runningCycleStartingSerial = qe.Incarnation_getIterateSerial();
+		this.runningCycleStartingTime = qe.Avatar_getElapsedTime();
+		this.runningCycleStartingSerial = qe.Avatar_getIterateSerial();
 		this.startIterating();
 	}
 	startRunningOneCycle = this.startRunningOneCycle.bind(this);
@@ -355,8 +355,8 @@ export class SquishPanel extends React.Component {
 					this.stopIterating();
 
 					this.setState({
-						runningCycleElapsedTime: qe.Incarnation_getElapsedTime() - this.runningCycleStartingTime,
-						runningCycleIterateSerial: qe.Incarnation_getIterateSerial() - this.runningCycleStartingSerial,
+						runningCycleElapsedTime: qe.Avatar_getElapsedTime() - this.runningCycleStartingTime,
+						runningCycleIterateSerial: qe.Avatar_getIterateSerial() - this.runningCycleStartingSerial,
 					});
 
 					this.goingDown = false;
@@ -425,7 +425,7 @@ export class SquishPanel extends React.Component {
 	singleStep = this.singleStep.bind(this);
 
 	resetCounters(ev) {
-		qe.Incarnation_resetCounters();
+		qe.Avatar_resetCounters();
 		this.showTimeNIteration();
 	}
 	resetCounters = this.resetCounters.bind(this);
@@ -434,28 +434,28 @@ export class SquishPanel extends React.Component {
 
 	setDt(dt) {
 		this.setState({dt});
-		qe.Incarnation_setDt(dt);
+		qe.Avatar_setDt(dt);
 	}
 	setDt = this.setDt.bind(this);
 
 	setStepsPerIteration(stepsPerIteration) {
 		console.info(`js setStepsPerIteration(${stepsPerIteration})`)
 		this.setState({stepsPerIteration});
-		qe.Incarnation_setStepsPerIteration(stepsPerIteration);
+		qe.Avatar_setStepsPerIteration(stepsPerIteration);
 	}
 	setStepsPerIteration = this.setStepsPerIteration.bind(this);
 
 	setLowPassFilter(lowPassFilter) {
 		console.info(`js setLowPassFilter(${lowPassFilter})`)
 		this.setState({lowPassFilter});
-		qe.Incarnation_setLowPassFilter(lowPassFilter);
+		qe.Avatar_setLowPassFilter(lowPassFilter);
 	}
 	setLowPassFilter = this.setLowPassFilter.bind(this);
 
 	// completely wipe out the 𝜓 wavefunction and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon setWave in wave tab
 	setWave(waveParams) {
-// 		const wave = qe.Incarnation_getWaveBuffer();
+// 		const wave = qe.Avatar_getWaveBuffer();
 		const qewave = this.state.space.qewave;
 		qewave.setFamiliarWave(waveParams);
 		this.iterateOneIteration(true, true);

@@ -7,7 +7,7 @@
 
 //#include <cmath>
 #include "qSpace.h"
-#include "../schrodinger/Incarnation.h"
+#include "../schrodinger/Avatar.h"
 #include "qWave.h"
 
 // a transitional kind of thing from raw wave arrays to the new qWave buffer obj

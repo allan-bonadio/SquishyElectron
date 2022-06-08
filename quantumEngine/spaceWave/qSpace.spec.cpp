@@ -5,7 +5,7 @@
 
 
 #include "qSpace.h"
-#include "../schrodinger/Incarnation.h"
+#include "../schrodinger/Avatar.h"
 #include "qWave.h"
 #include "qViewBuffer.h"
 #include "../testing/cppuMain.h"

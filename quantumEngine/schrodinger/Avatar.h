@@ -1,12 +1,12 @@
 /*
-** incarnation -- the instance and simulation of a quantum mechanical wave in a space
+** Avatar -- the instance and simulation of a quantum mechanical wave in a space
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 
-struct Incarnation {
-	Incarnation(qSpace *);
-	~Incarnation(void);
+struct Avatar {
+	Avatar(qSpace *);
+	~Avatar(void);
 
 	int magic;
 	qSpace *space;
@@ -72,17 +72,17 @@ struct Incarnation {
 // for JS to call
 extern "C" {
 
-	qCx *Incarnation_getWaveBuffer(void);
+	qCx *Avatar_getWaveBuffer(void);
 	float *qViewBuffer_getViewBuffer();
-	double Incarnation_getElapsedTime(void);
-	double Incarnation_getIterateSerial(void);
-	double Incarnation_getMaxNorm(void);
+	double Avatar_getElapsedTime(void);
+	double Avatar_getIterateSerial(void);
+	double Avatar_getMaxNorm(void);
 
 
-	void Incarnation_oneIteration(void);
+	void Avatar_oneIteration(void);
 
-	void Incarnation_askForFFT(void);
-	void Incarnation_normalize(void);
+	void Avatar_askForFFT(void);
+	void Avatar_normalize(void);
 
 	int manyRk2Steps(void);
 

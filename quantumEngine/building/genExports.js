@@ -27,13 +27,13 @@ exportsSrc  = [
 
 
 	// gets
-	{name: 'Incarnation_getWaveBuffer', retType: 'number', args: []},
+	{name: 'Avatar_getWaveBuffer', retType: 'number', args: []},
 	{name: 'qSpace_getPotentialBuffer', retType: 'number', args: []},
 
-	// the Incarnation ones act on theIncarn in the c++ code
-	{name: 'Incarnation_getElapsedTime', retType: 'number', args: []},
-	{name: 'Incarnation_getIterateSerial', retType: 'number', args: []},
-	{name: 'Incarnation_getMaxNorm', retType: 'number', args: []},
+	// the Avatar ones act on theAvatar in the c++ code
+	{name: 'Avatar_getElapsedTime', retType: 'number', args: []},
+	{name: 'Avatar_getIterateSerial', retType: 'number', args: []},
+	{name: 'Avatar_getMaxNorm', retType: 'number', args: []},
 
 	// the potential
 	{name: 'qSpace_dumpPotential', retType: 'number', args: ['string']},
@@ -41,12 +41,12 @@ exportsSrc  = [
 	{name: 'qSpace_setValleyPotential', retType: 'number', args: ['number', 'number', 'number']},
 
 	// params
-	{name: 'Incarnation_setDt', retType: null, args: ['number']},
-	{name: 'Incarnation_setStepsPerIteration', retType: null, args: ['number']},
-	{name: 'Incarnation_setLowPassFilter', retType: null, args: ['number']},
+	{name: 'Avatar_setDt', retType: null, args: ['number']},
+	{name: 'Avatar_setStepsPerIteration', retType: null, args: ['number']},
+	{name: 'Avatar_setLowPassFilter', retType: null, args: ['number']},
 
-	{name: 'Incarnation_oneIteration', retType: 'number', args: []},
-	{name: 'Incarnation_resetCounters', retType: null, args: []},
+	{name: 'Avatar_oneIteration', retType: 'number', args: []},
+	{name: 'Avatar_resetCounters', retType: null, args: []},
 
 	// views
 	{name: 'qViewBuffer_getViewBuffer', retType: 'number', args: []},
@@ -55,8 +55,8 @@ exportsSrc  = [
 
 	// FFT
  	//{name: 'testFFT', retType: null, args: []},
-	{name: 'Incarnation_askForFFT', retType: null, args: []},
-	{name: 'Incarnation_normalize', retType: null, args: []},
+	{name: 'Avatar_askForFFT', retType: null, args: []},
+	{name: 'Avatar_normalize', retType: null, args: []},
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():

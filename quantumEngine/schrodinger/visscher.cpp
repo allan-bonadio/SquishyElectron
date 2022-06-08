@@ -5,7 +5,7 @@
 */
 
 #include "../spaceWave/qSpace.h"
-#include "Incarnation.h"
+#include "Avatar.h"
 #include "../spaceWave/qWave.h"
 
 
@@ -57,12 +57,12 @@ and for now omit the potential
 // newW points to buffer with real = ψr(t + dt)   imag unchanged = ψi(t + dt/2)
 // here we will calculate the ψr(t + dt) values in a new buffer only, and fill them in.
 // the ψi values in buffer 0 are still uncalculated
-void Incarnation::stepReal(qCx *newW, qCx *oldW, double dt) {
+void Avatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
 	//printf("⚛️ start of stepReal");
 	//dumpThatWave(oldW, true);
 	//printf("⚛︎ stepReal start N States=(%d), dt=%lf\n",
-	//	dims->nStates, incarn->dt);
+	//	dims->nStates, avatar->dt);
 
 	//printf("⚛︎ the hamiltonian 𝜓.re at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
@@ -87,7 +87,7 @@ void Incarnation::stepReal(qCx *newW, qCx *oldW, double dt) {
 
 // second step: advance the Imaginaries of 𝜓 a dt, from dt/2 to 3dt/2
 // given the reals we just generated in stepReal() but don't change them
-void Incarnation::stepImaginary(qCx *newW, qCx *oldW, double dt) {
+void Avatar::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
 	//printf("⚛︎ start of stepImaginary(), oldWave=");
 	//dumpThatWave(oldW, true);
@@ -120,7 +120,7 @@ void Incarnation::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 }
 
 // form the new wave from the old wave, in separate buffers, chosen by our caller.
-void Incarnation::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
+void Avatar::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
 	qWave *oldQW = oldQWave;
 	qCx *oldW = oldQWave->wave;
 	qWave *newQW = newQWave;

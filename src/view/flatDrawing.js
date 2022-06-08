@@ -103,7 +103,7 @@ class flatDrawing extends abstractDrawing {
 
 		let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
 		unitHeightUniform.setValue(() => {
-			return {value: 1 / qe.Incarnation_getMaxNorm(), type: '1f'};
+			return {value: 1 / qe.Avatar_getMaxNorm(), type: '1f'};
 		});
 
 // 		this.unitHeight = 1. / maxNorm;

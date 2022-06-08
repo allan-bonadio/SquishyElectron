@@ -1,5 +1,5 @@
 /*
-** Incarnation -- the instance and simulation of a quantum mechanical wave in a space
+** Avatar -- the instance and simulation of a quantum mechanical wave in a space
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
@@ -8,7 +8,7 @@
 #include <cfenv>
 
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Incarnation.h"
+#include "../schrodinger/Avatar.h"
 #include "../spaceWave/qWave.h"
 #include "../fourier/qSpectrum.h"
 #include "../spaceWave/qViewBuffer.h"
@@ -24,11 +24,11 @@ static bool traceJustInnerProduct = false;
 
 const double sNAN99999 = std::numeric_limits<double>::signaling_NaN();
 
-Incarnation::Incarnation(qSpace *sp)
+Avatar::Avatar(qSpace *sp)
 	: dt(sNAN99999), stepsPerIteration(100), lowPassFilter(0.5),
 		space(sp), magic('Inca'), pleaseFFT(false), isIterating(false) {
 
-	space->incarn = this;  // until I get this straightened out
+	space->avatar = this;  // until I get this straightened out
 
 	mainQWave = new qWave(space);
 	scratchQWave = new qWave(space);
@@ -37,12 +37,12 @@ Incarnation::Incarnation(qSpace *sp)
 	resetCounters();
 };
 
-Incarnation::~Incarnation(void) {
+Avatar::~Avatar(void) {
 	delete mainQWave;
 	delete scratchQWave;
 };
 
-void Incarnation::resetCounters(void) {
+void Avatar::resetCounters(void) {
 	elapsedTime = 0.;
 	iterateSerial = 0;
 }
@@ -60,13 +60,13 @@ double getTimeDouble()
 
 // does several visscher steps (eg 100 or 500)
 // actually does stepsPerIteration+1 steps; half steps at start and finish
-void Incarnation::oneIteration() {
+void Avatar::oneIteration() {
 	int tt;
 
 	//printf("the ttime: %lf\n", getTimeDouble());
 
 	if (traceIteration)
-		printf("🚀 🚀 Incarnation::oneIteration() - dt=%lf   stepsPerIteration=%d\n",
+		printf("🚀 🚀 Avatar::oneIteration() - dt=%lf   stepsPerIteration=%d\n",
 			dt, stepsPerIteration);
 	isIterating = true;
 
@@ -115,7 +115,7 @@ void Incarnation::oneIteration() {
 
 	iterateSerial++;
 
-	// printf("Incarnation::oneIteration(): viewBuffer %ld and latestWave=%ld\n",
+	// printf("Avatar::oneIteration(): viewBuffer %ld and latestWave=%ld\n",
 	// 	(long) viewBuffer, (long) latestWave);
 	//mainQWave = mainQWave;
 
@@ -158,7 +158,7 @@ void Incarnation::oneIteration() {
 
 
 // FFT the wave, cut down the high frequencies, then iFFT it back
-void Incarnation::fourierFilter(double lowPassFilter) {
+void Avatar::fourierFilter(double lowPassFilter) {
 	spect->generateSpectrum(mainQWave);
 
 	// the high frequencies are in the middle; the nyquist freq is at N/2
@@ -179,7 +179,7 @@ void Incarnation::fourierFilter(double lowPassFilter) {
 
 
 // user button to print it out now, or at end of the next iteration
-void Incarnation::askForFFT(void) {
+void Avatar::askForFFT(void) {
 	if (isIterating)
 		this->pleaseFFT = true;
 	else

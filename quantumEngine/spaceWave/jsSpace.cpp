@@ -5,7 +5,7 @@
 
 
 #include "qSpace.h"
-#include "../schrodinger/Incarnation.h"
+#include "../schrodinger/Avatar.h"
 #include "qWave.h"
 #include "qViewBuffer.h"
 
@@ -19,7 +19,7 @@ static bool traceSpaceCreation = false;
 // important objects.  Someday we'll get the JS to hold these.
 class qSpace *theSpace = NULL;
 double *thePotential = NULL;
-class Incarnation *theIncarn;
+class Avatar *theAvatar;
 qViewBuffer *theQViewBuffer;
 
 
@@ -48,7 +48,7 @@ void allocWaves(void) {
 
 
 	// our own view buffer - needs potential to be in place
-	theIncarn->viewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
+	theAvatar->viewBuffer = theQViewBuffer = new qViewBuffer(theSpace);
 //	printf("🚀 🚀 🚀  %s:%d freeBufferList: %p\n", __FILE__, __LINE__, theSpace->freeBufferList);
 	//dumpViewBuffer("newly created");
 
@@ -87,38 +87,38 @@ static void freeWaves(void) {
 extern "C" {
 
 // return a pointer to just the main wave for theSpace
-qCx *Incarnation_getWaveBuffer(void) {
-	//printf("🚀 🚀 🚀 Incarnation_getWaveBuffer() theSpace: %p\n", (theSpace));
-	//printf("        🚀 🚀 🚀        the qWave %p\n", (theIncarn->mainQWave));
-	//printf("        🚀 🚀 🚀        the wave %p\n", (theIncarn->mainQWave->wave));
+qCx *Avatar_getWaveBuffer(void) {
+	//printf("🚀 🚀 🚀 Avatar_getWaveBuffer() theSpace: %p\n", (theSpace));
+	//printf("        🚀 🚀 🚀        the qWave %p\n", (theAvatar->mainQWave));
+	//printf("        🚀 🚀 🚀        the wave %p\n", (theAvatar->mainQWave->wave));
 //	printf("        🚀 🚀 🚀     q=w %d   s=w %d   q=s %d\n",
-//		(uintptr_t) (theIncarn->mainQWave) == (uintptr_t)  (theIncarn->mainQWave->wave),
-//		(uintptr_t) (theSpace) == (uintptr_t) (theIncarn->mainQWave->wave),
-//		(uintptr_t) (theIncarn->mainQWave) == (uintptr_t) (theSpace)
+//		(uintptr_t) (theAvatar->mainQWave) == (uintptr_t)  (theAvatar->mainQWave->wave),
+//		(uintptr_t) (theSpace) == (uintptr_t) (theAvatar->mainQWave->wave),
+//		(uintptr_t) (theAvatar->mainQWave) == (uintptr_t) (theSpace)
 //	);
 
-	return theIncarn->mainQWave->wave;
+	return theAvatar->mainQWave->wave;
 }
 
 double *qSpace_getPotentialBuffer(void) {
 	return thePotential;
 }
 
-double Incarnation_getElapsedTime(void) {
+double Avatar_getElapsedTime(void) {
 	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getElapsedTime()");
-	return theIncarn->elapsedTime;
+	return theAvatar->elapsedTime;
 }
 
-double Incarnation_getIterateSerial(void) {
+double Avatar_getIterateSerial(void) {
 	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getIterateSerial()");
-	return theIncarn->iterateSerial;
+	return theAvatar->iterateSerial;
 }
 
 // actually gets Average maxNorm, over maybe a hundred iterations
-double Incarnation_getMaxNorm(void) {
-	if (!theIncarn) throw std::runtime_error("🚀 🚀 🚀 null space in Incarnation_getMaxNorm()");
-	printf("Incarnation_getMaxNorm() return avgMaxNorm=%lf\n", theIncarn->mainQWave->avgMaxNorm);
-	return theIncarn->mainQWave->avgMaxNorm;
+double Avatar_getMaxNorm(void) {
+	if (!theAvatar) throw std::runtime_error("🚀 🚀 🚀 null space in Avatar_getMaxNorm()");
+	printf("Avatar_getMaxNorm() return avgMaxNorm=%lf\n", theAvatar->mainQWave->avgMaxNorm);
+	return theAvatar->mainQWave->avgMaxNorm;
 }
 
 
@@ -128,44 +128,44 @@ void qSpace_setValleyPotential(double power, double scale, double offset) {
 	theSpace->setValleyPotential(power, scale, offset);
 }
 
-void Incarnation_setDt(double dt) {
-	theIncarn->dt = dt;
+void Avatar_setDt(double dt) {
+	theAvatar->dt = dt;
 }
 
 // iterations are what the user sees.  steps are what Visscher does repeatedly.
-void Incarnation_setStepsPerIteration(int stepsPerIteration) {
-	//printf("🚀 🚀 🚀 Incarnation_setStepsPerIteration(%d)\n", stepsPerIteration);
+void Avatar_setStepsPerIteration(int stepsPerIteration) {
+	//printf("🚀 🚀 🚀 Avatar_setStepsPerIteration(%d)\n", stepsPerIteration);
 	if (stepsPerIteration < 1 || stepsPerIteration > 1e8) {
 		char buf[100];
-		snprintf(buf, 100, "Incarnation_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
+		snprintf(buf, 100, "Avatar_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
 		throw std::runtime_error(buf);
 	}
-	theIncarn->stepsPerIteration = stepsPerIteration;
-	//printf("🚀 🚀 🚀 Incarnation_setStepsPerIteration result %d in theSpace=%p\n",
-	//	theIncarn->stepsPerIteration, theSpace);
+	theAvatar->stepsPerIteration = stepsPerIteration;
+	//printf("🚀 🚀 🚀 Avatar_setStepsPerIteration result %d in theSpace=%p\n",
+	//	theAvatar->stepsPerIteration, theSpace);
 }
 
 // low pass filter.
-void Incarnation_setLowPassFilter(double dilution) {
-	//printf("🚀 🚀 🚀 Incarnation_setLowPassFilter(%lf)\n", dilution);
+void Avatar_setLowPassFilter(double dilution) {
+	//printf("🚀 🚀 🚀 Avatar_setLowPassFilter(%lf)\n", dilution);
 	if (dilution >= 1. || dilution <= 0.) {
 		char buf[100];
-		snprintf(buf, 100, "🚀 🚀 🚀 Incarnation_setLowPassFilter, %lf, must be between 0 and 1\n", dilution);
+		snprintf(buf, 100, "🚀 🚀 🚀 Avatar_setLowPassFilter, %lf, must be between 0 and 1\n", dilution);
 		throw std::runtime_error(buf);
 	}
-	theIncarn->lowPassFilter = dilution;
-	//printf("🚀 🚀 🚀 Incarnation_setLowPassFilter result %lf in theSpace=%p\n",
-	//	theIncarn->lowPassFilter, theSpace);
+	theAvatar->lowPassFilter = dilution;
+	//printf("🚀 🚀 🚀 Avatar_setLowPassFilter result %lf in theSpace=%p\n",
+	//	theAvatar->lowPassFilter, theSpace);
 }
 
-void Incarnation_oneIteration(void) { theIncarn->oneIteration(); }
-void Incarnation_resetCounters(void) { theIncarn->resetCounters(); }
+void Avatar_oneIteration(void) { theAvatar->oneIteration(); }
+void Avatar_resetCounters(void) { theAvatar->resetCounters(); }
 
 // if iterating, FFT after the current iterate finishes.  If stopped, fft current wave.
-void Incarnation_askForFFT(void) { theIncarn->askForFFT(); }
+void Avatar_askForFFT(void) { theAvatar->askForFFT(); }
 
 // this will normalize with the C++ normalize which also sets maxNorm
-void Incarnation_normalize(void) { theIncarn->mainQWave->normalize(); }
+void Avatar_normalize(void) { theAvatar->mainQWave->normalize(); }
 
 
 /* ******************************************************** space creation from JS */
@@ -190,7 +190,7 @@ qSpace *startNewSpace(const char *label) {
 	}
 	//printf("🚀 🚀 🚀  startNewSpace: about to construct new space  itself '%s'\n", label);
 	theSpace = new qSpace(label);
-	theIncarn = NULL;
+	theAvatar = NULL;
 
 	if (traceSpaceCreation) {
 		printf("🚀 🚀 🚀  JS startNewSpace   done (%s == %s)   theSpace=%p, freeBufferList: %p\n",
@@ -216,7 +216,7 @@ qSpace *completeNewSpace(void) {
 
 	// finish up all the dimensions now that we know them all
 	theSpace->initSpace();
-	theIncarn = theSpace->incarn;
+	theAvatar = theSpace->avatar;
 	//printf("did initSpace\n");
 
 	/* *********************************** allocate waves */
@@ -229,9 +229,9 @@ qSpace *completeNewSpace(void) {
 
 
 	// we make our own wave - static
-	//theIncarn->mainQWave = laosQWave;
-	printf(" %p\n", theIncarn);
-	qCx *wave = theIncarn->mainQWave->wave;
+	//theAvatar->mainQWave = laosQWave;
+	printf(" %p\n", theAvatar);
+	qCx *wave = theAvatar->mainQWave->wave;
 
 	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
 
@@ -245,7 +245,7 @@ qSpace *completeNewSpace(void) {
 	//theSpace->dumpThatWave(wave, true);
 
 	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
-	theIncarn->mainQWave->normalize();
+	theAvatar->mainQWave->normalize();
 	if (traceSpaceCreation) printf("🚀 🚀 🚀  jsSpace:%d freeBufferList: %p\n", __LINE__, theSpace->freeBufferList);
 	//printf("🚀 🚀 🚀 newly created wave, AFTER norm:\n");
 	//theSpace->dumpThatWave(wave, true);

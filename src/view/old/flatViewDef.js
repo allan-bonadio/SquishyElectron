@@ -100,7 +100,7 @@ class flatViewDef extends abstractViewDef {
 
 		let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
 		//let unitHeight = 1;
-		unitHeightUniform.setValue(() => qe.Incarnation_getMaxNorm(), '1f');
+		unitHeightUniform.setValue(() => qe.Avatar_getMaxNorm(), '1f');
 
 		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar

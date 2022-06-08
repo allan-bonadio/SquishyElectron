@@ -6,7 +6,7 @@
 
 //#include <cmath>
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Incarnation.h"
+#include "../schrodinger/Avatar.h"
 #include "qSpectrum.h"
 
 /* ************************************************************ birth & death & basics */

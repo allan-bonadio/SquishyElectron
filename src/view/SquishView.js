@@ -44,7 +44,7 @@ export class SquishView extends React.Component {
 		if (qe.getElapsedTime) {
 			// after qe has been initialized
 			et = thousands(qe.getElapsedTime().toFixed(4));
-			iser = thousands(qe.Incarnation_getIterateSerial());
+			iser = thousands(qe.Avatar_getIterateSerial());
 		}
 
 		const spinner = qe.cppLoaded ? ''

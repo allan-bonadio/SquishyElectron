@@ -21,7 +21,7 @@ function setPT() {
 
 function clickOnFFR()
 {
-	qe.Incarnation_askForFFT()
+	qe.Avatar_askForFFT()
 }
 
 

@@ -9,7 +9,7 @@
 #include <cmath>
 //#include <cstdlib>
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Incarnation.h"
+#include "../schrodinger/Avatar.h"
 #include "../spaceWave/qWave.h"
 #include "qSpectrum.h"
 #include "../testing/cppuMain.h"
