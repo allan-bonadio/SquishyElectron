@@ -124,7 +124,7 @@ class qeWave {
 			if (norm > max)
 				max = norm;
 		}
-		this.maxNorm = max;
+		//this.maxNorm = max;
 		return tot;
 	}
 

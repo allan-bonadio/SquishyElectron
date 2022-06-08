@@ -43,7 +43,7 @@ exportsSrc  = [
 	// params
 	{name: 'Incarnation_setDt', retType: null, args: ['number']},
 	{name: 'Incarnation_setStepsPerIteration', retType: null, args: ['number']},
-	{name: 'Incarnation_setLowPassDilution', retType: null, args: ['number']},
+	{name: 'Incarnation_setLowPassFilter', retType: null, args: ['number']},
 
 	{name: 'Incarnation_oneIteration', retType: 'number', args: []},
 	{name: 'Incarnation_resetCounters', retType: null, args: []},

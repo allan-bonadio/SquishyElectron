@@ -20,7 +20,7 @@ export function defineQEngineFuncs() {
 	qe.qSpace_setValleyPotential = cwrap('qSpace_setValleyPotential', 'number', ['number','number','number']);
 	qe.Incarnation_setDt = cwrap('Incarnation_setDt', null, ['number']);
 	qe.Incarnation_setStepsPerIteration = cwrap('Incarnation_setStepsPerIteration', null, ['number']);
-	qe.Incarnation_setLowPassDilution = cwrap('Incarnation_setLowPassDilution', null, ['number']);
+	qe.Incarnation_setLowPassFilter = cwrap('Incarnation_setLowPassFilter', null, ['number']);
 	qe.Incarnation_oneIteration = cwrap('Incarnation_oneIteration', 'number', []);
 	qe.Incarnation_resetCounters = cwrap('Incarnation_resetCounters', null, []);
 	qe.qViewBuffer_getViewBuffer = cwrap('qViewBuffer_getViewBuffer', 'number', []);

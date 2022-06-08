@@ -25,13 +25,14 @@ static bool traceJustInnerProduct = false;
 const double sNAN99999 = std::numeric_limits<double>::signaling_NaN();
 
 Incarnation::Incarnation(qSpace *sp)
-	: dt(sNAN99999), stepsPerIteration(100), lowPassDilution(0.5),
+	: dt(sNAN99999), stepsPerIteration(100), lowPassFilter(0.5),
 		space(sp), magic('Inca'), pleaseFFT(false), isIterating(false) {
 
 	space->incarn = this;  // until I get this straightened out
 
 	mainQWave = new qWave(space);
 	scratchQWave = new qWave(space);
+	spect = new qSpectrum(space);
 
 	resetCounters();
 };
@@ -62,7 +63,7 @@ double getTimeDouble()
 void Incarnation::oneIteration() {
 	int tt;
 
-	printf("the ttime: %lf\n", getTimeDouble());
+	//printf("the ttime: %lf\n", getTimeDouble());
 
 	if (traceIteration)
 		printf("🚀 🚀 Incarnation::oneIteration() - dt=%lf   stepsPerIteration=%d\n",
@@ -119,11 +120,18 @@ void Incarnation::oneIteration() {
 	//mainQWave = mainQWave;
 
 	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
-	//	mainQWave->lowPassFilter(lowPassDilution);
+	//	mainQWave->lowPassFilter(lowPassFilter);
 //	mainQWave->nyquistFilter();
 
 
-	fourierFilter();
+	fourierFilter(lowPassFilter);
+
+	// average the maxNorm, but first time around, just use the whole thing
+	mainQWave->mixInMaxNorm();
+	//if (avgMaxNorm > 0)
+	//	avgMaxNorm = (63 * avgMaxNorm + maxNorm) / 64;
+	//else
+	//	avgMaxNorm = maxNorm;
 
 	// need it; somehow? not done in JS
 	theQViewBuffer->loadViewBuffer();
@@ -150,21 +158,19 @@ void Incarnation::oneIteration() {
 
 
 // FFT the wave, cut down the high frequencies, then iFFT it back
-void Incarnation::fourierFilter(void) {
-	qSpectrum *spect = new qSpectrum(space);
+void Incarnation::fourierFilter(double lowPassFilter) {
 	spect->generateSpectrum(mainQWave);
 
 	// the high frequencies are in the middle; the nyquist freq is at N/2
 	int nyquist = spect->nPoints/2;
-	double widest = nyquist / 4;  // number of freqs we'll attenuate
+	double spread = nyquist / 4;  // number of freqs we'll attenuate on each side
 	qCx *s = spect->wave;
 	s[nyquist] = 0;
-	for (int k = 1; k < widest; k++) {
-		double factor = 1. - k / widest;
+	for (int k = 1; k < spread; k++) {
+		double factor = 1. - k / spread;
 		s[nyquist + k] *= factor;
 		s[nyquist - k] *= factor;
 	}
-
 
 	spect->generateWave(mainQWave);
 	mainQWave->normalize();

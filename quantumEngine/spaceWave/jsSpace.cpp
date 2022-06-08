@@ -114,9 +114,11 @@ double Incarnation_getIterateSerial(void) {
 	return theIncarn->iterateSerial;
 }
 
+// actually gets Average maxNorm, over maybe a hundred iterations
 double Incarnation_getMaxNorm(void) {
 	if (!theIncarn) throw std::runtime_error("🚀 🚀 🚀 null space in Incarnation_getMaxNorm()");
-	return theIncarn->mainQWave->maxNorm;
+	printf("Incarnation_getMaxNorm() return avgMaxNorm=%lf\n", theIncarn->mainQWave->avgMaxNorm);
+	return theIncarn->mainQWave->avgMaxNorm;
 }
 
 
@@ -144,16 +146,16 @@ void Incarnation_setStepsPerIteration(int stepsPerIteration) {
 }
 
 // low pass filter.
-void Incarnation_setLowPassDilution(double dilution) {
-	//printf("🚀 🚀 🚀 Incarnation_setLowPassDilution(%lf)\n", dilution);
+void Incarnation_setLowPassFilter(double dilution) {
+	//printf("🚀 🚀 🚀 Incarnation_setLowPassFilter(%lf)\n", dilution);
 	if (dilution >= 1. || dilution <= 0.) {
 		char buf[100];
-		snprintf(buf, 100, "🚀 🚀 🚀 Incarnation_setLowPassDilution, %lf, must be between 0 and 1\n", dilution);
+		snprintf(buf, 100, "🚀 🚀 🚀 Incarnation_setLowPassFilter, %lf, must be between 0 and 1\n", dilution);
 		throw std::runtime_error(buf);
 	}
-	theIncarn->lowPassDilution = dilution;
-	//printf("🚀 🚀 🚀 Incarnation_setLowPassDilution result %lf in theSpace=%p\n",
-	//	theIncarn->lowPassDilution, theSpace);
+	theIncarn->lowPassFilter = dilution;
+	//printf("🚀 🚀 🚀 Incarnation_setLowPassFilter result %lf in theSpace=%p\n",
+	//	theIncarn->lowPassFilter, theSpace);
 }
 
 void Incarnation_oneIteration(void) { theIncarn->oneIteration(); }

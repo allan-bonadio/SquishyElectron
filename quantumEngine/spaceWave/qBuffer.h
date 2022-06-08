@@ -50,6 +50,8 @@ struct qBuffer {
 	// maximum magnitude of all the points in this buffer; calculated in .innerProduct()
 	// which is called by .normalize()
 	double maxNorm;
+	double avgMaxNorm;
+	void mixInMaxNorm(void);
 
 	// if it used the first constructor
 	// this has, among other things, the count of points and states in all qWave buffers

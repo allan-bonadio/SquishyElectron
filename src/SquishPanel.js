@@ -20,9 +20,9 @@ import ResolutionDialog from './controlPanel/ResolutionDialog';
 
 // must make sure somebody imports all of them
 import abstractViewDef from './view/abstractViewDef';
-import manualViewDef from './view/manualViewDef';
-import viewVariableViewDef from './view/viewVariableViewDef';
-import flatViewDef from './view/flatViewDef';
+//import manualViewDef from './view/manualViewDef';
+//import viewVariableViewDef from './view/viewVariableViewDef';
+//import flatViewDef from './view/flatViewDef';
 import flatDrawingViewDef from './view/flatDrawingViewDef';
 //import drawingViewDef from './view/drawingViewDef';
 
@@ -31,7 +31,7 @@ import storeSettings from './utils/storeSettings';
 import {setFamiliarPotential} from './widgets/utils';
 
 // runtime debugging flags - you can change in the debugger or here
-let areBenchmarking = true;
+let areBenchmarking = false;
 let dumpingTheViewBuffer = false;
 
 
@@ -39,8 +39,8 @@ let dumpingTheViewBuffer = false;
 // unfortunately, we hafe to have a list of all the view types.  here.
 // this will appear in the resolution dialog
 export const listOfViewClassNames = {
-	manualViewDef, abstractViewDef, viewVariableViewDef,
-	flatViewDef,
+	abstractViewDef,
+	//manualViewDef, viewVariableViewDef, flatViewDef,
 
 	//drawingViewDef,
 	flatDrawingViewDef,
@@ -112,7 +112,7 @@ export class SquishPanel extends React.Component {
 			// defaults for sliders for dt & spi
 			dt: .001,
 			stepsPerIteration: 100,
-			lowPassDilution: .02,
+			lowPassFilter: .02,
 
 			// advance forward with each iter
 			runningCycleElapsedTime: 0,
@@ -235,9 +235,7 @@ export class SquishPanel extends React.Component {
 		// (actually many visscher steps)
 		qe.Incarnation_oneIteration();
 
-		//qe.createQEWaveFromCBuf();
-
-		console.info(`📶  Incarnation_getMaxNorm=`, qe.Incarnation_getMaxNorm());
+		//console.info(`📶  Incarnation_getMaxNorm=`, qe.Incarnation_getMaxNorm());
 		if (dumpingTheViewBuffer)
 			this.dumpViewBuffer('crunchOneIteration()');
 	}
@@ -447,12 +445,12 @@ export class SquishPanel extends React.Component {
 	}
 	setStepsPerIteration = this.setStepsPerIteration.bind(this);
 
-	setLowPassDilution(lowPassDilution) {
-		console.info(`js setLowPassDilution(${lowPassDilution})`)
-		this.setState({lowPassDilution});
-		qe.Incarnation_setLowPassDilution(lowPassDilution);
+	setLowPassFilter(lowPassFilter) {
+		console.info(`js setLowPassFilter(${lowPassFilter})`)
+		this.setState({lowPassFilter});
+		qe.Incarnation_setLowPassFilter(lowPassFilter);
 	}
-	setLowPassDilution = this.setLowPassDilution.bind(this);
+	setLowPassFilter = this.setLowPassFilter.bind(this);
 
 	// completely wipe out the 𝜓 wavefunction and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon setWave in wave tab
@@ -528,15 +526,17 @@ export class SquishPanel extends React.Component {
 
 					iterateFrequency={1000 / s.iteratePeriod}
 					setIterateFrequency={freq => this.setIterateFrequency(freq)}
+
 					openResolutionDialog={() => this.openResolutionDialog()}
 					space={s.space}
+					N={this.state.N}
 
 					dt={s.dt}
 					setDt={this.setDt}
 					stepsPerIteration={s.stepsPerIteration}
 					setStepsPerIteration={this.setStepsPerIteration}
-					lowPassDilution={s.lowPassDilution}
-					setLowPassDilution={this.setLowPassDilution}
+					lowPassFilter={s.lowPassFilter}
+					setLowPassFilter={this.setLowPassFilter}
 				/>
 				{this.renderRunningOneCycle()}
 			</div>

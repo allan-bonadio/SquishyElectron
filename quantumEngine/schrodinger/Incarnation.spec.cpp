@@ -25,7 +25,7 @@ TEST(Incarnation, Incarnation_ConstructorGauntlet)
 	qSpace *space = makeBareSpace(8, contENDLESS);
 	Incarnation *incarn = space->incarn;
 
-	LONGS_EQUAL(0.5, incarn->lowPassDilution);
+	LONGS_EQUAL(0.5, incarn->lowPassFilter);
 
 	LONGS_EQUAL(false, incarn->pleaseFFT);
 	LONGS_EQUAL(false, incarn->isIterating);
@@ -51,7 +51,7 @@ void completeNewManiGauntlet(int N, int expectedSpectrumLength, int expectedFree
 	LONGS_EQUAL(0, incarn->iterateSerial);
 	//pointless DOUBLES_EQUAL(1.0, incarn->dt, 1e-12);
 	LONGS_EQUAL(100, incarn->stepsPerIteration);
-	DOUBLES_EQUAL(0.5, incarn->lowPassDilution, 1e-12);
+	DOUBLES_EQUAL(0.5, incarn->lowPassFilter, 1e-12);
 	LONGS_EQUAL(false, incarn->isIterating);
 
 

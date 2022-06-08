@@ -330,4 +330,13 @@ void qBuffer::normalize(void) {
 	maxNorm /= mag;
 }
 
+// when the scaling changes every frame, the image can get jumpy.
+// here we smooth it out
+void qBuffer::mixInMaxNorm(void) {
+	printf("qBuffer::mixInMaxNorm: maxNorm=%lf  avgMaxNorm=%lf\n", maxNorm, avgMaxNorm);
+	if (avgMaxNorm > 0)
+		avgMaxNorm = (63 * avgMaxNorm + maxNorm) / 64;
+	else
+		avgMaxNorm = maxNorm;
+}
 

@@ -29,13 +29,16 @@ struct Incarnation {
 	struct qWave *mainQWave;
 	struct qWave *scratchQWave;
 
+	// for the fourier filter
+	struct qSpectrum *spect;
+
 	// the buffer to be passed to webgl
 	struct qViewBuffer *viewBuffer;
 
 	// params that the user can set
 	double dt;
 	int stepsPerIteration;
-	double lowPassDilution;
+	double lowPassFilter;
 
 	/* *********************************************** iteration */
 	// multiple steps; stepsPerIteration+1
@@ -51,7 +54,7 @@ struct Incarnation {
 	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);  // obsolete
 
 	// kill high frequencies via FFTs
-	void fourierFilter(void);
+	void fourierFilter(double lowPassFilter);
 
 	bool isIterating;
 
