@@ -20,7 +20,7 @@ struct qWave : public virtual qBuffer {
 	void dumpThatWave(qCx *wave, bool withExtras = false);
 	void dumpWave(const char *title, bool withExtras = false);
 
-	// used for low pass; need general buffer for arithmetic
+	// used for low pass; need general buffer for arithmetic.  obsolete.
 	qCx *scratchBuffer;
 
 	// never even tried any of these

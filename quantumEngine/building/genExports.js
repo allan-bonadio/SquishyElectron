@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
-** generate exports -- generate files for emscripten compiler, for JS calling C++ code
+** generate exports -- generate files for JS calling C++ code through emscripten
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
@@ -68,7 +68,7 @@ fs.writeFile(`${process.env.SQUISH_ROOT}/quantumEngine/building/exports.json`,
 	JSON.stringify(exportsFile) + '\n',
 	ex => ex && console.error('error building exports:', ex));
 
-// the JS file.  convert json's " to '
+// the JS file.  convert json's double " to single '
 let defineFuncBody = exportsSrc.map(funcDesc => {
 	return `\tqe.${funcDesc.name} = cwrap('${funcDesc.name}', `+
 		`${JSON.stringify(funcDesc.retType).replace(/\x22/g, '\x27')}, `+

@@ -66,7 +66,7 @@ qCx *qBuffer::allocateWave(int nPoints) {
 
 // create one
 qBuffer::qBuffer(void)
-	: magic('qBuf'), wave(NULL), space(NULL) {
+	: magic('qBuf'), wave(NULL), space(NULL), maxNorm(0), avgMaxNorm(0) {
 }
 
 // actually create the buffer that we need
@@ -255,6 +255,7 @@ void qBuffer::fixThoseBoundaries(qCx *targetWave) {
 	fixSomeBoundaries(targetWave, continuum, start, end);
 }
 
+// get rid of this!
 void qSpace::fixThoseBoundaries(qCx *targetWave) {
 	qDimension *dims = dimensions;
 	fixSomeBoundaries(targetWave, dims->continuum, dims->start, dims->end);
@@ -307,17 +308,16 @@ void qBuffer::normalize(void) {
 	//tempQWave->dumpWave("The wave,before normalize", true);
 
 	if (mag == 0. || ! isfinite(mag)) {
-		// ALL ZEROES!??! this is bogus, shouldn't be happening
-		const double factor = pow(end - start, -0.5);
-		printf("🍕 🍕 🍕 🍕 🍕 🍕 ALL ZEROES ! ? ? ! not finite ! ? ? !  set them all to a constant, normalized\n");
-		for (int ix = start; ix < end; ix++)
-			wave[ix] = factor;
+		// ALL ZEROES!??! this is bogus, shouldn't be happening.
+		// Well, except that brand new buffers are initialized to zeroes.
+		throw std::runtime_error("tried to normalize a buffer with all zeroes!");
 	}
 	else {
+		// normal functioning
 		const double factor = pow(mag, -0.5);
 		if (traceNormalize) {
 			printf("🍕 normalizing qBuffer.  factor=%lf, start=%d, end=%d, N=%d\n",
-			factor, start, end, end - start);
+				factor, start, end, end - start);
 		}
 
 		for (int ix = start; ix < end; ix++)
@@ -334,8 +334,8 @@ void qBuffer::normalize(void) {
 // here we smooth it out
 void qBuffer::mixInMaxNorm(void) {
 	printf("qBuffer::mixInMaxNorm: maxNorm=%lf  avgMaxNorm=%lf\n", maxNorm, avgMaxNorm);
-	if (avgMaxNorm > 0)
-		avgMaxNorm = (63 * avgMaxNorm + maxNorm) / 64;
+	if (avgMaxNorm > 1e-12)
+		avgMaxNorm = (7 * avgMaxNorm + maxNorm) / 8;
 	else
 		avgMaxNorm = maxNorm;
 }

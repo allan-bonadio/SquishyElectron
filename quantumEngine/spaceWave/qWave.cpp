@@ -176,6 +176,7 @@ void qWave::prune() {
 
 // these have to be in C++ cuz they're called during iteration
 
+// OBSOLETE!!
 // average the wave's points (by x) with the closest neighbors to fix the divergence
 // along the x axis I always see.  Since the density of our mesh is finite,
 // you can't expect noise at or near the nyquist frequency to be meaningful.

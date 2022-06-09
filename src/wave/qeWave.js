@@ -77,8 +77,8 @@ class qeWave {
 			// zeroes.  if you're lucky.
 			this.wave = new Float64Array(2 * space.nPoints);
 		}
-		else if (Array.isArray(waveArg)) {
-			// an existing Float64Array
+		else if (Array.isArray(waveArg) & 'Float64Array' == waveArg.constructor.name) {
+			// an existing Float64Array, should be
 			this.wave = waveArg;
 		}
 		else if (Number.isInteger(waveArg)) {

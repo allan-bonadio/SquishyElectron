@@ -141,7 +141,7 @@ export const stepsPerDecadeStepFactors = {
 	// 8: [1, 1.3, 2.4, 3.2, 4.2, 5.6, 7.5]
 	10: [1, 1.25, 1.5,     2, 2.50, 3,     4, 5, 6,     8],
 
-	// base 2 only, all the way up.  Special case in the code.  a "decade" is really x16 with 4 gradations
+	// 16 = base 2 only, all the way up.  Special case in the code.  a "decade" is really x16 with 4 gradations
 	16: [1, 2, 4, 8],
 };
 //const Base2 = 16;

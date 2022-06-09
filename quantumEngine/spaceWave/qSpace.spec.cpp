@@ -115,7 +115,9 @@ void completeNewSpaceGauntlet(int N, int expectedSpectrumLength, int expectedFre
 	proveItsMine(theSpace->potential, nPoints * sizeof(double));
 
 //	printf("🧨 🧨       we're done, deleting freeBufferList=%p\n", space->freeBufferList);
+
 	deleteTheSpace();
+
 //	printf("🧨 🧨       completeNewSpaceGauntlet() completed\n");
 }
 

@@ -42,6 +42,7 @@ static void tryOutFFT(int N, double freq) {
 	if (dumpWaves) spect->dumpSpectrum("    tryOutFFT: generated spectrum");
 
 	// now there should be 1 number that's nonzero; we should be able to predict what and where
+	// should be real and should be at position freq from whichever end
 	double expected = sqrt(N);
 	int pos;
 	if (freq < 0.)
@@ -49,6 +50,8 @@ static void tryOutFFT(int N, double freq) {
 	else
 		pos = round(freq);
 	if (tracing) printf("     tryOutFFT: ... pos=%d  expected=%lf\n", pos, expected);
+
+	// now verify that
 	qCx *sw = spect->wave;
 	for (int ix = 0; ix < N; ix++) {
 		char reBuf[100], imBuf[100];
