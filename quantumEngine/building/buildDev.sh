@@ -27,6 +27,7 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-DLABEL_LEN=$LABEL_LEN \
 	-I/dvl/emscripten/emsdk/upstream/emscripten/cache/sysroot/include \
 	-include emscripten.h \
+	-ffast-math \
 	main.cpp $allCpp || exit 99
 # changed -g to -g4 to -gsource-map --source-map-base
 #  --source-map-base expects an arg so I put the wasm.map file name
@@ -39,6 +40,9 @@ exit $?
 # compiler hints and links:
 # https://emscripten.org/docs/tools_reference/emcc.html
 # https://emscripten.org/docs/compiling/Building-Projects.html
+
+# -ffast-math: lets the compiler make aggressive, potentially-lossy assumptions about floating-point math
+# https://clang.llvm.org/docs/UsersManual.html#controlling-floating-point-behavior
 
 # pthreads:
 #  -s USE_PTHREADS=1
