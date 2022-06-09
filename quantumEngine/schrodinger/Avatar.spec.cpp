@@ -20,17 +20,17 @@ TEST_GROUP(Avatar)
 };
 
 // just the constructor; it's not even fully created
-TEST(Avatar, Avatar_ConstructorGauntlet)
+TEST(Avatar, CheckConstructor)
 {
 	qSpace *space = makeBareSpace(8, contENDLESS);
-	Avatar *avatar = space->avatar;
+	Avatar *avatar = new Avatar(space);
 
 	LONGS_EQUAL(0.5, avatar->lowPassFilter);
 
 	LONGS_EQUAL(false, avatar->pleaseFFT);
 	LONGS_EQUAL(false, avatar->isIterating);
 
-
+	delete avatar;
 	delete space;
 }
 
@@ -39,38 +39,39 @@ TEST(Avatar, Avatar_ConstructorGauntlet)
 // boring, just copied from the space test script
 
 // this tests the whole shebang, as created from JS
-void completeNewManiGauntlet(int N, int expectedSpectrumLength, int expectedFreeBufferLength) {
-//	printf("🧨 🧨 starting completeNewManiGauntlet(N=%d, sl=%d, fbl=%d)\n",
+void completeNewAvatarGauntlet(int N, int expectedSpectrumLength, int expectedFreeBufferLength) {
+//	printf("🧨 🧨 starting completeNewAvatarGauntlet(N=%d, sl=%d, fbl=%d)\n",
 //		N, expectedSpectrumLength, expectedFreeBufferLength);
 	qSpace *space = makeFullSpace(N);
 //	printf("🧨 🧨       created the space and all the buffers; freeBufferList=%p\n", space->freeBufferList);
 	int nPoints = space->nPoints;
-	Avatar *avatar = space->avatar;
 
-	LONGS_EQUAL(0, avatar->elapsedTime);
-	LONGS_EQUAL(0, avatar->iterateSerial);
-	//pointless DOUBLES_EQUAL(1.0, avatar->dt, 1e-12);
-	LONGS_EQUAL(100, avatar->stepsPerIteration);
-	DOUBLES_EQUAL(0.5, avatar->lowPassFilter, 1e-12);
-	LONGS_EQUAL(false, avatar->isIterating);
+	LONGS_EQUAL(0, theAvatar->elapsedTime);
+	LONGS_EQUAL(0, theAvatar->iterateSerial);
+	//pointless DOUBLES_EQUAL(1.0, theAvatar->dt, 1e-12);
+	LONGS_EQUAL(100, theAvatar->stepsPerIteration);
+	DOUBLES_EQUAL(0.125, theAvatar->lowPassFilter, 1e-12);
+	LONGS_EQUAL(false, theAvatar->isIterating);
 
 
 	// lets see if the buffers are all large enough
 //	printf("🧨 🧨       lets see if the buffers are all large enough freeBufferList=%p\n", space->freeBufferList);
-	proveItsMine(avatar->mainQWave->wave	, nPoints * sizeof(qCx));
-	proveItsMine(avatar->scratchQWave->wave, nPoints * sizeof(qCx));
-	proveItsMine(avatar->viewBuffer->buffer, nPoints * sizeof(float) * 8);
+	proveItsMine(theAvatar->mainQWave->wave	, nPoints * sizeof(qCx));
 
-//	printf("🧨 🧨       we're done, deleting freeBufferList=%p\n", space->freeBufferList);
+	theAvatar->getScratchWave();
+	proveItsMine(theAvatar->scratchQWave->wave, nPoints * sizeof(qCx));
+
+	theAvatar->getSpect();
+	proveItsMine(theAvatar->qvBuffer->vBuffer, nPoints * sizeof(float) * 8);
+
+	// will also delete the avatar and other buffers
 	deleteTheSpace();
-//	printf("🧨 🧨       completeNewManiGauntlet() completed\n");
 }
 
-TEST(Avatar, Avatar_completeNewManiGauntlet4000) { completeNewManiGauntlet(4000, 4096, 4096); }
-TEST(Avatar, Avatar_completeNewManiGauntlet254) { completeNewManiGauntlet(254, 256, 256); }
-TEST(Avatar, Avatar_completeNewManiGauntlet63) { completeNewManiGauntlet(63, 64, 65); }
-TEST(Avatar, Avatar_completeNewManiGauntlet48) { completeNewManiGauntlet(48, 64, 64); }
-TEST(Avatar, Avatar_completeNewManiGauntlet32) { completeNewManiGauntlet(32, 32, 34); }
-TEST(Avatar, Avatar_completeNewManiGauntlet32x) { completeNewManiGauntlet(32, 32, 34); }
-TEST(Avatar, Avatar_completeNewManiGauntlet4) { completeNewManiGauntlet(4, 4, 6); }
+TEST(Avatar, Avatar_completeNewAvatarGauntlet4000) { completeNewAvatarGauntlet(4096, 4096, 4098); }
+TEST(Avatar, Avatar_completeNewAvatarGauntlet254) { completeNewAvatarGauntlet(256, 256, 258); }
+TEST(Avatar, Avatar_completeNewAvatarGauntlet63) { completeNewAvatarGauntlet(64, 64, 66); }
+TEST(Avatar, Avatar_completeNewAvatarGauntlet32) { completeNewAvatarGauntlet(32, 32, 34); }
+TEST(Avatar, Avatar_completeNewAvatarGauntlet32x) { completeNewAvatarGauntlet(32, 32, 34); }
+TEST(Avatar, Avatar_completeNewAvatarGauntlet4) { completeNewAvatarGauntlet(4, 4, 6); }
 
