@@ -25,7 +25,7 @@ static bool traceFreeBuffer = false;
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
 qSpace::qSpace(const char *lab)
-	: magic('qSpa'), nDimensions(0), freeBufferList(NULL) {
+	: magic('qSpa'), nDimensions(0), potential(NULL), nPoints(0), nStates(0), freeBufferList(NULL) {
 
 	//printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n", lab, (this));
 
@@ -37,20 +37,6 @@ qSpace::qSpace(const char *lab)
 
 	//printf("🚀 🚀 qSpace::qSpace() constructor done this= %p, length %lx\n",
 	//	(this), sizeof(qSpace));
-}
-
-qSpace::~qSpace(void) {
-//	printf("🚀 🚀 qSpace destructor starting %s, this= %p  \n", label, (this));
-//	printf("🧨 🧨    made it this far, %s:%d    freeBufferList=%p\n", __FILE__, __LINE__, this->freeBufferList);
-
-
-	// these cached buffers need to go free
-	clearFreeBuffers();
-
-	delete avatar;
-
-//	printf("🚀 🚀 qSpace destructor done this= %p\n", (this));
-//	printf("🧨 🧨    made it this far, %s:%d  freeBufferList=%p\n", __FILE__, __LINE__, this->freeBufferList);
 }
 
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
@@ -114,18 +100,39 @@ void qSpace::tallyDimensions(void) {
 // If nPoints is still zero, initSpace hasn't been called yet; failure
 void qSpace::initSpace() {
 	tallyDimensions();
+	// now we know the sizes of buffers!!
+
+	// part of the space: the lay of the land
+	potential = new double[nPoints];
+
 
 	// this allocates the qwaves so must call this after sizes have been decided
-	avatar = new Avatar(this);
+	// not there anymore avatar = new Avatar(this);
 
-	// try out different formulas here.  Um, this is actually set manually in CP
-	avatar->dt = 1. / (nStates * nStates);
+//	// try out different formulas here.  Um, this is actually set manually in CP
+//	avatar->dt = 1. / (nStates * nStates);
 	//double dt = dt = nStates * 0.02;  // try out different factors here
 
 	// used only for the RKs - therefore obsolete
 //	dtOverI = qCx(0., -dt);
 //	halfDtOverI = qCx(0., -dt / 2.);
 //	bufferNum = 0;
+}
+
+qSpace::~qSpace(void) {
+//	printf("🚀 🚀 qSpace destructor starting %s, this= %p  \n", label, (this));
+//	printf("🧨 🧨    made it this far, %s:%d    freeBufferList=%p\n", __FILE__, __LINE__, this->freeBufferList);
+
+	// not there if initSpace() never called
+	if (potential)
+		delete[] potential;
+
+
+	// these cached buffers need to go free... OBSOLETE
+	clearFreeBuffers();
+
+//	printf("🚀 🚀 qSpace destructor done this= %p\n", (this));
+//	printf("🧨 🧨    made it this far, %s:%d  freeBufferList=%p\n", __FILE__, __LINE__, this->freeBufferList);
 }
 
 
@@ -163,7 +170,7 @@ void qSpace::setValleyPotential(double power = 1, double scale = 1, double offse
 
 
 
-/* ********************************************************** FreeBuffer */
+/* ********************************************************** FreeBuffer - ALL OBSOLETE */
 
 // this is all on the honor system.  If you borrow a buf, you either have to return it
 // with returnBuffer() or you free it with freeWave().
