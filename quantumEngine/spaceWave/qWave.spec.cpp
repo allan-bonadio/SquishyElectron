@@ -18,7 +18,6 @@ TEST_GROUP(qWave)
 {
 };
 
-
 static void tryOutWave(int N) {
 	//printf("🌊🌊🌊  starting tryOutWave(N=%d)\n", N);
 //	printf("🌊🌊🌊      tryOutWave:%d freeBufferList: %p\n", __LINE__, theSpace ? theSpace->freeBufferList : (void *) 0x99);
@@ -43,11 +42,12 @@ static void tryOutWave(int N) {
 //	printf("🌊🌊🌊      tryOutWave:%d freeBufferList: %p\n", __LINE__, theSpace ? theSpace->freeBufferList : (void *) 0x99);
 }
 
+// unfortunately these all have to be powers of 2
 TEST(qWave, WaveConstructDestruct4) { tryOutWave(4); }
-TEST(qWave, WaveConstructDestruct31) { tryOutWave(31); }
+TEST(qWave, WaveConstructDestruct16) { tryOutWave(16); }
 TEST(qWave, WaveConstructDestruct32) { tryOutWave(32); }
-TEST(qWave, WaveConstructDestruct33) { tryOutWave(33); }
-TEST(qWave, WaveConstructDestruct33x) { tryOutWave(33); }
-TEST(qWave, WaveConstructDestruct600) { tryOutWave(600); }
+TEST(qWave, WaveConstructDestruct32again) { tryOutWave(32); }
+TEST(qWave, WaveConstructDestruct128) { tryOutWave(128); }
+TEST(qWave, WaveConstructDestruct512) { tryOutWave(512); }
 TEST(qWave, WaveConstructDestruct1024) { tryOutWave(1024); }
 
