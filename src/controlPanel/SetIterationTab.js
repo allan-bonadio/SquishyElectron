@@ -27,7 +27,7 @@ function SetIterationTab(props) {
 			unique='dtSlider'
 			className='dtSlider cpSlider'
 			label='dt'
-			minLabel='.0001'
+			minLabel='.00001'
 			maxLabel='1.0'
 
 			current={props.dt}
@@ -65,9 +65,9 @@ function SetIterationTab(props) {
 			maxLabel='.999'
 
 			current={props.lowPassFilter}
-			sliderMin={0.001}
-			sliderMax={.999}
-			stepsPerDecade={6}
+			sliderMin={1/1024}
+			sliderMax={.5}
+			stepsPerDecade={16}
 
 			handleChange={(power, ix) => {
 				console.info(`handleChange Low Pass Filter::  ix=${ix}  `, power);
