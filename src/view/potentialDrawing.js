@@ -96,7 +96,7 @@ class potentialDrawing extends abstractDrawing {
 		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
-		this.rowAttr.attachArray(qe.space.viewBuffer, this.rowFloats);
+		this.rowAttr.attachArray(qe.space.vBuffer, this.rowFloats);
 	}
 
 

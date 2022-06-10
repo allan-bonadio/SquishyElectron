@@ -6,8 +6,6 @@ logs
 npm-debug.log*
 
 package-lock.json
-# old stuff I used to get the QE off the ground
-old
 
 # Dependency directories
 node_modules/

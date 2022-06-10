@@ -114,7 +114,7 @@ class flatDrawing extends abstractDrawing {
 		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
-		this.rowAttr.attachArray(qe.space.viewBuffer, this.rowFloats);
+		this.rowAttr.attachArray(qe.space.vBuffer, this.rowFloats);
 
 		//console.log(`just set inputs in flatDrawing.js.  :`);
 	}
@@ -139,6 +139,7 @@ class flatDrawing extends abstractDrawing {
 		if (alsoDrawPoints)
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 
+		// i think this is problematic
 		if (dumpViewBufAfterDrawing)
 			qe.qViewBuffer_dumpViewBuffer(`finished drawing in flatDrawing.js; drew buf:`);
 	}

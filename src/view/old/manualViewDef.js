@@ -63,7 +63,7 @@ export class manualViewDef extends abstractViewDef {
 		const normalize = false; // don't normalize the data
 		const stride = 0;        // 0 = move forward number of bytes to get the next position
 								// size * sizeof(type) each iteration
-		const offset = 0;        // start at the beginning of the buffer
+		const offset = 0;        // start at the beginning of the vBuffer
 		gl.vertexAttribPointer(cornerAttributeLocation, size, type, normalize, stride, offset);
 	}
 }

@@ -229,7 +229,7 @@ export class abstractViewDef {
 //		const type = gl.FLOAT;   // the data is 32bit floats
 //		const normalize = false; // don't normalize the data
 //		const stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-//		const offset = 0;        // start at the beginning of the buffer
+//		const offset = 0;        // start at the beginning of the vBuffer
 //		gl.vertexAttribPointer(cornerAttributeLocation, size, type, normalize, stride, offset);
 	}
 
@@ -362,7 +362,7 @@ export class abstractViewDef {
 			vertexShaderSource = `
 
 			// an attribute is an input (in) to a vertex shader.
-			// It will receive data from a buffer
+			// It will receive data from a vBuffer
 			attribute vec4 corner;
 			uniform cornerColor;
 			varying color;
@@ -469,7 +469,7 @@ export class abstractViewDef {
 			var type = gl.FLOAT;   // the data is 32bit floats
 			var normalize = false; // don't normalize the data
 			var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-			var offset = 0;        // start at the beginning of the buffer
+			var offset = 0;        // start at the beginning of the vBuffer
 			gl.vertexAttribPointer(
 				positionAttributeLocation, size, type, normalize, stride, offset)
 		}
@@ -505,7 +505,7 @@ export class abstractViewDef {
 			// Tell it to use our program (pair of shaders)
 			gl.useProgram(program);
 
-			// Bind the attribute/buffer set we want. ... again?
+			// Bind the attribute/vBuffer set we want. ... again?
 			//this.vaoExt.bindVertexArrayOES(vao);
 
 

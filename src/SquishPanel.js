@@ -492,7 +492,7 @@ export class SquishPanel extends React.Component {
 	dumpViewBuffer(title = '') {
 		const s = this.state;
 		let nRows = s.space.nPoints * 2;
-		let vb = s.space.viewBuffer;
+		let vb = s.space.vBuffer;
 		const _ = (f) => f.toFixed(3).padStart(6);
 		console.log(`dump of view buffer '${title}' for ${s.space.nPoints} points in ${nRows} rows`);
 		for (let i = 0; i < nRows; i++)
