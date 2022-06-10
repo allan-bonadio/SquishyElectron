@@ -5,11 +5,12 @@
 
 
 
-//#include <cmath>
-//#include "../spaceWave/qCx.h"
+#include "../squish.h"
 #include "../spaceWave/qSpace.h"
 #include "../schrodinger/Avatar.h"
 #include "../spaceWave/qWave.h"
+#include "../fourier/qSpectrum.h"
+#include "../spaceWave/qViewBuffer.h"
 
 #include "CppUTest/TestHarness.h"
 #include "CppUTest/CommandLineTestRunner.h"
@@ -17,8 +18,8 @@
 
 #include "./cppuMain.h"
 
-
-void initExperiments(void) {
+// how do initializers in C++ work?
+static void initExperiments(void) {
 	int n0{};
 	int n1{1};
 
@@ -31,11 +32,17 @@ void initExperiments(void) {
 		n0, n1, nn0, nn1, zombie[0].re, zombie[0].im, zombie[1].re, zombie[1].im);
 }
 
+// for memory leaks that cppu conveniently gives us, some clues:
+static void dumpSizes(void) {
+	printf("byte sizes... sz(qSpace)=%lu  sz(qWave)=%lu  sz(qBuffer)=%lu  sz(qSpectrum)=%lu  sz(qViewBuffer)=%lu  sz(Avatar)=%lu\n\n",
+		sizeof(qSpace), sizeof(qWave), sizeof(qBuffer), sizeof(qSpectrum), sizeof(qViewBuffer), sizeof(Avatar));
+}
 
 
 int main(int ac, char** av)
 {
-	initExperiments();
+	//initExperiments();
+	dumpSizes();
 
     return CommandLineTestRunner::RunAllTests(ac, av);
 }
@@ -56,19 +63,22 @@ SimpleString StringFrom(const qCx value) {
 
 static bool traceMakeSpace = false;
 
-// make a new 1d space with N state locations along x, in theSpace, along with lots of buffers.
+// in case someone wants some of the other pointers after making a fullSpace, here they are
+salientPointersType *fullSpaceSalientPointers = NULL;
+
+// make a new 1d space with N state locations along x, in theSpace, along with whatever else
 // the way JS does it.  Needed for lots of tests.
 // You are (usually) responsible for deleting it with deleteTheSpace().
-// Space generated in theSpace.  Old theSpace deleted automatically if you don't deleteTheSpace().
+// Space generated in theSpace.  Old theSpace triggers error if you don't deleteTheSpace().
 // frees and reallocates laos, peru, thePotential and the ViewBuffer
 qSpace *makeFullSpace(int N) {
 	if (traceMakeSpace) printf("🧨 🧨  starting makeFullSpace(%d), about to startNewSpace\n", N);
 
-	startNewSpace(MAKEFULLSPACE_LABEL);
+	qSpace *space = startNewSpace(MAKEFULLSPACE_LABEL);
 	if (traceMakeSpace) printf("        finished startNewSpace(), on to add\n");
 	addSpaceDimension(N, contENDLESS, "x");
 	if (traceMakeSpace) printf("        finished addSpaceDimension(), on to complete\n");
-	qSpace *space = completeNewSpace();
+	fullSpaceSalientPointers = completeNewSpace();
 
 	if (traceMakeSpace) printf("        finished makeFullSpace(%d)\n", N);
 	return theSpace;
@@ -110,13 +120,14 @@ void setCircularWave(qWave *target, double frequency) {
 	}
 
 	target->normalize();
+	target->fixBoundaries();
 }
 
 
 // turn this on to see if a bug goes away when we avoid stomping on memory
 static bool avoidProving = false;
 
-// fill up this buffer with some byte values just to prove that we can do it.
+// fill up this buffer (of any kind) with some byte values just to prove that we can do it.
 // Any kind of buffer/wave/array.  Size is number of BYTES.
 // oh yeah read from each location, too.
 // If I end up stomping on something I shouldn't, it'll crash soon enough.
@@ -145,6 +156,7 @@ void compareWaves(qBuffer *qexpected, qBuffer *qactual) {
 
 	// do the WHOLE THING including boundaries
 	for (int ix = 0; ix < qexpected->nPoints; ix++) {
+		// we can't use DOUBLES_EQUAL() cuz these aren't doubles, they're complex!
 		CHECK_EQUAL(expected[ix], actual[ix]);
 	}
 }
