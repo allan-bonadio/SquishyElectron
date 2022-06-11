@@ -91,16 +91,16 @@ class flatViewDef extends abstractViewDef {
 
 	setInputs() {
 		//const highest =
-		// always done at end of integration qe.loadViewBuffer();
+		// always returned by qe.loadViewBuffer();
 
 		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
-		let nPoints = this.nPoints = this.space.nPoints;
+		let nPoints = this.nPoints = this.space ? this.space.nPoints : 10;  // ??
 		let barWidth = 1 / (nPoints - 1);
 		barWidthUniform.setValue(barWidth, '1f');
 
 		let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
 		//let unitHeight = 1;
-		unitHeightUniform.setValue(() => qe.Avatar_getMaxNorm(), '1f');
+		//unitHeightUniform.setValue(() => qe.Avatar_getMaxNorm(), '1f');
 
 		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar

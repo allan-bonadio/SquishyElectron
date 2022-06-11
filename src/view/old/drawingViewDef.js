@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-// TRYING to make this obsolete by merging it into abstractViewDef
+ OBSOLETE;   merged it into abstractViewDef
 
 import abstractViewDef from './abstractViewDef';
 
