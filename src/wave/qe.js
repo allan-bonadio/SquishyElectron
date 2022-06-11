@@ -1,4 +1,4 @@
-// this file generated Wed Jun 08 2022 11:38:19 GMT-0700 (Pacific Daylight Time)
+// this file generated Sat Jun 11 2022 11:49:02 GMT-0700 (Pacific Daylight Time)
 // by the file SquishyElectron/quantumEngine/building/genExports.js
 let cwrap;
 export const qe = {};
@@ -7,14 +7,13 @@ export function defineQEngineFuncs() {
 
 	qe.main = cwrap('main', 'number', []);
 	qe.startNewSpace = cwrap('startNewSpace', 'number', ['string']);
-	qe.addSpaceDimension = cwrap('addSpaceDimension', 'number', ['number','number','string']);
+	qe.addSpaceDimension = cwrap('addSpaceDimension', null, ['number','number','string']);
 	qe.completeNewSpace = cwrap('completeNewSpace', 'number', []);
 	qe.deleteTheSpace = cwrap('deleteTheSpace', null, []);
 	qe.Avatar_getWaveBuffer = cwrap('Avatar_getWaveBuffer', 'number', []);
 	qe.qSpace_getPotentialBuffer = cwrap('qSpace_getPotentialBuffer', 'number', []);
 	qe.Avatar_getElapsedTime = cwrap('Avatar_getElapsedTime', 'number', []);
 	qe.Avatar_getIterateSerial = cwrap('Avatar_getIterateSerial', 'number', []);
-	qe.Avatar_getMaxNorm = cwrap('Avatar_getMaxNorm', 'number', []);
 	qe.qSpace_dumpPotential = cwrap('qSpace_dumpPotential', 'number', ['string']);
 	qe.qSpace_setZeroPotential = cwrap('qSpace_setZeroPotential', 'number', []);
 	qe.qSpace_setValleyPotential = cwrap('qSpace_setValleyPotential', 'number', ['number','number','number']);
@@ -24,7 +23,7 @@ export function defineQEngineFuncs() {
 	qe.Avatar_oneIteration = cwrap('Avatar_oneIteration', 'number', []);
 	qe.Avatar_resetCounters = cwrap('Avatar_resetCounters', null, []);
 	qe.qViewBuffer_getViewBuffer = cwrap('qViewBuffer_getViewBuffer', 'number', []);
-	qe.qViewBuffer_loadViewBuffer = cwrap('qViewBuffer_loadViewBuffer', null, []);
+	qe.qViewBuffer_loadViewBuffer = cwrap('qViewBuffer_loadViewBuffer', 'number', []);
 	qe.qViewBuffer_dumpViewBuffer = cwrap('qViewBuffer_dumpViewBuffer', null, ['string']);
 	qe.Avatar_askForFFT = cwrap('Avatar_askForFFT', null, []);
 	qe.Avatar_normalize = cwrap('Avatar_normalize', null, []);

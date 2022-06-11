@@ -33,6 +33,6 @@ extern qViewBuffer *theQViewBuffer;
 extern "C" {
 	void qViewBuffer_dumpViewBuffer(const char *title = NULL);
 	float *qViewBuffer_getViewBuffer(void);
-	void qViewBuffer_loadViewBuffer(void);
+	double qViewBuffer_loadViewBuffer(void);
 }
 

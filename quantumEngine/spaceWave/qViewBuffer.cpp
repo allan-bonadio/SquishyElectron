@@ -175,6 +175,7 @@ extern "C" {
 		theAvatar->qvBuffer->dumpViewBuffer(title);
 	}
 
+	// return the vbuffer, raw floats
 	float *qViewBuffer_getViewBuffer(void) {
 //		printf("📺 qViewBuffer_getViewBuffer: theQViewBuffer=%p \n",
 //			theQViewBuffer);
@@ -184,10 +185,11 @@ extern "C" {
 		return theQViewBuffer->vBuffer;
 	}
 
-	void qViewBuffer_loadViewBuffer(void) {
+	// returns the highest height of norm of wave entries
+	double qViewBuffer_loadViewBuffer(void) {
 		if (debugViewBuffer)
 			printf("📺 qViewBuffer_getViewBuffer... theQViewBuffer=%p\n", theQViewBuffer);
-		theQViewBuffer->loadViewBuffer();
+		return theQViewBuffer->loadViewBuffer();
 	}
 }
 

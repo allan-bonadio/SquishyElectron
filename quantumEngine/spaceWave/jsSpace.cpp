@@ -70,14 +70,6 @@ double Avatar_getIterateSerial(void) {
 	return theAvatar->iterateSerial;
 }
 
-// actually gets Average maxNorm, over maybe a hundred iterations
-double Avatar_getMaxNorm(void) {
-	if (!theAvatar) throw std::runtime_error("🚀 🚀 🚀 null space in Avatar_getMaxNorm()");
-	printf("Avatar_getMaxNorm() return avgMaxNorm=%lf\n", theAvatar->mainQWave->avgMaxNorm);
-	return theAvatar->mainQWave->avgMaxNorm;
-}
-
-
 void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
 void qSpace_setZeroPotential(void) { theSpace->setZeroPotential(); }
 void qSpace_setValleyPotential(double power, double scale, double offset) {
@@ -154,11 +146,10 @@ qSpace *startNewSpace(const char *label) {
 
 // call this from JS to add one or more dimensions
 // nobody uses this return value either.
-qSpace *addSpaceDimension(int N, int continuum, const char *label) {
+void addSpaceDimension(int N, int continuum, const char *label) {
 	if (traceSpaceCreation) printf("addSpaceDimension(%d, %d, %s)   %p\n", N, continuum, label, theSpace->freeBufferList);
 	theSpace->addDimension(N, continuum, label);
 	if (traceSpaceCreation) printf("🚀 🚀 🚀  addSpaceDimension(): freeBufferList: %p\n", theSpace->freeBufferList);
-	return theSpace;
 }
 
 // call this from JS to finish the process

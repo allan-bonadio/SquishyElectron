@@ -20,7 +20,7 @@ exportsSrc  = [
 
 	// recreating the space
 	{name: 'startNewSpace', retType: 'number', args: ['string']},
-	{name: 'addSpaceDimension', retType: 'number',
+	{name: 'addSpaceDimension', retType: null,
 		args: ['number', 'number', 'string']},
 	{name: 'completeNewSpace', retType: 'number', args: []},
 	{name: 'deleteTheSpace', retType: null, args: []},
@@ -33,7 +33,6 @@ exportsSrc  = [
 	// the Avatar ones act on theAvatar in the c++ code
 	{name: 'Avatar_getElapsedTime', retType: 'number', args: []},
 	{name: 'Avatar_getIterateSerial', retType: 'number', args: []},
-	{name: 'Avatar_getMaxNorm', retType: 'number', args: []},
 
 	// the potential
 	{name: 'qSpace_dumpPotential', retType: 'number', args: ['string']},
@@ -50,7 +49,7 @@ exportsSrc  = [
 
 	// views
 	{name: 'qViewBuffer_getViewBuffer', retType: 'number', args: []},
-	{name: 'qViewBuffer_loadViewBuffer', retType: null, args: []},
+	{name: 'qViewBuffer_loadViewBuffer', retType:  'number', args: []},
 	{name: 'qViewBuffer_dumpViewBuffer', retType: null, args: ['string']},
 
 	// FFT

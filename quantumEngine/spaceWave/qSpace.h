@@ -149,7 +149,7 @@ struct salientPointersType {
 // for JS to call
 extern "C" {
 	qSpace *startNewSpace(const char *name = "a space");
-	qSpace *addSpaceDimension(int N, int continuum, const char *label);
+	void addSpaceDimension(int N, int continuum, const char *label);
 	struct salientPointersType *completeNewSpace(void);
 	void deleteTheSpace(void);
 

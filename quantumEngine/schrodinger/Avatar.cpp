@@ -170,12 +170,6 @@ void Avatar::oneIteration() {
 
 	fourierFilter(lowPassFilter);
 
-	// average the maxNorm, but first time around, just use the whole thing
-	mainQWave->mixInMaxNorm();
-	//if (avgMaxNorm > 0)
-	//	avgMaxNorm = (63 * avgMaxNorm + maxNorm) / 64;
-	//else
-	//	avgMaxNorm = maxNorm;
 
 	// need it; somehow? not done in JS
 	theQViewBuffer->loadViewBuffer();

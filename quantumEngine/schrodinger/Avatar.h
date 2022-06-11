@@ -86,7 +86,6 @@ extern "C" {
 	float *qViewBuffer_getViewBuffer();
 	double Avatar_getElapsedTime(void);
 	double Avatar_getIterateSerial(void);
-	double Avatar_getMaxNorm(void);
 
 
 	void Avatar_oneIteration(void);

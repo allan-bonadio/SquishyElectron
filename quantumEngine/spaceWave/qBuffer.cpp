@@ -66,7 +66,7 @@ qCx *qBuffer::allocateWave(int nPoints) {
 
 // create one
 qBuffer::qBuffer(void)
-	: magic('qBuf'), wave(NULL), space(NULL), maxNorm(0), avgMaxNorm(0) {
+	: magic('qBuf'), wave(NULL), space(NULL) {
 }
 
 // actually create the buffer that we need
@@ -87,7 +87,6 @@ void qBuffer::initBuffer(int length, qCx *useThisBuffer) {
 	}
 
 	nPoints = length;
-	maxNorm = 0;
 
 	// don't mess with these; subclass may have already set them
 	//start = end = -1;  // wave / spectrum calculates these differently
@@ -263,26 +262,19 @@ void qSpace::fixThoseBoundaries(qCx *targetWave) {
 
 
 // calculate ⟨𝜓 | 𝜓⟩  'inner product'.  Non-visscher; do not use it during an iteration.
-// Also calculate maxNorm and save it in qBuffer object.
 double qBuffer::innerProduct(void) {
 	qCx *wave = this->wave;
 	double sum = 0.;
-	maxNorm = 0;
 
 	for (int ix = start; ix < end; ix++) {
 		qCx point = wave[ix];
 		double norm = point.norm();
 		sum += norm;
-		if (maxNorm < norm)
-			maxNorm = norm;
-
-		//printf("in qBuffer::innerProduct()   re=%lf  im=%lf  norm=%lf and maxnorm=%lf\n", point.re, point.im, norm, maxNorm);
 		//sum += wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im;
 		//printf("innerProduct point %d (%lf,%lf) %lf\n", ix, wave[ix].re, wave[ix].im,
 		//	wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im);
 	}
 
-	//printf("final maxnorm in qBuffer::innerProduct=%lf\n", maxNorm);
 	return sum;
 }
 
@@ -290,7 +282,6 @@ double qBuffer::innerProduct(void) {
 
 // enforce ⟨𝜓 | 𝜓⟩ = 1 by dividing out the current magnitude sum.
 // BUffer must be installed as well as nPoints, start and end
-// innerProduct() will calculate maxNorm for you.
 void qBuffer::normalize(void) {
 	// for visscher, we have to make it in a temp wave and copy back to our buffer
 	// huh?  this is never copied back.  normalize here does nothing.
@@ -324,19 +315,5 @@ void qBuffer::normalize(void) {
 			wave[ix] *= factor;
 	}
 	fixBoundaries();
-	//dumpWave("qWave::normalize done", true);
-
-	// you know that maxNorm calculated in innerProduct?  adjust that too.
-	maxNorm /= mag;
-}
-
-// when the scaling changes every frame, the image can get jumpy.
-// here we smooth it out
-void qBuffer::mixInMaxNorm(void) {
-	printf("qBuffer::mixInMaxNorm: maxNorm=%lf  avgMaxNorm=%lf\n", maxNorm, avgMaxNorm);
-	if (avgMaxNorm > 1e-12)
-		avgMaxNorm = (7 * avgMaxNorm + maxNorm) / 8;
-	else
-		avgMaxNorm = maxNorm;
 }
 
