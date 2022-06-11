@@ -5,14 +5,26 @@
 
 import {viewUniform, viewAttribute} from './viewVariable';
 
-// superclass of all drawings.  A drawing is a piece of code that draws one thing on
-// a GL canvas.  It's got v&f shaders, a source of data, and a Draw function.
-// But it does NOT own the canvas or gl object - that's shared among all drawings on a view.
-// THat's why drawings are not the same thing as ViewDefs: a viewDef has zero or more drawings.
+/* superclass of all drawings.  A drawing is a piece of code that draws one thing on
+a GL canvas.  It's got v&f shaders, a source of data, and a Draw function.
+But it does NOT own the canvas or gl object - that's shared among all drawings on a view.
+THat's why drawings are not the same thing as ViewDefs: a viewDef has zero or more drawings.
+
+drawings must include:
+- vertex and frag shaders, probably backtic strings
+- a class which extends abstractDrawing and has methods:
+	- class and instance names
+	- setShaders() to prep the shaders
+	- setInputs() to prep the variables, uniform and attr; see viewVariable.js
+	- draw() to issue actual drawing commands
+*/
+
+// in addition to being a superclass for other drawings, you can use it straight, to draw a triangle for testing.
 export class abstractDrawing {
 	static drawingName: 'abstractDrawing';
 
 	/* ************************************************** construction */
+	// view is eg flatDrawingViewDef.  Here we add ourselves to the ViewDef list of drawings.
 	constructor(view, space) {
 		this.view = view;
 		this.viewVariables = [];
@@ -23,14 +35,10 @@ export class abstractDrawing {
 		this.bufferDataDrawMode = view.bufferDataDrawMode;
 		//bufferDataDrawMode = this.gl.STATIC_DRAW;
 
+		// isn't this passed in as a separate arg?
 		this.space = view.space;
 
 		view.drawings.push(this);
-	}
-
-	completeDrawingSetup() {
-		this.setShaders();
-		this.setInputs();
 	}
 
 	/* ************************************************** Shader Creation/Compile */
@@ -80,6 +88,9 @@ export class abstractDrawing {
 		throw `Error linking program abstractDrawing for ${this.view.viewName}: ${msg}`;
 	}
 
+	/* **************************************************  test drawing */
+	// these are example functions that actually work as a Drawing.  Draw one dot i think.
+
 	// abstract supermethod: write your setShaders() function to compile your two GLSL sources
 	setShaders() {
 		this.vertexShaderSrc = `
@@ -100,11 +111,8 @@ export class abstractDrawing {
 
 		this.compileProgram();
 	}
-	/* ************************************************** buffers & variables */
 
-
-
-	// abstract supermethod: all subclasses should write their own setInputs() method.
+	// abstract supermethod: all drawings should write their own setInputs() method.
 	// mostly, creating viewVariables that can be dynamically changed
 	setInputs() {
 		// gotta have at least one attr?  this is just a dummy.
@@ -116,8 +124,6 @@ export class abstractDrawing {
 	}
 
 
-
-	/* ************************************************** drawing */
 	// abstract supermethod: another dummy submethod... write yer  own
 	draw() {
 		const gl = this.gl;
@@ -135,6 +141,7 @@ export class abstractDrawing {
 
 	/* ************************************************** interactivity */
 	// abstract supermethod: another dummy submethod... write yer  own
+	// supposed to set click/touch/keystroke handlers and stuff
 	domSetup() {
 	}
 }

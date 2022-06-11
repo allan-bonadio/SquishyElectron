@@ -111,20 +111,17 @@ class qeWave {
 
 	/* ********************************************************************** calculatons */
 
-	// calculate ⟨𝜓 | 𝜓⟩  'inner product'.  Also calculate maxNorm; save it in qeWave.
-	// See also C++ function of same name.
+	// calculate ⟨𝜓 | 𝜓⟩  'inner product'.
+	// See also C++ function of same name, that one's official.
 	innerProduct() {
 		const wave = this.wave;
 		const {start, end} = this.space.startEnd2;
 
-		let tot = 0, max = 0;  // always real
+		let tot = 0;
 		for (let ix = start; ix < end; ix += 2) {
 			let norm = wave[ix] ** 2 + wave[ix + 1] ** 2;
 			tot += norm;
-			if (norm > max)
-				max = norm;
 		}
-		//this.maxNorm = max;
 		return tot;
 	}
 
@@ -287,7 +284,7 @@ class qeWave {
 			break;
 		}
 
-		qe.Avatar_normalize();  // also sets maxNorm
+		qe.Avatar_normalize();
 		//this.normalize();
 		this.space.fixThoseBoundaries(this.wave);
 	}

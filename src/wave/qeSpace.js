@@ -229,7 +229,7 @@ export class qeSpace extends qeBasicSpace {
 			new Float32Array(emscriptenMemory, address, np);
 // 		this.viewBuffer = qe.viewBuffer =
 // 			new Float32Array(window.Module.HEAPF32.buffer, qe.qViewBuffer_getViewBuffer(), this.nPoints*8);
-		qe.qViewBuffer_loadViewBuffer();
+//		qe.qViewBuffer_loadViewBuffer();
 
 		//console.log(`🚀  qViewBuffer_getViewBuffer 200: 🛸`, qe.qViewBuffer_getViewBuffer());
 

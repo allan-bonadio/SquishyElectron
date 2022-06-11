@@ -155,7 +155,7 @@ export class SquishPanel extends React.Component {
 			// use this.currentView rather than state.currentView - we just set it
 			// and it takes a while.
 			// Make sure you call the new view's domSetup method.
-			this.curView.domSetup(this.canvas);
+			this.curView.domSetupForAllDrawings(this.canvas);
 		}).catch(ex => {
 			console.error(`error in SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
 			debugger;
@@ -208,6 +208,8 @@ export class SquishPanel extends React.Component {
 
 			// OK callback
 			finalParams => {
+				qe.deleteTheSpace();
+
 				this.setNew1DResolution(
 					finalParams.N, finalParams.continuum, finalParams.viewClassName);
 				this.setState({isTimeAdvancing: timeWasAdvancing});
@@ -235,7 +237,6 @@ export class SquishPanel extends React.Component {
 		// (actually many visscher steps)
 		qe.Avatar_oneIteration();
 
-		//console.info(`📶  Avatar_getMaxNorm=`, qe.Avatar_getMaxNorm());
 		if (dumpingTheViewBuffer)
 			this.dumpViewBuffer('crunchOneIteration()');
 	}
@@ -266,8 +267,8 @@ export class SquishPanel extends React.Component {
 			this.endReloadVarsBuffers = performance.now();
 
 			// draw
-			this.curView.setInputs();
-			this.curView.draw();
+			this.curView.setInputsOnDrawings();
+			this.curView.drawAllDrawings();
 
 			// populate the on-screen numbers
 			this.showTimeNIteration();
