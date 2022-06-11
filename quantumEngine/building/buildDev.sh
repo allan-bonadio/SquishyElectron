@@ -9,7 +9,7 @@ cd `dirname $0`
 # also try emsdk without the -main or make a symlink
 
 # this has all c++ & h files, except main.cpp and the testing files.
-# omit those, so testing can compile & run itself.
+# omit those, so testing can also use this and compile & run itself (see testing/cppu*).
 allCpp=`cat allCpp.list`
 
 # keep LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 32
@@ -28,10 +28,8 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-I/dvl/emscripten/emsdk/upstream/emscripten/cache/sysroot/include \
 	-include emscripten.h \
 	-ffast-math \
-	main.cpp $allCpp || exit 99
-# changed -g to -g4 to -gsource-map --source-map-base
-#  --source-map-base expects an arg so I put the wasm.map file name
-#  --source-map-base quantumEngine.wasm.map
+	main.cpp $allCpp || exit $?
+# changed -g to -g4 to -gsource-map --source-map-base / ; debugger can see into c++
 
 cp quantumEngine.wasm quantumEngine.js quantumEngine.wasm.map ../public
 
