@@ -78,7 +78,7 @@ function CPToolbar(props) {
 		</button>
 
 		<div className='toolbarThing'>
-			{props.N} states
+			{props.N} states &nbsp;
 		</div>
 
 		<button onClick={clickOnFFR}>
