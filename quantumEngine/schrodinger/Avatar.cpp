@@ -47,6 +47,7 @@ qWave *Avatar::getScratchWave(void) {
 		scratchQWave = new qWave(space);
 	return scratchQWave;
 };
+
 qSpectrum *Avatar::getSpect(void) {
 	if (!spect)
 		spect = new qSpectrum(space);
@@ -196,25 +197,29 @@ void Avatar::oneIteration() {
 
 
 // FFT the wave, cut down the high frequencies, then iFFT it back.
-// If lowPassFilter is 0 or smaller than 1/nPoints, we skip it
+// If lowPassFilter is 0 or smaller than 1/nPoints, we skip it except for the nyquist freq
 void Avatar::fourierFilter(double lowPassFilter) {
-	getSpect();
-	if (!spect)
-		spect = new qSpectrum(space);
+	spect = getSpect();
 	spect->generateSpectrum(mainQWave);
 
 	// the high frequencies are in the middle; the nyquist freq is at N/2
 	int nyquist = spect->nPoints/2;
-	double spread = round(nyquist * lowPassFilter);  // number of freqs we'll attenuate on each side
-	if (spread <= 1e-10)
-		return;
-	if (spread > nyquist)
-		spread = nyquist;  // sorry can't do that
-
 	qCx *s = spect->wave;
 	s[nyquist] = 0;
+
+	int spread = round(nyquist * lowPassFilter);  // number of freqs we'll attenuate on each side
+	printf("🌈  fourierFilter: nPoints=%d  nyquist=%d   spread=%d,   lowPassFilter=%lf\n",
+		spect->nPoints, nyquist, spread, lowPassFilter);
+	if (spread <= 0)
+		return;
+	if (spread > nyquist)  // sorry can't do that
+		spread = nyquist;
+
 	for (int k = 1; k < spread; k++) {
-		double factor = 1. - k / spread;
+		double factor = 0;  //1. - k / spread;
+		printf("🌈  fourierFilter: smashing lowPassFilter=%lf   freqs %d which was %lf, "
+			"and %d which was %lf, by factor %lf\n",
+			nyquist - k, s[nyquist - k].norm(), lowPassFilter, nyquist + k, s[nyquist + k].norm(), factor);
 		s[nyquist + k] *= factor;
 		s[nyquist - k] *= factor;
 	}

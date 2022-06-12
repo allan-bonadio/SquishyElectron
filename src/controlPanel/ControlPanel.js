@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** Control Panel -- all the widgets below the displayed canvas
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
@@ -51,6 +51,12 @@ export class ControlPanel extends React.Component {
 			valleyScale: PropTypes.number.isRequired,
 			valleyOffset: PropTypes.number.isRequired,
 		}),
+
+		iStats: PropTypes.shape({
+			startIteration: PropTypes.number.isRequired,
+			endDraw: PropTypes.number.isRequired,
+		}),
+		refreshStats: PropTypes.func.isRequired,
 	}
 
 	constructor(props) {
@@ -164,6 +170,8 @@ export class ControlPanel extends React.Component {
 				setStepsPerIteration={p.setStepsPerIteration}
 				lowPassFilter={p.lowPassFilter}
 				setLowPassFilter={p.setLowPassFilter}
+
+				iStats={p.iStats}
 			/>;
 
 		default:

@@ -75,7 +75,7 @@ const defaultPotentialParams = {
 export class SquishPanel extends React.Component {
 	static propTypes = {
 		token: PropTypes.number,
-		////showResolutionDialog: PropTypes.func.isRequired,
+		id: PropTypes.string.isRequired,
 	};
 
 	static getListOfViews() {
@@ -126,7 +126,7 @@ export class SquishPanel extends React.Component {
 
 		// ticks and benchmarks
 		const now = performance.now();
-		this.prevStart  = now;
+		this.initStats(now);
 		this.timeForNextTic = now + 10;  // default so we can get rolling
 		this.lastAniIteration = now;
 
@@ -224,13 +224,46 @@ export class SquishPanel extends React.Component {
 		)
 	}
 
-	/* ******************************************************* iteration & animation */
+	/* ******************************************************* stats */
 
+	// the upper left and right numbers
 	showTimeNIteration() {
 		// need them instantaneously - react is too slow
 		document.querySelector('.voNorthWest').innerHTML = qe.Avatar_getElapsedTime().toFixed(2);
 		document.querySelector('.voNorthEast').innerHTML = qe.Avatar_getIterateSerial();
 	}
+
+	// constructor only calls this (?)
+	initStats(now) {
+		this.iStats = {
+			startIteration: now,
+			endCalc: now,
+			endReloadViewBuffer: now,
+			endReloadInputs: now,
+			endDraw: now,
+			prevStart: now,
+		}
+	}
+
+	// update the stats, as displayed in the Integration tab
+	refreshStats() {
+		const p = this.props;
+		function show(cName, ms) {
+			const el = document.querySelector(`#${p.id}.SquishPanel .ControlPanel .SetIterationTab .${cName}`);
+			if (el)
+				el.innerHTML = ms.toFixed(2);  // only if it's showing
+		}
+
+		const st = this.iStats;
+		show('iterationCalcTime', st.endCalc - st.startIteration);
+		show('reloadViewBuffers', st.endReloadViewBuffer - st.endCalc);
+		show('reloadGlInputs', st.endReloadInputs - st.endReloadViewBuffer);
+		show('drawTime', st.endDraw - st.endReloadInputs);
+		show('totalForIteration', st.endDraw - st.startIteration);
+		show('cyclePeriod', st.startIteration - st.prevStart);
+	}
+
+	/* ******************************************************* iteration & animation */
 
 	// do one integration iteration
 	crunchOneIteration() {
@@ -246,48 +279,49 @@ export class SquishPanel extends React.Component {
 	// so if needsRepaint false or absent, it'll only repaint if an iteration has been done.
 	iterateOneIteration(isTimeAdvancing, needsRepaint) {
 		//console.log(`time since last tic: ${now - startIteration}ms`)
-// 		this.endCalc = this.startReloadVarsBuffers = this.endReloadVarsBuffers =
+// 		this.endCalc = this.startReloadViewBuffer = this.endReloadViewBuffer =
 // 			this.endIteration = 0;
-		this.startIteration = performance.now();  // absolute beginning of integrate iteration
+		this.iStats.startIteration = performance.now();  // absolute beginning of integrate iteration
 		// could be slow.
 		if (isTimeAdvancing) {
 			this.crunchOneIteration();
 			needsRepaint = true;
 		}
-		this.endCalc = performance.now();
+		this.iStats.endCalc = performance.now();
 
 		// if we need to repaint... if we're iterating, if the view says we have to,
 		// or if this is a one shot step
-		this.startReloadVarsBuffers = performance.now();
+		this.iStats.endReloadViewBuffer = this.iStats.endReloadInputs = this.iStats.endDraw = performance.now();
 		if (needsRepaint) {
 			this.curView.reloadAllVariables();
 
 			// copy from latest wave to view buffer (c++)
 			qe.qViewBuffer_getViewBuffer();
-			this.endReloadVarsBuffers = performance.now();
+			this.iStats.endReloadViewBuffer = performance.now();
 
 			// draw
 			this.curView.setInputsOnDrawings();
-			this.curView.drawAllDrawings();
+			this.iStats.endReloadInputs = performance.now();
 
-			// populate the on-screen numbers
+			this.curView.drawAllDrawings();
+			// populate the frame number and elapsed pseudo-time
 			this.showTimeNIteration();
-		}
-		else {
-			this.endReloadVarsBuffers = this.startReloadVarsBuffers;
+			this.iStats.endDraw = performance.now();
+
 		}
 
 		// print out per-iteration benchmarks
-		this.endIteration = performance.now();
 		if (areBenchmarking) {
 			console.log(`times:\n`+
-				`iteration calc time:     ${(this.endCalc - this.startIteration).toFixed(2)}ms\n`+
-				`reload GL variables:     ${(this.endReloadVarsBuffers - this.startReloadVarsBuffers).toFixed(2)}ms\n`+
-				`draw:   ${(this.endIteration - this.endReloadVarsBuffers).toFixed(2)}ms\n`+
-				`total for iteration:  ${(this.endIteration - this.startIteration).toFixed(2)}ms\n` +
-				`period since last:  ${(this.startIteration - this.prevStart).toFixed(2)}ms\n`);
-			this.prevStart = this.startIteration;
+				`iteration calc time:     ${(this.iStats.endCalc - this.iStats.startIteration).toFixed(2)}ms\n`+
+				`reloadViewBuffers:     ${(this.iStats.endReloadViewBuffer - this.iStats.endCalc).toFixed(2)}ms\n`+
+				`reload GL variables:     ${(this.iStats.endReloadInputs - this.iStats.endReloadViewBuffer).toFixed(2)}ms\n`+
+				`draw:   ${(this.iStats.endDraw - this.iStats.endReloadInputs).toFixed(2)}ms\n`+
+				`total for iteration:  ${(this.iStats.endDraw - this.iStats.startIteration).toFixed(2)}ms\n` +
+				`period since last:  ${(this.iStats.startIteration - this.iStats.prevStart).toFixed(2)}ms\n`);
 		}
+		this.refreshStats();
+		this.iStats.prevStart = this.iStats.startIteration;
 
 		this.continueRunningOneCycle();
 	}
@@ -508,7 +542,7 @@ export class SquishPanel extends React.Component {
 		const s = this.state;
 
 		return (
-			<div className="SquishPanel">
+			<div id={this.props.id} className="SquishPanel">
 				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
 				<SquishView setGLCanvas={canvas => this.setGLCanvas(canvas)}
 					width={s.canvasSize.width} height={s.canvasSize.height}/>
@@ -538,6 +572,9 @@ export class SquishPanel extends React.Component {
 					setStepsPerIteration={this.setStepsPerIteration}
 					lowPassFilter={s.lowPassFilter}
 					setLowPassFilter={this.setLowPassFilter}
+
+					iStats={this.iStats}
+					refreshStats={this.refreshStats}
 				/>
 				{this.renderRunningOneCycle()}
 			</div>

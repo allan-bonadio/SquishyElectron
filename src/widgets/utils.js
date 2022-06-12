@@ -159,7 +159,7 @@ export function indexToPower(willRoundPowers, stepFactors, spd, ix) {
 		factor = stepFactors[ix - whichDecade * spd];
 	}
 	else {
-		// remember, there's still decades, but of 16x each, and 4 settings in each one, separated by 2x
+		// remember, there's still decades, but of 16x each, and 4 settings in each one
 		whichDecade = Math.floor(ix/4);
 		decadePower =  16 ** whichDecade;
 		factor = stepFactors[ix - whichDecade * 4];
@@ -183,9 +183,10 @@ export function powerToIndex(spd, power) {
 
 	//console.info(`powerToIndex - spd=${spd}  power=${power}    logOf=${logOf}  6=${6}   `)
 
-	// now it's reasonable at this point to say why are we rounding vs flooring?
-	return Math.floor(logOf);
-	//return Math.round(logOf);
+	// now it's reasonable at this point to say why are we rounding vs flooring?  Well, try spd=3 and power=200;
+	// log*spd => 6.903 which falls down to 6 when it should be 7.
+	//return Math.floor(logOf);
+	return Math.round(logOf);
 }
 
 // keep this!!
