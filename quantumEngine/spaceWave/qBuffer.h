@@ -67,7 +67,7 @@ struct qBuffer {
 	void rainbowDump(const char *title = "a buffer");  // calls JS to do it
 
 	double innerProduct(void);
-	void normalize(void);
+	void normalize(void);  // returns inner product
 	void fixThoseBoundaries(qCx *targetWave);
 	void fixBoundaries(void) { fixThoseBoundaries(wave); }
 };

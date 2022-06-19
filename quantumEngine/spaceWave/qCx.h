@@ -85,14 +85,14 @@ public:
 
 	// // // // // // // // // // // // // other
 	// inline so faster
-	double norm() {return re*re + im*im;};
+	double norm(void) {return re*re + im*im;};
 
 	// oh i don't want to do abs
-	double abs();
+	double abs(void);
 
 	// the angle, ±180 degrees.  Kindof retro but really i'm just using it
 	// for display colors.  not even that.
-	double phase();
+	double phase(void);
 };
 
 typedef class qCx qCx;

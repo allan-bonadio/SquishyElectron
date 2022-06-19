@@ -20,7 +20,6 @@ extern class qSpace *theSpace;
 //extern class qWave *peruQWave, *laosQWave;
 
 extern double *thePotential;
-//extern float *viewBuffer;
 
 extern qCx hamiltonian(qCx *wave, int x);
 extern void qeStarted(void);
@@ -72,8 +71,6 @@ public:
 	qSpace(const char *label);
 	~qSpace(void);
 
-	struct Incarnation *incarn;
-
 	// additional for space creation
 	void addDimension(int N, int continuum, const char *label);
 	private:
@@ -98,7 +95,8 @@ public:
 	int nStates;
 	int nPoints;
 
-	// should this be part of the space or the incarnation?
+	// should this be part of the space or the Avatar?
+	// the space; it helps to define the lay of the land
 	double *potential;
 
 
@@ -107,9 +105,8 @@ public:
 
 	// some of these might go away as the buffers now have the essential numbers
 
-	// will dump any wave that uses this space.  same as in qWave:: or qSpectrum::
+	// will dump any wave that uses this space.  same as in qWave:: (obsolete)
 	void dumpThatWave(qCx *wave, bool withExtras = false);
-	void dumpThatSpectrum(qCx *wave, bool withExtras = false);
 
 	void fixThoseBoundaries(qCx *targetWave);  // like for qWave but on any wave
 
@@ -138,11 +135,22 @@ public:
 
 /* ************************************************************ JS interface */
 
+// this gets passed back to the JS after the space is created, so it can construct stuff
+// just a one-off struct; JS will access it via Uint32Array
+struct salientPointersType {
+	qSpace *space;
+	qCx *mainWaveBuffer;
+	double *potentialBuffer;
+	float *vBuffer;
+	struct Avatar *theAvatar;
+	struct Avatar *miniGraphAvatar;
+};
+
 // for JS to call
 extern "C" {
 	qSpace *startNewSpace(const char *name = "a space");
-	qSpace *addSpaceDimension(int N, int continuum, const char *label);
-	qSpace *completeNewSpace(void);
+	void addSpaceDimension(int N, int continuum, const char *label);
+	struct salientPointersType *completeNewSpace(void);
 	void deleteTheSpace(void);
 
 

@@ -19,6 +19,8 @@ extern struct qSpace *makeBareSpace(int N, int continuum = contENDLESS);
 // with all of the buffers allocated.
 extern struct qSpace *makeFullSpace(int N);  // handy
 #define MAKEFULLSPACE_LABEL "makeFul"
+extern struct salientPointersType *fullSpaceSalientPointers;
+
 
 // make sure we own all the bytes in this buffer by reading and writing each byte
 extern void proveItsMine(void *buf, size_t size);

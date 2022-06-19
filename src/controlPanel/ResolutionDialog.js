@@ -125,26 +125,6 @@ export default class ResolutionDialog extends React.Component {
 
 	/* ******************************************************************* rendering */
 
-/*
-			datapoints: <big>{thousands(indexToPower(this.state.power, ix))}</big>
-			&nbsp; <small>(was {thousands(this.props.N)})</small>
-			<div style={{break: 'both', fontSize: 'smaller'}}>
-				<div style={{float: 'left'}}>faster</div>
-				<div style={{float: 'right'}}>more accurate</div>
-			</div>
-
-			<input className='power, ixControl' type="range"
-				min={MIN_SLIDER_RES} max={MAX_SLIDER_RES}
-				value={s.power, ix}
-				list='GoodPowersOf10'
-				style={{width: '100%'}}
-				onInput={this.handleChangePowersOf10}
-			/>
-			<br />
-
-*/
-
-
 	renderSlider() {
 		const s = this.state;
 		return <>
@@ -179,9 +159,9 @@ export default class ResolutionDialog extends React.Component {
 
 	renderContinuum() {
 		const s = this.state;
-		const onChange = ev => this.setState({continuum: ev.target.value});
+		const onChange = ev => this.setState({continuum: +ev.target.value});
 		return <>
-			what kind of universe:
+			what kind of space:
 			<label><input type='radio' name='continuum'  value={qeBasicSpace.contENDLESS}
 					checked={s.continuum == qeBasicSpace.contENDLESS}
 					onChange={onChange}
@@ -241,7 +221,7 @@ export default class ResolutionDialog extends React.Component {
 		return (
 			<article className='dialog ResolutionDialog' style={{fontSize: '80%'}}>
 
-				<h3>Reconfigure the Universe</h3>
+				<h3>Reconfigure the Space</h3>
 
 				<section className='dialogSection'>
 					{this.renderSlider()}
@@ -264,7 +244,7 @@ export default class ResolutionDialog extends React.Component {
 					</button>
 					<button className='setResolutionOKButton'
 						onClick={this.OK}>
-							Recreate Universe
+							Recreate Space
 					</button>
 				</section>
 

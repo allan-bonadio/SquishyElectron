@@ -20,16 +20,18 @@ import ResolutionDialog from './controlPanel/ResolutionDialog';
 
 // must make sure somebody imports all of them
 import abstractViewDef from './view/abstractViewDef';
-import manualViewDef from './view/manualViewDef';
-import viewVariableViewDef from './view/viewVariableViewDef';
-import flatViewDef from './view/flatViewDef';
+//import manualViewDef from './view/manualViewDef';
+//import viewVariableViewDef from './view/viewVariableViewDef';
+//import flatViewDef from './view/flatViewDef';
 import flatDrawingViewDef from './view/flatDrawingViewDef';
-import drawingViewDef from './view/drawingViewDef';
+//import drawingViewDef from './view/drawingViewDef';
+
+import storeSettings from './utils/storeSettings';
 
 import {setFamiliarPotential} from './widgets/utils';
 
 // runtime debugging flags - you can change in the debugger or here
-let areBenchmarking = true;
+let areBenchmarking = false;
 let dumpingTheViewBuffer = false;
 
 
@@ -37,11 +39,12 @@ let dumpingTheViewBuffer = false;
 // unfortunately, we hafe to have a list of all the view types.  here.
 // this will appear in the resolution dialog
 export const listOfViewClassNames = {
-	manualViewDef, abstractViewDef, viewVariableViewDef,
-	flatViewDef,
+	abstractViewDef,
+	//manualViewDef, viewVariableViewDef, flatViewDef,
 
-	drawingViewDef,
-	flatDrawingViewDef, };
+	//drawingViewDef,
+	flatDrawingViewDef,
+};
 
 
 const DEFAULT_VIEW_CLASS_NAME =
@@ -52,12 +55,7 @@ const DEFAULT_VIEW_CLASS_NAME =
 //'flatViewDef';
 'flatDrawingViewDef';
 
-//const DEFAULT_RESOLUTION = 100;
-//const DEFAULT_RESOLUTION = 60;
-//const DEFAULT_RESOLUTION = 25;
-const DEFAULT_RESOLUTION = 32;
-//const DEFAULT_RESOLUTION = 5;
-//const DEFAULT_RESOLUTION = process.env.MODE ? 100 : 25;
+const DEFAULT_RESOLUTION = 64;
 const DEFAULT_CONTINUUM = qeBasicSpace.contENDLESS;
 
 const defaultWaveParams = {
@@ -77,14 +75,8 @@ const defaultPotentialParams = {
 export class SquishPanel extends React.Component {
 	static propTypes = {
 		token: PropTypes.number,
-		////showResolutionDialog: PropTypes.func.isRequired,
+		id: PropTypes.string.isRequired,
 	};
-
-	// if you subclass abstractViewDef, call this to join the 'in' crowd
-	// and be listed
-	//static addMeToYourList(aViewClass) {
-	//listOfViewClassNames[aViewClass.viewClassName] = aViewClass;
-	//}
 
 	static getListOfViews() {
 		return listOfViewClassNames;
@@ -94,19 +86,17 @@ export class SquishPanel extends React.Component {
 	constructor(props) {
 		super(props);
 
+		const space0 = storeSettings.retrieveSettings('space0');
+
 		this.state = {
 			// THE N and continuum for THE space we're currently doing
-			N: DEFAULT_RESOLUTION,
-			continuum: DEFAULT_CONTINUUM,
+			N: storeSettings.ratify(space0.N, DEFAULT_RESOLUTION, [4,8,16,32,64,128,256,502,1024]),
+			continuum: storeSettings.ratify(space0.N, DEFAULT_CONTINUUM,
+				[qeBasicSpace.contDISCRETE, qeBasicSpace.contWELL, qeBasicSpace.contENDLESS]),
 			viewClassName: DEFAULT_VIEW_CLASS_NAME,
 
 			// the qeSpace
 			space: null,  // set in setNew1DResolution()
-			// space: new qeSpace([{
-			// 	N: DEFAULT_RESOLUTION,
-			// 	continuum: qeBasicSpace.contENDLESS,
-			// 	label: 'x', coord: 'x'
-			// }]),
 
 			// see the view dir
 			currentView: null,
@@ -122,10 +112,13 @@ export class SquishPanel extends React.Component {
 			// defaults for sliders for dt & spi
 			dt: .001,
 			stepsPerIteration: 100,
-			lowPassDilution: .02,
+			lowPassFilter: .02,
 
+			// advance forward with each iter
 			runningCycleElapsedTime: 0,
-			runningCycleElapsedSerial: 0,
+			runningCycleIterateSerial: 0,
+
+			canvasSize: {width: 800, height: 400}
 		};
 
 		// never changes once set
@@ -133,7 +126,7 @@ export class SquishPanel extends React.Component {
 
 		// ticks and benchmarks
 		const now = performance.now();
-		this.prevStart  = now;
+		this.initStats(now);
 		this.timeForNextTic = now + 10;  // default so we can get rolling
 		this.lastAniIteration = now;
 
@@ -147,13 +140,13 @@ export class SquishPanel extends React.Component {
 		qeStartPromise.then((arg) => {
 			// done in qEngine qeDefineAccess();
 
-			this.setNew1DResolution(
-				DEFAULT_RESOLUTION, DEFAULT_CONTINUUM, DEFAULT_VIEW_CLASS_NAME);
+			const s = this.state;
+			this.setNew1DResolution(s.N, s.continuum, s.viewClassName);
 
 			// vital properties of the space
-			qe.Incarnation_setDt(this.state.dt);
-			qe.Incarnation_setStepsPerIteration(this.state.stepsPerIteration);
-			//qe.Incarnation_askForFFT();
+			qe.Avatar_setDt(this.state.dt);
+			qe.Avatar_setStepsPerIteration(this.state.stepsPerIteration);
+			//qe.Avatar_askForFFT();
 
 			// this should be the only place animateHeartbeat() should be called
 			// except for inside the function itself
@@ -162,7 +155,7 @@ export class SquishPanel extends React.Component {
 			// use this.currentView rather than state.currentView - we just set it
 			// and it takes a while.
 			// Make sure you call the new view's domSetup method.
-			this.currentView.domSetup(this.canvas);
+			this.curView.domSetupForAllDrawings(this.canvas);
 		}).catch(ex => {
 			console.error(`error in SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
 			debugger;
@@ -186,11 +179,10 @@ export class SquishPanel extends React.Component {
 
 	// init or re-init the space and the panel
 	setNew1DResolution(N, continuum, viewClassName) {
-		qe.theCurrentView =  null;
-
 		qe.space = new qeSpace([{N, continuum, label: 'x'}], defaultWaveParams, defaultPotentialParams);
 
-		// now create the view class instance as described by the space
+		// now create the draw view class instance as described by the space
+		// this is the flatDrawingViewDef class, not a CSS class or React class component
 		const vClass = listOfViewClassNames[viewClassName];
 		if (! vClass)
 			throw `no vClass! see for yerself! ${JSON.stringify(listOfViewClassNames)}`;
@@ -200,10 +192,6 @@ export class SquishPanel extends React.Component {
 
 		// we've now got a qeSpace etc all set up
 		this.setState({N, continuum, space: qe.space, currentView});
-		this.currentView = currentView;  // this set before the setState finishes
-
-		// kinda paranoid?  this should be deprecated.
-		qe.theCurrentView = currentView;
 	}
 
 	// puts up the resolution dialog, starting with the values from this.state
@@ -220,9 +208,13 @@ export class SquishPanel extends React.Component {
 
 			// OK callback
 			finalParams => {
+				qe.deleteTheSpace();
+
 				this.setNew1DResolution(
 					finalParams.N, finalParams.continuum, finalParams.viewClassName);
 				this.setState({isTimeAdvancing: timeWasAdvancing});
+
+				localStorage.space0 = JSON.stringify({N: finalParams.N, continuum: finalParams.continuum});
 			},
 
 			// cancel callback
@@ -232,72 +224,104 @@ export class SquishPanel extends React.Component {
 		)
 	}
 
-	/* ******************************************************* iteration & animation */
+	/* ******************************************************* stats */
 
+	// the upper left and right numbers
 	showTimeNIteration() {
 		// need them instantaneously - react is too slow
-		document.querySelector('.voNorthWest').innerHTML = qe.Incarnation_getElapsedTime().toFixed(2);
-		document.querySelector('.voNorthEast').innerHTML = qe.Incarnation_getIterateSerial();
+		document.querySelector('.voNorthWest').innerHTML = qe.Avatar_getElapsedTime().toFixed(2);
+		document.querySelector('.voNorthEast').innerHTML = qe.Avatar_getIterateSerial();
 	}
 
-	// take one integration iteration
+	// constructor only calls this (?)
+	initStats(now) {
+		this.iStats = {
+			startIteration: now,
+			endCalc: now,
+			endReloadViewBuffer: now,
+			endReloadInputs: now,
+			endDraw: now,
+			prevStart: now,
+		}
+	}
+
+	// update the stats, as displayed in the Integration tab
+	refreshStats() {
+		const p = this.props;
+		function show(cName, ms) {
+			const el = document.querySelector(`#${p.id}.SquishPanel .ControlPanel .SetIterationTab .${cName}`);
+			if (el)
+				el.innerHTML = ms.toFixed(2);  // only if it's showing
+		}
+
+		const st = this.iStats;
+		show('iterationCalcTime', st.endCalc - st.startIteration);
+		show('reloadViewBuffers', st.endReloadViewBuffer - st.endCalc);
+		show('reloadGlInputs', st.endReloadInputs - st.endReloadViewBuffer);
+		show('drawTime', st.endDraw - st.endReloadInputs);
+		show('totalForIteration', st.endDraw - st.startIteration);
+		show('cyclePeriod', st.startIteration - st.prevStart);
+	}
+
+	/* ******************************************************* iteration & animation */
+
+	// do one integration iteration
 	crunchOneIteration() {
 		// (actually many visscher steps)
-		qe.Incarnation_oneIteration();
-
-		//qe.createQEWaveFromCBuf();
+		qe.Avatar_oneIteration();
 
 		if (dumpingTheViewBuffer)
 			this.dumpViewBuffer('crunchOneIteration()');
 	}
 
-	// Integrate the ODEs by one 'step', or not.  and then display.
+	// Integrate the ODEs by one 'iteration', or not.  and then display.
 	// called every so often in animateHeartbeat() so it's called as often as the menu setting says
 	// so if needsRepaint false or absent, it'll only repaint if an iteration has been done.
 	iterateOneIteration(isTimeAdvancing, needsRepaint) {
 		//console.log(`time since last tic: ${now - startIteration}ms`)
-// 		this.endCalc = this.startReloadVarsBuffers = this.endReloadVarsBuffers =
+// 		this.endCalc = this.startReloadViewBuffer = this.endReloadViewBuffer =
 // 			this.endIteration = 0;
-		this.startIteration = performance.now();  // absolute beginning of integrate iteration
+		this.iStats.startIteration = performance.now();  // absolute beginning of integrate iteration
 		// could be slow.
 		if (isTimeAdvancing) {
 			this.crunchOneIteration();
 			needsRepaint = true;
 		}
-		this.endCalc = performance.now();
+		this.iStats.endCalc = performance.now();
 
 		// if we need to repaint... if we're iterating, if the view says we have to,
 		// or if this is a one shot step
-		this.startReloadVarsBuffers = performance.now();
+		this.iStats.endReloadViewBuffer = this.iStats.endReloadInputs = this.iStats.endDraw = performance.now();
 		if (needsRepaint) {
-			// reload all variables
 			this.curView.reloadAllVariables();
 
 			// copy from latest wave to view buffer (c++)
 			qe.qViewBuffer_getViewBuffer();
-			this.endReloadVarsBuffers = performance.now();
+			this.iStats.endReloadViewBuffer = performance.now();
 
 			// draw
-			qe.theCurrentView.draw();
+			this.curView.setInputsOnDrawings();
+			this.iStats.endReloadInputs = performance.now();
 
-			// populate the on-screen numbers
+			this.curView.drawAllDrawings();
+			// populate the frame number and elapsed pseudo-time
 			this.showTimeNIteration();
-		}
-		else {
-			this.endReloadVarsBuffers = this.startReloadVarsBuffers;
+			this.iStats.endDraw = performance.now();
+
 		}
 
 		// print out per-iteration benchmarks
-		this.endIteration = performance.now();
 		if (areBenchmarking) {
 			console.log(`times:\n`+
-				`iteration calc time:     ${(this.endCalc - this.startIteration).toFixed(2)}ms\n`+
-				`reload GL variables:     ${(this.endReloadVarsBuffers - this.startReloadVarsBuffers).toFixed(2)}ms\n`+
-				`draw:   ${(this.endIteration - this.endReloadVarsBuffers).toFixed(2)}ms\n`+
-				`total for iteration:  ${(this.endIteration - this.startIteration).toFixed(2)}ms\n` +
-				`period since last:  ${(this.startIteration - this.prevStart).toFixed(2)}ms\n`);
-			this.prevStart = this.startIteration;
+				`iteration calc time:     ${(this.iStats.endCalc - this.iStats.startIteration).toFixed(2)}ms\n`+
+				`reloadViewBuffers:     ${(this.iStats.endReloadViewBuffer - this.iStats.endCalc).toFixed(2)}ms\n`+
+				`reload GL variables:     ${(this.iStats.endReloadInputs - this.iStats.endReloadViewBuffer).toFixed(2)}ms\n`+
+				`draw:   ${(this.iStats.endDraw - this.iStats.endReloadInputs).toFixed(2)}ms\n`+
+				`total for iteration:  ${(this.iStats.endDraw - this.iStats.startIteration).toFixed(2)}ms\n` +
+				`period since last:  ${(this.iStats.startIteration - this.iStats.prevStart).toFixed(2)}ms\n`);
 		}
+		this.refreshStats();
+		this.iStats.prevStart = this.iStats.startIteration;
 
 		this.continueRunningOneCycle();
 	}
@@ -344,8 +368,8 @@ export class SquishPanel extends React.Component {
 	// button handler
 	startRunningOneCycle() {
 		this.runningOneCycle = true;
-		this.runningCycleStartingTime = qe.Incarnation_getElapsedTime();
-		this.runningCycleStartingSerial = qe.Incarnation_getIterateSerial();
+		this.runningCycleStartingTime = qe.Avatar_getElapsedTime();
+		this.runningCycleStartingSerial = qe.Avatar_getIterateSerial();
 		this.startIterating();
 	}
 	startRunningOneCycle = this.startRunningOneCycle.bind(this);
@@ -366,8 +390,8 @@ export class SquishPanel extends React.Component {
 					this.stopIterating();
 
 					this.setState({
-						runningCycleElapsedTime: qe.Incarnation_getElapsedTime() - this.runningCycleStartingTime,
-						runningCycleElapsedSerial: qe.Incarnation_getIterateSerial() - this.runningCycleStartingSerial,
+						runningCycleElapsedTime: qe.Avatar_getElapsedTime() - this.runningCycleStartingTime,
+						runningCycleIterateSerial: qe.Avatar_getIterateSerial() - this.runningCycleStartingSerial,
 					});
 
 					this.goingDown = false;
@@ -393,7 +417,7 @@ export class SquishPanel extends React.Component {
 
 		// you can turn this on in the debugger anytime
 		return <div className='runningOneCycle' style={{display: 'block'}}>
-			<span>total iterations: {s.runningCycleElapsedSerial.toFixed(0)} &nbsp;
+			<span>total iterations: {s.runningCycleIterateSerial.toFixed(0)} &nbsp;
 				elapsed vtime: {s.runningCycleElapsedTime.toFixed(3)} &nbsp;</span>
 			<button onClick={this.startRunningOneCycle}>start running 1 cycle</button>
 		</div>
@@ -436,7 +460,7 @@ export class SquishPanel extends React.Component {
 	singleStep = this.singleStep.bind(this);
 
 	resetCounters(ev) {
-		qe.Incarnation_resetCounters();
+		qe.Avatar_resetCounters();
 		this.showTimeNIteration();
 	}
 	resetCounters = this.resetCounters.bind(this);
@@ -445,28 +469,28 @@ export class SquishPanel extends React.Component {
 
 	setDt(dt) {
 		this.setState({dt});
-		qe.Incarnation_setDt(dt);
+		qe.Avatar_setDt(dt);
 	}
 	setDt = this.setDt.bind(this);
 
 	setStepsPerIteration(stepsPerIteration) {
 		console.info(`js setStepsPerIteration(${stepsPerIteration})`)
 		this.setState({stepsPerIteration});
-		qe.Incarnation_setStepsPerIteration(stepsPerIteration);
+		qe.Avatar_setStepsPerIteration(stepsPerIteration);
 	}
 	setStepsPerIteration = this.setStepsPerIteration.bind(this);
 
-	setLowPassDilution(lowPassDilution) {
-		console.info(`js setLowPassDilution(${lowPassDilution})`)
-		this.setState({lowPassDilution});
-		qe.Incarnation_setLowPassDilution(lowPassDilution);
+	setLowPassFilter(lowPassFilter) {
+		console.info(`js setLowPassFilter(${lowPassFilter})`)
+		this.setState({lowPassFilter});
+		qe.Avatar_setLowPassFilter(lowPassFilter);
 	}
-	setLowPassDilution = this.setLowPassDilution.bind(this);
+	setLowPassFilter = this.setLowPassFilter.bind(this);
 
 	// completely wipe out the 𝜓 wavefunction and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon setWave in wave tab
 	setWave(waveParams) {
-// 		const wave = qe.Incarnation_getWaveBuffer();
+// 		const wave = qe.Avatar_getWaveBuffer();
 		const qewave = this.state.space.qewave;
 		qewave.setFamiliarWave(waveParams);
 		this.iterateOneIteration(true, true);
@@ -503,7 +527,7 @@ export class SquishPanel extends React.Component {
 	dumpViewBuffer(title = '') {
 		const s = this.state;
 		let nRows = s.space.nPoints * 2;
-		let vb = s.space.viewBuffer;
+		let vb = s.space.vBuffer;
 		const _ = (f) => f.toFixed(3).padStart(6);
 		console.log(`dump of view buffer '${title}' for ${s.space.nPoints} points in ${nRows} rows`);
 		for (let i = 0; i < nRows; i++)
@@ -518,9 +542,10 @@ export class SquishPanel extends React.Component {
 		const s = this.state;
 
 		return (
-			<div className="SquishPanel">
+			<div id={this.props.id} className="SquishPanel">
 				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
-				<SquishView setGLCanvas={canvas => this.setGLCanvas(canvas)} />
+				<SquishView setGLCanvas={canvas => this.setGLCanvas(canvas)}
+					width={s.canvasSize.width} height={s.canvasSize.height}/>
 				<ControlPanel
 					iterateAnimate={(shouldAnimate, freq) => this.iterateAnimate(shouldAnimate, freq)}
 					isTimeAdvancing={s.isTimeAdvancing}
@@ -536,15 +561,20 @@ export class SquishPanel extends React.Component {
 
 					iterateFrequency={1000 / s.iteratePeriod}
 					setIterateFrequency={freq => this.setIterateFrequency(freq)}
+
 					openResolutionDialog={() => this.openResolutionDialog()}
 					space={s.space}
+					N={this.state.N}
 
 					dt={s.dt}
 					setDt={this.setDt}
 					stepsPerIteration={s.stepsPerIteration}
 					setStepsPerIteration={this.setStepsPerIteration}
-					lowPassDilution={s.lowPassDilution}
-					setLowPassDilution={this.setLowPassDilution}
+					lowPassFilter={s.lowPassFilter}
+					setLowPassFilter={this.setLowPassFilter}
+
+					iStats={this.iStats}
+					refreshStats={this.refreshStats}
 				/>
 				{this.renderRunningOneCycle()}
 			</div>
@@ -554,6 +584,3 @@ export class SquishPanel extends React.Component {
 
 export default SquishPanel;
 
-// do these work?  becha not.
-//SquishPanel.addMeToYourList(abstractViewDef);
-//SquishPanel.addMeToYourList(flatViewDef);

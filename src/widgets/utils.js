@@ -141,7 +141,7 @@ export const stepsPerDecadeStepFactors = {
 	// 8: [1, 1.3, 2.4, 3.2, 4.2, 5.6, 7.5]
 	10: [1, 1.25, 1.5,     2, 2.50, 3,     4, 5, 6,     8],
 
-	// base 2 only, all the way up.  Special case in the code.  a "decade" is really x16 with 4 gradations
+	// 16 = base 2 only, all the way up.  Special case in the code.  a "decade" is really x16 with 4 gradations
 	16: [1, 2, 4, 8],
 };
 //const Base2 = 16;
@@ -159,7 +159,7 @@ export function indexToPower(willRoundPowers, stepFactors, spd, ix) {
 		factor = stepFactors[ix - whichDecade * spd];
 	}
 	else {
-		// remember, there's still decades, but of 16x each, and 4 settings in each one, separated by 2x
+		// remember, there's still decades, but of 16x each, and 4 settings in each one
 		whichDecade = Math.floor(ix/4);
 		decadePower =  16 ** whichDecade;
 		factor = stepFactors[ix - whichDecade * 4];
@@ -183,9 +183,10 @@ export function powerToIndex(spd, power) {
 
 	//console.info(`powerToIndex - spd=${spd}  power=${power}    logOf=${logOf}  6=${6}   `)
 
-	// now it's reasonable at this point to say why are we rounding vs flooring?
-	return Math.floor(logOf);
-	//return Math.round(logOf);
+	// now it's reasonable at this point to say why are we rounding vs flooring?  Well, try spd=3 and power=200;
+	// log*spd => 6.903 which falls down to 6 when it should be 7.
+	//return Math.floor(logOf);
+	return Math.round(logOf);
 }
 
 // keep this!!

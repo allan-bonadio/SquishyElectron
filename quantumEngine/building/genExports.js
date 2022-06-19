@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
-** generate exports -- generate files for emscripten compiler, for JS calling C++ code
+** generate exports -- generate files for JS calling C++ code through emscripten
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
@@ -15,24 +15,24 @@ const fs = require('fs');
 // also must call defineQEngineFuncs after C++ is initialized
 exportsSrc  = [
 	// args and retType can be 'number', 'string', 'array' (of bytes), or null meaning void.
-	// That's all.  Anything more complex, you have to make up out of those with multiple calls.
+	// That's all.  Anything more complex, you have to make up out of those with multiple calls or a typed array.
 	{name: 'main', retType: 'number', args: []},
 
 	// recreating the space
 	{name: 'startNewSpace', retType: 'number', args: ['string']},
-	{name: 'addSpaceDimension', retType: 'number',
+	{name: 'addSpaceDimension', retType: null,
 		args: ['number', 'number', 'string']},
 	{name: 'completeNewSpace', retType: 'number', args: []},
 	{name: 'deleteTheSpace', retType: null, args: []},
 
 
 	// gets
-	{name: 'Incarnation_getWaveBuffer', retType: 'number', args: []},
+	{name: 'Avatar_getWaveBuffer', retType: 'number', args: []},
 	{name: 'qSpace_getPotentialBuffer', retType: 'number', args: []},
 
-	// the qSpace ones act on theSpace in the c++ code
-	{name: 'Incarnation_getElapsedTime', retType: 'number', args: []},
-	{name: 'Incarnation_getIterateSerial', retType: 'number', args: []},
+	// the Avatar ones act on theAvatar in the c++ code
+	{name: 'Avatar_getElapsedTime', retType: 'number', args: []},
+	{name: 'Avatar_getIterateSerial', retType: 'number', args: []},
 
 	// the potential
 	{name: 'qSpace_dumpPotential', retType: 'number', args: ['string']},
@@ -40,21 +40,22 @@ exportsSrc  = [
 	{name: 'qSpace_setValleyPotential', retType: 'number', args: ['number', 'number', 'number']},
 
 	// params
-	{name: 'Incarnation_setDt', retType: null, args: ['number']},
-	{name: 'Incarnation_setStepsPerIteration', retType: null, args: ['number']},
-	{name: 'Incarnation_setLowPassDilution', retType: null, args: ['number']},
+	{name: 'Avatar_setDt', retType: null, args: ['number']},
+	{name: 'Avatar_setStepsPerIteration', retType: null, args: ['number']},
+	{name: 'Avatar_setLowPassFilter', retType: null, args: ['number']},
 
-	{name: 'Incarnation_oneIteration', retType: 'number', args: []},
-	{name: 'Incarnation_resetCounters', retType: null, args: []},
+	{name: 'Avatar_oneIteration', retType: 'number', args: []},
+	{name: 'Avatar_resetCounters', retType: null, args: []},
 
 	// views
 	{name: 'qViewBuffer_getViewBuffer', retType: 'number', args: []},
-	{name: 'qViewBuffer_loadViewBuffer', retType: null, args: []},
+	{name: 'qViewBuffer_loadViewBuffer', retType:  'number', args: []},
 	{name: 'qViewBuffer_dumpViewBuffer', retType: null, args: ['string']},
 
 	// FFT
  	//{name: 'testFFT', retType: null, args: []},
-	{name: 'Incarnation_askForFFT', retType: null, args: []},
+	{name: 'Avatar_askForFFT', retType: null, args: []},
+	{name: 'Avatar_normalize', retType: null, args: []},
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():
@@ -66,7 +67,7 @@ fs.writeFile(`${process.env.SQUISH_ROOT}/quantumEngine/building/exports.json`,
 	JSON.stringify(exportsFile) + '\n',
 	ex => ex && console.error('error building exports:', ex));
 
-// the JS file.  convert json's " to '
+// the JS file.  convert json's double " to single '
 let defineFuncBody = exportsSrc.map(funcDesc => {
 	return `\tqe.${funcDesc.name} = cwrap('${funcDesc.name}', `+
 		`${JSON.stringify(funcDesc.retType).replace(/\x22/g, '\x27')}, `+

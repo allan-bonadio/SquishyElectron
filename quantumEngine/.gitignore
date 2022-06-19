@@ -4,8 +4,7 @@ old
 # compiled results
 quantumEngine.js
 quantumEngine.wasm
-quantumTest.js
-quantumTest.wasm
+quantumEngine.wasm.map
 cppuTestBin
 cppuTestBin.dSYM
 

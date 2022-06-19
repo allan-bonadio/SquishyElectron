@@ -4,6 +4,26 @@
 # cppu Unit Test Runner -- for Squishy Electron
 # Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 
+# To run all the tests, run it like this:
+#    quantumEngine> make test
+# or
+#    quantumEngine> testing/cppuRunner.sh
+#
+# To run under debugger:
+#    quantumEngine> testing/cppuRunner.sh db
+# or
+#    quantumEngine> testing/cppuRunner.sh db foo bar
+#
+# To run all tests whose Names include the string 'foo' and those including 'bar':
+#    quantumEngine> testing/cppuRunner.sh foo bar
+#
+# To run all tests under Group(s), use this:
+#    quantumEngine> testing/cppuRunner.sh -g foo -g bar
+#
+# to use any other cppuTest switches, do it like this
+#    quantumEngine> testing/cppuRunner.sh -sn foo -xg bar
+# see other switches https://cpputest.github.io/manual.html#command-line-switches
+#
 
 # this runs from the main quantumEngine directory
 cd `dirname $0`
@@ -44,21 +64,33 @@ echo ====================== done compiling... start testing ====================
 echo
 
 debug=false
+mode=-n
 while [ "$1" ]
 do
 	case $1 in
-	db) debug=true ;;
-	*) moreArgs="$moreArgs -n $1" ;;
+	db)
+		debug=true
+		;;
+
+	-*) # anything starting with a hyphen will be passed through and -n will be inhibited for one arg
+		moreArgs="$moreArgs $1"
+		mode=''
+		;;
+
+	*)
+		moreArgs="$moreArgs $mode $1"
+		mode=-n;;
 	esac
 	shift
 done
 
+echo "gonna run: cppuTestBin -v -c $moreArgs"
 if $debug
 then
+	# it's a real C++ program and I can use gdb!
 	#  well, lldb at least.
 	lldb  -f /dvl/squishyElectron/SquishyElectron/quantumEngine/cppuTestBin -- -v -c $moreArgs
 else
-	# it's a real C++ program and I can use gdb!
 	./cppuTestBin -v -c  $moreArgs
 fi
 

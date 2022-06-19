@@ -7,7 +7,7 @@
 
 //#include <cmath>
 #include "qSpace.h"
-#include "../schrodinger/Incarnation.h"
+#include "../schrodinger/Avatar.h"
 #include "qWave.h"
 
 // a transitional kind of thing from raw wave arrays to the new qWave buffer obj
@@ -114,7 +114,6 @@ void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
 void qWave::dumpThatWave(qCx *wave, bool withExtras) {
 	//printf("🌊🌊 any wave, probably shouldn't call this\n");
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
-	//space->dumpThatWave(wave, withExtras);
 }
 
 // this is the member function that dumps its own wave and space
@@ -177,6 +176,7 @@ void qWave::prune() {
 
 // these have to be in C++ cuz they're called during iteration
 
+// OBSOLETE!!
 // average the wave's points (by x) with the closest neighbors to fix the divergence
 // along the x axis I always see.  Since the density of our mesh is finite,
 // you can't expect noise at or near the nyquist frequency to be meaningful.

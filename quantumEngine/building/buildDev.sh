@@ -9,7 +9,7 @@ cd `dirname $0`
 # also try emsdk without the -main or make a symlink
 
 # this has all c++ & h files, except main.cpp and the testing files.
-# omit those, so testing can compile & run itself.
+# omit those, so testing can also use this and compile & run itself (see testing/cppu*).
 allCpp=`cat allCpp.list`
 
 # keep LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 32
@@ -19,7 +19,7 @@ cd ..
 
 # https://emscripten.org/docs/tools_reference/emcc.html
 emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
-	-gsource-map --source-map-base \
+	-gsource-map --source-map-base / \
 	-sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 \
 	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \
 	-sEXPORTED_FUNCTIONS=@building/exports.json \
@@ -27,16 +27,20 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-DLABEL_LEN=$LABEL_LEN \
 	-I/dvl/emscripten/emsdk/upstream/emscripten/cache/sysroot/include \
 	-include emscripten.h \
-	main.cpp $allCpp || exit 99
-# changed -g to -g4 to -gsource-map --source-map-base
+	-ffast-math \
+	main.cpp $allCpp || exit $?
+# changed -g to -g4 to -gsource-map --source-map-base / ; debugger can see into c++
 
-cp quantumEngine.wasm quantumEngine.js ../public
+cp quantumEngine.wasm quantumEngine.js quantumEngine.wasm.map ../public
 
 exit $?
 
 # compiler hints and links:
 # https://emscripten.org/docs/tools_reference/emcc.html
 # https://emscripten.org/docs/compiling/Building-Projects.html
+
+# -ffast-math: lets the compiler make aggressive, potentially-lossy assumptions about floating-point math
+# https://clang.llvm.org/docs/UsersManual.html#controlling-floating-point-behavior
 
 # pthreads:
 #  -s USE_PTHREADS=1

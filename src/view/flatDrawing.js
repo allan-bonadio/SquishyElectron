@@ -10,36 +10,7 @@ import {viewUniform, viewAttribute} from './viewVariable';
 //import SquishPanel from '../SquishPanel';
 //import {qeStartPromise} from '../wave/qEngine';
 
-let debug = false;
-
-/* ******************************************************* unit height management */
-
-// wait, do I need this?  what if I try without any scaling, just fixed.
-
-// adjust the target unitHeight.  The currentUnitHeight will relax to the target value.
-export function adjustUnitHeight(highest) {
-	const highestHeight = highest * this.targetUnitHeight;
-	if (highestHeight > 1.)
-		this.targetUnitHeight /= 2;
-	else if (highestHeight < .25)
-		this.targetUnitHeight *= 2;
-}
-
-export function coastUnitHeight() {
-	if (this.curUnitHeight != this.targetUnitHeight) {
-		if (Math.abs((this.curUnitHeight - this.targetUnitHeight) / this.targetUnitHeight) < .01) {
-			//ok we're done.  close enough.
-			this.curUnitHeight = this.targetUnitHeight;
-			//this.onceMore = true;  // just to make sure it paints
-			return;
-		}
-
-		// exponential relaxation towards the target
-		this.curUnitHeight = (15 * this.curUnitHeight + this.targetUnitHeight) / 16;
-	}
-}
-
-
+let dumpViewBufAfterDrawing = false;
 
 /* ******************************************************* flat drawing */
 
@@ -62,14 +33,14 @@ const vertexSrc = `${cxToColorGlsl}
 varying highp vec4 vColor;
 attribute vec4 row;
 uniform float barWidth;
-uniform float unitHeight;
+uniform float maxHeight;
 
 void main() {
 	// figure out y
 	float y;
 	int vertexSerial = int(row.w);
 	if (vertexSerial / 2 * 2 < vertexSerial) {
-		y = (row.x * row.x + row.y * row.y) * unitHeight;
+		y = (row.x * row.x + row.y * row.y) / maxHeight;
 	}
 	else {
 		y = 0.;
@@ -120,25 +91,31 @@ class flatDrawing extends abstractDrawing {
 
 
 	setInputs() {
-		//const highest =
-		// always done at end of integration qe.loadViewBuffer();
+		// loads view buffer from main wave, calculates highest norm, which we use below.
+		const highest = qe.qViewBuffer_loadViewBuffer();
+
+		// smooth it out otherwise the wave sortof bounces up and down a little on each step
+		if (!this.avgHighest)
+			this.avgHighest = highest;
+		else
+			this.avgHighest = (highest + 31*this.avgHighest) / 32;
 
 		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
-		let nPoints = this.nPoints = this.space ? this.space.nPoints : 10;
+		let nPoints = this.nPoints = this.space ? this.space.nPoints : 10;  // ??
 		let barWidth = 1 / (nPoints - 1);
 		barWidthUniform.setValue(barWidth, '1f');
 
-		let unitHeightUniform = this.unitHeightUniform = new viewUniform('unitHeight', this);
-		let nStates = this.nStates = this.space ? this.space.nStates : 10;
-		this.unitHeight = nStates / 4;
-		unitHeightUniform.setValue(this.unitHeight, '1f');
+		//let maxHeightUniform = this.maxHeightUniform = new viewUniform('maxHeight', this);
+
+		let maxHeightUniform = this.maxHeightUniform = new viewUniform('maxHeight', this);
+		maxHeightUniform.setValue(() => {
+			return {value: this.avgHighest, type: '1f'};
+		});
 
 		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
-		this.rowAttr.attachArray(qe.space.viewBuffer, this.rowFloats);
-
-		console.log(`just set inputs in flatDrawing.js.  :`);
+		this.rowAttr.attachArray(qe.space.vBuffer, this.rowFloats);
 	}
 
 
@@ -161,13 +138,10 @@ class flatDrawing extends abstractDrawing {
 		if (alsoDrawPoints)
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 
-		if (debug)
+		// i think this is problematic
+		if (dumpViewBufAfterDrawing)
 			qe.qViewBuffer_dumpViewBuffer(`finished drawing in flatDrawing.js; drew buf:`);
 	}
-
-
-	adjustUnitHeight = adjustUnitHeight;
-	coastUnitHeight = coastUnitHeight;
 }
 
 export default flatDrawing;

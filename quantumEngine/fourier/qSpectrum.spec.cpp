@@ -1,11 +1,11 @@
 /*
 ** quantum spectrum testing
-** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
 #include "qSpectrum.h"
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Incarnation.h"
+#include "../schrodinger/Avatar.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"

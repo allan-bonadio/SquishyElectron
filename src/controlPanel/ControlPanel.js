@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** Control Panel -- all the widgets below the displayed canvas
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
@@ -11,6 +11,7 @@ import CPToolbar from './CPToolbar';
 import SetWaveTab from './SetWaveTab';
 import SetPotentialTab from './SetPotentialTab';
 import SetResolutionTab from './SetResolutionTab';
+import SetIterationTab from './SetIterationTab';
 import qeSpace from '../wave/qeSpace';
 // import {qeStartPromise} from '../wave/qEngine';
 // import qe from '../wave/qe';
@@ -35,6 +36,7 @@ export class ControlPanel extends React.Component {
 
 		// early on, there's no space.  Must have SquishPanel mounted first.
 		space: PropTypes.instanceOf(qeSpace),
+		N: PropTypes.number.isRequired,
 
 		waveParams: PropTypes.shape({
 			waveBreed: PropTypes.string.isRequired,
@@ -49,6 +51,12 @@ export class ControlPanel extends React.Component {
 			valleyScale: PropTypes.number.isRequired,
 			valleyOffset: PropTypes.number.isRequired,
 		}),
+
+		iStats: PropTypes.shape({
+			startIteration: PropTypes.number.isRequired,
+			endDraw: PropTypes.number.isRequired,
+		}),
+		refreshStats: PropTypes.func.isRequired,
 	}
 
 	constructor(props) {
@@ -151,10 +159,20 @@ export class ControlPanel extends React.Component {
 				origSpace={p.space}
 			/>;
 
-
-
 		case 'resolution':
 			return <SetResolutionTab openResolutionDialog={p.openResolutionDialog} />;
+
+		case 'iteration':
+			return <SetIterationTab
+				dt={p.dt}
+				setDt={p.setDt}
+				stepsPerIteration={p.stepsPerIteration}
+				setStepsPerIteration={p.setStepsPerIteration}
+				lowPassFilter={p.lowPassFilter}
+				setLowPassFilter={p.setLowPassFilter}
+
+				iStats={p.iStats}
+			/>;
 
 		default:
 			return `Do not understand showingTab='${s.showingTab}'`;
@@ -182,12 +200,7 @@ export class ControlPanel extends React.Component {
 				iterateFrequency={p.iterateFrequency}
 				setIterateFrequency={this.setIterateFrequency}
 
-				dt={p.dt}
-				setDt={p.setDt}
-				stepsPerIteration={p.stepsPerIteration}
-				setStepsPerIteration={p.setStepsPerIteration}
-				lowPassDilution={p.lowPassDilution}
-				setLowPassDilution={p.setLowPassDilution}
+				N={this.props.N}
 			/>
 			<div className='cpSecondRow'>
 				<ul className='TabBar' >
@@ -196,7 +209,9 @@ export class ControlPanel extends React.Component {
 					<li  className={s.showingTab == 'potential' ? 'selected' : ''} key='potential'
 						onClick={ev => this.setState({showingTab: 'potential'})}>Potential</li>
 					<li  className={s.showingTab == 'resolution' ? 'selected' : ''} key='resolution'
-						onClick={ev => this.setState({showingTab: 'resolution'})}>Universe</li>
+						onClick={ev => this.setState({showingTab: 'resolution'})}>Space</li>
+					<li  className={s.showingTab == 'iteration' ? 'selected' : ''} key='iteration'
+						onClick={ev => this.setState({showingTab: 'iteration'})}>Iteration</li>
 				</ul>
 				<div className='tabFrame'>
 					{showingTabHtml}

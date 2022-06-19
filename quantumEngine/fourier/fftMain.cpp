@@ -4,7 +4,7 @@
 */
 
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Incarnation.h"
+#include "../schrodinger/Avatar.h"
 #include "../spaceWave/qWave.h"
 #include "qSpectrum.h"
 #include "fftMain.h"
@@ -27,7 +27,6 @@ void qDimension::chooseSpectrumLength(void) {
 /* ********************************************************* qWave interface */
 
 
-// take this wave in and FFT it and dump the result to console
 // Calculate the FFT of this qWave and deposit it in the spectrum.
 // must make/free your own qSpectrum *spect = new qSpectrum(origSpace);
 void qSpectrum::generateSpectrum(qWave *inputQWave) {
@@ -38,6 +37,7 @@ void qSpectrum::generateSpectrum(qWave *inputQWave) {
 	//printf("    generateSpectrum completed\n");
 }
 
+// do an inverse FFT to reconstruct the wave from generateSpectrum()
 void qSpectrum::generateWave(qWave *outputWave) {
 	if (trace) printf("🌈 about to generateWave\n");
 
@@ -48,13 +48,14 @@ void qSpectrum::generateWave(qWave *outputWave) {
 }
 
 
+// take this wave in and FFT it and dump the result to console
 void analyzeWaveFFT(qWave *original) {
 	if (!original || !original->space)
 		throw std::runtime_error(original ? "null space in analyzeWaveFFT"
 			: "null original in analyzeWaveFFT");
 	qSpectrum *spect = new qSpectrum(original->space, NULL);
 	spect->generateSpectrum(original);
-	spect->dumpSpectrum("🌈 analyzeWaveFFT: generated spectrum");
+	spect->dumpSpectrum("🌈  spectrum");
 	delete spect;
 }
 

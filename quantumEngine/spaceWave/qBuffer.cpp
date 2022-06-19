@@ -19,10 +19,7 @@ qFlick - object that owns a list of waves, and points to its space
 */
 
 #include "../squish.h"
-//#include <stdexcept>
-//#include <cmath>
 #include "qSpace.h"
-//#include "../schrodinger/Incarnation.h"
 #include "qBuffer.h"
 
 static bool traceNormalize = false;
@@ -171,7 +168,7 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 		*pPrevPhase = phase;
 	}
 	else {
-		snprintf(buf,200, "[%d] (%8.4lf,%8.4lf)", ix, re, im);
+		snprintf(buf,200, "[%3d] (%8.4lf,%8.4lf)", ix, re, im);
 	}
 	return mag;
 }
@@ -257,25 +254,27 @@ void qBuffer::fixThoseBoundaries(qCx *targetWave) {
 	fixSomeBoundaries(targetWave, continuum, start, end);
 }
 
+// get rid of this!
 void qSpace::fixThoseBoundaries(qCx *targetWave) {
 	qDimension *dims = dimensions;
 	fixSomeBoundaries(targetWave, dims->continuum, dims->start, dims->end);
 }
 
 
-// calculate ⟨𝜓 | 𝜓⟩  'inner product'.  Non-visscher.
+// calculate ⟨𝜓 | 𝜓⟩  'inner product'.  Non-visscher; do not use it during an iteration.
 double qBuffer::innerProduct(void) {
 	qCx *wave = this->wave;
 	double sum = 0.;
 
 	for (int ix = start; ix < end; ix++) {
 		qCx point = wave[ix];
-		sum += point.norm();
-
+		double norm = point.norm();
+		sum += norm;
 		//sum += wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im;
-// 		printf("innerProduct point %d (%lf,%lf) %lf\n", ix, wave[ix].re, wave[ix].im,
-// 			wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im);
+		//printf("innerProduct point %d (%lf,%lf) %lf\n", ix, wave[ix].re, wave[ix].im,
+		//	wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im);
 	}
+
 	return sum;
 }
 
@@ -300,25 +299,21 @@ void qBuffer::normalize(void) {
 	//tempQWave->dumpWave("The wave,before normalize", true);
 
 	if (mag == 0. || ! isfinite(mag)) {
-		// ALL ZEROES!??! this is bogus, shouldn't be happening
-		const double factor = pow(end - start, -0.5);
-		printf("🍕 🍕 🍕 🍕 🍕 🍕 ALL ZEROES ! ? ? ! not finite ! ? ? !  set them all to a constant, normalized\n");
-		for (int ix = start; ix < end; ix++)
-			wave[ix] = factor;
+		// ALL ZEROES!??! this is bogus, shouldn't be happening.
+		// Well, except that brand new buffers are initialized to zeroes.
+		throw std::runtime_error("tried to normalize a buffer with all zeroes!");
 	}
 	else {
+		// normal functioning
 		const double factor = pow(mag, -0.5);
 		if (traceNormalize) {
 			printf("🍕 normalizing qBuffer.  factor=%lf, start=%d, end=%d, N=%d\n",
-			factor, start, end, end - start);
+				factor, start, end, end - start);
 		}
 
 		for (int ix = start; ix < end; ix++)
 			wave[ix] *= factor;
 	}
 	fixBoundaries();
-	//dumpWave("qWave::normalize done", true);
-	///space->visscherHalfStep(wave, this);
 }
-
 

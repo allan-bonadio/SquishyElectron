@@ -6,7 +6,7 @@ import qe from './qe';
 import qeWave from './qeWave';
 import {setFamiliarPotential, getWrappedPotential} from '../widgets/utils';
 
-let debugSpace = true;
+let debugSpace = false;
 
 
 const _ = num => num.toFixed(4).padStart(9);
@@ -29,6 +29,20 @@ function dumpRow(ix, re, im, prev, isBorder) {
 		`${_(phase)} ${_(dPhase)}} ${_(mag)}\n` ;
 }
 
+// handed back when space is created by C++
+class salientPointersClass {
+	constructor(salientPointersPointer) {
+		this.struct = new Uint32Array(window.Module.HEAPU32.buffer, salientPointersPointer);
+	}
+
+	get mainWaveBuffer() { return this.struct[1]; }
+	get potentialBuffer() { return this.struct[2]; }
+	get vBuffer() { return this.struct[3]; }
+	get theAvatar() { return this.struct[4]; }
+	get miniGraphAvatar() { return this.struct[5]; }
+}
+
+export let salientPointers;
 
 /* **************************************************************** Basic Space */
 // the dimensions part of the space
@@ -163,10 +177,13 @@ export class qeSpace extends qeBasicSpace {
 			this.end = this.start + this.N;
 			this.nPoints = this.start + this.end;
 		});
-		qe.completeNewSpace();
+
+		// salientPointers will give us pointers to buffers and stuff we need
+		let sp = qe.completeNewSpace();
+		salientPointers = new salientPointersClass(sp);
 
 		// the qSpace already has allocated a wave, wrap as a nice TypedArray of doubles (pairs making up cx numbers)
-// 		this.wave = new Float64Array(window.Module.HEAPF64.buffer, qe.Incarnation_getWaveBuffer(), 2 * this.nPoints);
+// 		this.wave = new Float64Array(window.Module.HEAPF64.buffer, qe.Avatar_getWaveBuffer(), 2 * this.nPoints);
 
 // 		let dim = dims[0];
 // 		this.start = dim.start;
@@ -176,7 +193,7 @@ export class qeSpace extends qeBasicSpace {
 
 		//qe.space.waveBuffer = qe.waveBuffer = wave;
 		//console.info(`the wave we're createQEWaveFromCBuf():`, wave);
-		this.qewave = new qeWave(this, qe.Incarnation_getWaveBuffer());
+		this.qewave = new qeWave(this, qe.Avatar_getWaveBuffer());
 		this.wave = this.qewave.wave;
 
 		//console.log(`🚀  qViewBuffer_getViewBuffer 176: 🛸`, qe.qViewBuffer_getViewBuffer());
@@ -204,13 +221,15 @@ export class qeSpace extends qeBasicSpace {
 // isn't the viewBuffer itself suipposed to do rthat?  oh ytean that's C++.  Here we make our own.
 		let emscriptenMemory = window.Module.HEAPF32.buffer;
 		let address = qe.qViewBuffer_getViewBuffer();
+
+		// display also the boundary points?  if not, use nStates instead
 		let np = this.nPoints * 16;  // 16 = sizeof(qCx)
 
-		this.viewBuffer = qe.viewBuffer =
+		this.vBuffer = qe.vBuffer =
 			new Float32Array(emscriptenMemory, address, np);
 // 		this.viewBuffer = qe.viewBuffer =
 // 			new Float32Array(window.Module.HEAPF32.buffer, qe.qViewBuffer_getViewBuffer(), this.nPoints*8);
-		qe.qViewBuffer_loadViewBuffer();
+//		qe.qViewBuffer_loadViewBuffer();
 
 		//console.log(`🚀  qViewBuffer_getViewBuffer 200: 🛸`, qe.qViewBuffer_getViewBuffer());
 

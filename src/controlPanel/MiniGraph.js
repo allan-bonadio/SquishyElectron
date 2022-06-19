@@ -97,12 +97,15 @@ function setPT() {
 
 
 
-// the component.  We need a class component cuz we weant to save stuff on this
-// doesn't really need any state.
+// the component.  We need a class component cuz we weant to save stuff on this?
+//  I want this done by webgl, just like SquishView.  and change to a func component at the same time.
 export class MiniGraph extends React.Component {
 	constructor(props) {
 		super(props);
 		const p = props;
+
+		// doesn't really need any state.
+		this.state = {};
 
 		// construct a copy of the origSpace, but with no more resolution than the minigraph
 		const proxyDim = {...p.origSpace.dimensions[0]};
@@ -160,19 +163,23 @@ export class MiniGraph extends React.Component {
 //	}
 //
 
+	// must be done before each render but not part of the render...
+	precalc() {
+	}
+
 	render() {
 		const p = this.props;
 		//const {N} = this.miniSpace.startEnd;
 
-
-		const gElement = p.recipe(this.miniSpace, p.familiarParams);
+		// this should not be in a render method cuz it has side effects
+			this.gElement = p.recipe(this.miniSpace, p.familiarParams);
 
 		return <svg className={`MiniGraph ${p.className}`}
 							viewBox={this.viewBox}
 							width={p.width} height={p.height}
 							preserveAspectRatio='none' >
 
-			{gElement}
+			{this.gElement}
 
 		</svg>;
 
