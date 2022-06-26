@@ -94,15 +94,10 @@ void Avatar_setStepsPerIteration(int stepsPerIteration) {
 }
 
 // low pass filter.
-void Avatar_setLowPassFilter(double dilution) {
-	//printf("🚀 🚀 🚀 Avatar_setLowPassFilter(%lf)\n", dilution);
-	if (dilution >= 1. || dilution <= 0.) {
-		char buf[100];
-		snprintf(buf, 100, "🚀 🚀 🚀 Avatar_setLowPassFilter, %lf, must be between 0 and 1\n", dilution);
-		throw std::runtime_error(buf);
-	}
-	theAvatar->lowPassFilter = dilution;
-	//printf("🚀 🚀 🚀 Avatar_setLowPassFilter result %lf in theSpace=%p\n",
+void Avatar_setLowPassFilter(int lowPassFilter) {
+	//printf("🚀 🚀 🚀 Avatar_setLowPassFilter(%d)\n", dilution);
+	theAvatar->lowPassFilter = lowPassFilter;
+	//printf("🚀 🚀 🚀 Avatar_setLowPassFilter result %d in theSpace=%p\n",
 	//	theAvatar->lowPassFilter, theSpace);
 }
 

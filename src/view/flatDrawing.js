@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-import abstractDrawing from './abstractDrawing';
+import {abstractDrawing} from './abstractDrawing';
 import cxToColorGlsl from './cxToColor.glsl';
 import qe from '../wave/qe';
 import {viewUniform, viewAttribute} from './viewVariable';
@@ -11,6 +11,7 @@ import {viewUniform, viewAttribute} from './viewVariable';
 //import {qeStartPromise} from '../wave/qEngine';
 
 let dumpViewBufAfterDrawing = false;
+let traceHighest = false;
 
 /* ******************************************************* flat drawing */
 
@@ -27,7 +28,7 @@ let alsoDrawPoints = false, alsoDrawLines = false;
 
 let ps = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
 
-// make the line number for the start a multiple of 10
+// make the line number for the start a multiple of 10 (?)
 const vertexSrc = `${cxToColorGlsl}
 #line 154
 varying highp vec4 vColor;
@@ -45,15 +46,11 @@ void main() {
 	else {
 		y = 0.;
 	}
-	//y=row.w / 10.;
-	//y=0.5;
-
 	y = 1. - 2. * y;
 
 	// figure out x, basically the point index
 	float x;
 	x = float(int(vertexSerial) / 2) * barWidth * 2. - 1.;
-	//x = row.w / 6. - 1.;
 
 	// and here we are
 	gl_Position = vec4(x, y, 0., 1.);
@@ -77,7 +74,7 @@ void main() {
 `;
 
 // the original display that's worth watching
-class flatDrawing extends abstractDrawing {
+export class flatDrawing extends abstractDrawing {
 
 	static drawingClassName: 'flatDrawing';
 	drawingClassName: 'flatDrawing';
@@ -95,22 +92,23 @@ class flatDrawing extends abstractDrawing {
 		const highest = qe.qViewBuffer_loadViewBuffer();
 
 		// smooth it out otherwise the wave sortof bounces up and down a little on each step
+		// must find a way to set the avgHighest
 		if (!this.avgHighest)
 			this.avgHighest = highest;
 		else
-			this.avgHighest = (highest + 31*this.avgHighest) / 32;
-
-		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
-		let nPoints = this.nPoints = this.space ? this.space.nPoints : 10;  // ??
-		let barWidth = 1 / (nPoints - 1);
-		barWidthUniform.setValue(barWidth, '1f');
-
-		//let maxHeightUniform = this.maxHeightUniform = new viewUniform('maxHeight', this);
+			this.avgHighest = (highest + 7*this.avgHighest) / 8;
+		if (traceHighest)
+			console.log(`flatDrawing: highest=${highest.toFixed(5)}  avgHighest=${this.avgHighest.toFixed(5)}`);
 
 		let maxHeightUniform = this.maxHeightUniform = new viewUniform('maxHeight', this);
 		maxHeightUniform.setValue(() => {
 			return {value: this.avgHighest, type: '1f'};
 		});
+
+		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
+		let nPoints = this.nPoints = this.space.nPoints;  //this.space ? this.space.nPoints : 10;
+		let barWidth = 1 / (nPoints - 1);
+		barWidthUniform.setValue(barWidth, '1f');
 
 		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar

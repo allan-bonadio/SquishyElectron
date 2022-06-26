@@ -4,6 +4,9 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
+// SquishPanel has a 1:1 relationship with the c++ qSpace.
+// the ResolutionDialog changes the initialParams and recreates the qSpace.
+
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -18,13 +21,6 @@ import qe from './wave/qe';
 import SquishView from './view/SquishView';
 import ResolutionDialog from './controlPanel/ResolutionDialog';
 
-// must make sure somebody imports all of them
-import abstractViewDef from './view/abstractViewDef';
-//import manualViewDef from './view/manualViewDef';
-//import viewVariableViewDef from './view/viewVariableViewDef';
-//import flatViewDef from './view/flatViewDef';
-import flatDrawingViewDef from './view/flatDrawingViewDef';
-//import drawingViewDef from './view/drawingViewDef';
 
 import storeSettings from './utils/storeSettings';
 
@@ -34,17 +30,6 @@ import {setFamiliarPotential} from './widgets/utils';
 let areBenchmarking = false;
 let dumpingTheViewBuffer = false;
 
-
-
-// unfortunately, we hafe to have a list of all the view types.  here.
-// this will appear in the resolution dialog
-export const listOfViewClassNames = {
-	abstractViewDef,
-	//manualViewDef, viewVariableViewDef, flatViewDef,
-
-	//drawingViewDef,
-	flatDrawingViewDef,
-};
 
 
 const DEFAULT_VIEW_CLASS_NAME =
@@ -59,8 +44,8 @@ const DEFAULT_RESOLUTION = 64;
 const DEFAULT_CONTINUUM = qeBasicSpace.contENDLESS;
 
 const defaultWaveParams = {
-	waveBreed: 'pulse',
-	waveFrequency: 4,
+	waveBreed: 'chord',
+	waveFrequency: 8,
 	stdDev: 20,
 	pulseOffset: 30,
 };
@@ -72,15 +57,17 @@ const defaultPotentialParams = {
 	valleyOffset: 50,
 };
 
+
 export class SquishPanel extends React.Component {
 	static propTypes = {
-		token: PropTypes.number,
+		//token: PropTypes.number,
 		id: PropTypes.string.isRequired,
+		width: PropTypes.number,
 	};
 
-	static getListOfViews() {
-		return listOfViewClassNames;
-	}
+	// static getListOfViews() {
+	// 	return listOfViewClasses;
+	// }
 
 	/* ************************************************ construction & reconstruction */
 	constructor(props) {
@@ -90,16 +77,22 @@ export class SquishPanel extends React.Component {
 
 		this.state = {
 			// THE N and continuum for THE space we're currently doing
-			N: storeSettings.ratify(space0.N, DEFAULT_RESOLUTION, [4,8,16,32,64,128,256,502,1024]),
-			continuum: storeSettings.ratify(space0.N, DEFAULT_CONTINUUM,
+			// kept between sessions in localStore
+			N: storeSettings.ratify(space0.N, DEFAULT_RESOLUTION, [4,8,16,32,64,128,256,512,1024]),
+
+			continuum: storeSettings.ratify(space0.continuum, DEFAULT_CONTINUUM,
 				[qeBasicSpace.contDISCRETE, qeBasicSpace.contWELL, qeBasicSpace.contENDLESS]),
-			viewClassName: DEFAULT_VIEW_CLASS_NAME,
+
+			mainViewClassName: DEFAULT_VIEW_CLASS_NAME,
 
 			// the qeSpace
 			space: null,  // set in setNew1DResolution()
 
-			// see the view dir
-			currentView: null,
+			// see the view dir, this is for the viewDef instance
+			effectiveView: null,
+
+			// the width is from props; the window width
+			//viewHeight: 400,
 
 			// this is controlled by the user (start/stop/step buttons)
 			// does not really influence the rendering of the canvas... (other than running)
@@ -111,24 +104,31 @@ export class SquishPanel extends React.Component {
 
 			// defaults for sliders for dt & spi
 			dt: .001,
-			stepsPerIteration: 100,
-			lowPassFilter: .02,
+			stepsPerIteration: 200,
+			lowPassFilter: space0.N / 8,
 
 			// advance forward with each iter
 			runningCycleElapsedTime: 0,
 			runningCycleIterateSerial: 0,
 
-			canvasSize: {width: 800, height: 400}
+			//canvasSize: {width: 800, height: 400}
 		};
 
-		// never changes once set
-		this.canvas = null;
+		// will be resolved when the space has been created; result will be qeSpace
+		this.createdSpacePromise = new Promise((succeed, fail) => {
+			this.createdSpace = succeed;
+			console.info(`qeStartPromise created:`, succeed, fail);
+		});
 
 		// ticks and benchmarks
 		const now = performance.now();
 		this.initStats(now);
 		this.timeForNextTic = now + 10;  // default so we can get rolling
 		this.lastAniIteration = now;
+
+		// stick ?allowRunningOneCycle at teh endnof URL to show runningONeCycle panel
+		// eslint-disable-next-line
+		this.allowRunningOneCycle = /allowRunningOneCycle/.test(location.search);
 
 		console.log(`SquishPanel constructor done`);
 	}
@@ -141,7 +141,9 @@ export class SquishPanel extends React.Component {
 			// done in qEngine qeDefineAccess();
 
 			const s = this.state;
-			this.setNew1DResolution(s.N, s.continuum, s.viewClassName);
+
+			// space will end up ini the state but meanwhile we need it now
+			const space = this.setNew1DResolution(s.N, s.continuum, s.mainViewClassName);
 
 			// vital properties of the space
 			qe.Avatar_setDt(this.state.dt);
@@ -152,10 +154,10 @@ export class SquishPanel extends React.Component {
 			// except for inside the function itself
 			this.animateHeartbeat(performance.now());
 
-			// use this.currentView rather than state.currentView - we just set it
-			// and it takes a while.
-			// Make sure you call the new view's domSetup method.
-			this.curView.domSetupForAllDrawings(this.canvas);
+			this.createdSpace(space);
+
+			console.info(`SquishPanel.compDidMount promise done`);
+
 		}).catch(ex => {
 			console.error(`error in SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
 			debugger;
@@ -163,35 +165,18 @@ export class SquishPanel extends React.Component {
 
 	}
 
-	// this is kinda cheating, but the currentView in the state takes some time to
-	// get set; but we need it immediately.  So we also set it as a variable on this.
-	get curView() {
-		return this.currentView || this.state.currentView;
-	}
 
-	// the canvas per panel, one panel per canvas
-	setGLCanvas(canvas) {
-		// dunno why, but sometimes this is null.  ?#?@?@
-		if (! canvas) return;
-		this.canvas = canvas;
-		canvas.squishPanel = this;
+	setEffectiveView(view) {
+		this.effectiveView = view;
+		this.setState({effectiveView: view})
 	}
+	setEffectiveView = this.setEffectiveView.bind(this);
 
 	// init or re-init the space and the panel
-	setNew1DResolution(N, continuum, viewClassName) {
+	setNew1DResolution(N, continuum) {
 		qe.space = new qeSpace([{N, continuum, label: 'x'}], defaultWaveParams, defaultPotentialParams);
-
-		// now create the draw view class instance as described by the space
-		// this is the flatDrawingViewDef class, not a CSS class or React class component
-		const vClass = listOfViewClassNames[viewClassName];
-		if (! vClass)
-			throw `no vClass! see for yerself! ${JSON.stringify(listOfViewClassNames)}`;
-
-		const currentView = new vClass('main view', this.canvas, qe.space);
-		currentView.completeView();
-
-		// we've now got a qeSpace etc all set up
-		this.setState({N, continuum, space: qe.space, currentView});
+		this.setState({space: qe.space});
+		return qe.space;
 	}
 
 	// puts up the resolution dialog, starting with the values from this.state
@@ -203,25 +188,33 @@ export class SquishPanel extends React.Component {
 		this.setState({isTimeAdvancing: false});
 
 		// pass our state upward to load into the dialog
-		ResolutionDialog.openResolutionDialog(
-			{N: s.N, continuum: s.continuum, viewClassName: s.viewClassName},
+		ResolutionDialog.openResDialog(
+			// this is the initialParams
+			{N: s.N, continuum: s.continuum, mainViewClassName: s.mainViewClassName},
 
 			// OK callback
 			finalParams => {
+				let prevLowPassFilter = s.lowPassFilter;
+				let prevN = s.N;
+
 				qe.deleteTheSpace();
 
 				this.setNew1DResolution(
-					finalParams.N, finalParams.continuum, finalParams.viewClassName);
-				this.setState({isTimeAdvancing: timeWasAdvancing});
+					finalParams.N, finalParams.continuum, finalParams.mainViewClassName);
+				this.setState({isTimeAdvancing: timeWasAdvancing, });
 
 				localStorage.space0 = JSON.stringify({N: finalParams.N, continuum: finalParams.continuum});
+
+				// move the LPF proportionately
+				let newLPF = Math.max(prevLowPassFilter * finalParams.N / prevN, 1);
+				this.setLowPassFilter(newLPF);
 			},
 
 			// cancel callback
 			() => {
 				this.setState({isTimeAdvancing: timeWasAdvancing});
 			}
-		)
+		);
 	}
 
 	/* ******************************************************* stats */
@@ -248,10 +241,10 @@ export class SquishPanel extends React.Component {
 	// update the stats, as displayed in the Integration tab
 	refreshStats() {
 		const p = this.props;
-		function show(cName, ms) {
+		function show(cName, ms, nDigits = 2) {
 			const el = document.querySelector(`#${p.id}.SquishPanel .ControlPanel .SetIterationTab .${cName}`);
 			if (el)
-				el.innerHTML = ms.toFixed(2);  // only if it's showing
+				el.innerHTML = ms.toFixed(nDigits);  // only if it's showing
 		}
 
 		const st = this.iStats;
@@ -260,7 +253,9 @@ export class SquishPanel extends React.Component {
 		show('reloadGlInputs', st.endReloadInputs - st.endReloadViewBuffer);
 		show('drawTime', st.endDraw - st.endReloadInputs);
 		show('totalForIteration', st.endDraw - st.startIteration);
-		show('cyclePeriod', st.startIteration - st.prevStart);
+		const period = st.startIteration - st.prevStart;
+		show('iterationPeriod', period);
+		show('iterationsPerSec', Math.round(1000 / period), 0)
 	}
 
 	/* ******************************************************* iteration & animation */
@@ -293,17 +288,21 @@ export class SquishPanel extends React.Component {
 		// or if this is a one shot step
 		this.iStats.endReloadViewBuffer = this.iStats.endReloadInputs = this.iStats.endDraw = performance.now();
 		if (needsRepaint) {
-			this.curView.reloadAllVariables();
+			// this is kinda cheating, but the effectiveView in the state takes some time to
+			// get set; but we need it immediately.  So we also set it as a variable on this.
+			const curView = this.effectiveView || this.state.effectiveView;
+
+			curView.reloadAllVariables();
 
 			// copy from latest wave to view buffer (c++)
 			qe.qViewBuffer_getViewBuffer();
 			this.iStats.endReloadViewBuffer = performance.now();
 
 			// draw
-			this.curView.setInputsOnDrawings();
+			curView.setInputsOnDrawings();
 			this.iStats.endReloadInputs = performance.now();
 
-			this.curView.drawAllDrawings();
+			curView.drawAllDrawings();
 			// populate the frame number and elapsed pseudo-time
 			this.showTimeNIteration();
 			this.iStats.endDraw = performance.now();
@@ -367,6 +366,7 @@ export class SquishPanel extends React.Component {
 
 	// button handler
 	startRunningOneCycle() {
+		if (!this.allowRunningOneCycle) return;
 		this.runningOneCycle = true;
 		this.runningCycleStartingTime = qe.Avatar_getElapsedTime();
 		this.runningCycleStartingSerial = qe.Avatar_getIterateSerial();
@@ -376,6 +376,7 @@ export class SquishPanel extends React.Component {
 
 	// manage runningOneCycle - called each iteration
 	continueRunningOneCycle() {
+		if (!this.allowRunningOneCycle) return
 		//debugger;
 		if (this.runningOneCycle) {
 			// get the real compoment of the first (#1) value of the wave
@@ -413,6 +414,7 @@ export class SquishPanel extends React.Component {
 	}
 
 	renderRunningOneCycle() {
+		if (!this.allowRunningOneCycle) return '';
 		const s = this.state;
 
 		// you can turn this on in the debugger anytime
@@ -480,6 +482,7 @@ export class SquishPanel extends React.Component {
 	}
 	setStepsPerIteration = this.setStepsPerIteration.bind(this);
 
+	// sets the LPF in both SPanel state AND in the C++ area
 	setLowPassFilter(lowPassFilter) {
 		console.info(`js setLowPassFilter(${lowPassFilter})`)
 		this.setState({lowPassFilter});
@@ -535,18 +538,28 @@ export class SquishPanel extends React.Component {
 	}
 
 
-
 	/* ******************************************************* rendering */
 
 	render() {
+		const p = this.props;
 		const s = this.state;
 
 		return (
 			<div id={this.props.id} className="SquishPanel">
 				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
-				<SquishView setGLCanvas={canvas => this.setGLCanvas(canvas)}
-					width={s.canvasSize.width} height={s.canvasSize.height}/>
+				<SquishView
+					viewClassName={s.mainViewClassName}
+					viewName='main view'
+					setEffectiveView={this.setEffectiveView}
+					createdSpacePromise={this.createdSpacePromise}
+					width={p.width}
+					defaultHeight={400}
+				/>
 				<ControlPanel
+					openResolutionDialog={() => this.openResolutionDialog()}
+					space={s.space}
+					N={this.state.N}
+
 					iterateAnimate={(shouldAnimate, freq) => this.iterateAnimate(shouldAnimate, freq)}
 					isTimeAdvancing={s.isTimeAdvancing}
 					startStop={this.startStop}
@@ -561,10 +574,6 @@ export class SquishPanel extends React.Component {
 
 					iterateFrequency={1000 / s.iteratePeriod}
 					setIterateFrequency={freq => this.setIterateFrequency(freq)}
-
-					openResolutionDialog={() => this.openResolutionDialog()}
-					space={s.space}
-					N={this.state.N}
 
 					dt={s.dt}
 					setDt={this.setDt}

@@ -11,8 +11,8 @@ import React from 'react';
 import {thousands, stepsPerDecadeStepFactors, indexToPower, powerToIndex} from './utils';
 
 // set a particular unique in this regex to trace its renders and stuff or use the second one to turn off
-let traceThisSlider = /stepsPerIterationSlider/;
-//let traceThisSlider = {test: () => false};
+//let traceThisSlider = /stepsPerIterationSlider/;
+let traceThisSlider = {test: () => false};
 
 // save this for hwen i put ticks on the log slider
 // give me an array of JUST the even powers of 10 between the min and max, inclusive
@@ -49,8 +49,11 @@ class LogSlider extends React.Component {
 	static propTypes = {
 		className: PropTypes.string,
 		label: PropTypes.string.isRequired,
-		minLabel: PropTypes.string,
-		maxLabel: PropTypes.string,
+		minLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+		maxLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+
+
+
 
 		// these are powers, not indices
 		current: PropTypes.number.isRequired,
@@ -87,8 +90,15 @@ class LogSlider extends React.Component {
 
 	constructor(props) {
 		super(props);
+		if (!props)
+			debugger;
 		const p = props;
+		if (traceThisSlider.test(p.unique)) console.info(`LogSlider props=`, JSON.stringify(props));
 		this.wasOriginal = p.original ? <small>&nbsp; (was {thousands(p.original)})</small> : '';
+
+		// these don't change dynamically i promise
+		this.minIndex = powerToIndex(p.stepsPerDecade, p.sliderMin);
+		this.maxIndex = powerToIndex(p.stepsPerDecade, p.sliderMax);
 	}
 
 	mouseDown(ev) {
@@ -117,38 +127,42 @@ class LogSlider extends React.Component {
 		const cur = p.current;
 		//const cur = indexToPower(p.willRoundPowers, stepFactors, p.stepsPerDecade, p.current);
 
-		if (traceThisSlider.test(p.unique)) console.info(
-			`LogSlider render... min=${powerToIndex(spd, p.sliderMin)} max=${powerToIndex(spd, p.sliderMax)}    `+
-			`  spd=${spd}, p.current=${p.current}   value=${powerToIndex(spd, p.current)}`);
-
 		// the actual css ID used for the datalist
 		const uniqueId = `LogSliderDataList-${p.unique.replace(/\W+/, '_')}`;
 
 		// right on the edge of transition, it can vibrate!  average this out. so it slides gently
 		let val = powerToIndex(spd, p.current);
-		val = (val + this.avgValue * 15) / 16
+		console.info()
+		//val = (val + this.avgValue * 15) / 16
 
-		return <div className={`${p.className} LogSlider`}>
-			<aside>
-				<div className='left'>{p.minLabel}</div>
-				<div className='middle'>
-					{p.label}: <big>{thousands(cur)}</big>
-					{this.wasOriginal}
-				</div>
-				<div className='right'>{p.maxLabel}</div>
+		if (traceThisSlider.test(p.unique)) console.info(
+			`LogSlider render..  spd=${spd}, p.current=${p.current}   value=${val}`);
 
-			</aside>
+		try {
+			return <div className={`${p.className} LogSlider`}>
+				<aside>
+					<div className='left'>{p.minLabel}</div>
+					<div className='middle'>
+						{p.label}: <big>{thousands(cur)}</big>
+						{this.wasOriginal}
+					</div>
+					<div className='right'>{p.maxLabel}</div>
 
-			<input type="range"
-				min={powerToIndex(spd, p.sliderMin)}
-				max={powerToIndex(spd, p.sliderMax)}
-				value={val}
-				list={uniqueId}
-				onInput={this.handleSlide}
-				onMouseDown={this.mouseDown}
-			/>
-			<datalist id={uniqueId} >{createGoodPowers(spd, p.sliderMin, p.sliderMax)}</datalist>
-		</div>;
+				</aside>
+
+				<input type="range"
+					min={this.minIndex}
+					max={this.maxIndex}
+					value={val}
+					list={uniqueId}
+					onInput={this.handleSlide}
+					onMouseDown={this.mouseDown}
+				/>
+				<datalist id={uniqueId} >{createGoodPowers(spd, p.sliderMin, p.sliderMax)}</datalist>
+			</div>;
+		} catch (ex) {
+			console.error(`LogSlider.render() Crash: `, ex.stack || ex.message || ex);
+		}
 	}
 }
 

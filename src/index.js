@@ -18,27 +18,4 @@ ReactDOM.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-function getRidofThisSomedAY()
-{
-/*
-		//<ErrorBoundary howToRecover={errorMsg => {
-			// just reload the page, dude
-			debugger;
-			//window.location = window.location;  // reload page??
-		}}>
-			<App />
-		//</ErrorBoundary>
-
-
-
-
-			// just reload the page, dude
-			debugger;
-			//window.location = window.location;  // reload page??
-		}}>
-*/
-
-}
-getRidofThisSomedAY();
-
 

@@ -63,7 +63,7 @@ class App extends React.Component {
 					&nbsp; &nbsp;
 					Squishy Electron
 				</h2>
-				<SquishPanel id='theSquishPanel'/>
+				<SquishPanel id='theSquishPanel' width={s.innerWindowWidth}/>
 
 				{sqDialog}
 			</div>

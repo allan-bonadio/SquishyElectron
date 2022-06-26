@@ -25,7 +25,7 @@ TEST(Avatar, CheckConstructor)
 	qSpace *space = makeBareSpace(8, contENDLESS);
 	Avatar *avatar = new Avatar(space);
 
-	LONGS_EQUAL(0.5, avatar->lowPassFilter);
+	LONGS_EQUAL(1, avatar->lowPassFilter);
 
 	LONGS_EQUAL(false, avatar->pleaseFFT);
 	LONGS_EQUAL(false, avatar->isIterating);
@@ -50,7 +50,7 @@ void completeNewAvatarGauntlet(int N, int expectedSpectrumLength, int expectedFr
 	LONGS_EQUAL(0, theAvatar->iterateSerial);
 	//pointless DOUBLES_EQUAL(1.0, theAvatar->dt, 1e-12);
 	LONGS_EQUAL(100, theAvatar->stepsPerIteration);
-	DOUBLES_EQUAL(0.125, theAvatar->lowPassFilter, 1e-12);
+	DOUBLES_EQUAL(N/8, theAvatar->lowPassFilter, 1e-12);
 	LONGS_EQUAL(false, theAvatar->isIterating);
 
 

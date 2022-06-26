@@ -14,13 +14,18 @@ function setPT() {
 		setStepsPerIteration: PropTypes.func.isRequired,
 		lowPassFilter: PropTypes.number.isRequired,
 		setLowPassFilter: PropTypes.func.isRequired,
+
+		// needed for filter
+		N: PropTypes.number.isRequired,
 	};
 }
 
 function SetIterationTab(props) {
-	//const p = props;
+	const p = props;
+	if (!props)
+		debugger;
 
-	// i was gonna call refreshStats() here in the componentDidMount func but this is a func comp
+	//Unlike other tabs, all these are instant-update.
 
 	return (<div className='SetIterationTab'>
 		<div className='sliders'>
@@ -51,7 +56,7 @@ function SetIterationTab(props) {
 				maxLabel='smoother'
 
 				current={props.stepsPerIteration}
-				sliderMin={100}
+				sliderMin={50}
 				sliderMax={10000}
 				stepsPerDecade={3}
 
@@ -63,13 +68,13 @@ function SetIterationTab(props) {
 			<LogSlider
 				unique='lowPassFilterSlider'
 				className='lowPassFilterSlider cpSlider'
-				label='Low Pass Filter'
-				minLabel='1/1024'
-				maxLabel='.5'
+				label='Frequencies to Suppress'
+				minLabel='1'
+				maxLabel={p.N/4}
 
 				current={props.lowPassFilter}
-				sliderMin={1/1024}
-				sliderMax={.5}
+				sliderMin={1}
+				sliderMax={p.N/4}
 				stepsPerDecade={16}
 
 				handleChange={(power, ix) => {
@@ -87,7 +92,8 @@ function SetIterationTab(props) {
 				<tr><td>reload GL variables:     </td><td><span  className='reloadGlInputs'>-</span> ms</td></tr>
 				<tr><td>draw:                      </td><td><span  className='drawTime'>-</span> ms</td></tr>
 				<tr><td>total for iteration:  </td><td><span  className='totalForIteration'>-</span> ms</td></tr>
-				<tr><td>cycle period:  </td><td><span  className='cyclePeriod'>-</span> ms</td></tr>
+				<tr><td>iteration period:  </td><td><span  className='iterationPeriod'>-</span> ms</td></tr>
+				<tr><td>iterations per sec:  </td><td><span  className='iterationsPerSec'>-</span>/sec</td></tr>
 			</tbody></table>
 		</div>
 	</div>);

@@ -7,11 +7,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {qeBasicSpace} from '../wave/qeSpace';
-import SquishPanel from '../SquishPanel';
+//import SquishPanel from '../SquishPanel';
 import CommonDialog from '../widgets/CommonDialog';
 import {powerToIndex} from '../widgets/utils';
 import LogSlider from '../widgets/LogSlider';
-
+import listOfViewClasses from '../view/SquishView';
 
 
 // had this been a real webiste, I would not have to copy/paste these here
@@ -66,7 +66,7 @@ export default class ResolutionDialog extends React.Component {
 	static propTypes = {
 		N: PropTypes.number.isRequired,
 		continuum: PropTypes.number.isRequired,
-		viewClassName: PropTypes.string.isRequired,
+		mainViewClassName: PropTypes.string.isRequired,
 	};
 
 	// this is the state in the dialog; doesn't become real until OK().
@@ -75,7 +75,7 @@ export default class ResolutionDialog extends React.Component {
 		N: this.props.N,  // same as power
 		index: powerToIndex(16, this.props.N),
 		continuum: this.props.continuum,
-		viewClassName: this.props.viewClassName,
+		mainViewClassName: this.props.mainViewClassName,
 		origN: this.props.N,
 	};
 
@@ -93,7 +93,8 @@ export default class ResolutionDialog extends React.Component {
 	static me = this;
 
 	// open the Resolution dialog specifically
-	static openResolutionDialog(initialParams, okCallback, cancelCallback) {
+	static openResDialog(initialParams, okCallback, cancelCallback) {
+		// there is no more than 1 resolution dialog open at a time so I can store this stuff here
 		ResolutionDialog.initialParams = initialParams;
 		ResolutionDialog.okCallback = okCallback;
 		ResolutionDialog.cancelCallback = cancelCallback;
@@ -103,7 +104,7 @@ export default class ResolutionDialog extends React.Component {
 			<ResolutionDialog
 				N={initialParams.N}
 				continuum={initialParams.continuum}
-				viewClassName={initialParams.viewClassName}
+				mainViewClassName={initialParams.mainViewClassName}
 			/>
 		);
 	}
@@ -190,21 +191,20 @@ export default class ResolutionDialog extends React.Component {
 	}
 
 	renderViewRadios() {
-		const onChange = ev => this.setState({viewClassName: ev.target.value});
+		const onChange = ev => this.setState({mainViewClassName: ev.target.value});
 
 		// the one that theoreticallyt should work
-		const viewz = SquishPanel.getListOfViews()
 		const radioz = [];
-		for (let vuName in viewz) {
-			const vu = viewz[vuName];
+		for (let vuName in listOfViewClasses) {
+			const vu = listOfViewClasses[vuName];
 			//console.log(`doin this vu:`, vu.viewClassName);
 			//console.dir(vu);
 			//console.log(`   typeof:`, typeof vuName, typeof vu);
 			//console.log(`   names:`, vu.viewClassName, vu.viewClassName, vu.name);
 			radioz.push(<label key={vu.viewClassName}>
-				<input type='radio' key={vu.viewClassName} name='viewClassName'
+				<input type='radio' key={vu.viewClassName} name='mainViewClassName'
 					value={vu.viewClassName}
-					checked={vu.viewClassName == this.state.viewClassName}
+					checked={vu.viewClassName == this.state.mainViewClassName}
 					onChange={onChange}/>
 				{vu.viewClassName}</label>);
 		}

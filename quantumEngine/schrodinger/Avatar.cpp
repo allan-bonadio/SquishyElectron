@@ -21,12 +21,13 @@ static bool traceIterSteps = false;
 
 static bool traceJustWave = false;
 static bool traceJustInnerProduct = false;
+static bool traceFourierFilter = false;
 
 //const double sNAN99999 = std::numeric_limits<double>::signaling_NaN();
 
 // make sure these values are doable by the sliders' steps
 Avatar::Avatar(qSpace *sp)
-	: dt(1e-3), stepsPerIteration(100), lowPassFilter(0.125),
+	: dt(1e-3), stepsPerIteration(100), lowPassFilter(1),
 		space(sp), magic('Avat'), pleaseFFT(false), isIterating(false) {
 
 	mainQWave = new qWave(space);
@@ -165,15 +166,11 @@ void Avatar::oneIteration() {
 	//mainQWave = mainQWave;
 
 	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
-	//	mainQWave->lowPassFilter(lowPassFilter);
-//	mainQWave->nyquistFilter();
-
-
 	fourierFilter(lowPassFilter);
 
 
-	// need it; somehow? not done in JS
-	theQViewBuffer->loadViewBuffer();
+	// need it; somehow? not done in JS.  YES IT IS!  remove this when you have the oppty
+	//theQViewBuffer->loadViewBuffer();
 
 	if (traceIterSummary) {
 		printf("🚀 🚀 finished one iteration (%d steps, N=%d), inner product: %lf",
@@ -197,8 +194,9 @@ void Avatar::oneIteration() {
 
 
 // FFT the wave, cut down the high frequencies, then iFFT it back.
-// If lowPassFilter is 0 or smaller than 1/nPoints, we skip it except for the nyquist freq
-void Avatar::fourierFilter(double lowPassFilter) {
+// lowPassFilter is #frequencies we zero out - max N/4
+// default is N/8.  Can't we eventually find a simple convolution to do this instead of FFT/iFFT?
+void Avatar::fourierFilter(int lowPassFilter) {
 	spect = getSpect();
 	spect->generateSpectrum(mainQWave);
 
@@ -207,19 +205,19 @@ void Avatar::fourierFilter(double lowPassFilter) {
 	qCx *s = spect->wave;
 	s[nyquist] = 0;
 
-	int spread = round(nyquist * lowPassFilter);  // number of freqs we'll attenuate on each side
-	printf("🌈  fourierFilter: nPoints=%d  nyquist=%d   spread=%d,   lowPassFilter=%lf\n",
-		spect->nPoints, nyquist, spread, lowPassFilter);
-	if (spread <= 0)
-		return;
-	if (spread > nyquist)  // sorry can't do that
-		spread = nyquist;
+	if (traceFourierFilter)
+		printf("🌈  fourierFilter: nPoints=%d  nyquist=%d    lowPassFilter=%d\n",
+			spect->nPoints, nyquist, lowPassFilter);
+	if (lowPassFilter > nyquist/2)  // sorry can't do that
+		lowPassFilter = nyquist/2;
 
-	for (int k = 1; k < spread; k++) {
-		double factor = 0;  //1. - k / spread;
-		printf("🌈  fourierFilter: smashing lowPassFilter=%lf   freqs %d which was %lf, "
-			"and %d which was %lf, by factor %lf\n",
-			nyquist - k, s[nyquist - k].norm(), lowPassFilter, nyquist + k, s[nyquist + k].norm(), factor);
+	for (int k = 1; k < lowPassFilter; k++) {
+		double factor = 0;
+		if (traceFourierFilter) {
+			printf("🌈  fourierFilter: smashing lowPassFilter=%d   freqs %d which was %lf, "
+				"and %d which was %lf, by factor %lf\n",
+				lowPassFilter, nyquist - k, s[nyquist - k].norm(), nyquist + k, s[nyquist + k].norm(), factor);
+		}
 		s[nyquist + k] *= factor;
 		s[nyquist - k] *= factor;
 	}

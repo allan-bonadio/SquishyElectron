@@ -61,7 +61,7 @@ TEST(Visscher, VisscherOneIteration)
 	// simulate the app taking one iter = 100 steps
 	theAvatar->stepsPerIteration = 100;
 	theAvatar->dt = .01;
-	theAvatar->lowPassFilter = 0.;
+	theAvatar->lowPassFilter = 1;
 
 	theAvatar->oneIteration();
 

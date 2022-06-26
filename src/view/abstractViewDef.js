@@ -3,11 +3,13 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-//import {viewUniform, viewAttribute} from './viewVariable';
-//import {curioShader, curioProgram, curioParameter} from './curiosity';
 
 // Each abstractViewDef subclass is a definition of a kind of view; one per each kind of view.
 // (A SquishView owns an instance of the def and is a React component enclosing the canvas.)
+
+/* ****************************************  */
+
+
 // This is the superclass of all view defs; with common webgl and space plumbing.
 // viewName is not the viewClassName, which is one of flatViewDef, garlandView, ...
 // there should be ONE of these per canvas, so each squishView should have 1.
@@ -85,7 +87,7 @@ export class abstractViewDef {
 		this.setShadersOnDrawings();
 		this.setInputsOnDrawings();
 
-		this.setGeometry();
+		this.setGeometry();  // call again if canvas outer dimensions change
 
 		// kick it off by drawing it once
 		this.drawAllDrawings();
@@ -240,6 +242,7 @@ export class abstractViewDef {
 	/* ************************************************** Geometry and transformations */
 	// abstract supermethod: another dummy submethod... write yer  own
 	// is this really needed?  seems like it can be omitted...
+	// no, call this every time the canvas resizes
 	setGeometry() {
 
 		// yeah i think it automatically defaults to this...
@@ -326,6 +329,8 @@ export class abstractViewDef {
 //		const available_extensions = gl.getSupportedExtensions();
 //		console.log(`--- available GL extensions:\n${available_extensions.join('\n')}`);
 //	}
+
+	static viewClassName: 'abstractViewDef';
 
 	/* ********************************************************************************************************  */
 	/* ************************************************** you can ignore the rest except for the very bottom */
@@ -523,4 +528,3 @@ export class abstractViewDef {
 
 export default abstractViewDef;
 
-abstractViewDef.viewClassName = 'abstractViewDef';

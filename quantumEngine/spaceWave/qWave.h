@@ -28,7 +28,7 @@ struct qWave : public virtual qBuffer {
 	void forEachState(void (*callback)(qCx, int));
 
 	void prune(void);
-	void lowPassFilter(double dilution = 0.01);
+	//void lowPassFilter(double dilution = 0.01);
 	void nyquistFilter(void);
 };
 

@@ -7,6 +7,8 @@
 import {qe} from './qe';
 import cxToRgb from '../view/cxToRgb';
 
+let traceSetWave = false;
+
 // emscripten sabotages this?  the log & info, but not error & warn?
 //const consoleLog = console.log.bind(console);
 
@@ -34,12 +36,7 @@ function rainbowDump(wave, start, end, nPoints) {
 		tot += mag;
 		let color = cxToRgb({re: wave[ix], im: wave[ix + 1]});
 
-		//console.log doesn't work here, dunnowhy, unless you stick in either extra console.log()
-		// or streatch these out?  makes no sense.
-// 		console.log(`%c rich `, "font-family: palatino");
-// 		console.log(`%c🌊  `, `background-color: ${color}; padding-right: ${mag+5}px; `);
 		console.log(`%c🌊  `, `background-color: ${color}; padding-right: ${mag+5}px; `);
-		//console.log(`zitgoin purdy good`);
 
 		ix += 2;
 		tot += mag;
@@ -198,7 +195,7 @@ class qeWave {
 		const {start, end, N} = this.space.startEnd2;
 		let offset = offsetUi * N / 100;  // now in units of X
 		const freq = Math.round(freqUi);
-		console.log(`🌊  setPulseWave freq=${freqUi} => ${freq} `+
+		if (traceSetWave) console.log(`🌊  setPulseWave freq=${freqUi} => ${freq} `+
 			`  offset=${offsetUi}% => ${offset}`)
 
 		// start with a circular wave, freq WITHIN the pulse width
@@ -239,24 +236,27 @@ class qeWave {
 		let freqHighHigh = freqHigh + 1.;
 
 		// FIve neighboring frequencies, weighting, where the middle freq has weight 1.0
-		let nearWeight = 0.5;
-		let farWeight = .25
+		let nearWeight = 2/3;
+		let farWeight = 1/3;
+// 		let nearWeight = .5;
+// 		let farWeight = .25;
+// 		let nearWeight = 1;
+// 		let farWeight = 1
+		// let nearWeight = 0.9;
+		// let farWeight = 0.8
 
 		for (let ix = start; ix < end; ix += 2) {
 			const angle = dAngle * (ix - start - offset);
 
-		//
+			// re
 			wave[ix] = Math.cos(freqLowLow*angle) * farWeight + Math.cos(freqLow*angle) * nearWeight +
 				Math.cos(freq*angle) +
 				Math.cos(freqHigh*angle) * nearWeight + Math.cos(freqHighHigh*angle) * farWeight;
 
-		//
+			// im
 			wave[ix+1] = Math.sin(freqLowLow*angle) * farWeight +Math.sin(freqLow*angle) * nearWeight +
 				Math.sin(freq*angle) +
 				Math.sin(freqHigh*angle) * nearWeight + Math.sin(freqHighHigh*angle) * farWeight;
-
-
-		//
 		}
 
 		//		//this.dumpWave('qeWave.setPulseWave() done');
@@ -275,7 +275,7 @@ class qeWave {
 			this.setStandingWave(+waveParams.waveFrequency);
 			break;
 
-		case 'pulse':
+		case 'gaussian':
 			this.setPulseWave(+waveParams.waveFrequency, +waveParams.stdDev, +waveParams.pulseOffset);
 			break;
 

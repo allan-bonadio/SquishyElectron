@@ -28,7 +28,7 @@ struct Avatar {
 
 	// params that the user can set
 	double dt;
-	double lowPassFilter;
+	int lowPassFilter;
 	int stepsPerIteration;
 
 	bool isIterating;
@@ -68,7 +68,7 @@ struct Avatar {
 	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);  // obsolete
 
 	// kill high frequencies via FFTs
-	void fourierFilter(double lowPassFilter);
+	void fourierFilter(int lowPassFilter);
 
 	// set pleaseFFt from JS (only if in the middle of an iteration)
 	void askForFFT(void);

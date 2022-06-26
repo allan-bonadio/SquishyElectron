@@ -60,19 +60,18 @@ button {
 		padding: .2px;
 
 		.left {
-			flex: 1 0 1em;
-			text-align: left;  // does it do anything?
+			flex: 1 0 4em;
+			text-align: left;
 		}
 
 		.middle {
-			flex: 2 0 1em;
-			text-align: center;  // does it do anything?
-
+			flex: 2 0 10em;
+			text-align: center;
 		}
 
 		.right {
-			flex: 1 0 1em;
-			text-align: right;  // does it do anything?
+			flex: 1 0 4em;
+			text-align: right;
 		}
 	}
 
