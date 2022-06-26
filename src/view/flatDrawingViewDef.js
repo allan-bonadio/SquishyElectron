@@ -3,11 +3,9 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-//import drawingViewDef from './drawingViewDef';
-import abstractViewDef from './abstractViewDef';
-import flatDrawing from './flatDrawing';
-import potentialDrawing from './potentialDrawing';
-
+import {abstractViewDef} from './abstractViewDef';
+import {flatDrawing} from './flatDrawing';
+import {potentialDrawing} from './potentialDrawing';
 
 class flatDrawingViewDef extends abstractViewDef {
 	static viewName: 'flatDrawingViewDef';
@@ -23,9 +21,9 @@ class flatDrawingViewDef extends abstractViewDef {
 		new potentialDrawing(this, space);
 	}
 
+	static viewClassName = 'flatDrawingViewDef'
 }
 
-flatDrawingViewDef.viewClassName = 'flatDrawingViewDef';
 
 export default flatDrawingViewDef;
 

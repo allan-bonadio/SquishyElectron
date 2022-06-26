@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-import abstractDrawing from './abstractDrawing';
+import {abstractDrawing} from './abstractDrawing';
 import qe from '../wave/qe';
 import {viewUniform, viewAttribute} from './viewVariable';
 //import SquishPanel from '../SquishPanel';
@@ -64,8 +64,9 @@ void main() {
 }
 `;
 
+
 // the original display that's worth watching
-class potentialDrawing extends abstractDrawing {
+export class potentialDrawing extends abstractDrawing {
 
 	static drawingClassName: 'potentialDrawing';
 	drawingClassName: 'potentialDrawing';

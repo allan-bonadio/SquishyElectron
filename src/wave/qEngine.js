@@ -30,7 +30,7 @@ function quantumEngineHasStarted(mDimensions, mLabel) {
 
 	qe.cppLoaded = true;
 
-	//console.log(`quantumEngineHasStarted:  resolving qeStartPromise`);
+	console.log(`quantumEngineHasStarted:  resolving qeStartPromise`);
 	qeStartPromiseSucceed({mDimensions, mLabel});
 };
 
@@ -42,7 +42,7 @@ window.quantumEngineHasStarted = quantumEngineHasStarted;
 // Also, importing this (in SquishPanel) guarantees this file is included in the build!
 export const qeStartPromise = new Promise((succeed, fail) => {
 	qeStartPromiseSucceed = succeed;
-	//console.info(`qeStartPromise created:`, succeed, fail);
+	console.info(`qeStartPromise created:`, succeed, fail);
 });
 
 

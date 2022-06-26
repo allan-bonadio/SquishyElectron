@@ -4,6 +4,7 @@
 */
 
 import {viewUniform, viewAttribute} from './viewVariable';
+//import {abstractViewDef} from './abstractViewDef';
 
 /* superclass of all drawings.  A drawing is a piece of code that draws one thing on
 a GL canvas.  It's got v&f shaders, a source of data, and a Draw function.
@@ -147,3 +148,4 @@ export class abstractDrawing {
 }
 
 export default abstractDrawing;
+

@@ -17,6 +17,7 @@ LABEL_LEN=15
 
 cd ..
 
+echo □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□ compile
 # https://emscripten.org/docs/tools_reference/emcc.html
 emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-gsource-map --source-map-base / \
@@ -31,6 +32,7 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	main.cpp $allCpp || exit $?
 # changed -g to -g4 to -gsource-map --source-map-base / ; debugger can see into c++
 
+echo □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□ copy
 cp quantumEngine.wasm quantumEngine.js quantumEngine.wasm.map ../public
 
 exit $?
@@ -43,14 +45,14 @@ exit $?
 # https://clang.llvm.org/docs/UsersManual.html#controlling-floating-point-behavior
 
 # pthreads:
-#  -s USE_PTHREADS=1
+#  -s USE_PTHREADS=navigator.hardwareConcurrency
 # https://emscripten.org/docs/porting/asyncify.html
+# NO!  use webworkers.
 
 # I think I really need this:
-#
-
 # -mnontrapping-fptoint
 # see https://emscripten.org/docs/compiling/WebAssembly.html#trapping
+# more speed, less safety, for float->int operations
 
 # poorly documented options:
 # -s WASM=0 or NO_WASM will switch over to asm.js, which is slower

@@ -18,8 +18,6 @@ import qeSpace from '../wave/qeSpace';
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
-		openResolutionDialog: PropTypes.func.isRequired,
-
 		iterateAnimate: PropTypes.func.isRequired,
 		startStop: PropTypes.func.isRequired,
 		singleStep: PropTypes.func.isRequired,
@@ -51,6 +49,8 @@ export class ControlPanel extends React.Component {
 			valleyScale: PropTypes.number.isRequired,
 			valleyOffset: PropTypes.number.isRequired,
 		}),
+
+		openResolutionDialog: PropTypes.func.isRequired,
 
 		iStats: PropTypes.shape({
 			startIteration: PropTypes.number.isRequired,
@@ -171,6 +171,7 @@ export class ControlPanel extends React.Component {
 				lowPassFilter={p.lowPassFilter}
 				setLowPassFilter={p.setLowPassFilter}
 
+				N={p.N}
 				iStats={p.iStats}
 			/>;
 
