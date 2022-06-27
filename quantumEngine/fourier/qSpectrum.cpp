@@ -51,7 +51,7 @@ void qSpectrum::dumpThatSpectrum(qCx *wave, bool withExtras) {
 		int cix = (N - ix);
 		norm = (wave[ix].norm() + wave[cix].norm()) / N;
 		totalNorm += norm;
-		printf("[%3d] (%8.4lf,%8.4lf)  (%8.4lf,%8.4lf)     %8.4lf\n",
+		printf("[%3d] (%8.4lf,%8.4lf)  (%8.4lf,%8.4lf)    %12.8lf\n",
 			ix, wave[ix].re, wave[ix].im, wave[cix].re, wave[cix].im, norm);
 	}
 
