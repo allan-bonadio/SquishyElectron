@@ -195,18 +195,18 @@ export default class ResolutionDialog extends React.Component {
 
 		// the one that theoreticallyt should work
 		const radioz = [];
-		for (let vuName in listOfViewClasses) {
-			const vu = listOfViewClasses[vuName];
-			//console.log(`doin this vu:`, vu.viewClassName);
-			//console.dir(vu);
-			//console.log(`   typeof:`, typeof vuName, typeof vu);
-			//console.log(`   names:`, vu.viewClassName, vu.viewClassName, vu.name);
-			radioz.push(<label key={vu.viewClassName}>
-				<input type='radio' key={vu.viewClassName} name='mainViewClassName'
-					value={vu.viewClassName}
-					checked={vu.viewClassName == this.state.mainViewClassName}
+		for (let vuClassName in listOfViewClasses) {
+			const vuClass = listOfViewClasses[vuClassName];
+			//console.log(`doin this vuClass:`, vuClass.name);
+			//console.dir(vuClass);
+			//console.log(`   typeof:`, typeof vuClassName, typeof vuClass);
+			//console.log(`   names:`, vuClass.name, vuClass.name, vuClass.name);
+			radioz.push(<label key={vuClass.name}>
+				<input type='radio' key={vuClass.name} name='mainViewClassName'
+					value={vuClass.name}
+					checked={vuClass.name == this.state.mainViewClassName}
 					onChange={onChange}/>
-				{vu.viewClassName}</label>);
+				{vuClass.name}</label>);
 		}
 
 		return radioz;

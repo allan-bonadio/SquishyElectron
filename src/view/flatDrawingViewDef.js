@@ -8,20 +8,18 @@ import {flatDrawing} from './flatDrawing';
 import {potentialDrawing} from './potentialDrawing';
 
 class flatDrawingViewDef extends abstractViewDef {
-	static viewName: 'flatDrawingViewDef';
-	static viewClassName: 'flatDrawingViewDef';
 
-	constructor(viewName, canvas, space) {
+	constructor(viewName, canvas, space, options = {flat: true, potential: false}) {
 		super(viewName, canvas, space);
 
 		if (! this.space) throw  `flatDrawingViewDef: being created without space`;
 
 		// create relevant drawings
-		new flatDrawing(this, space);
-		new potentialDrawing(this, space);
+		if (options.flat)
+			new flatDrawing(this, space);
+		if (options.potential)
+			new potentialDrawing(this, space);
 	}
-
-	static viewClassName = 'flatDrawingViewDef'
 }
 
 
