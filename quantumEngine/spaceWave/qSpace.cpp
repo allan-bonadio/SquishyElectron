@@ -156,16 +156,22 @@ void qSpace::dumpPotential(const char *title) {
 
 void qSpace::setZeroPotential(void) {
 	qDimension *dims = dimensions;
+	printf("setZeroPotential power=%lf  scale=%lf  offset=%lf\n", power, scale, offset);
 	for (int ix = 0; ix < dims->nPoints; ix++)
 		thePotential[ix] = 0.;
+
+	potentialFactor = 1.;
 }
 
 void qSpace::setValleyPotential(double power = 1, double scale = 1, double offset = 0) {
+	printf("setValleyPotential power=%lf  scale=%lf  offset=%lf\n", power, scale, offset);
 	qDimension *dims = dimensions;
 	double mid = floor(dims->nPoints / 2);
 	for (int ix = 0; ix < dims->nPoints; ix++) {
 		thePotential[ix] = pow(abs(ix - mid), power) * scale + offset;
 	}
+
+	potentialFactor = 1.;
 }
 
 

@@ -66,14 +66,12 @@ void Avatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 
 	//printf("⚛︎ the hamiltonian 𝜓.re at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
-		///double oldWr = oldW[ix].re;
-
-		// note this is
 		double d2ψi = oldW[ix-1].im + oldW[ix+1].im - oldW[ix].im * 2;
 
 		//printf("⚛︎ x=%d  Hψ = %lf,%lf \n", ix, d2.re, d2.im);
 
-		double Hψ = d2ψi;   // + Vψ
+		double Hψ = d2ψi + potential[ix] * potentialFactor * oldW[ix].re;
+		//double Hψ = d2ψi;   // without potential
 
 		// note subtraction
 		newW[ix].re = oldW[ix].re - dt * Hψ;
@@ -82,7 +80,6 @@ void Avatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 	if (traceVischerBench) printf("      stepReal, on to fix boundaries: time=%lf\n", getTimeDouble());
 	space->fixThoseBoundaries(newW);
 	//printf("⚛️ end of stepReal:");
-	//dumpThatWave(newW, true);
 }
 
 // second step: advance the Imaginaries of 𝜓 a dt, from dt/2 to 3dt/2
@@ -91,18 +88,11 @@ void Avatar::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
 	//printf("⚛︎ start of stepImaginary(), oldWave=");
 	//dumpThatWave(oldW, true);
-	//printf("⚛︎ dt=%lf\n", dt);
 
-	//double *potential = potential;
-	//printf("⚛︎ the hamiltonian 𝜓.im at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
-
 		double d2ψr = oldW[ix-1].re + oldW[ix+1].re - oldW[ix].re * 2;
 
-		//printf("⚛︎ the hamiltonian 𝜓.im at x=%d  then dt=%lf d2x=%lf,%lf oldW1=%lf,%lf\n",
-		//	ix, dt, d2.re,d2.im, oldW1.re, oldW1.im);
-
-		double Hψ = d2ψr; // + potential[ix];
+		double Hψ = d2ψr + potential[ix] * potentialFactor * oldW[ix].im;
 		//double Hψ = d2ψr;  // without potential
 
 		// note addition
@@ -116,7 +106,6 @@ void Avatar::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 
 	space->fixThoseBoundaries(newW);
 	//printf("⚛️ end of stepImaginary - result wave:");
-	//dumpThatWave(newW, true);
 }
 
 // form the new wave from the old wave, in separate buffers, chosen by our caller.

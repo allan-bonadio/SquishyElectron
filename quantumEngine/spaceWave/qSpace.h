@@ -98,6 +98,7 @@ public:
 	// should this be part of the space or the Avatar?
 	// the space; it helps to define the lay of the land
 	double *potential;
+	double potentialFactor;
 
 
 	/* *********************************************** buffers */
