@@ -45,8 +45,8 @@ const DEFAULT_CONTINUUM = qeBasicSpace.contENDLESS;
 
 const defaultWaveParams = {
 	waveBreed: 'chord',
-	waveFrequency: 8,
-	stdDev: 20,
+	waveFrequency: 16,
+	pulseWidth: 1/16,
 	pulseOffset: 30,
 };
 
@@ -456,10 +456,10 @@ export class SquishPanel extends React.Component {
 	}
 	startStop = this.startStop.bind(this);
 
-	singleStep() {
+	singleIteration() {
 		this.iterateOneIteration(true);
 	}
-	singleStep = this.singleStep.bind(this);
+	singleIteration = this.singleIteration.bind(this);
 
 	resetCounters(ev) {
 		qe.Avatar_resetCounters();
@@ -563,7 +563,7 @@ export class SquishPanel extends React.Component {
 					iterateAnimate={(shouldAnimate, freq) => this.iterateAnimate(shouldAnimate, freq)}
 					isTimeAdvancing={s.isTimeAdvancing}
 					startStop={this.startStop}
-					singleStep={this.singleStep}
+					singleIteration={this.singleIteration}
 					resetCounters={this.resetCounters}
 
 					waveParams={defaultWaveParams}

@@ -9,7 +9,7 @@ import qe from '../wave/qe';
 function setPT() {
 	CPToolbar.propTypes = {
 		startStop: PropTypes.func.isRequired,
-		singleStep: PropTypes.func.isRequired,
+		singleIteration: PropTypes.func.isRequired,
 		isTimeAdvancing: PropTypes.bool.isRequired,
 		resetCounters: PropTypes.func.isRequired,
 
@@ -73,7 +73,7 @@ function CPToolbar(props) {
 
 
 		<button className={`stepButton toolbarButton toolbarGradient `}
-			onClick={props.singleStep}>
+			onClick={props.singleIteration}>
 			<big>►</big> ▌
 		</button>
 

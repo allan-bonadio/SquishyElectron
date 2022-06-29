@@ -16,11 +16,15 @@ import qeSpace from '../wave/qeSpace';
 // import {qeStartPromise} from '../wave/qEngine';
 // import qe from '../wave/qe';
 
+// this keeps many settings that don't immediately affect running iteration.
+// So 'Set Wave' button actually sets the wave, but meanwhile the setting sliders
+// need to be remembered; this does it.
+
 export class ControlPanel extends React.Component {
 	static propTypes = {
 		iterateAnimate: PropTypes.func.isRequired,
 		startStop: PropTypes.func.isRequired,
-		singleStep: PropTypes.func.isRequired,
+		singleIteration: PropTypes.func.isRequired,
 		resetCounters: PropTypes.func.isRequired,
 
 		// these are the actual functions that change the SquishView on the screen
@@ -39,7 +43,7 @@ export class ControlPanel extends React.Component {
 		waveParams: PropTypes.shape({
 			waveBreed: PropTypes.string.isRequired,
 			waveFrequency: PropTypes.number.isRequired,
-			stdDev: PropTypes.number.isRequired,
+			pulseWidth: PropTypes.number.isRequired,
 			pulseOffset: PropTypes.number.isRequired,
 		}).isRequired,
 
@@ -70,7 +74,7 @@ export class ControlPanel extends React.Component {
 			// waveParams - Only goes into effect if we call setWave()
 			waveBreed: wp.waveBreed,
 			waveFrequency: wp.waveFrequency,
-			stdDev: wp.stdDev,
+			pulseWidth: wp.pulseWidth,
 			pulseOffset: wp.pulseOffset,
 
 			// state for potential resets - control panel only, setPotential()
@@ -95,7 +99,7 @@ export class ControlPanel extends React.Component {
 
 	/* ********************************************** wave & pot */
 
-	// used to set any familiarParam value, pass eg {stdDev: 40}
+	// used to set any familiarParam value, pass eg {pulseWidth: 40}
 	setCPState(obj) {
 		this.setState(obj);
 	}
@@ -104,8 +108,8 @@ export class ControlPanel extends React.Component {
 	// this one is an event handler in the wave tab for the SetWave button
 	// but squishpanel hands us a more refined function.
 	setWaveHandler(ev) {
-		const {waveBreed, waveFrequency, stdDev, pulseOffset} = this.state;
-		this.props.setWave({waveBreed, waveFrequency, stdDev, pulseOffset});
+		const {waveBreed, waveFrequency, pulseWidth, pulseOffset} = this.state;
+		this.props.setWave({waveBreed, waveFrequency, pulseWidth, pulseOffset});
 	}
 	setWaveHandler = this.setWaveHandler.bind(this);
 
@@ -138,7 +142,7 @@ export class ControlPanel extends React.Component {
 			return <SetWaveTab
 				setWaveHandler={this.setWaveHandler}
 				waveParams={{waveBreed: s.waveBreed, waveFrequency: s.waveFrequency,
-					stdDev: s.stdDev, pulseOffset: s.pulseOffset,}}
+					pulseWidth: s.pulseWidth, pulseOffset: s.pulseOffset,}}
 
 				setCPState={this.setCPState}
 				origSpace={p.space}
@@ -195,7 +199,7 @@ export class ControlPanel extends React.Component {
 			<CPToolbar
 				isTimeAdvancing={p.isTimeAdvancing}
 				startStop={p.startStop}
-				singleStep={p.singleStep}
+				singleIteration={p.singleIteration}
 				resetCounters={p.resetCounters}
 
 				iterateFrequency={p.iterateFrequency}

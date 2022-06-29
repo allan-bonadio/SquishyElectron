@@ -187,10 +187,10 @@ class qeWave {
 		//this.rainbowDump('🌊  qeWave.setStandingWave() done');
 	}
 
-	// freq is just like circular, although as a fraction of the stdDev instead of N
+	// freq is just like circular, although as a fraction of the pulseWidth instead of N
 	// 2stdDev is width of the packet, as percentage of N (0%...100%).
 	// offset is how far along is the peak, as an integer X value (0...N).
-	setPulseWave(freqUi, stdDev, offsetUi) {
+	setPulseWave(freqUi, pulseWidth, offsetUi) {
 		const wave = this.wave;
 		const {start, end, N} = this.space.startEnd2;
 		let offset = offsetUi * N / 100;  // now in units of X
@@ -201,8 +201,8 @@ class qeWave {
 		// start with a circular wave, freq WITHIN the pulse width
 		this.setCircularWave(freq);
 
-		// modulate with a gaussian, centered at the offset, with stdDev
-		const s2 = 1 / (stdDev * 2);
+		// modulate with a gaussian, centered at the offset, with pulseWidth
+		const s2 = 1 / (pulseWidth * 2);
 		for (let ix = start; ix < end; ix += 2) {
 			const 𝜟 = ix - offset;
 			const stretch = Math.exp(-𝜟 * 𝜟 * s2);
@@ -216,47 +216,46 @@ class qeWave {
 
 
 
-	// freq is just like circular, although as a fraction of the stdDev instead of N
+	// freq is just like circular, although as a fraction of the pulseWidth instead of N
 	// 2stdDev is width of the packet, as percentage of N (0%...100%).
 	// offset is how far along is the peak, as an integer X value (0...N).
-	setChordWave(freqUi, stdDev, offsetUi) {
+	setChordWave(freqUi, pulseWidth, offsetUi) {
 		const wave = this.wave;
 		const {start, end, N} = this.space.startEnd2;
 		let offset = offsetUi * N / 100;  // now in units of X
 		const freq = Math.round(freqUi);
-		console.log(`🌊  setPulseWave freq=${freqUi} => ${freq} `+
+		const nSideFreqs = Math.round(pulseWidth * N)
+		console.log(`🌊  setPulseWave freq=${freqUi} => ${freq}  nSideFreqs=${nSideFreqs}`+
 			`  offset=${offsetUi}% => ${offset}`)
 
 
 		//const dAngle = 4 * Math.PI / N;
 		const dAngle = 1.0 * Math.PI / N;
-		let freqLow = freq - 1.;  // could be zero!  but still works.
-		let freqLowLow = freqLow - 1.;  // could be zero!  but still works.
-		let freqHigh = freq + 1.;
-		let freqHighHigh = freqHigh + 1.;
+// 		let freqLow = freq - 1.;  // could be zero!  but still works.
+// 		let freqLowLow = freqLow - 1.;  // could be zero!  but still works.
+// 		let freqHigh = freq + 1.;
+// 		let freqHighHigh = freqHigh + 1.;
 
 		// FIve neighboring frequencies, weighting, where the middle freq has weight 1.0
-		let nearWeight = 2/3;
-		let farWeight = 1/3;
+// 		let nearWeight = 2/3;
+// 		let farWeight = 1/3;
 // 		let nearWeight = .5;
 // 		let farWeight = .25;
 // 		let nearWeight = 1;
 // 		let farWeight = 1
 		// let nearWeight = 0.9;
 		// let farWeight = 0.8
+		const startFreq = freqUi - Math.floor(nSideFreqs);
+		const lastFreq = startFreq + nSideFreqs
 
 		for (let ix = start; ix < end; ix += 2) {
 			const angle = dAngle * (ix - start - offset);
+			wave[ix] = wave[ix+1] = 0;
 
-			// re
-			wave[ix] = Math.cos(freqLowLow*angle) * farWeight + Math.cos(freqLow*angle) * nearWeight +
-				Math.cos(freq*angle) +
-				Math.cos(freqHigh*angle) * nearWeight + Math.cos(freqHighHigh*angle) * farWeight;
-
-			// im
-			wave[ix+1] = Math.sin(freqLowLow*angle) * farWeight +Math.sin(freqLow*angle) * nearWeight +
-				Math.sin(freq*angle) +
-				Math.sin(freqHigh*angle) * nearWeight + Math.sin(freqHighHigh*angle) * farWeight;
+			for (let f = startFreq; f <= lastFreq; f++) {
+				wave[ix] += Math.cos(f * angle);  // r
+				wave[ix+1] += Math.sin(f * angle);  // im
+			}
 		}
 
 		//		//this.dumpWave('qeWave.setPulseWave() done');
@@ -276,11 +275,11 @@ class qeWave {
 			break;
 
 		case 'gaussian':
-			this.setPulseWave(+waveParams.waveFrequency, +waveParams.stdDev, +waveParams.pulseOffset);
+			this.setPulseWave(+waveParams.waveFrequency, +waveParams.pulseWidth, +waveParams.pulseOffset);
 			break;
 
 		case 'chord':
-			this.setChordWave(+waveParams.waveFrequency, +waveParams.stdDev, +waveParams.pulseOffset);
+			this.setChordWave(+waveParams.waveFrequency, +waveParams.pulseWidth, +waveParams.pulseOffset);
 			break;
 		}
 

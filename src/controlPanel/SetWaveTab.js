@@ -106,7 +106,7 @@ class SetWaveTab extends React.Component {
 	render() {
 		const p = this.props;
 		const breed = p.waveParams.waveBreed;
-		const needPulseWidth = breed == 'gaussian';
+		const needPulseWidth = breed == 'gaussian' || breed == 'chord';
 		const needOffset = (breed == 'gaussian' || breed == 'chord');
 
 		const sliders = <>
@@ -118,9 +118,9 @@ class SetWaveTab extends React.Component {
 
 			<TextNSlider className='pulseWidth' label='pulse width, %'
 				style={{display: needPulseWidth ? 'block' :  'none'}}
-				value={+p.waveParams.stdDev}
+				value={+p.waveParams.pulseWidth}
 				min={1} max={10} step={.1}
-				handleChange={stdDev => p.setCPState({stdDev})}
+				handleChange={pulseWidth => p.setCPState({pulseWidth})}
 			/>
 
 			<TextNSlider className='offset' label='offset, %'
