@@ -23,6 +23,8 @@ static bool traceJustWave = false;
 static bool traceJustInnerProduct = false;
 static bool traceFourierFilter = false;
 
+static bool traceInfrequentFFTs = true;
+
 //const double sNAN99999 = std::numeric_limits<double>::signaling_NaN();
 
 // make sure these values are doable by the sliders' steps
@@ -110,6 +112,11 @@ void Avatar::oneIteration() {
 
 	// some uses never need this so wait till we do
 	getScratchWave();
+
+	// update this all the time cuz user might have changed it.  Well, actually,
+	// since it's a pointer, maybe not.... maybe just the factor...
+	potential = space->potential;
+	potentialFactor = space->potentialFactor;
 
 	if (traceIteration)
 		printf("🚀 🚀 Avatar::oneIteration() - dt=%lf   stepsPerIteration=%d\n",
@@ -218,9 +225,21 @@ void Avatar::fourierFilter(int lowPassFilter) {
 				"and %d which was %lf, by factor %lf\n",
 				lowPassFilter, nyquist - k, s[nyquist - k].norm(), nyquist + k, s[nyquist + k].norm(), factor);
 		}
-		s[nyquist + k] *= factor;
-		s[nyquist - k] *= factor;
+		s[nyquist + k] = 0;
+		s[nyquist - k] = 0;
+		//s[nyquist + k] *= factor;
+		//s[nyquist - k] *= factor;
+		if (traceFourierFilter) printf("resulting poimts: (%lf %lf)  (%lf %lf)\n",
+				s[nyquist - k].re, s[nyquist - k].im, s[nyquist + k].re, s[nyquist + k].im);
 	}
+
+	if (traceInfrequentFFTs && (((int) iterateSerial & 0x3FF) == 0) && iterateSerial > 15000) {
+		printf("fourierFilter iteration %8.0lf", iterateSerial);
+		spect->dumpSpectrum("periodic spectrum check after fourierFilter iteration");
+		traceFourierFilter = true;
+	}
+	else
+		traceFourierFilter = false;
 
 	spect->generateWave(mainQWave);
 	mainQWave->normalize();
