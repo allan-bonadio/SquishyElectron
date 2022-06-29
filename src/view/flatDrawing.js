@@ -96,7 +96,7 @@ export class flatDrawing extends abstractDrawing {
 		if (!this.avgHighest)
 			this.avgHighest = highest;
 		else
-			this.avgHighest = (highest + 7*this.avgHighest) / 8;
+			this.avgHighest = (highest + 3*this.avgHighest) / 4;
 		if (traceHighest)
 			console.log(`flatDrawing: highest=${highest.toFixed(5)}  avgHighest=${this.avgHighest.toFixed(5)}`);
 
