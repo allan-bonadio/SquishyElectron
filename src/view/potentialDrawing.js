@@ -18,10 +18,12 @@ import {viewUniform, viewAttribute} from './viewVariable';
 ** or zero
 */
 
-let alsoDrawPoints = false, alsoDrawLines = false;
+let alsoDrawPoints = true;
+let alsoDrawLines = false;
+let traceGLSLCalc = true;
 //alsoDrawLines =0;
 
-let ps = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
+let ps = alsoDrawPoints ? `gl_PointSize = 16.;` : '';
 
 // make the line number for the start a multiple of 10
 const vertexSrc = `
@@ -42,6 +44,7 @@ void main() {
 		y -= hThickness;  // even
 	}
 
+	// scale to -1...+1
 	y = 2. * y - 1.;
 
 	// figure out x, basically the point index
@@ -65,11 +68,8 @@ void main() {
 `;
 
 
-// the original display that's worth watching
+// the white line
 export class potentialDrawing extends abstractDrawing {
-
-	static drawingClassName: 'potentialDrawing';
-	drawingClassName: 'potentialDrawing';
 
 	setShaders() {
 		this.vertexShaderSrc = vertexSrc;
@@ -80,9 +80,6 @@ export class potentialDrawing extends abstractDrawing {
 
 
 	setInputs() {
-		//const highest =
-		// always done at end of integration qe.loadViewBuffer();
-
 		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
 		let nPoints = this.nPoints = this.space.nPoints;
 		let barWidth = 1 / (nPoints - 1);
@@ -94,10 +91,49 @@ export class potentialDrawing extends abstractDrawing {
 		unitHeightUniform.setValue(this.unitHeight, '1f');
 
 		// this shares the view buf with wave, [re, im, potential, serial]
+		// do we have to do this twice?!?!
 		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
 		this.rowAttr.attachArray(qe.space.vBuffer, this.rowFloats);
+
+
+
+
+		if (traceGLSLCalc) {
+			// try to recreate what the vertex shader does
+			let vBuffer = qe.space.vBuffer;
+			let ix;
+			for (ix = 0; ix < nPoints*2; ix++) {
+
+				let y = vBuffer[ix * 4 + 2] * this.unitHeight;
+				let hThickness = this.unitHeight * .03;
+				let vertexSerial = ix;
+				if (Math.floor(vertexSerial / 2) * 2 < vertexSerial) {
+					y += hThickness; // odd
+				}
+				else {
+					y -= hThickness;  // even
+				}
+
+				// scale to -1...+1
+				y = 2. * y - 1.;
+
+				// figure out x, basically the point index
+				let x;
+				x = Math.floor(vertexSerial / 2) * barWidth * 2. - 1.;
+
+				console.log(`row [${ix.toFixed(4) }]: ${x}  ${y.toFixed(4) } from `,
+					vBuffer[ix * 4 + 0].toFixed(4) ,
+					vBuffer[ix * 4 + 1].toFixed(4) ,
+					vBuffer[ix * 4 + 2].toFixed(4) ,
+					vBuffer[ix * 4 + 3].toFixed(4) ,
+				);
+			}
+		}
+
+
+
 	}
 
 
