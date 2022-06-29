@@ -41,6 +41,10 @@ struct Avatar {
 	// our main qWave and a scratch wave for stepping
 	struct qWave *mainQWave;
 
+	// grabbed from the space upon each iteration start
+	double *potential;
+	double potentialFactor;
+
 	//  Call the function first time you need it.
 	struct qWave *scratchQWave;
 	qWave *getScratchWave(void);
