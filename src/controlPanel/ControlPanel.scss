@@ -154,7 +154,7 @@
 			border: outset #abc 2px;
 			border-radius: .5em 0 0 .5em;
 			padding: .2em .5em .2em 2em;
-			width: 7em;
+			width: calc(7em + 2px);
 			margin: 0 0 .2em .5em;
 			text-align: right;
 		}
@@ -281,10 +281,14 @@
 
 			td {
 				text-align: right;
-			}
-			td:first-child {
-				padding-right: 2em;
-				font-weight: normal;
+
+				&:first-child {
+					font-size: .7em;
+				}
+				&:last-child {
+					width: 7em;
+					font-weight: normal;
+				}
 			}
 		}
 	}
