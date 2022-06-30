@@ -11,7 +11,7 @@ const fs = require('fs');
 
 // the exports list.
 // in C++: each function must be declared 'export "C" ...'
-// in JS: import qe from 'wave/qe', then use qe.funcname()
+// in JS: import qe from 'engine/qe', then use qe.funcname()
 // also must call defineQEngineFuncs after C++ is initialized
 exportsSrc  = [
 	// args and retType can be 'number', 'string', 'array' (of bytes), or null meaning void.
@@ -91,6 +91,6 @@ window.qe = qe;
 export default qe;
 `;
 
-fs.writeFile(`${process.env.SQUISH_ROOT}/src/wave/qe.js`, code,
+fs.writeFile(`${process.env.SQUISH_ROOT}/src/engine/qe.js`, code,
 	ex => ex && console.error(ex));
 

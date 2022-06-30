@@ -3,8 +3,8 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-import qe from '../wave/qe';
-import {qeBasicSpace} from '../wave/qeSpace';
+import qe from '../engine/qe';
+import {qeBasicSpace} from '../engine/qeSpace';
 
 
 /* ********************************** toSiPieces() */

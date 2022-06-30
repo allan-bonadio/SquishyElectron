@@ -7,13 +7,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import qe from './wave/qe';
+import qe from './engine/qe';
 import PropTypes from 'prop-types';
 
-import qeSpace from './wave/qeSpace';
+import qeSpace from './engine/qeSpace';
 
 /* This draws the white potential line, and handels interaction
 
+This was the SVG version... abandoned?  not sure...
 */
 
 /* *************************************************** potential click & drag */
