@@ -5,6 +5,7 @@
 import qe from './qe';
 import qeWave from './qeWave';
 import {setFamiliarPotential, getWrappedPotential} from '../widgets/utils';
+import storeSettings from '../utils/storeSettings';
 
 let debugSpace = false;
 
@@ -162,7 +163,7 @@ export class qeBasicSpace {
 export class qeSpace extends qeBasicSpace {
 	static contCodeToText = code => ['Discrete', 'Well', 'Endless'][code];
 
-	constructor(dims, waveParams, potentialParams) {
+	constructor(dims) {
 		super(dims);
 
 		// this actually does it over on the C++ side
@@ -200,25 +201,17 @@ export class qeSpace extends qeBasicSpace {
  		//if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
 
 
+// 		const controls0 = storeSettings.retrieveSettings('controls0');
+// 		const rat = storeSettings.retrieveRatify;
 
 
 		// by default it's set to 1s, but we want something good.
-		this.qewave.setFamiliarWave(waveParams);
-
-		//console.log(`🚀  qViewBuffer_getViewBuffer 181: 🛸`, qe.qViewBuffer_getViewBuffer());
-
-		//console.log(`🚀  qViewBuffer_getViewBuffer 195: 🛸`, qe.qViewBuffer_getViewBuffer());
- 		//if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
+		this.qewave.setFamiliarWave(storeSettings.waveParams);
 
 		// this will be good after completeNewSpace() is called
 		this.potentialBuffer = getWrappedPotential(this);
-		setFamiliarPotential(this, this.potentialBuffer, potentialParams);
+		setFamiliarPotential(this, this.potentialBuffer, storeSettings.potentialParams);
 
-		//console.log(`🚀  qViewBuffer_getViewBuffer 187: 🛸`, qe.qViewBuffer_getViewBuffer());
-
-		// wrap viewbuffer as a nice TypedArray of floats (4 for each row; 8 for each datapoint)
-		//console.log(`🚀  qViewBuffer_getViewBuffer 193: 🛸`, qe.qViewBuffer_getViewBuffer());
-// isn't the viewBuffer itself suipposed to do rthat?  oh ytean that's C++.  Here we make our own.
 		let emscriptenMemory = window.Module.HEAPF32.buffer;
 		let address = qe.qViewBuffer_getViewBuffer();
 
@@ -227,11 +220,6 @@ export class qeSpace extends qeBasicSpace {
 
 		this.vBuffer = qe.vBuffer =
 			new Float32Array(emscriptenMemory, address, np);
-// 		this.viewBuffer = qe.viewBuffer =
-// 			new Float32Array(window.Module.HEAPF32.buffer, qe.qViewBuffer_getViewBuffer(), this.nPoints*8);
-//		qe.qViewBuffer_loadViewBuffer();
-
-		//console.log(`🚀  qViewBuffer_getViewBuffer 200: 🛸`, qe.qViewBuffer_getViewBuffer());
 
 		if (debugSpace) console.log(`🚀  done with the resulting qeSpace:`, this);
 	}

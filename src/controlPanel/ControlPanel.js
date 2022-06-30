@@ -12,13 +12,32 @@ import SetWaveTab from './SetWaveTab';
 import SetPotentialTab from './SetPotentialTab';
 import SetResolutionTab from './SetResolutionTab';
 import SetIterationTab from './SetIterationTab';
-import qeSpace from '../wave/qeSpace';
-// import {qeStartPromise} from '../wave/qEngine';
-// import qe from '../wave/qe';
+import qeSpace from '../engine/qeSpace';
+// import {qeStartPromise} from '../engine/qEngine';
+// import qe from '../engine/qe';
+
+import storeSettings from '../utils/storeSettings';
 
 // this keeps many settings that don't immediately affect running iteration.
 // So 'Set Wave' button actually sets the wave, but meanwhile the setting sliders
 // need to be remembered; this does it.
+
+
+// see storeSettings for where they are now
+// const defaultWaveParams = {
+// 	waveBreed: 'chord',
+// 	waveFrequency: 16,
+// 	pulseWidth: 1/16,
+// 	pulseOffset: 30,
+// };
+//
+// const defaultPotentialParams = {
+// 	potentialBreed: 'flat',
+// 	valleyPower: 1,
+// 	valleyScale: 1,
+// 	valleyOffset: 50,
+// };
+
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
@@ -28,6 +47,7 @@ export class ControlPanel extends React.Component {
 		resetCounters: PropTypes.func.isRequired,
 
 		// these are the actual functions that change the SquishView on the screen
+		// when user chooses 'set wave'
 		setWave: PropTypes.func.isRequired,
 		setPotential: PropTypes.func.isRequired,
 
@@ -40,19 +60,19 @@ export class ControlPanel extends React.Component {
 		space: PropTypes.instanceOf(qeSpace),
 		N: PropTypes.number.isRequired,
 
-		waveParams: PropTypes.shape({
-			waveBreed: PropTypes.string.isRequired,
-			waveFrequency: PropTypes.number.isRequired,
-			pulseWidth: PropTypes.number.isRequired,
-			pulseOffset: PropTypes.number.isRequired,
-		}).isRequired,
-
-		potentialParams: PropTypes.shape({
-			potentialBreed: PropTypes.string.isRequired,
-			valleyPower: PropTypes.number.isRequired,
-			valleyScale: PropTypes.number.isRequired,
-			valleyOffset: PropTypes.number.isRequired,
-		}),
+		// waveParams: PropTypes.shape({
+		// 	waveBreed: PropTypes.string.isRequired,
+		// 	waveFrequency: PropTypes.number.isRequired,
+		// 	pulseWidth: PropTypes.number.isRequired,
+		// 	pulseOffset: PropTypes.number.isRequired,
+		// }).isRequired,
+		//
+		// potentialParams: PropTypes.shape({
+		// 	potentialBreed: PropTypes.string.isRequired,
+		// 	valleyPower: PropTypes.number.isRequired,
+		// 	valleyScale: PropTypes.number.isRequired,
+		// 	valleyOffset: PropTypes.number.isRequired,
+		// }),
 
 		openResolutionDialog: PropTypes.func.isRequired,
 
@@ -65,25 +85,30 @@ export class ControlPanel extends React.Component {
 
 	constructor(props) {
 		super(props);
-		const wp = props.waveParams;
-		const pp = props.potentialParams;
 
-		// most of the state is kept here.  But, the defaults are from the SquishPanel
+// 		const controls0 = storeSettings.retrieveSettings('controls0');
+
+// 		const rat = storeSettings.retrieveRatify;
+// 		const wp = controls0.waveParams || {};
+// 		const pp = controls0.potentialParams || {};
+
+		// most of the state is kept here.  But, also, in the store settings
 		this.state = {
 			// state for the wave resets - these are control-panel only.
 			// waveParams - Only goes into effect if we call setWave()
-			waveBreed: wp.waveBreed,
-			waveFrequency: wp.waveFrequency,
-			pulseWidth: wp.pulseWidth,
-			pulseOffset: wp.pulseOffset,
+
+			waveBreed: storeSettings.waveParams.waveBreed,
+			waveFrequency: storeSettings.waveParams.waveFrequency,
+			pulseWidth: storeSettings.waveParams.pulseWidth,
+			pulseOffset: storeSettings.waveParams.pulseOffset,
 
 			// state for potential resets - control panel only, setPotential()
-			potentialBreed: pp.potentialBreed,
-			valleyPower: pp.valleyPower,
-			valleyScale: pp.valleyScale,
-			valleyOffset: pp.valleyOffset,
+			potentialBreed: storeSettings.potentialParams.potentialBreed,
+			valleyPower: storeSettings.potentialParams.valleyPower,
+			valleyScale: storeSettings.potentialParams.valleyScale,
+			valleyOffset: storeSettings.potentialParams.valleyOffset,
 
-			showingTab: 'wave',
+			showingTab: storeSettings.miscParams.showingTab,
 		}
 	}
 

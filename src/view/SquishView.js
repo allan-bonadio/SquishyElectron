@@ -12,11 +12,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {thousands} from '../widgets/utils';
-import qe from '../wave/qe';
+import qe from '../engine/qe';
 import './view.scss';
 // import {abstractViewDef} from './abstractViewDef';
 // import flatDrawingViewDef from './flatDrawingViewDef';
 import {listOfViewClasses} from './listOfViewClasses';
+import storeSettings from '../utils/storeSettings';
 
 
 /* **************************************** actual canvas wrapper */
@@ -31,7 +32,6 @@ export class SquishView extends React.Component {
 		viewName: PropTypes.string,
 
 		width: PropTypes.number,  // handed in, depends on window width
-		defaultHeight: PropTypes.number,  // only the starting height
 
 		// tells us when the space exists.  From the SquishPanel, or just pass something resolved.
 		createdSpacePromise: PropTypes.instanceOf(Promise),
@@ -40,9 +40,8 @@ export class SquishView extends React.Component {
 	constructor(props) {
 		super(props);
 
-		// i don't think we even need the state.
 		this.state = {
-			height: props.defaultHeight,
+			height: storeSettings.miscParams.viewHeight,
 		}
 
 		// will be resolved when the canvas has been nailed down; result will be canvas dom obj
@@ -110,7 +109,9 @@ export class SquishView extends React.Component {
 	mouseMove(ev) {
 		//if (this.resizing) {
 
-			this.setState({height: ev.pageY + this.yOffset});
+			const viewHeight = ev.pageY + this.yOffset;
+			this.setState({height: viewHeight});
+			storeSettings.miscParams.viewHeight = viewHeight;
 			console.info(`mouse drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
 
 			ev.preventDefault();

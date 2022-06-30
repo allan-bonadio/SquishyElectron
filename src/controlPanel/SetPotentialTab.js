@@ -11,8 +11,9 @@ import {path as d3path} from 'd3-path';
 
 import {setFamiliarPotential, dumpPotential} from '../widgets/utils';
 import MiniGraph from './MiniGraph';
-import qeSpace from '../wave/qeSpace';
+import qeSpace from '../engine/qeSpace';
 import TextNSlider from '../widgets/TextNSlider';
+import storeSettings from '../utils/storeSettings';
 
 // some typical potential value, so we can get an idea of how to scale in the graph
 let SOME_POTENTIAL = 0.01;
@@ -89,24 +90,29 @@ class SetPotentialTab extends React.Component {
 	}
 	recipe = this.recipe.bind(this);
 
-
-	setValleyPower(valleyPower) {
+	setFlat = () => {
+		this.props.setCPState({potentialBreed: 'flat'});
+		storeSettings.potentialParams.potentialBreed = 'flat';
+	}
+	setValley = () => {
+		this.props.setCPState({potentialBreed: 'valley'});
+		storeSettings.potentialParams.potentialBreed = 'valley';
+	}
+	setValleyPower = valleyPower => {
 		this.props.setCPState({potentialBreed: 'valley', valleyPower});
+		storeSettings.potentialParams.valleyPower = valleyPower;
+		storeSettings.potentialParams.potentialBreed = 'valley';
 	}
-	setValleyPower = this.setValleyPower.bind(this);
-
-	setValleyScale(valleyScale) {
+	setValleyScale = valleyScale => {
 		this.props.setCPState({potentialBreed: 'valley', valleyScale});
-
+		storeSettings.potentialParams.valleyScale = valleyScale;
+		storeSettings.potentialParams.potentialBreed = 'valley';
 	}
-	setValleyScale = this.setValleyScale.bind(this);
-
-	setValleyOffset(valleyOffset) {
+	setValleyOffset = valleyOffset => {
 		this.props.setCPState({potentialBreed: 'valley', valleyOffset});
-
+		storeSettings.potentialParams.valleyOffset = valleyOffset;
+		storeSettings.potentialParams.potentialBreed = 'valley';
 	}
-	setValleyOffset = this.setValleyOffset.bind(this);
-
 
 	// rendering for the Tab
 	render() {

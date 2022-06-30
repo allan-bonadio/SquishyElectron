@@ -10,11 +10,12 @@ import {scaleLinear} from 'd3-scale';
 
 
 import MiniGraph from './MiniGraph';
-import qeSpace from '../wave/qeSpace';
-import qeWave from '../wave/qeWave';
-import qCx from '../wave/qCx';
+import qeSpace from '../engine/qeSpace';
+import qeWave from '../engine/qeWave';
+import qCx from '../engine/qCx';
 import cxToRgb from '../view/cxToRgb';
 import TextNSlider from '../widgets/TextNSlider';
+import storeSettings from '../utils/storeSettings';
 
 let debugWaveTab = false;
 
@@ -103,6 +104,24 @@ class SetWaveTab extends React.Component {
 	}
 	recipe = this.recipe.bind(this);
 
+	setBreed = breed => {
+		this.props.setCPState({waveBreed: breed});
+		storeSettings.waveParams.waveBreed = breed;
+	}
+	setWaveFrequency = waveFrequency => {
+		this.props.setCPState({waveFrequency});
+		storeSettings.waveParams.waveFrequency = waveFrequency;
+	}
+	setPulseWidth = pulseWidth => {
+		this.props.setCPState({pulseWidth});
+		storeSettings.waveParams.pulseWidth = pulseWidth;
+	}
+	setPulseOffset = pulseOffset => {
+		this.props.setCPState({pulseOffset});
+		storeSettings.waveParams.pulseOffset = pulseOffset;
+	}
+
+
 	render() {
 		const p = this.props;
 		const breed = p.waveParams.waveBreed;
@@ -113,21 +132,21 @@ class SetWaveTab extends React.Component {
 			<TextNSlider className='frequency' label='frequency'
 				value={+p.waveParams.waveFrequency}
 				min={-20} max={20} step={'standing' == breed ? .5 : 1}
-				handleChange={waveFrequency => p.setCPState({waveFrequency})}
+				handleChange={this.setWaveFrequency}
 			/>
 
 			<TextNSlider className='pulseWidth' label='pulse width, %'
 				style={{display: needPulseWidth ? 'block' :  'none'}}
 				value={+p.waveParams.pulseWidth}
 				min={1} max={10} step={.1}
-				handleChange={pulseWidth => p.setCPState({pulseWidth})}
+				handleChange={this.setPulseWidth}
 			/>
 
 			<TextNSlider className='offset' label='offset, %'
 				style={{display: needOffset ? 'block' :  'none'}}
 				value={+p.waveParams.pulseOffset}
 				min={0} max={100} step={2}
-				handleChange={pulseOffset => p.setCPState({pulseOffset})}
+				handleChange={this.setPulseOffset}
 			/>
 
 		</>;
