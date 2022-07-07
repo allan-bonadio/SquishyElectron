@@ -9,7 +9,7 @@ _a_ + _b i_
 
 _a_ is called the 'real part' and _b_ is called the 'imaginary part'... although b is still a real number.  _i_ is the square root of -1, which is impossible to do using only real numbers.  There are no real numbers that make this true:
 
-i<sup>2</sup> = -1
+_i_ <sup>2</sup> = -1
 
 
 
@@ -28,9 +28,9 @@ During the Golden Age of Islam, Al-Khwarizmi invented algebra and introduced Ara
 
 Meanwhile, in Europe, equations like _x_ + 1 = 0 were considered to have no solutions at all, even up to the 1700s.  Equations with minus terms had to have them moved to the other side of the equation to avoid the nasty.  Leonardo Fibonacci introduced Arabic numbers, zeroes and negatives to European intellectuals in the early 1200s.
 
-Imaginary and Complex numbers were first used by Cardano in the 1500s to solve quadradic (_a x_<sup>2<sup> + _b x_ + c = 0), cubic and quartic equations.  Still then, there were no other practical uses, and they seemed to break rules that were used at the time, so Descartes in 1637 called them 'imaginary'.
+Imaginary and Complex numbers were first used by Cardano in the 1500s to solve quadradic (_a x_<sup>2</sup> + _b x_ + c = 0), cubic and quartic equations.  Still then, there were no other practical uses, and they seemed to break rules that were used at the time, so Descartes, in 1637, called them 'imaginary'.
 
-In the 1700s, Euler ('oiler') wrote a book _Elements of Algebra_, where he immediately plunged students into complex numbers.  But some mathematicians were still paranoid about them into the 1800s.  Gauss introduced the letter _i_ as we use it today, and coined the term 'complex numbers' in the early 1800s.
+In the 1700s, Euler ('oiler') wrote a book _Elements of Algebra_, where he immediately plunged beginning students into complex numbers.  But some mathematicians were still paranoid about them into the 1800s.  Gauss introduced the letter _i_ as we use it today, and coined the term 'complex numbers' in the early 1800s.
 
 Complex numbers today are used for almost anything that has waves or vibrates.  For instance, if you have an alternating electrical current running through a device, the device has an _impedance_, which is a complex number.  The real part is the _resistance_ that absorbs energy, and the imaginary part is called the _reactance_, a sort of elastic pushback on the vibration.
 
