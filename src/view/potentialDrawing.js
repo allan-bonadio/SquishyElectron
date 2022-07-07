@@ -4,10 +4,10 @@
 */
 
 import {abstractDrawing} from './abstractDrawing';
-import qe from '../wave/qe';
+import qe from '../engine/qe';
 import {viewUniform, viewAttribute} from './viewVariable';
 //import SquishPanel from '../SquishPanel';
-//import {qeStartPromise} from '../wave/qEngine';
+//import {qeStartPromise} from '../engine/qEngine';
 
 /* ******************************************************* unit height management */
 
@@ -120,15 +120,15 @@ export class potentialDrawing extends abstractDrawing {
 				y = 2. * y - 1.;
 
 				// figure out x, basically the point index
-				let x;
-				x = Math.floor(vertexSerial / 2) * barWidth * 2. - 1.;
+// 				let x;
+// 				x = Math.floor(vertexSerial / 2) * barWidth * 2. - 1.;
 
-				console.log(`row [${ix.toFixed(4) }]: ${x}  ${y.toFixed(4) } from `,
-					vBuffer[ix * 4 + 0].toFixed(4) ,
-					vBuffer[ix * 4 + 1].toFixed(4) ,
-					vBuffer[ix * 4 + 2].toFixed(4) ,
-					vBuffer[ix * 4 + 3].toFixed(4) ,
-				);
+// 				console.log(`row [${ix.toFixed(4) }]: ${x}  ${y.toFixed(4) } from `,
+// 					vBuffer[ix * 4 + 0].toFixed(4) ,
+// 					vBuffer[ix * 4 + 1].toFixed(4) ,
+// 					vBuffer[ix * 4 + 2].toFixed(4) ,
+// 					vBuffer[ix * 4 + 3].toFixed(4) ,
+// 				);
 			}
 		}
 

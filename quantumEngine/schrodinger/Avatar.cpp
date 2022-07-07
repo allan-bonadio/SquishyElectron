@@ -235,7 +235,10 @@ void Avatar::fourierFilter(int lowPassFilter) {
 
 	if (traceInfrequentFFTs && (((int) iterateSerial & 0x3FF) == 0) && iterateSerial > 15000) {
 		printf("fourierFilter iteration %8.0lf", iterateSerial);
-		spect->dumpSpectrum("periodic spectrum check after fourierFilter iteration");
+		for (int ix = nyquist - 10; ix < nyquist+10; ix++)
+			printf("[%d] (%8.4lf,%8.4lf)\n", ix, s[ix] .re, s[ix] .im);
+
+		//spect->dumpSpectrum("periodic spectrum check after fourierFilter iteration");
 		traceFourierFilter = true;
 	}
 	else

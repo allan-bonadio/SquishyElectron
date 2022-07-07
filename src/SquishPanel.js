@@ -13,15 +13,16 @@ import PropTypes from 'prop-types';
 import ControlPanel from './controlPanel/ControlPanel';
 
 // eslint-disable-next-line no-unused-vars
-import {qeBasicSpace, qeSpace} from './wave/qeSpace';
-// import qeWave from './wave/qeWave';
-import {qeStartPromise} from './wave/qEngine';
-import qe from './wave/qe';
+import {qeBasicSpace, qeSpace} from './engine/qeSpace';
+// import qeWave from './engine/qeWave';
+import {qeStartPromise} from './engine/qEngine';
+import qe from './engine/qe';
 
 import SquishView from './view/SquishView';
 import ResolutionDialog from './controlPanel/ResolutionDialog';
 
-
+// why doesn't this work?!?!!?
+//import {storeSettings} from './utils/storeSettings';
 import storeSettings from './utils/storeSettings';
 
 import {setFamiliarPotential} from './widgets/utils';
@@ -29,33 +30,13 @@ import {setFamiliarPotential} from './widgets/utils';
 // runtime debugging flags - you can change in the debugger or here
 let areBenchmarking = false;
 let dumpingTheViewBuffer = false;
+//debugger;
+if (typeof storeSettings == 'undefined') debugger;
 
+const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
 
-
-const DEFAULT_VIEW_CLASS_NAME =
-//'manualViewDef';
-//'abstractViewDef';
-//'viewVariableViewDef';
-//'flatViewDef';
-//'flatViewDef';
-'flatDrawingViewDef';
-
-const DEFAULT_RESOLUTION = 64;
-const DEFAULT_CONTINUUM = qeBasicSpace.contENDLESS;
-
-const defaultWaveParams = {
-	waveBreed: 'chord',
-	waveFrequency: 16,
-	pulseWidth: 1/16,
-	pulseOffset: 30,
-};
-
-const defaultPotentialParams = {
-	potentialBreed: 'flat',
-	valleyPower: 1,
-	valleyScale: 1,
-	valleyOffset: 50,
-};
+// const DEFAULT_RESOLUTION = 64;
+// const DEFAULT_CONTINUUM = qeBasicSpace.contENDLESS;
 
 
 export class SquishPanel extends React.Component {
@@ -70,18 +51,26 @@ export class SquishPanel extends React.Component {
 	// }
 
 	/* ************************************************ construction & reconstruction */
+	static created = 0;
+
 	constructor(props) {
+
 		super(props);
 
-		const space0 = storeSettings.retrieveSettings('space0');
+		SquishPanel.created += 1;
+		console.info(`*** SquishPanel.created:`, SquishPanel.created);////
+		console.info((new Error()).stack);
+		debugger;
+
+// 		const space0 = storeSettings.retrieveSettings('space0');
+// 		const rat = storeSettings.retrieveRatify;
 
 		this.state = {
 			// THE N and continuum for THE space we're currently doing
 			// kept between sessions in localStore
-			N: storeSettings.ratify(space0.N, DEFAULT_RESOLUTION, [4,8,16,32,64,128,256,512,1024]),
+			N: storeSettings.spaceParams.N,
 
-			continuum: storeSettings.ratify(space0.continuum, DEFAULT_CONTINUUM,
-				[qeBasicSpace.contDISCRETE, qeBasicSpace.contWELL, qeBasicSpace.contENDLESS]),
+			continuum: storeSettings.spaceParams.continuum,
 
 			mainViewClassName: DEFAULT_VIEW_CLASS_NAME,
 
@@ -91,21 +80,18 @@ export class SquishPanel extends React.Component {
 			// see the view dir, this is for the viewDef instance
 			effectiveView: null,
 
-			// the width is from props; the window width
-			//viewHeight: 400,
-
 			// this is controlled by the user (start/stop/step buttons)
 			// does not really influence the rendering of the canvas... (other than running)
-			isTimeAdvancing: false,
+			isTimeAdvancing: storeSettings.iterationParams.isTimeAdvancing,
 
 			// this is the actual 'frequency' in actual milliseconds, convert between like 1000/n
 			// eg the menu on the CPToolbar says 10/sec, so this becomes 100
-			iteratePeriod: 50,
+			iteratePeriod: storeSettings.iterationParams.iteratePeriod,
 
 			// defaults for sliders for dt & spi
-			dt: .001,
-			stepsPerIteration: 200,
-			lowPassFilter: space0.N / 8,
+			dt: storeSettings.iterationParams.dt,
+			stepsPerIteration: storeSettings.iterationParams.stepsPerIteration,
+			lowPassFilter: storeSettings.iterationParams.lowPassFilter,
 
 			// advance forward with each iter
 			runningCycleElapsedTime: 0,
@@ -174,7 +160,7 @@ export class SquishPanel extends React.Component {
 
 	// init or re-init the space and the panel
 	setNew1DResolution(N, continuum) {
-		qe.space = new qeSpace([{N, continuum, label: 'x'}], defaultWaveParams, defaultPotentialParams);
+		qe.space = new qeSpace([{N, continuum, label: 'x'}]);
 		this.setState({space: qe.space});
 		return qe.space;
 	}
@@ -203,7 +189,11 @@ export class SquishPanel extends React.Component {
 					finalParams.N, finalParams.continuum, finalParams.mainViewClassName);
 				this.setState({isTimeAdvancing: timeWasAdvancing, });
 
-				localStorage.space0 = JSON.stringify({N: finalParams.N, continuum: finalParams.continuum});
+				storeSettings.spaceParams.N = finalParams.N;
+				storeSettings.spaceParams.continuum = finalParams.continuum;
+				//localStorage.space0 = JSON.stringify({N: finalParams.N, continuum: finalParams.continuum});
+				// should also work storeSettings.setSetting('space0.N, finalParams.N);
+				// and storeSettings.setSetting('space0.continuum, finalParams.continuum);
 
 				// move the LPF proportionately
 				let newLPF = Math.max(prevLowPassFilter * finalParams.N / prevN, 1);
@@ -241,10 +231,18 @@ export class SquishPanel extends React.Component {
 	// update the stats, as displayed in the Integration tab
 	refreshStats() {
 		const p = this.props;
+
+		// given a stat name, value and precision, display it using oldschool DOM
 		function show(cName, ms, nDigits = 2) {
 			const el = document.querySelector(`#${p.id}.SquishPanel .ControlPanel .SetIterationTab .${cName}`);
-			if (el)
-				el.innerHTML = ms.toFixed(nDigits);  // only if it's showing
+			if (el) {
+				// hard to see if it's jumping around a lot
+				if (!el.iStatAvg)
+					el.iStatAvg = ms;
+				else
+					el.iStatAvg = (ms + 31 * el.iStatAvg) / 32;
+				el.innerHTML = el.iStatAvg.toFixed(nDigits);  // only if it's showing
+			}
 		}
 
 		const st = this.iStats;
@@ -380,7 +378,7 @@ export class SquishPanel extends React.Component {
 		//debugger;
 		if (this.runningOneCycle) {
 			// get the real compoment of the first (#1) value of the wave
-			const real0 = this.state.space.waveBuffer[2];
+			const real0 = this.state.space.wave[2];
 
 			if (real0 < this.prevReal0) {
 				// we're going down - first half of the cycle
@@ -469,43 +467,50 @@ export class SquishPanel extends React.Component {
 
 	/* ******************************************************* user settings */
 
-	setDt(dt) {
+	setDt = dt => {
 		this.setState({dt});
 		qe.Avatar_setDt(dt);
+		if (typeof storeSettings != 'undefined')  // goddamned bug in importing works in constructor
+			storeSettings.iterationSettings.dt = dt;
 	}
-	setDt = this.setDt.bind(this);
+	//setDt = this.setDt.bind(this);
 
-	setStepsPerIteration(stepsPerIteration) {
+	setStepsPerIteration = stepsPerIteration => {
 		console.info(`js setStepsPerIteration(${stepsPerIteration})`)
 		this.setState({stepsPerIteration});
 		qe.Avatar_setStepsPerIteration(stepsPerIteration);
+		if (typeof storeSettings != 'undefined')  // goddamned bug in importing works in constructor
+			storeSettings.iterationSettings.stepsPerIteration = stepsPerIteration;
 	}
-	setStepsPerIteration = this.setStepsPerIteration.bind(this);
+	//setStepsPerIteration = this.setStepsPerIteration.bind(this);
 
 	// sets the LPF in both SPanel state AND in the C++ area
-	setLowPassFilter(lowPassFilter) {
+	setLowPassFilter = lowPassFilter => {
+		debugger;
 		console.info(`js setLowPassFilter(${lowPassFilter})`)
 		this.setState({lowPassFilter});
 		qe.Avatar_setLowPassFilter(lowPassFilter);
+		if (typeof storeSettings != 'undefined')  //  goddamned bug in importing works in constructor
+			storeSettings.iterationSettings.lowPassFilter = lowPassFilter;
 	}
-	setLowPassFilter = this.setLowPassFilter.bind(this);
+	//setLowPassFilter = this.setLowPassFilter.bind(this);
 
 	// completely wipe out the 𝜓 wavefunction and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon setWave in wave tab
-	setWave(waveParams) {
+	setWave = waveParams => {
 // 		const wave = qe.Avatar_getWaveBuffer();
 		const qewave = this.state.space.qewave;
 		qewave.setFamiliarWave(waveParams);
-		this.iterateOneIteration(true, true);
+		this.iterateOneIteration(true, true);  // ??
 		//this.iterateOneIteration(false, true);
 		//qe.qViewBuffer_getViewBuffer();
 		//qe.createQEWaveFromCBuf();
 	}
-	setWave = this.setWave.bind(this);
+	//setWave = this.setWave.bind(this);
 
 	// completely wipe out the quantum potential and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon set potential in potential tab
-	setPotential(potentialParams) {
+	setPotential = potentialParams => {
 		setFamiliarPotential(this.state.space, this.state.space.potentialBuffer, potentialParams);
 		this.iterateOneIteration(true, true);  // ???
 		if (dumpingTheViewBuffer)
@@ -524,7 +529,7 @@ export class SquishPanel extends React.Component {
 // 			throw `setPotential: no voltage breed '${breed}'`
 // 		}
 	}
-	setPotential = this.setPotential.bind(this);
+	//setPotential = this.setPotential.bind(this);
 
 	// dump the view buffer, from the JS side.  Why not use the C++ version?
 	dumpViewBuffer(title = '') {
@@ -544,6 +549,9 @@ export class SquishPanel extends React.Component {
 		const p = this.props;
 		const s = this.state;
 
+			// potentialParams={defaultPotentialParams}
+			// waveParams={defaultWaveParams}
+
 		return (
 			<div id={this.props.id} className="SquishPanel">
 				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
@@ -553,7 +561,6 @@ export class SquishPanel extends React.Component {
 					setEffectiveView={this.setEffectiveView}
 					createdSpacePromise={this.createdSpacePromise}
 					width={p.width}
-					defaultHeight={400}
 				/>
 				<ControlPanel
 					openResolutionDialog={() => this.openResolutionDialog()}
@@ -566,10 +573,8 @@ export class SquishPanel extends React.Component {
 					singleIteration={this.singleIteration}
 					resetCounters={this.resetCounters}
 
-					waveParams={defaultWaveParams}
 					setWave={this.setWave}
 
-					potentialParams={defaultPotentialParams}
 					setPotential={this.setPotential}
 
 					iterateFrequency={1000 / s.iteratePeriod}

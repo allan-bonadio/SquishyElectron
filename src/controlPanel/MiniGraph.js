@@ -9,9 +9,9 @@ import PropTypes from 'prop-types';
 //import {path as d3path} from 'd3-path';
 
 //import cxToRgb from '../view/cxToRgb';
-// import qCx from '../wave/qCx';
-import {qeSpace, qeBasicSpace} from '../wave/qeSpace';
-// import qeWave from '../wave/qeWave';
+// import qCx from '../engine/qCx';
+import {qeSpace, qeBasicSpace} from '../engine/qeSpace';
+// import qeWave from '../engine/qeWave';
 // import {setFamiliarPotential} from '../widgets/utils';
 
 //const π = Math.PI;

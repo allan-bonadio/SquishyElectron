@@ -153,8 +153,5 @@ extern "C" {
 	void addSpaceDimension(int N, int continuum, const char *label);
 	struct salientPointersType *completeNewSpace(void);
 	void deleteTheSpace(void);
-
-
-	double *qSpace_getPotentialBuffer(void);
 }
 

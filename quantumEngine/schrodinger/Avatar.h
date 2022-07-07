@@ -86,7 +86,6 @@ extern Avatar *theAvatar;
 // for JS to call
 extern "C" {
 
-	qCx *Avatar_getWaveBuffer(void);
 	float *qViewBuffer_getViewBuffer();
 	double Avatar_getElapsedTime(void);
 	double Avatar_getIterateSerial(void);

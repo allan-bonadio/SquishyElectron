@@ -4,7 +4,7 @@
 */
 
 import PropTypes from 'prop-types';
-import qe from '../wave/qe';
+import qe from '../engine/qe';
 
 function setPT() {
 	CPToolbar.propTypes = {

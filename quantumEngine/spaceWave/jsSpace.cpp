@@ -43,22 +43,18 @@ extern "C" {
 
 // return a pointer to just the main wave for theSpace
 // i guess it's not used anymore
-qCx *Avatar_getWaveBuffer(void) {
-	//printf("🚀 🚀 🚀 Avatar_getWaveBuffer() theSpace: %p\n", (theSpace));
-	//printf("        🚀 🚀 🚀        the qWave %p\n", (theAvatar->mainQWave));
-	//printf("        🚀 🚀 🚀        the wave %p\n", (theAvatar->mainQWave->wave));
-//	printf("        🚀 🚀 🚀     q=w %d   s=w %d   q=s %d\n",
-//		(uintptr_t) (theAvatar->mainQWave) == (uintptr_t)  (theAvatar->mainQWave->wave),
-//		(uintptr_t) (theSpace) == (uintptr_t) (theAvatar->mainQWave->wave),
-//		(uintptr_t) (theAvatar->mainQWave) == (uintptr_t) (theSpace)
-//	);
-
-	return theAvatar->mainQWave->wave;
-}
-
-double *qSpace_getPotentialBuffer(void) {
-	return thePotential;
-}
+//qCx *Avatar_getWaveBuffer(void) {
+//	//printf("🚀 🚀 🚀 Avatar_getWaveBuffer() theSpace: %p\n", (theSpace));
+//	//printf("        🚀 🚀 🚀        the qWave %p\n", (theAvatar->mainQWave));
+//	//printf("        🚀 🚀 🚀        the wave %p\n", (theAvatar->mainQWave->wave));
+////	printf("        🚀 🚀 🚀     q=w %d   s=w %d   q=s %d\n",
+////		(uintptr_t) (theAvatar->mainQWave) == (uintptr_t)  (theAvatar->mainQWave->wave),
+////		(uintptr_t) (theSpace) == (uintptr_t) (theAvatar->mainQWave->wave),
+////		(uintptr_t) (theAvatar->mainQWave) == (uintptr_t) (theSpace)
+////	);
+//
+//	return theAvatar->mainQWave->wave;
+//}
 
 double Avatar_getElapsedTime(void) {
 	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getElapsedTime()");

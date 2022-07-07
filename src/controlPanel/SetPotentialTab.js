@@ -11,8 +11,9 @@ import {path as d3path} from 'd3-path';
 
 import {setFamiliarPotential, dumpPotential} from '../widgets/utils';
 import MiniGraph from './MiniGraph';
-import qeSpace from '../wave/qeSpace';
+import qeSpace from '../engine/qeSpace';
 import TextNSlider from '../widgets/TextNSlider';
+import storeSettings from '../utils/storeSettings';
 
 // some typical potential value, so we can get an idea of how to scale in the graph
 let SOME_POTENTIAL = 0.01;
@@ -74,14 +75,14 @@ class SetPotentialTab extends React.Component {
 
 		// generate the points for the <path
 		let pathObj = d3path();
-		console.info(`point 1 = (${this.xScale(start)}, ${ this.yScale(potentialArray[start])})`)
+		//console.info(`point 1 = (${this.xScale(start)}, ${ this.yScale(potentialArray[start])})`)
 		pathObj.moveTo(this.xScale(start),  this.yScale(potentialArray[start]).toFixed(2));
 		for (let ix = start+1; ix < end; ix++) {
 			pathObj.lineTo(this.xScale(ix), this.yScale(potentialArray[ix]).toFixed(2));
 		}
 		const d = pathObj.toString();
 		//console.info(`d = ${d}`)
-		dumpPotential(miniSpace, potentialArray);
+		//dumpPotential(miniSpace, potentialArray);
 
 		return <g className='linePaths' >
 			<path d={d} stroke='#fff' fill='none'  key='only' strokeWidth={3} />
@@ -89,24 +90,29 @@ class SetPotentialTab extends React.Component {
 	}
 	recipe = this.recipe.bind(this);
 
-
-	setValleyPower(valleyPower) {
+	setFlat = () => {
+		this.props.setCPState({potentialBreed: 'flat'});
+		storeSettings.potentialParams.potentialBreed = 'flat';
+	}
+	setValley = () => {
+		this.props.setCPState({potentialBreed: 'valley'});
+		storeSettings.potentialParams.potentialBreed = 'valley';
+	}
+	setValleyPower = valleyPower => {
 		this.props.setCPState({potentialBreed: 'valley', valleyPower});
+		storeSettings.potentialParams.valleyPower = valleyPower;
+		storeSettings.potentialParams.potentialBreed = 'valley';
 	}
-	setValleyPower = this.setValleyPower.bind(this);
-
-	setValleyScale(valleyScale) {
+	setValleyScale = valleyScale => {
 		this.props.setCPState({potentialBreed: 'valley', valleyScale});
-
+		storeSettings.potentialParams.valleyScale = valleyScale;
+		storeSettings.potentialParams.potentialBreed = 'valley';
 	}
-	setValleyScale = this.setValleyScale.bind(this);
-
-	setValleyOffset(valleyOffset) {
+	setValleyOffset = valleyOffset => {
 		this.props.setCPState({potentialBreed: 'valley', valleyOffset});
-
+		storeSettings.potentialParams.valleyOffset = valleyOffset;
+		storeSettings.potentialParams.potentialBreed = 'valley';
 	}
-	setValleyOffset = this.setValleyOffset.bind(this);
-
 
 	// rendering for the Tab
 	render() {

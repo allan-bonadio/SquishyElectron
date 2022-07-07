@@ -5,10 +5,10 @@
 
 import {abstractDrawing} from './abstractDrawing';
 import cxToColorGlsl from './cxToColor.glsl';
-import qe from '../wave/qe';
+import qe from '../engine/qe';
 import {viewUniform, viewAttribute} from './viewVariable';
 //import SquishPanel from '../SquishPanel';
-//import {qeStartPromise} from '../wave/qEngine';
+//import {qeStartPromise} from '../engine/qEngine';
 
 let dumpViewBufAfterDrawing = false;
 let traceHighest = false;
