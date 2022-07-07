@@ -4,7 +4,7 @@
 */
 import qe from './qe';
 import qeWave from './qeWave';
-import {setFamiliarPotential, getWrappedPotential} from '../widgets/utils';
+import {setFamiliarPotential} from '../widgets/utils';
 import storeSettings from '../utils/storeSettings';
 
 let debugSpace = false;
@@ -181,6 +181,7 @@ export class qeSpace extends qeBasicSpace {
 
 		// salientPointers will give us pointers to buffers and stuff we need
 		let sp = qe.completeNewSpace();
+		debugger;
 		salientPointers = new salientPointersClass(sp);
 
 		// the qSpace already has allocated a wave, wrap as a nice TypedArray of doubles (pairs making up cx numbers)
@@ -192,9 +193,8 @@ export class qeSpace extends qeBasicSpace {
 // 		this.nPoints = dim.nPoints;
 		//console.log(`🚀  qViewBuffer_getViewBuffer 170: 🛸`, qe.qViewBuffer_getViewBuffer());
 
-		//qe.space.waveBuffer = qe.waveBuffer = wave;
-		//console.info(`the wave we're createQEWaveFromCBuf():`, wave);
-		this.qewave = new qeWave(this, qe.Avatar_getWaveBuffer());
+		// this reaches into C++ space and accesses the main wave buffer of this space
+		this.qewave = new qeWave(this, salientPointers.mainWaveBuffer);
 		this.wave = this.qewave.wave;
 
 		//console.log(`🚀  qViewBuffer_getViewBuffer 176: 🛸`, qe.qViewBuffer_getViewBuffer());
@@ -208,8 +208,10 @@ export class qeSpace extends qeBasicSpace {
 		// by default it's set to 1s, but we want something good.
 		this.qewave.setFamiliarWave(storeSettings.waveParams);
 
-		// this will be good after completeNewSpace() is called
-		this.potentialBuffer = getWrappedPotential(this);
+		// direct access into the potential buffer
+		debugger;
+		this.potentialBuffer = new Float64Array(window.Module.HEAPF64.buffer,
+			salientPointers.potentialBuffer, this.nPoints);
 		setFamiliarPotential(this, this.potentialBuffer, storeSettings.potentialParams);
 
 		let emscriptenMemory = window.Module.HEAPF32.buffer;

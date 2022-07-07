@@ -27,8 +27,8 @@ exportsSrc  = [
 
 
 	// gets
-	{name: 'Avatar_getWaveBuffer', retType: 'number', args: []},
-	{name: 'qSpace_getPotentialBuffer', retType: 'number', args: []},
+// 	{name: 'Avatar_getWaveBuffer', retType: 'number', args: []},
+// 	{name: 'qSpace_getPotentialBuffer', retType: 'number', args: []},
 
 	// the Avatar ones act on theAvatar in the c++ code
 	{name: 'Avatar_getElapsedTime', retType: 'number', args: []},
