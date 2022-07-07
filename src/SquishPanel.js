@@ -58,8 +58,9 @@ export class SquishPanel extends React.Component {
 		super(props);
 
 		SquishPanel.created += 1;
-		// console.info(`*** SquishPanel.created:`, SquishPanel.created);////
-		// console.info((new Error()).stack);
+		console.info(`*** SquishPanel.created:`, SquishPanel.created);////
+		console.info((new Error()).stack);
+		debugger;
 
 // 		const space0 = storeSettings.retrieveSettings('space0');
 // 		const rat = storeSettings.retrieveRatify;
