@@ -5,6 +5,12 @@ old
 quantumEngine.js
 quantumEngine.wasm
 quantumEngine.wasm.map
+
+# cppu test objects
 cppuTestBin
 cppuTestBin.dSYM
+
+# the old, pre cppu test objects
+quantumTest.js
+quantumTest.wasm
 
