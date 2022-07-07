@@ -75,14 +75,14 @@ class SetPotentialTab extends React.Component {
 
 		// generate the points for the <path
 		let pathObj = d3path();
-		console.info(`point 1 = (${this.xScale(start)}, ${ this.yScale(potentialArray[start])})`)
+		//console.info(`point 1 = (${this.xScale(start)}, ${ this.yScale(potentialArray[start])})`)
 		pathObj.moveTo(this.xScale(start),  this.yScale(potentialArray[start]).toFixed(2));
 		for (let ix = start+1; ix < end; ix++) {
 			pathObj.lineTo(this.xScale(ix), this.yScale(potentialArray[ix]).toFixed(2));
 		}
 		const d = pathObj.toString();
 		//console.info(`d = ${d}`)
-		dumpPotential(miniSpace, potentialArray);
+		//dumpPotential(miniSpace, potentialArray);
 
 		return <g className='linePaths' >
 			<path d={d} stroke='#fff' fill='none'  key='only' strokeWidth={3} />

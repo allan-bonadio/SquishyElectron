@@ -1,9 +1,9 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** utils -- msg functions for here and there
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-import qe from '../engine/qe';
+//import qe from '../engine/qe';
 import {qeBasicSpace} from '../engine/qeSpace';
 
 
@@ -217,11 +217,6 @@ export function powerToIndex(spd, power) {
 
 // raw numbers ~ 1 are way too big and throw it all into chaos
 const VALLEY_FACTOR = .001;
-
-// these are simple arrays.  No wrapper object needed (not yet)  Just make a typed array from what C++ created
-export function getWrappedPotential(space) {
-	return new Float64Array(window.Module.HEAPF64.buffer, qe.qSpace_getPotentialBuffer(), space.nPoints);
-}
 
 export function fixPotentialBoundaries(space, potential) {
 	const {end, continuum} = space.startEnd;
