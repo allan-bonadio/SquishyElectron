@@ -73,8 +73,8 @@ function SetIterationTab(props) {
 				maxLabel={p.N/4}
 
 				current={props.lowPassFilter}
-				sliderMin={1}
-				sliderMax={p.N/4}
+				sliderMin={.125}
+				sliderMax={.5}
 				stepsPerDecade={16}
 
 				handleChange={(power, ix) => {
