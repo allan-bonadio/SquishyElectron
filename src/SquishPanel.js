@@ -21,7 +21,8 @@ import qe from './engine/qe';
 import SquishView from './view/SquishView';
 import ResolutionDialog from './controlPanel/ResolutionDialog';
 
-
+// why doesn't this work?!?!!?
+//import {storeSettings} from './utils/storeSettings';
 import storeSettings from './utils/storeSettings';
 
 import {setFamiliarPotential} from './widgets/utils';
@@ -29,8 +30,8 @@ import {setFamiliarPotential} from './widgets/utils';
 // runtime debugging flags - you can change in the debugger or here
 let areBenchmarking = false;
 let dumpingTheViewBuffer = false;
-
-
+//debugger;
+if (typeof storeSettings == 'undefined') debugger;
 
 const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
 
@@ -50,8 +51,15 @@ export class SquishPanel extends React.Component {
 	// }
 
 	/* ************************************************ construction & reconstruction */
+	static created = 0;
+
 	constructor(props) {
+
 		super(props);
+
+		SquishPanel.created += 1;
+		// console.info(`*** SquishPanel.created:`, SquishPanel.created);////
+		// console.info((new Error()).stack);
 
 // 		const space0 = storeSettings.retrieveSettings('space0');
 // 		const rat = storeSettings.retrieveRatify;
@@ -222,10 +230,18 @@ export class SquishPanel extends React.Component {
 	// update the stats, as displayed in the Integration tab
 	refreshStats() {
 		const p = this.props;
+
+		// given a stat name, value and precision, display it using oldschool DOM
 		function show(cName, ms, nDigits = 2) {
 			const el = document.querySelector(`#${p.id}.SquishPanel .ControlPanel .SetIterationTab .${cName}`);
-			if (el)
-				el.innerHTML = ms.toFixed(nDigits);  // only if it's showing
+			if (el) {
+				// hard to see if it's jumping around a lot
+				if (!el.iStatAvg)
+					el.iStatAvg = ms;
+				else
+					el.iStatAvg = (ms + 31 * el.iStatAvg) / 32;
+				el.innerHTML = el.iStatAvg.toFixed(nDigits);  // only if it's showing
+			}
 		}
 
 		const st = this.iStats;
@@ -361,7 +377,7 @@ export class SquishPanel extends React.Component {
 		//debugger;
 		if (this.runningOneCycle) {
 			// get the real compoment of the first (#1) value of the wave
-			const real0 = this.state.space.waveBuffer[2];
+			const real0 = this.state.space.wave[2];
 
 			if (real0 < this.prevReal0) {
 				// we're going down - first half of the cycle
@@ -453,7 +469,8 @@ export class SquishPanel extends React.Component {
 	setDt = dt => {
 		this.setState({dt});
 		qe.Avatar_setDt(dt);
-		storeSettings.iterationSettings.dt = dt;
+		if (typeof storeSettings != 'undefined')  // goddamned bug in importing works in constructor
+			storeSettings.iterationSettings.dt = dt;
 	}
 	//setDt = this.setDt.bind(this);
 
@@ -461,16 +478,19 @@ export class SquishPanel extends React.Component {
 		console.info(`js setStepsPerIteration(${stepsPerIteration})`)
 		this.setState({stepsPerIteration});
 		qe.Avatar_setStepsPerIteration(stepsPerIteration);
-		storeSettings.iterationSettings.stepsPerIteration = stepsPerIteration;
+		if (typeof storeSettings != 'undefined')  // goddamned bug in importing works in constructor
+			storeSettings.iterationSettings.stepsPerIteration = stepsPerIteration;
 	}
 	//setStepsPerIteration = this.setStepsPerIteration.bind(this);
 
 	// sets the LPF in both SPanel state AND in the C++ area
 	setLowPassFilter = lowPassFilter => {
+		debugger;
 		console.info(`js setLowPassFilter(${lowPassFilter})`)
 		this.setState({lowPassFilter});
 		qe.Avatar_setLowPassFilter(lowPassFilter);
-		storeSettings.iterationSettings.lowPassFilter = lowPassFilter;
+		if (typeof storeSettings != 'undefined')  //  goddamned bug in importing works in constructor
+			storeSettings.iterationSettings.lowPassFilter = lowPassFilter;
 	}
 	//setLowPassFilter = this.setLowPassFilter.bind(this);
 
