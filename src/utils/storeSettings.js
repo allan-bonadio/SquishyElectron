@@ -19,13 +19,14 @@
 
 
 // these'll be filled in below
-const storeSettings =  {
+export const storeSettings =  {
 	spaceParams: {},
 	waveParams: {},
 	potentialParams: {},
 	iterationParams: {},
 	miscParams: {},
 }
+if (typeof storeSettings == 'undefined') debugger;
 
 
 let alwaysSave = false;
@@ -115,6 +116,11 @@ makeParam(storeSettings.spaceParams, 'continuum', 'spaceParams', 2, [0, 1, 2]);
 // 	[qeBasicSpace.contDISCRETE, qeBasicSpace.contWELL, qeBasicSpace.contENDLESS]);
 
 /* ************************************ waveParams */
+
+// this keeps many settings that don't immediately affect running iteration.
+// So 'Set Wave' button actually sets the wave, but meanwhile the setting sliders
+// need to be remembered; this does it.  Potential and space too; not active until user does something.
+
 makeParam(storeSettings.waveParams, 'waveBreed', 'waveParams', 'chord', ['circular', 'standing', 'gaussian', 'chord']);
 makeParam(storeSettings.waveParams, 'waveFrequency', 'waveParams', 16, freq =>
 	freq >= 1 && freq <= 1000 && 0 === freq % .5 );

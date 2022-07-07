@@ -18,26 +18,6 @@ import qeSpace from '../engine/qeSpace';
 
 import storeSettings from '../utils/storeSettings';
 
-// this keeps many settings that don't immediately affect running iteration.
-// So 'Set Wave' button actually sets the wave, but meanwhile the setting sliders
-// need to be remembered; this does it.
-
-
-// see storeSettings for where they are now
-// const defaultWaveParams = {
-// 	waveBreed: 'chord',
-// 	waveFrequency: 16,
-// 	pulseWidth: 1/16,
-// 	pulseOffset: 30,
-// };
-//
-// const defaultPotentialParams = {
-// 	potentialBreed: 'flat',
-// 	valleyPower: 1,
-// 	valleyScale: 1,
-// 	valleyOffset: 50,
-// };
-
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
