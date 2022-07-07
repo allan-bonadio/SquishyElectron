@@ -18,6 +18,7 @@ import './view.scss';
 // import flatDrawingViewDef from './flatDrawingViewDef';
 import {listOfViewClasses} from './listOfViewClasses';
 import storeSettings from '../utils/storeSettings';
+import PotentialArea from './PotentialArea';
 
 
 /* **************************************** actual canvas wrapper */
@@ -42,6 +43,7 @@ export class SquishView extends React.Component {
 
 		this.state = {
 			height: storeSettings.miscParams.viewHeight,
+			space: null,  // set when promise comes in
 		}
 
 		// will be resolved when the canvas has been nailed down; result will be canvas dom obj
@@ -59,14 +61,19 @@ export class SquishView extends React.Component {
 	setGLCanvas(canvas) {
 		const p = this.props;
 
-		this.canvas = canvas;
-		canvas.squishView = this;
+		// why do i have to do this?  Old version of CHrome??!?!?!  preposterous
+		if (canvas) {
+			this.canvas = canvas;
+			canvas.squishView = this;
+		}
 
 		// we need the space AND the canvas to make the views
 		p.createdSpacePromise.then(space => {
 			// now create the draw view class instance as described by the space
 			// this is the flatDrawingViewDef class for webgl, not a CSS class or React class component
 			// do we do this EVERY RENDER?  probably not needed.
+
+			this.setState({space});
 
 			let vClass = listOfViewClasses[p.viewClassName];
 			this.effectiveView = new vClass(p.viewName, this.canvas, space);
@@ -88,7 +95,7 @@ export class SquishView extends React.Component {
 		});
 
 	}
-	setGLCanvas = this.setGLCanvas.bind(this);
+	//setGLCanvas = this.setGLCanvas.bind(this);
 
 	/* ************************************************************************ resizing */
 
@@ -183,10 +190,16 @@ export class SquishView extends React.Component {
 
 				{spinner}
 			</aside>
+
 			<canvas className='squishCanvas'
 				width={p.width} height={s.height}
-				ref={this.setGLCanvas}
+				ref={
+					canvas =>
+					this.setGLCanvas(canvas)
+				}
 				style={{width: `${p.width}px`, height: `${s.height}px`}} />
+
+			<PotentialArea width={p.width} height={s.height} nPoints={s.space ? s.space.nPoints : -1}/>
 		</div>);
 	}
 }

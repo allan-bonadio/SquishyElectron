@@ -7,14 +7,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import qe from './engine/qe';
-import PropTypes from 'prop-types';
+import qe from '../engine/qe';
 
-import qeSpace from './engine/qeSpace';
+// import qeSpace from '../engine/qeSpace';
 
-/* This draws the white potential line, and handels interaction
+/* This draws the white potential line, and handles interaction
 
 This was the SVG version... abandoned?  not sure...
+See also view/potentialDrawing for the webgl version
 */
 
 /* *************************************************** potential click & drag */
@@ -26,6 +26,7 @@ export class PotentialArea extends React.Component {
 	};
 
 	constructor(props) {
+		debugger;
 		super(props);
 
 		this.state = {
@@ -49,7 +50,7 @@ export class PotentialArea extends React.Component {
 		let potential = qe.get1DPotential(dim.start);
 		points[0] = `M0,${potential}L `;
 		for (let ix = 1; ix < dim.N; ix++) {
-			potential = qe.get1DPotential(ix + dim.start);
+			potential = potentialBuffer[ix + dim.start];
 			points[ix] = `${(ix * p.barWidth).toFixed(1)},${potential} `;
 		}
 		return points.join('');
@@ -79,7 +80,7 @@ export class PotentialArea extends React.Component {
 	}
 
 	mouseDown(ev) {
-		const p = this.props;
+		//const p = this.props;
 
 		// which x?
 		//this.mouseReveal('down', ev, ix);
@@ -90,7 +91,7 @@ export class PotentialArea extends React.Component {
 		this.dragging = true;
 		//debugger;
 
-//		}
+	}
 //		const x = Math.floor(ev.clientX / p.barWidth);
 //		this.mouseReveal('down', ev, x);
 ////		console.log(`mouseDown on point (%f,%f) %f`,
@@ -103,11 +104,11 @@ export class PotentialArea extends React.Component {
 //			this.dragging = true;
 //			debugger;
 //		}
-	}
+// 	}
 
 	mouseMove(ev) {
-		const p = this.props;
-		const ix = Math.floor(ev.clientX / p.barWidth);
+		//const p = this.props;
+		//const ix = Math.floor(ev.clientX / p.barWidth);
 		if (ev.buttons && this.dragging) {
 			//this.mouseReveal('move DRAGGING', ev, ix);
 			this.changePotential(ev, 'move DRAGGING');
@@ -121,7 +122,7 @@ export class PotentialArea extends React.Component {
 	}
 
 	mouseUp(ev) {
-		const p = this.props;
+		//const p = this.props;
 		this.dragging = false;
 
 		//const ix = Math.floor(ev.clientX / p.barWidth);
@@ -131,6 +132,7 @@ export class PotentialArea extends React.Component {
 
 	render() {
 		const p = this.props;
+		//debugger;
 
 		let transform =
 			`translate(${p.x}px, ${p.height}px) scale(1, -1) `;
@@ -138,8 +140,10 @@ export class PotentialArea extends React.Component {
 
 		const pathAttribute = this.makePathAttribute();
 		return (
-			<g className='PotentialArea'
+			<svg className='PotentialArea' viewBox={`0 0 ${p.width} ${p.height}`}
+				width={p.width} height={p.height}
 			 	style={{transform: transform}} >
+
 				<rect className='potentialCardNotUsed'
 					style={{display: 'none'}}
 					x='0' y={-p.height}
@@ -161,7 +165,7 @@ export class PotentialArea extends React.Component {
 					onMouseUp={ev => this.mouseUp(ev)}
 					/>
 
-			</g>
+			</svg>
 		);
 	}
 }
