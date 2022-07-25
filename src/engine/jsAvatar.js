@@ -2,15 +2,19 @@
 ** jsAvatar - the JS representations of the c++ Avatar object
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
-import qe from './qe';
+//import qe from './qe';
 
 class jsAvatar {
-	constructor(pointer) {
-		// we directly access fields in this C++ object, cuz the overhead from each js-C++ call is kindof large
+	// as of this writing, the miniGraph avatar has a null qewave
+	constructor(pointer, qewave) {
+		// we directly access fields in this C++ object,
+		// cuz the overhead from each js-C++ call is kindof large
 		this.pointer = pointer;
 		this.doubles = new Float64Array(window.Module.HEAPF64.buffer, pointer);
 		this.ints = new Uint32Array(window.Module.HEAPU32.buffer, pointer);
 		this.bools = new Uint8Array(window.Module.HEAPU8.buffer, pointer);
+
+		this.qewave = qewave;
 	}
 
 	/* ************************************************************************* Accessors */
@@ -26,16 +30,14 @@ class jsAvatar {
 	△ isIterating=44
 	△ pleaseFFT=45
 
+	what to do with these...
 	△ mainQWave=48
 	△ scratchQWave=52
 	△ spect=56
 	△ qvBuffer=60
 	*/
 
-	get waveBuffer() {
-		// um, please contact your system administrator...
-	}
-
+	// getters
 	get elapsedTime() { return this.doubles[1]; }
 	get iterateSerial() { return this.doubles[2]; }
 	get dt() { return this.doubles[3]; }
@@ -44,6 +46,7 @@ class jsAvatar {
 	get isIterating() { return this.bools[44]; }
 	get pleaseFFT() { return this.bools[45]; }
 
+	// setters
 	set elapsedTime(a) { this.doubles[1] = a; }
 	set iterateSerial(a) { this.doubles[2] = a; }
 	set dt(a) { this.doubles[3] = a; }
@@ -53,6 +56,8 @@ class jsAvatar {
 	set pleaseFFT(a) { this.bools[45] = a; }
 }
 
+
+export default jsAvatar;
 
 /* just thinking out loud here... about automating this:
 	input to the mapper:
