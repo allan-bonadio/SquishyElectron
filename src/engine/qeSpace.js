@@ -3,11 +3,12 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 import qe from './qe';
-import qeWave from './qeWave';
+//import qeWave from './qeWave';
 import {setFamiliarPotential} from '../widgets/utils';
 import storeSettings from '../utils/storeSettings';
+import salientBuffersFactory from './salientBuffersFactory';
 
-let debugSpace = false;
+let debugSpace = true;
 
 
 const _ = num => num.toFixed(4).padStart(9);
@@ -29,21 +30,6 @@ function dumpRow(ix, re, im, prev, isBorder) {
 	return`[${ix}] (${_(re)} , ${_(im)}) | `+
 		`${_(phase)} ${_(dPhase)}} ${_(mag)}\n` ;
 }
-
-// handed back when space is created by C++
-class salientPointersClass {
-	constructor(salientPointersPointer) {
-		this.struct = new Uint32Array(window.Module.HEAPU32.buffer, salientPointersPointer);
-	}
-
-	get mainWaveBuffer() { return this.struct[1]; }
-	get potentialBuffer() { return this.struct[2]; }
-	get vBuffer() { return this.struct[3]; }
-	get theAvatar() { return this.struct[4]; }
-	get miniGraphAvatar() { return this.struct[5]; }
-}
-
-export let salientPointers;
 
 /* **************************************************************** Basic Space */
 // the dimensions part of the space
@@ -181,47 +167,28 @@ export class qeSpace extends qeBasicSpace {
 
 		// salientPointers will give us pointers to buffers and stuff we need
 		let sp = qe.completeNewSpace();
-		debugger;
-		salientPointers = new salientPointersClass(sp);
-
-		// the qSpace already has allocated a wave, wrap as a nice TypedArray of doubles (pairs making up cx numbers)
-// 		this.wave = new Float64Array(window.Module.HEAPF64.buffer, qe.Avatar_getWaveBuffer(), 2 * this.nPoints);
-
-// 		let dim = dims[0];
-// 		this.start = dim.start;
-// 		this.end = dim.end;
-// 		this.nPoints = dim.nPoints;
-		//console.log(`🚀  qViewBuffer_getViewBuffer 170: 🛸`, qe.qViewBuffer_getViewBuffer());
+		const salientBuffers = this.salientBuffers = new salientBuffersFactory(this, sp);
 
 		// this reaches into C++ space and accesses the main wave buffer of this space
-		this.qewave = new qeWave(this, salientPointers.mainWaveBuffer);
+		// hmmm space shouldn't point to this - just avatar?
+		this.qewave = salientBuffers.mainQeWave;  // new qeWave(this, salientPointers.mainWaveBuffer);
 		this.wave = this.qewave.wave;
 
-		//console.log(`🚀  qViewBuffer_getViewBuffer 176: 🛸`, qe.qViewBuffer_getViewBuffer());
- 		//if (qe.qViewBuffer_getViewBuffer() & 3) debugger;
-
-
-// 		const controls0 = storeSettings.retrieveSettings('controls0');
-// 		const rat = storeSettings.retrieveRatify;
-
-
-		// by default it's set to 1s, but we want something good.
-		this.qewave.setFamiliarWave(storeSettings.waveParams);
+		// by default it's set to 1s, or zeroes?  but we want something good.
+		this.qewave.setFamiliarWave(storeSettings.waveParams);  // wait - SquishPanel does this too
 
 		// direct access into the potential buffer
-		debugger;
-		this.potentialBuffer = new Float64Array(window.Module.HEAPF64.buffer,
-			salientPointers.potentialBuffer, this.nPoints);
+		this.potentialBuffer = salientBuffers.potentialBuffer;
+			//new Float64Array(window.Module.HEAPF64.buffer,
+			//salientPointers.potentialBuffer, this.nPoints);
 		setFamiliarPotential(this, this.potentialBuffer, storeSettings.potentialParams);
 
-		let emscriptenMemory = window.Module.HEAPF32.buffer;
-		let address = qe.qViewBuffer_getViewBuffer();
+		//let emscriptenMemory = window.Module.HEAPF32.buffer;
+		//let address = qe.qViewBuffer_getViewBuffer();
 
-		// display also the boundary points?  if not, use nStates instead
-		let np = this.nPoints * 16;  // 16 = sizeof(qCx)
 
-		this.vBuffer = qe.vBuffer =
-			new Float32Array(emscriptenMemory, address, np);
+		this.vBuffer = salientBuffers.vBuffer;
+			// new Float32Array(emscriptenMemory, address, np);
 
 		if (debugSpace) console.log(`🚀  done with the resulting qeSpace:`, this);
 	}
