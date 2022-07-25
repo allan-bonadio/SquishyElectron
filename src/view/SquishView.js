@@ -41,6 +41,7 @@ export class SquishView extends React.Component {
 	constructor(props) {
 		super(props);
 
+		console.log(`SquishView(...`, props, (new Error()).stack);
 		this.state = {
 			height: storeSettings.miscParams.viewHeight,
 			space: null,  // set when promise comes in
@@ -60,6 +61,9 @@ export class SquishView extends React.Component {
 	// Only called when canvas is created (or recreated, someday)
 	setGLCanvas(canvas) {
 		const p = this.props;
+		if (this.state.space && this.canvas)
+			return;  // already done
+		console.log(`SquishView.setGLCanvas(...`, canvas);
 
 		// why do i have to do this?  Old version of CHrome??!?!?!  preposterous
 		if (canvas) {
@@ -72,6 +76,7 @@ export class SquishView extends React.Component {
 			// now create the draw view class instance as described by the space
 			// this is the flatDrawingViewDef class for webgl, not a CSS class or React class component
 			// do we do this EVERY RENDER?  probably not needed.
+			console.log(`setGLCanvas.then(...`, space);
 
 			this.setState({space});
 
@@ -90,7 +95,7 @@ export class SquishView extends React.Component {
 			console.info(`SquishPanel.compDidMount promise done`);
 
 		}).catch(ex => {
-			console.error(`error in SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
+			console.error(`error in SquishView createdSpacePromise.then():`, ex.stack || ex.message || ex);
 			debugger;
 		});
 
@@ -171,6 +176,8 @@ export class SquishView extends React.Component {
 			iser = thousands(qe.Avatar_getIterateSerial());
 		}
 
+		//let nPoints = s.space && s.space.nPoints;
+
 		const spinner = qe.cppLoaded ? ''
 			: <img className='spinner' alt='spinner' src='eclipseOnTransparent.gif' />;
 
@@ -193,13 +200,11 @@ export class SquishView extends React.Component {
 
 			<canvas className='squishCanvas'
 				width={p.width} height={s.height}
-				ref={
-					canvas =>
-					this.setGLCanvas(canvas)
-				}
+				ref={canvas => this.setGLCanvas(canvas)}
 				style={{width: `${p.width}px`, height: `${s.height}px`}} />
 
-			<PotentialArea width={p.width} height={s.height} nPoints={s.space ? s.space.nPoints : -1}/>
+			<PotentialArea width={p.width} height={s.height}
+				x={0} space={s.space} />
 		</div>);
 	}
 }
