@@ -7,7 +7,7 @@
 import {qe} from './qe';
 import cxToRgb from '../view/cxToRgb';
 
-let traceSetWave = false;
+let traceSetWave = true;
 
 // emscripten sabotages this?  the log & info, but not error & warn?
 //const consoleLog = console.log.bind(console);
@@ -220,6 +220,7 @@ class qeWave {
 	// 2stdDev is width of the packet, as percentage of N (0%...100%).
 	// offset is how far along is the peak, as an integer X value (0...N).
 	setChordWave(freqUi, pulseWidth, offsetUi) {
+		console.log(`setChordWave(${freqUi}, ${pulseWidth}, ${offsetUi})`);
 		const wave = this.wave;
 		const {start, end, N} = this.space.startEnd2;
 		let offset = offsetUi * N / 100;  // now in units of X
@@ -227,7 +228,6 @@ class qeWave {
 		const nSideFreqs = Math.round(pulseWidth * N)
 		console.log(`🌊  setPulseWave freq=${freqUi} => ${freq}  nSideFreqs=${nSideFreqs}`+
 			`  offset=${offsetUi}% => ${offset}`)
-
 
 		//const dAngle = 4 * Math.PI / N;
 		const dAngle = 1.0 * Math.PI / N;

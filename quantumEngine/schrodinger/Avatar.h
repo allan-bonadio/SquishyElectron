@@ -38,14 +38,14 @@ struct Avatar {
 
 	/* *********************************************** iteration */
 
-	// our main qWave and a scratch wave for stepping
+	// our main qWave
 	struct qWave *mainQWave;
 
 	// grabbed from the space upon each iteration start
 	double *potential;
 	double potentialFactor;
 
-	//  Call the function first time you need it.
+	//  and a scratch wave for stepping. Call the function first time you need it.
 	struct qWave *scratchQWave;
 	qWave *getScratchWave(void);
 
@@ -64,12 +64,13 @@ struct Avatar {
 
 	void oneRk2Step(qWave *oldQWave, qWave *newQWave);  // obsolete
 	void oneRk4Step(qWave *oldQWave, qWave *newQWave);  // obsolete
-	void oneVisscherStep(qWave *oldQWave, qWave *newQWave);
+	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);  // obsolete
+
+	void oneVisscherStep(qWave *newQWave, qWave *oldQWave);
 
 	// visscher
 	void stepReal(qCx *newW, qCx *oldW, double dt);
 	void stepImaginary(qCx *newW, qCx *oldW, double dt);
-	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);  // obsolete
 
 	// kill high frequencies via FFTs
 	void fourierFilter(int lowPassFilter);

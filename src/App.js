@@ -13,6 +13,7 @@ class App extends React.Component {
 	constructor(props) {
 		super(props);
 
+		console.log(`App(...`, props);
 		this.state = {
 			innerWindowWidth: window.innerWidth,
 

@@ -499,8 +499,8 @@ export class SquishPanel extends React.Component {
 	setWave = waveParams => {
 // 		const wave = qe.Avatar_getWaveBuffer();
 		const qewave = this.state.space.qewave;
-		qewave.setFamiliarWave(waveParams);
-		this.iterateOneIteration(true, true);  // ??
+		qewave.setFamiliarWave(waveParams);  // wait - qeSpace does this too
+		this.iterateOneIteration(true, true);  // ?? take  this out
 		//this.iterateOneIteration(false, true);
 		//qe.qViewBuffer_getViewBuffer();
 		//qe.createQEWaveFromCBuf();
@@ -511,7 +511,7 @@ export class SquishPanel extends React.Component {
 	// (but do not change N or anything in the state)  Called upon set potential in potential tab
 	setPotential = potentialParams => {
 		setFamiliarPotential(this.state.space, this.state.space.potentialBuffer, potentialParams);
-		this.iterateOneIteration(true, true);  // ???
+		this.iterateOneIteration(true, true);  // ???  take this out
 		if (dumpingTheViewBuffer)
 			qe.qViewBuffer_getViewBuffer();
 
