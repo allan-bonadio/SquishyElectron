@@ -46,9 +46,10 @@ export const qeStartPromise = new Promise((succeed, fail) => {
 });
 
 
-/* ***************************************** data access */
+/* ***************************************** obsolete data access */
 
 // these can't be defined until emscripten is alive
+
 // obsolete
 //function qeDefineAccess() {
 //	debugger;
@@ -70,6 +71,25 @@ export const qeStartPromise = new Promise((succeed, fail) => {
 //}
 
 
+// function qeDefineAccess() {
+// // 	qe.createQEWaveFromCBuf = function createQEWaveFromCBuf() {
+// // 		// make this thing which is the wave buffer, as a nice TypedArray of doubles (pairs making up cx numbers)
+// // 		const wave = qe.space.wave;
+// // 		//const wave = new Float64Array(window.Module.HEAPF64.buffer, salientPointers.mainWaveBuffer, 2 * qe.space.nPoints);
+// // 		//qe.space.waveBuffer =
+// // 		//qe.waveBuffer = wave;
+// // 	}
+//
+// 	// get the complex wave value at this point in the wave
+// 	// not used very much now
+// 	// qe.get1DWave = function get1DWave(ixPoint) {
+// 	// 	const ix = 2*ixPoint;
+// 	// 	return qCx(
+// 	// 		qe.waveBuffer[ix],
+// 	// 		qe.waveBuffer[ix+1]
+// 	// 	);
+// 	// }
+// }
 
 
 

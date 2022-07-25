@@ -16,7 +16,7 @@
 // (maybe I should integrate these better...)
 
 /* ************************************************** All Settings */
-
+debugger;
 
 // these'll be filled in below
 export const storeSettings =  {
@@ -36,7 +36,7 @@ function saveGroup(base) {
 	localStorage.setItem(base, JSON.stringify(storeSettings[base]));
 }
 
-// figure out a function that can validate this quickly
+// figure out a function that can validate this param quickly
 function makeCriterionFunction(criterion) {
 	switch (typeof criterion) {
 	// always or never
