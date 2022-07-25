@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import qe from '../engine/qe';
+import qeSpace from '../engine/qeSpace';
 
 // import qeSpace from '../engine/qeSpace';
 
@@ -21,13 +22,17 @@ See also view/potentialDrawing for the webgl version
 
 export class PotentialArea extends React.Component {
 	static propTypes = {
-		innerActiveWidth: PropTypes.number,
-		barWidth: PropTypes.number,
+		// ?? innerActiveWidth: PropTypes.number.isRequired,
+		width: PropTypes.number.isRequired,
+		height: PropTypes.number.isRequired,
+		x: PropTypes.number.isRequired,
+		space: PropTypes.instanceOf(qeSpace),
 	};
 
 	constructor(props) {
-		debugger;
 		super(props);
+		console.log(`PotentialArea(...`, props, (new Error()).stack);
+
 
 		this.state = {
 			// we increment this in lieu of storing the whole potential in the state
@@ -38,20 +43,22 @@ export class PotentialArea extends React.Component {
 	// make the sequence of coordinates the white line needs to draw
 	// as compressed as possible
 	makePathAttribute() {
-		if (! qe.potentialBuffer)
-			return `M0,0`;  // too early
+		//if (! p.space)  won't be called if no spae
+		//	return `M0,0`;  // too early
 
 		const p = this.props;
 
-		const space = qe.space;
-		const dim = space.dimensions[0];
-		const potentialBuffer = space.potentialBuffer;
-		const points = new Array(dim.start + dim.end);
-		let potential = qe.get1DPotential(dim.start);
+		const space = p.space;
+		const nPoints = space.nPoints;
+		const barWidth = p.width / nPoints;
+		//const dim = space.dimensions[0];
+		const potentialBuffer = this.potentialBuffer = space.potentialBuffer;
+		const points = new Array(nPoints);
+		let potential = potentialBuffer[0];  //qe.get1DPotential(dim.start);
 		points[0] = `M0,${potential}L `;
-		for (let ix = 1; ix < dim.N; ix++) {
-			potential = potentialBuffer[ix + dim.start];
-			points[ix] = `${(ix * p.barWidth).toFixed(1)},${potential} `;
+		for (let ix = 1; ix < nPoints; ix++) {
+			potential = potentialBuffer[ix];
+			points[ix] = `${(ix * barWidth).toFixed(1)},${potential} `;
 		}
 		return points.join('');
 	}
@@ -60,8 +67,7 @@ export class PotentialArea extends React.Component {
 		console.log(`mouse %s on point (%f,%f) potential[%d]=%f`,
 			title,
 			ev.clientX, ev.clientY,
-			x, qe.get1DPotential(x));//,
-//			ev);
+			x, this.potentialBuffer[x]);
 	}
 
 	// every time user changes it
@@ -72,7 +78,7 @@ export class PotentialArea extends React.Component {
 		console.log(`mouse %s on point (%f,%f) potential[%d]=%f`,
 			title,
 			ev.clientX, ev.clientY,
-			ix, qe.get1DPotential(ix));//,
+			ix, this.potentialBuffer[ix]);//,
 //		mouseReveal(title, ev, ix);
 
 		qe.set1DPotential(ix, p.height + p.y - newPotential);
@@ -96,7 +102,7 @@ export class PotentialArea extends React.Component {
 //		this.mouseReveal('down', ev, x);
 ////		console.log(`mouseDown on point (%f,%f) %f`,
 ////			ev.clientX, ev.clientY,
-////			qe.get1DPotential(x), ev);
+////			potentialBuffer[x), ev];
 //		if (Math.abs(qe.space.potentialBuffer[x] - ev.clientY) < 10) {
 //			// a hit!
 //			console.log(`    a hit! on point ${x}:`, ev);
@@ -132,6 +138,8 @@ export class PotentialArea extends React.Component {
 
 	render() {
 		const p = this.props;
+		if (! p.space)
+			return '';  // too early
 		//debugger;
 
 		let transform =
