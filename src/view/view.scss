@@ -11,14 +11,16 @@
 
 /* canvas itself */
 canvas.squishCanvas {
-	position: relative;
+	position: absolute;
 	border: 1px #666 inset;
+	z-index: 10;
 }
 
 /* overlay with frame ct and virtual time */
 aside.viewOverlay {
 	position: absolute;
 	border: 1px #0000 solid;
+	z-index: 20;
 
 	// numbers in upper corners
 	.northWestWrapper, .northEastWrapper {
@@ -46,6 +48,9 @@ aside.viewOverlay {
 	}
 }
 
+svg.PotentialArea {
+	z-index: 30;
+}
 
 .spinner {
 	position: absolute;

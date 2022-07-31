@@ -31,7 +31,7 @@ export class PotentialArea extends React.Component {
 
 	constructor(props) {
 		super(props);
-		console.log(`PotentialArea(...`, props, (new Error()).stack);
+		// why is this called so many times!?!?!?!?!  console.log(`PotentialArea(...`, props, (new Error()).stack);
 
 
 		this.state = {
@@ -58,7 +58,7 @@ export class PotentialArea extends React.Component {
 		points[0] = `M0,${potential}L `;
 		for (let ix = 1; ix < nPoints; ix++) {
 			potential = potentialBuffer[ix];
-			points[ix] = `${(ix * barWidth).toFixed(1)},${potential} `;
+			points[ix] = `${(ix * barWidth).toFixed(1)},${(potential).toFixed(4)} `;
 		}
 		return points.join('');
 	}
@@ -143,7 +143,8 @@ export class PotentialArea extends React.Component {
 		//debugger;
 
 		let transform =
-			`translate(${p.x}px, ${p.height}px) scale(1, -1) `;
+			`translate(${p.x}px, ${0}px) scale(1, -1) `;
+			//`translate(${p.x}px, ${p.height}px) scale(1, -1) `;
 		//let transform = `translate(${p.x}px, ${p.height}px) scale(1, 1) `;
 
 		const pathAttribute = this.makePathAttribute();

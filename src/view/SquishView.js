@@ -41,7 +41,7 @@ export class SquishView extends React.Component {
 	constructor(props) {
 		super(props);
 
-		console.log(`SquishView(...`, props, (new Error()).stack);
+		// why is this called so many times!?!?!?!?!  console.log(`SquishView(...`, props, (new Error()).stack);
 		this.state = {
 			height: storeSettings.miscParams.viewHeight,
 			space: null,  // set when promise comes in
@@ -183,6 +183,11 @@ export class SquishView extends React.Component {
 
 		// voNorthWest/East are populated during drawing
 		return (<div className='SquishView' >
+			<canvas className='squishCanvas'
+				width={p.width} height={s.height}
+				ref={canvas => this.setGLCanvas(canvas)}
+				style={{width: `${p.width}px`, height: `${s.height}px`}} />
+
 			<aside className='viewOverlay'
 				style={{width: `${p.width}px`, height: `${s.height}px`}}>
 
@@ -198,10 +203,6 @@ export class SquishView extends React.Component {
 				{spinner}
 			</aside>
 
-			<canvas className='squishCanvas'
-				width={p.width} height={s.height}
-				ref={canvas => this.setGLCanvas(canvas)}
-				style={{width: `${p.width}px`, height: `${s.height}px`}} />
 
 			<PotentialArea width={p.width} height={s.height}
 				x={0} space={s.space} />
