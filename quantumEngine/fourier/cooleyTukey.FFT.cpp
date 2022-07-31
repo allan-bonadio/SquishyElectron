@@ -55,21 +55,33 @@ void cooleyTukeyFFT(qCx *dest, qCx *src, int N)
 	}
 }
 
+
+static bool traceIFFT = false;
+
 // inverse fft, same rules as fft(),
-// except this trashes the src coming in: all values become complex conjugages, sorry
+// DON'T  trash the src coming in
 void cooleyTukeyIFFT(qCx *dest, qCx *src, int N)
 {
+	qCx altSrc[N];
+
 	// conjugate the qCx numbers
-	for (int i = 0; i < N; i++)
-		src[i].im = -src[i].im;
+	if (traceIFFT) printf("input altSrc heading into cooleyTukeyFFT() \n");
+	for (int i = 0; i < N; i++) {
+		altSrc[i].re = src[i].re;
+		altSrc[i].im = -src[i].im;
+		if (traceIFFT) printf("altSrc[%3d] = %10.5lf %10.5lf\n", i, altSrc[i].re , altSrc[i].im);
+	}
 
 	// forward cooleyTukeyFFT
-	cooleyTukeyFFT(dest, src, N);
+	cooleyTukeyFFT(dest, altSrc, N);
 
 	// conjugate the qCx numbers again, and scale (fft+ifft multiplies by N)
+	if (traceIFFT) printf("output dest fresh out of cooleyTukeyFFT() \n");
 	for (int i = 0; i < N; i++) {
+		if (traceIFFT) printf("dest bfore[%3d] = %10.5lf %10.5lf\n", i, dest[i].re , dest[i].im);
 		dest[i].re = dest[i].re / N;
 		dest[i].im = -dest[i].im / N;
+		if (traceIFFT) printf("dest after[%3d] = %10.5lf %10.5lf\n", i, dest[i].re , dest[i].im);
 	}
 }
 
