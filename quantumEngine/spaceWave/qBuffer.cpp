@@ -66,7 +66,9 @@ qCx *qBuffer::allocateWave(int nPoints) {
 
 // create one
 qBuffer::qBuffer(void)
-	: magic('qBuf'), wave(NULL), space(NULL) {
+	: magic('qBuf'), wave(NULL),
+		nPoints(0), start(0), end(0), continuum(contDISCRETE),
+		space(NULL) {
 }
 
 // actually create the buffer that we need
@@ -132,17 +134,8 @@ qBuffer::~qBuffer() {
 
 
 
-void qBuffer::copyThatWave(qCx *dest, qCx *src, int length) {
-//	printf("🍕 qWave::copyThatWave(%d <== %d)\n", (int) dest, (int) src);
-	if (!dest) dest = wave;
-	if (!src) src = wave;
-	if (length < 0)
-		length = nPoints;
-	memcpy(dest, src, length * sizeof(qCx));
-}
 
-
-/* ******************************************************** diagnostic dump **/
+/* ******************************************************** diagnostic dumps **/
 
 // print one complex number, plus maybe some more calculated metrics for that point, on a line in the dump on stdout.
 // if it overflows the buffer, it won't.  just dump a row for a cx datapoint.
@@ -163,7 +156,7 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 		if (dPhase >= 360.) dPhase -= 360.;
 
 		// if this or the previous point was (0,0) then the phase and dPhase will be NAN, and they print that way
-		snprintf(buf, 200, "[%d] (%8.4lf,%8.4lf) | %8.3lf %8.3lf %8.4lf",
+		snprintf(buf, 200, "[%3d] (%8.4lf,%8.4lf) | %8.3lf %8.3lf %8.4lf",
 			ix, re, im, phase, dPhase, mag);
 		*pPrevPhase = phase;
 	}
@@ -207,12 +200,54 @@ void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int co
 	printf("    inner product=%11.8lf\n", innerProd);
 }
 
-// this is more for visscher steps to remember the floats
+// any wave, probably shouldn't call this
+void qBuffer::dumpThat(qCx *wave, bool withExtras) {
+	//printf("🌊🌊 any wave, probably shouldn't call this\n");
+	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
+}
+
+// works on any buffer but originally written for qWaves
+void qBuffer::dump(const char *title, bool withExtras) {
+	printf("\n🌊🌊 ==== Wave | %s ", title);
+	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
+	//space->dumpThat(wave, withExtras);
+	printf("\n        ==== end of Wave ====\n\n");
+}
+
+
+
+
+// use this if roundoff is a problem
 void qBuffer::dumpHiRes(const char *title) {
 	printf("🍕 🍕  HIRES %s: s=%d e=%d continuum:%d nPoints:%d\n", title, start, end, continuum, nPoints);
+	double iProd = 0;
 	for (int ix = 0; ix < nPoints; ix++) {
-		printf("🍕 [%d]  %18.12lf, %18.12lf\n", ix, wave[ix].re, wave[ix].im);
+		printf("🍕 [%3d]  %22.16lg, %22.16lg\n", ix, wave[ix].re, wave[ix].im);
+		if (ix >= start && ix < end)
+			iProd += wave[ix].norm();
 	}
+	printf("🍕 🍕  HIRES innerProduct: %8.4lf\n", iProd);
+}
+
+// calls the JS dumpRainbow method of qeWave.  Note we can't compile this for
+// straight C++ specs cuz there's no emscripten or JS.  So the app,
+// or node with emscripten
+void qBuffer::rainbowDump(const char *title) {
+	printf("about to rainbowDump EM_ASM %p %d %d %d %s\n\n", wave, start, end, nPoints, title);
+	// this also has to compile for standard C++ with no emscripten
+	#ifdef EM_ASM
+	EM_ASM({
+		console.log('rainbowDump: starting the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n', $1, $2, $3);
+		let waveJS = new Float64Array(window.Module.HEAPF64.buffer, $0, 2 * $3);
+
+		//rainbowDump(wave, start, end, nPoints, title);
+		rainbowDump(waveJS, $1, $2, $3);
+
+
+		console.log("rainbowDump: done the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n", $1, $2, $3, $4);
+	}, wave, start, end, nPoints);
+	#endif
+printf("done with rainbowDump EM_ASM\n\n");
 }
 
 
@@ -255,10 +290,10 @@ void qBuffer::fixThoseBoundaries(qCx *targetWave) {
 }
 
 // get rid of this!
-void qSpace::fixThoseBoundaries(qCx *targetWave) {
-	qDimension *dims = dimensions;
-	fixSomeBoundaries(targetWave, dims->continuum, dims->start, dims->end);
-}
+//void qSpace::fixThoseBoundaries(qCx *targetWave) {
+//	qDimension *dims = dimensions;
+//	fixSomeBoundaries(targetWave, dims->continuum, dims->start, dims->end);
+//}
 
 
 // calculate ⟨𝜓 | 𝜓⟩  'inner product'.  Non-visscher; do not use it during an iteration.
@@ -315,5 +350,114 @@ void qBuffer::normalize(void) {
 			wave[ix] *= factor;
 	}
 	fixBoundaries();
+}
+
+/* ****************************************************************************  setting */
+
+// a little bit dangerous if your waves don't have the same continuum
+void qBuffer::copyThatWave(qCx *dest, qCx *src, int length) {
+//	printf("🍕 qWave::copyThatWave(%d <== %d)\n", (int) dest, (int) src);
+	if (!dest) dest = wave;
+	if (!src) src = wave;
+	if (length < 0)
+		length = nPoints;
+	memcpy(dest, src, length * sizeof(qCx));
+}
+
+// qBuffers know their length
+// buffers (waves, spectrums) must be same length!
+void qBuffer::copyBuffer(qBuffer *dest, qBuffer *src) {
+	int sStates = src->end - src->start;
+	int dStates = dest->end - dest->start;
+	if (sStates != dStates)
+		throw std::runtime_error("qBuffer::copyBuffer() - different buffer lengths");
+
+	if (dest->continuum == src->continuum) {
+		// plus the boundaries, just copy it all
+		copyThatWave(dest->wave, src->wave, src->nPoints);
+	}
+	else {
+		// do the boundaries depending
+		copyThatWave(dest->wave + dest->start, src->wave + src->start, dStates);
+		dest->fixBoundaries();
+	}
+}
+
+void qBuffer::copyFrom(qBuffer *src) {
+	copyBuffer(this, src);
+}
+
+void qBuffer::copyTo(qBuffer *dest) {
+	copyBuffer(dest, this);
+}
+
+
+void qBuffer::fill(qCx value) {
+	for (int ix = 0; ix < nPoints; ix++)
+		wave[ix] *= value;
+}
+
+// just for C++ testing; should be same as in JS
+// previous contents of target overwritten.  Must be the size you want.
+void qBuffer::setCircularWave(double frequency, int first) {
+	int N = end - start;
+
+	// the pie-slice for each point
+	double dAngle = 2 * PI / N * frequency;
+
+	for (int ix = start; ix < end; ix++) {
+		double angle = dAngle * (ix - start - first);
+		wave[ix] = qCx(cos(angle), sin(angle));
+	}
+
+	normalize();
+	fixBoundaries();
+}
+
+// just for C++ testing
+// previous contents of target gone.  Must be the size you want.
+// Is value height starting at ix=first, switches to -height after wavelength/2
+// then repeats.  If wavelength is odd, inbetween psi is 0
+void qBuffer::setSquareWave(int wavelength, int first, qCx height) {
+	int N = end - start;
+
+	bool isOdd = wavelength & 1;
+	int halfWavelength = wavelength / 2;
+
+	// the pie-slice for each point
+	for (int ix = start; ix < end; ix++) {
+		int phase = (ix - start - first) % wavelength;
+		qCx val = height;
+		if (phase >= halfWavelength) {
+			 if (isOdd && phase == halfWavelength)
+			 	val = 0;
+			 else
+				val = -height;
+		}
+		wave[ix] = val;
+	}
+
+	normalize();
+	fixBoundaries();
+	dump("setSquareWave() done");
+}
+
+
+// add these two waves, modulated by the coefficients, leaving result in this->wave
+// un-normalized, un-fixed boundaries.  Either can be this if you want, no probs
+void qBuffer::add(qBuffer *qwave1, double coeff1, qBuffer *qwave2, double coeff2) {
+	int N = end - start;
+	qCx *wave1 = qwave1->wave + qwave1->start;
+	qCx *wave2 = qwave2->wave + qwave2->start;
+	qCx *dest = wave + start;
+
+	for (int ix = 0; ix < N; ix++) {
+		// must do multiply in this order; gotta fix that someday
+		dest[ix] = wave1[ix] * coeff1 +  wave2[ix] * coeff2;
+	}
+
+	//normalize();
+	//fixBoundaries();
+	//dump("qBuffer::add() done");
 }
 

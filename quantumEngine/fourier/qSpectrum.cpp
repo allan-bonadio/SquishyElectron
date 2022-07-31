@@ -12,10 +12,12 @@
 /* ************************************************************ birth & death & basics */
 
 // This produces a spectrum ready to hold an FFT transformed wave
-qSpectrum::qSpectrum(qSpace *sp, qCx *useThisBuffer) {
+qSpectrum::qSpectrum(qSpace *sp, qCx *useThisBuffer)
+	: qBuffer() {
+
 	space = sp;
 	magic = 'qSpe';
-	continuum = 0;
+	continuum = contDISCRETE;  // always zero for spectrum
 	start = 0;
 	end = nPoints = sp->spectrumLength;
 

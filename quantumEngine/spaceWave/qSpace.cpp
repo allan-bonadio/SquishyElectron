@@ -147,10 +147,10 @@ void qSpace::dumpPotential(const char *title) {
 	//printf("\n");
 
 	//for (ix = dims->start; ix < dims->end; ix++) {
-	//	if (0 == ix % 10) printf("\n[%d] ", ix);
+	//	if (0 == ix % 10) printf("\n[%3d] ", ix);
 	//	printf("%lf ", thePotential[ix]);
 	//}
-	//if (dims->continuum) printf("\n🚀 🚀 end [%d]=%lf", ix, thePotential[ix]);
+	//if (dims->continuum) printf("\n🚀 🚀 end [%3d]=%lf", ix, thePotential[ix]);
 	//printf("\n");
 }
 

@@ -69,12 +69,12 @@ double qFlick::dumpRow(char *buf, int doubleAge, int ix, double *pPrevPhase, boo
 		double dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
 		while (dPhase >= 360.) dPhase -= 360.;
 
-		sprintf(buf, "[%d] %c%8.4lf,%8.4lf%c | %8.2lf %8.2lf %8.4lf",
+		sprintf(buf, "[%3d] %c%8.4lf,%8.4lf%c | %8.2lf %8.2lf %8.4lf",
 			ix, leftParen, w.re, w.im, rightParen, phase, dPhase, mag);
 		*pPrevPhase = phase;
 	}
 	else {
-		sprintf(buf, "[%d] %c%8.4lf,%8.4lf%c", ix, leftParen, w.re, w.im, rightParen);
+		sprintf(buf, "[%3d] %c%8.4lf,%8.4lf%c", ix, leftParen, w.re, w.im, rightParen);
 	}
 	return mag;
 }
@@ -130,7 +130,7 @@ void qFlick::dumpAllWaves(const char *title) {
 void qFlick::dumpOverview(const char *title) {
 	printf("==== Flick Overview | %s\n", title);
 	for (int i = 0; i < nWaves; i++) {
-		printf("         waves[%d]=0%p    sample @x=1: %lf,  %lf\n",
+		printf("         waves[%3d]=0%p    sample @x=1: %lf,  %lf\n",
 			i, waves[i], waves[i][1].re, waves[i][1].im);
 	}
 	printf("==== Flick Overview End ====\n");
@@ -288,7 +288,7 @@ double qFlick::innerProduct(void) {
 // Normalize (should be) always idempotent;
 // anything else you wana do, make your own function
 void qFlick::normalize(void) {
-	//dumpWave("qFlick::normalize starting", true);
+	//dump("qFlick::normalize starting", true);
 
 	qDimension *dims = space->dimensions;
 	double inProd = innerProduct();
@@ -314,7 +314,7 @@ void qFlick::normalize(void) {
 		older[ix] *= factor;
 	}
 	fixBoundaries();
-	dumpWave("qFlick::normalize done", true);
+	dump("qFlick::normalize done", true);
 }
 
 /* ************************************************************ populating */
@@ -332,7 +332,7 @@ void qFlick::normalize(void) {
 //
 //	printf(" starting qFlick::setCircularWave(%3.2lf) with points=%d\n",
 //		n, space->nPoints);
-//	//dumpWave("before set sircular & normalize", true);
+//	//dump("before set sircular & normalize", true);
 //	qCx *wave = tempWave;
 //	//qCx *wave = wave;
 //	qDimension *dims = space->dimensions;
@@ -357,9 +357,9 @@ void qFlick::normalize(void) {
 //	for (int ix = start; ix < end; ix++) {
 ////		printf("    doin ix=%d\n", ix);
 //		angle = dAngle * (ix - start);
-////		printf("       [%d] angle=%lf°\n", ix, angle / PI * 180.);
+////		printf("       [%3d] angle=%lf°\n", ix, angle / PI * 180.);
 //		wave[ix] = qCx(cos(angle), sin(angle + vGap));
-////		printf("        wave[%d] =%lf, %lf\n", ix, wave[ix].re, wave[ix].im);
+////		printf("        wave[%3d] =%lf, %lf\n", ix, wave[ix].re, wave[ix].im);
 //	}
 ////	printf("flick, before boundaries, 1 copy");
 //	fixBoundaries();
@@ -371,10 +371,10 @@ void qFlick::normalize(void) {
 //		//printf("  copied that wave\n");
 //		//dumpAllWaves("qFlick::setCircularWave: copied wave 2ice; about to normalize");
 //		//space->visscherHalfStep(tempQWave, this);
-//		//dumpWave("after set sircular & normalize", true);
+//		//dump("after set sircular & normalize", true);
 //		normalize();
 //		//printf(" got past normalize here\n");
-//	//	dumpWave("after set sircular & normalize", true);
+//	//	dump("after set sircular & normalize", true);
 //	fixBoundaries();
 //	//dumpAllWaves("qFlick::setCircularWave: normalize");
 //

@@ -41,8 +41,6 @@ struct qBuffer {
 	// the actual data, hopefully in the right size allocated block
 	qCx *wave;
 
-	void copyThatWave(qCx *dest, qCx *src, int length = -1);
-
 	// spectrums don't have wraparounds boundaries so spectrums calculate different numbers from waves.
 	// should be in accord with the space, sortof, depending on whether wave or spectrum.
 	int nPoints; int start; int end, continuum;
@@ -63,13 +61,35 @@ struct qBuffer {
 	static void dumpSegment(qCx *wave, bool withExtras = false,
 		int start = 0, int end = -1, int continuum = 0);
 
-	void dumpHiRes(const char *title = "a buffer");
-	void rainbowDump(const char *title = "a buffer");  // calls JS to do it
+	// for a naked wave, and for a qWave.
+	// so the length of each buffer is nPoints from the wave's space.
+	void dumpThat(qCx *wave, bool withExtras = false);
+
+	//void dumpWave(const char *title, bool withExtras = false);
+
+	void dump(const char *title = "any buffer", bool withExtras = false);
+
+
+	void dumpHiRes(const char *title = "a hi res buffer");
+	void rainbowDump(const char *title = "a rainbow buffer");  // calls JS to do it
 
 	double innerProduct(void);
 	void normalize(void);  // returns inner product
-	void fixThoseBoundaries(qCx *targetWave);
-	void fixBoundaries(void) { fixThoseBoundaries(wave); }
+	void fixThoseBoundaries(qCx *targetWave = NULL);
+	void fixBoundaries(void) { this->fixThoseBoundaries(); };
+
+	void fill(qCx value = 0);
+	void copyThatWave(qCx *dest, qCx *src, int length = -1);
+	void copyBuffer(qBuffer *dest, qBuffer *src);
+	void copyFrom(qBuffer *src);
+	void copyTo(qBuffer *dest);
+
+	void add(qBuffer *qwave1, double coeff1, qBuffer *qwave2, double coeff2);
+
+	// like the JS version but in C++ and used only for testing
+	void setCircularWave(double freq = 1., int first = 0);
+	void setSquareWave(int wavelength = 1, int first = 0, qCx height = 1.);
+
 };
 
 #endif

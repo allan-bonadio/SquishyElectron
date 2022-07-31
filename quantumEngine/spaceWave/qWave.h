@@ -15,10 +15,6 @@ struct qWave : public virtual qBuffer {
 	virtual ~qWave();
 
 
-	// for a naked wave, and for a qWave.  dumpThatWave same as in qSpace::
-	// so the length of each buffer is nPoints from the wave's space.
-	void dumpThatWave(qCx *wave, bool withExtras = false);
-	void dumpWave(const char *title, bool withExtras = false);
 
 	// used for low pass; need general buffer for arithmetic.  obsolete.
 	qCx *scratchBuffer;
@@ -70,7 +66,6 @@ struct qFlick : public qWave {
 	// for vischer
 	double innerProduct(void);
 	void normalize(void);
-	//void setCircularWave(double n);
 
 	// retrieve properly interpolated values here
 	double magnitude(int doubleAge, int ix = 1);

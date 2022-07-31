@@ -102,30 +102,8 @@ qSpace *makeBareSpace(int N, int continuum) {
 
 /* ******************************************************** helpers - waves */
 
-// just for C++ testing; should be same as in JS
-// previous contents of target gone.  Must be the size you want.
-void setCircularWave(qWave *target, double frequency) {
-	int start = target->start;
-	int end = target->end;
-	int N = end - start;
-
-	// the pie-slice for each point
-	double dAngle = 2 * PI / N * frequency;
-	// ????!?!?!?! qCx *wave = laosWave;
-
-	qCx *wave = target->wave;
-	for (int ix = start; ix < end; ix++) {
-		double angle = dAngle * (ix - start);
-		wave[ix] = qCx(cos(angle), sin(angle));
-	}
-
-	target->normalize();
-	target->fixBoundaries();
-}
-
-
-// turn this on to see if a bug goes away when we avoid stomping on memory
-static bool avoidProving = false;
+// turn this off to see if a bug goes away when we avoid stomping on memory
+static bool goAheadAndProve = true;
 
 // fill up this buffer (of any kind) with some byte values just to prove that we can do it.
 // Any kind of buffer/wave/array.  Size is number of BYTES.
@@ -133,7 +111,7 @@ static bool avoidProving = false;
 // If I end up stomping on something I shouldn't, it'll crash soon enough.
 // and cpputest might even detect that
 void proveItsMine(void *buf, size_t size) {
-	if (avoidProving) return;
+	if (!goAheadAndProve) return;
 
 	if (size == 0)
 		throw std::runtime_error("proveItsMine()- size is zero");
@@ -142,7 +120,7 @@ void proveItsMine(void *buf, size_t size) {
 
 	uint8_t *buffer = (uint8_t *) buf;
 	for (int i = 0; i < size; i++)
-		buffer[i] = 0xab ^ buffer[i];
+		buffer[i] = 0xAB ^ buffer[i];  // read And write
 }
 
 void compareWaves(qBuffer *qexpected, qBuffer *qactual) {
@@ -159,5 +137,54 @@ void compareWaves(qBuffer *qexpected, qBuffer *qactual) {
 		// we can't use DOUBLES_EQUAL() cuz these aren't doubles, they're complex!
 		CHECK_EQUAL(expected[ix], actual[ix]);
 	}
+}
+
+
+#define IAZ_TOLERANCE   1e-12
+
+static void complexEqualText(qCx cx1, qCx cx2, const char *msg) {
+	//printf("checking.   see if (%lf %lf) == (%lf %lf) close enough.\n",
+	//	cx1.re, cx1.im, cx2.re, cx2.im);
+	DOUBLES_EQUAL_TEXT(cx1.re, cx2.re, IAZ_TOLERANCE, msg);
+	DOUBLES_EQUAL_TEXT(cx1.im, cx2.im, IAZ_TOLERANCE, msg);
+}
+
+// need this to verify waves have a certain specific frequency.  Do this to the spectrum.
+void isAllZeroesExceptFor(qBuffer *qwave, int except1, int except2) {
+	qCx *wave = qwave->wave;
+	int start = qwave->start;
+	int end = qwave->end;
+	char buf[100];
+
+	for (int ix = start; ix < end; ix++) {
+		qCx cx = wave[ix];
+		double re = cx.re, im = cx.im;
+		sprintf(buf, "wave at [%d]  bad value = %8.8lf %8.8lf",
+			ix, re, im);
+
+		if (ix != except1 && ix != except2)
+			complexEqualText(cx, qCx(0), buf);
+		else
+			CHECK_TEXT(cx.norm() > IAZ_TOLERANCE, buf);
+	}
+}
+
+
+
+/* ********************************************** my favorite random number generator */
+
+static bool traceRando = true;
+
+// set this any time you need a predictable sequence.  Probably a number -.5 to .5,
+// or I dunno -10 to 10 or 100x or 100÷ that
+double rando = PI - 3;
+
+// a mediocre random number generator that's easy to type into a calculator.
+// returns -.5 ... +.5
+double nextRando(void) {
+	double xxx;
+	rando = modf(exp(rando + 7.4), &xxx);
+	if (traceRando) printf("next num: %lf\n", rando);
+	return rando - .5;
 }
 

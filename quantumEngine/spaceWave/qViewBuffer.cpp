@@ -62,7 +62,7 @@ float qViewBuffer::loadViewBuffer(void) {
 			avatar->mainQWave->wave);
 		printf("loadViewBuffer(vb,lqw): vBuffer %p and avatar->mainQWave->wave=%p\n",
 			vBuffer, latestWave);
-		mainQWave->dumpWave("📺 at start of loadViewBuffer()");
+		mainQWave->dump("📺 at start of loadViewBuffer()");
 	}
 
 	// this is index into the complex point, which translates to 2 GL points

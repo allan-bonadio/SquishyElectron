@@ -20,7 +20,9 @@ int traceConstDeconst = false;
 /* ************************************************************ birth & death & basics */
 
 // This produces a wave ready to hold an electron
-qWave::qWave(qSpace *sp, qCx *useThisBuffer) {
+qWave::qWave(qSpace *sp, qCx *useThisBuffer)
+	: qBuffer() {
+
 	if (! sp)
 		throw "qWave::qWave null space";
 	magic = 'qWav';
@@ -73,7 +75,7 @@ void qWave::forEachPoint(void (*callback)(qCx, int) ) {
 	qCx *wave = wave;
 	int end = dims->end + dims->start;
 	for (int ix = 0; ix < end; ix++) {
-		//printf("\n[%d] ", ix);
+		//printf("\n[%3d] ", ix);
 		//printf("(%lf,%lf) \n", wave[ix].re, wave[ix].im);
 		callback(wave[ix], ix);
 	}
@@ -85,7 +87,7 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 	int end = dims->end;
 	qCx *wave = wave;
 	for (int ix = dims->start; ix < end; ix++) {
-		//printf("\n[%d] ", ix);
+		//printf("\n[%3d] ", ix);
 		//printf("(%lf,%lf) ", wave[ix].re, wave[ix].im);
 		callback(wave[ix], ix);
 	}
@@ -99,53 +101,17 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 // one for the 0 element if it's a continuum
 // the complete set of states
 // one for the N+1 if continuum
-void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
-	qSpace *ss = this;
-	if (NULL == ss) throw std::runtime_error("🌊🌊 qSpace::dumpThatWave() with null this");
-	if (nPoints <= 0) throw std::runtime_error("🌊🌊 qSpace::dumpThatWave() with zero points");
+//void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
+//	qSpace *ss = this;
+//	if (NULL == ss) throw std::runtime_error("🌊🌊 qSpace::dumpThatWave() with null this");
+//	if (nPoints <= 0) throw std::runtime_error("🌊🌊 qSpace::dumpThatWave() with zero points");
+//
+//
+//
+//	const qDimension *dims = dimensions;
+//	qBuffer::dumpSegment(wave, withExtras, dims->start, dims->end, dims->continuum);
+//}
 
-
-
-	const qDimension *dims = dimensions;
-	qBuffer::dumpSegment(wave, withExtras, dims->start, dims->end, dims->continuum);
-}
-
-// any wave, probably shouldn't call this
-void qWave::dumpThatWave(qCx *wave, bool withExtras) {
-	//printf("🌊🌊 any wave, probably shouldn't call this\n");
-	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
-}
-
-// this is the member function that dumps its own wave and space
-void qWave::dumpWave(const char *title, bool withExtras) {
-	printf("\n🌊🌊 ==== Wave | %s ", title);
-	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
-	//space->dumpThatWave(wave, withExtras);
-	printf("\n        ==== end of Wave ====\n\n");
-}
-
-
-
-// calls the JS dumpRainbow method of qeWave.  Note we can't compile this for
-// straight C++ specs cuz there's no emscripten or JS.  So the app,
-// or node with emscripten
-void qBuffer::rainbowDump(const char *title) {
-printf("about to rainbowDump EM_ASM %p %d %d %d %s\n\n", wave, start, end, nPoints, title);
-	// this also has to compile for standard C++ with no emscripten
-	#ifdef EM_ASM
-	EM_ASM({
-		console.log('rainbowDump: starting the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n', $1, $2, $3);
-		let waveJS = new Float64Array(window.Module.HEAPF64.buffer, $0, 2 * $3);
-
-		//rainbowDump(wave, start, end, nPoints, title);
-		rainbowDump(waveJS, $1, $2, $3);
-
-
-		console.log("rainbowDump: done the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n", $1, $2, $3, $4);
-	}, wave, start, end, nPoints);
-	#endif
-printf("done with rainbowDump EM_ASM\n\n");
-}
 
 
 /* ************************************************* bad ideas I might revisit?  */
@@ -153,7 +119,7 @@ printf("done with rainbowDump EM_ASM\n\n");
 double cleanOneNumber(double u, int ix, int sense) {
 	if (!isfinite(u)) {
 		// just enough to be nonzero without affecting the balance
-		printf("🌊🌊 had to prune [%d]= %f\n", ix, u);
+		printf("🌊🌊 had to prune [%3d]= %f\n", ix, u);
 		double faker = sense ? 1e-9 :  -1e-9;
 		return faker;
 	}
@@ -264,6 +230,6 @@ void qWave::nyquistFilter(void) {
 
 	copyThatWave(wave, scratchBuffer, nPoints);
 
-//	dumpWave("after nyquist filter");
+//	dump("after nyquist filter");
 }
 

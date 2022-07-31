@@ -14,6 +14,8 @@ struct qSpectrum : public virtual  qBuffer {
 
 	void dumpThatSpectrum(qCx *wave, bool withExtras = false);
 	void dumpSpectrum(const char *title, bool withExtras = false);
+	void dump(const char *title = "a spectrum", bool withExtras = false)
+		{this->dumpSpectrum(title, withExtras);};
 
 	// do fft
 	void generateSpectrum(qWave *inputQWave);

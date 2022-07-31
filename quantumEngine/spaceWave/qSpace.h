@@ -107,9 +107,9 @@ public:
 	// some of these might go away as the buffers now have the essential numbers
 
 	// will dump any wave that uses this space.  same as in qWave:: (obsolete)
-	void dumpThatWave(qCx *wave, bool withExtras = false);
+	//void dumpThatWave(qCx *wave, bool withExtras = false);
 
-	void fixThoseBoundaries(qCx *targetWave);  // like for qWave but on any wave
+	//void fixThoseBoundaries(qCx *targetWave);  // like for qWave but on any wave
 
 	/* *********************************************** FreeBuffers */
 
