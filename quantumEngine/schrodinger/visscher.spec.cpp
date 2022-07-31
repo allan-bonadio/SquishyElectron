@@ -36,7 +36,7 @@ qWave *expectedWave4 = new qWave(space4, ex4Wave);
 
 TEST(Visscher, VisscherOneStep)
 {
-	setCircularWave(oldWave4, 1.);
+	oldWave4->setCircularWave(1.);
 	Avatar *avatar = new Avatar(space4);
 
 	avatar->dt = 0.01;
@@ -56,7 +56,7 @@ TEST(Visscher, VisscherOneIteration)
 {
 	// simulate the app starting up
 	makeFullSpace(32);
-	setCircularWave(theAvatar->mainQWave, 1.);
+	theAvatar->mainQWave->setCircularWave(1.);
 
 	// simulate the app taking one iter = 100 steps
 	theAvatar->stepsPerIteration = 100;

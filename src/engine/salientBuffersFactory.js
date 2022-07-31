@@ -12,7 +12,7 @@ import jsAvatar from './jsAvatar';
 
 // handed back when space is created by C++
 // This is recreated every time the space changes dimension(s) -
-// the space is actually deleted and reconstructed along with space and all the rest
+// the salientBuffers object is actually deleted and reconstructed along with space and all the rest
 class salientBuffersFactory {
 	// hand in a pointer into C++ space for the the buffer pointers, as returned from completeNewSpace()
 	constructor(space, salientPointersPointer) {
@@ -23,18 +23,21 @@ class salientBuffersFactory {
 		const struct = new Uint32Array(window.Module.HEAPU32.buffer, salientPointersPointer);
 
 		// now make the JS-usable versions.  Someday: pass in the length of each?
+		//np = this.nPoints * 8;  // 8 = four floats for first row, four for second row
+
+		// qeWave figures out the right buffer length
 		this.mainQeWave = new qeWave(space, struct[1]);
-		this.potentialBuffer = new Float64Array(window.Module.HEAPF64.buffer, struct[2], space.nPoints);
+
+		// one double per point
+		this.potentialBuffer = new Float64Array(window.Module.HEAPF64.buffer, struct[2],
+			space.nPoints * Float64Array.BYTES_PER_ELEMENT);
 
 		// display also the boundary points?  if not, use nStates instead
-		let np = this.nPoints * 8;  // 8 = four floats for first row, four for second row
-		this.vBuffer = new Float32Array(window.Module.HEAPF64.buffer, struct[3], np);
-
+		this.vBuffer = new Float32Array(window.Module.HEAPF64.buffer, struct[3],
+			space.nPoints * Float32Array.BYTES_PER_ELEMENT *  8); // two vec4 s per point
 
 		this.theAvatar = new jsAvatar(struct[4], this.mainQeWave);
-		this.miniGraphAvatar = new jsAvatar(struct[5]);
-
-
+		this.miniGraphAvatar = new jsAvatar(struct[5]);  // not yet implemented or used...
 	}
 
 //	get mainWaveBuffer() { return this.struct[1]; }

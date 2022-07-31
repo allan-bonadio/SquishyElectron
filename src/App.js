@@ -43,7 +43,7 @@ class App extends React.Component {
 		// keep track of any window width changes, to reset the svg
 		// add listener only executed once
 		window.addEventListener('resize', ev => {
-			console.log(` window resize ==> `, ev);
+			console.log(` window resize to ${ev.currentTarget.innerWidth}==> `, ev);
 			this.setState({innerWindowWidth: ev.currentTarget.innerWidth})
 		});
 	}

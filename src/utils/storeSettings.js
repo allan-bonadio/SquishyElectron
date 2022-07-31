@@ -16,7 +16,7 @@
 // (maybe I should integrate these better...)
 
 /* ************************************************** All Settings */
-debugger;
+//debugger;
 
 // these'll be filled in below
 export const storeSettings =  {

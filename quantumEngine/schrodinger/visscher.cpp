@@ -60,7 +60,7 @@ and for now omit the potential
 void Avatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
 	//printf("⚛️ start of stepReal");
-	//dumpThatWave(oldW, true);
+	//dumpThat(oldW, true);
 	//printf("⚛︎ stepReal start N States=(%d), dt=%lf\n",
 	//	dims->nStates, avatar->dt);
 
@@ -78,7 +78,7 @@ void Avatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 		qCheck("vischer stepReal", newW[ix]);
 	}
 	if (traceVischerBench) printf("      stepReal, on to fix boundaries: time=%lf\n", getTimeDouble());
-	space->fixThoseBoundaries(newW);
+	mainQWave->fixThoseBoundaries(newW);
 	//printf("⚛️ end of stepReal:");
 }
 
@@ -87,7 +87,7 @@ void Avatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 void Avatar::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
 	//printf("⚛︎ start of stepImaginary(), oldWave=");
-	//dumpThatWave(oldW, true);
+	//dumpThat(oldW, true);
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		double d2ψr = oldW[ix-1].re + oldW[ix+1].re - oldW[ix].re * 2;
@@ -104,7 +104,7 @@ void Avatar::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 	}
 	if (traceVischerBench) printf("      stepImaginary, on to fix boundaries: time=%lf\n", getTimeDouble());
 
-	space->fixThoseBoundaries(newW);
+	mainQWave->fixThoseBoundaries(newW);
 	//printf("⚛️ end of stepImaginary - result wave:");
 }
 
@@ -120,11 +120,11 @@ void Avatar::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
 
 	qDimension *dims = space->dimensions;
 	oldQW->fixBoundaries();
-	if (debugVisscher) oldQW->dumpWave("starting oneVisscherStep", true);
+	if (debugVisscher) oldQW->dump("starting oneVisscherStep", true);
 
 	if (traceVischerBench) printf("         oneVisscherStep, about to stepReal: time=%lf\n", getTimeDouble());
 	stepReal(oldW, newW, dt);
-	if (debugHalfway) newQWave->dumpWave("Visscher wave after the Re step", true);
+	if (debugHalfway) newQWave->dump("Visscher wave after the Re step", true);
 	// now at an half-odd fraction of dt
 
 	if (traceVischerBench) printf("         oneVisscherStep, about to stepImaginary: time=%lf\n", getTimeDouble());
@@ -139,7 +139,7 @@ void Avatar::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
 	if (debugVisscher) {
 		char atVisscher[100];
 		snprintf(atVisscher, 100, "at end of Visscher frame %1.0lf | ", iterateSerial);
-		newQW->dumpWave(atVisscher, true);
+		newQW->dump(atVisscher, true);
 	}
 	if (traceVischerBench) printf("         oneVisscherStep, done: time=%lf\n", getTimeDouble());
 }

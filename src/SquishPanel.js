@@ -57,10 +57,11 @@ export class SquishPanel extends React.Component {
 
 		super(props);
 
+		// why is this called so many times!?!?!?!?!
 		SquishPanel.created += 1;
-		console.info(`*** SquishPanel.created:`, SquishPanel.created);////
-		console.info((new Error()).stack);
-		debugger;
+		// console.info(`*** SquishPanel.created:`, SquishPanel.created);////
+		// console.info((new Error()).stack);
+		// debugger;
 
 // 		const space0 = storeSettings.retrieveSettings('space0');
 // 		const rat = storeSettings.retrieveRatify;
@@ -486,7 +487,6 @@ export class SquishPanel extends React.Component {
 
 	// sets the LPF in both SPanel state AND in the C++ area
 	setLowPassFilter = lowPassFilter => {
-		debugger;
 		console.info(`js setLowPassFilter(${lowPassFilter})`)
 		this.setState({lowPassFilter});
 		qe.Avatar_setLowPassFilter(lowPassFilter);

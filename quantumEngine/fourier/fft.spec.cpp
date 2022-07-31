@@ -16,7 +16,7 @@
 
 #include "CppUTest/TestHarness.h"
 
-bool dumpWaves = false;
+bool traceDumpWaves = true;
 bool tracing = false;
 
 TEST_GROUP(FFT)
@@ -34,12 +34,12 @@ static void tryOutFFT(int N, double freq) {
 	//printf("     tryOutFFT:%d freeBufferList: %p\n", __LINE__, space->freeBufferList);
 
 	qWave *original = new qWave(space);
-	setCircularWave(original, freq);
-	if (dumpWaves) original->dumpWave("    tryOutFFT:  orignal wave set", true);
+	original->setCircularWave(freq);
+	if (traceDumpWaves) original->dump("    tryOutFFT:  orignal wave set", true);
 
 	qSpectrum *spect = new qSpectrum(space);
 	spect->generateSpectrum(original);
-	if (dumpWaves) spect->dumpSpectrum("    tryOutFFT: generated spectrum");
+	if (traceDumpWaves) spect->dumpSpectrum("    tryOutFFT: generated spectrum");
 
 	// now there should be 1 number that's nonzero; we should be able to predict what and where
 	// should be real and should be at position freq from whichever end
@@ -107,7 +107,7 @@ static void trySquareWaveFFT(int N) {
 	// make a spectrum and FFT it
 	qSpectrum *spect = new qSpectrum(space);
 	spect->generateSpectrum(original);
-	if (dumpWaves) spect->dumpSpectrum("    trySquareWaveFFT: generated spectrum");
+	if (traceDumpWaves) spect->dumpSpectrum("    trySquareWaveFFT: generated spectrum");
 
 	// resulting spectrum looks like this: alternating 2s (-1...1) and zeroes for the real
 	// imaginary has different values that are mirrored in negative in the complementary point
@@ -140,23 +140,15 @@ static void trySquareWaveFFT(int N) {
 }
 
 
-TEST(FFT, SquareWave4) {trySquareWaveFFT(4);}
-TEST(FFT, SquareWave8) {trySquareWaveFFT(8);}
-TEST(FFT, SquareWave16) {trySquareWaveFFT(16);}
-TEST(FFT, SquareWave32) {trySquareWaveFFT(32);}
+TEST(FFT, SquareWaveFFT4) {trySquareWaveFFT(4);}
+TEST(FFT, SquareWaveFFT8) {trySquareWaveFFT(8);}
+TEST(FFT, SquareWaveFFT16) {trySquareWaveFFT(16);}
+TEST(FFT, SquareWaveFFT32) {trySquareWaveFFT(32);}
 
 
 
-/* ********************************************************************* Square Wave */
+/* ********************************************************************* invrse FFT */
 
-double rando = PI - 3;
-// a mediocre random number generator that's easy to type.  returns -.5 ... +.5
-static double nextNum(void) {
-	double xxx;
-	rando = modf(exp(rando + 7.4), &xxx);
-	if (tracing) printf("next num: %lf\n", rando);
-	return rando - .5;
-}
 
 // take a 'random' wave, then FFT and IFFT it, and make sure they equal.
 // seed = 0...1   The wave is a random walk rather than purely random.
@@ -170,17 +162,17 @@ static void tryInverseFFT(int N, double seed) {
 
 	// now fill it using a repeatable 'random' sequence
 	qCx *o = original->wave;
-	qCx here = qCx(nextNum(), nextNum());
+	qCx here = qCx(nextRando(), nextRando());
 	for (int ix = 0; ix < N; ix++) {
 		o[ix] = here;
-		here += qCx(nextNum(), nextNum());
+		here += qCx(nextRando(), nextRando());
 	}
-	if (dumpWaves) original->dumpWave("    tryInverseFFT:  orignal wave set", true);
+	if (traceDumpWaves) original->dump("    tryInverseFFT:  orignal wave set", true);
 
 	// make a spectrum and FFT it
 	qSpectrum *spect = new qSpectrum(space);
 	spect->generateSpectrum(original);
-	if (dumpWaves) spect->dumpSpectrum("    tryInverseFFT: generated spectrum");
+	if (traceDumpWaves) spect->dumpSpectrum("    tryInverseFFT: generated spectrum");
 
 	// now convert it back
 	qWave *result = new qWave(space);

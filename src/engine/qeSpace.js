@@ -85,9 +85,8 @@ export class qeBasicSpace {
 
 	// a qeSpace method to dump any wave buffer according to that space.
 	// RETURNS A STRING of the wave.
-	// modeled after qSpace::dumpThatWave() pls keep in sync!
-	dumpThatWave(wave) {
-		if (this.nPoints <= 0) throw "🚀  qeBasicSpace::dumpThatWave() with zero points";
+	dumpThat(wave) {
+		if (this.nPoints <= 0) throw "🚀  qeBasicSpace::dumpThat	() with zero points";
 
 		const {start, end, continuum} = this.startEnd2;
 		let ix = 0;
