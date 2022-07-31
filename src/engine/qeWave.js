@@ -94,10 +94,10 @@ class qeWave {
 
 	/* **************************************************************** dumping */
 
-	// dump out wave content.  Actually just calls qWave::dumpWave()
-	dumpWave(title) {
+	// dump out wave content.
+	dump(title) {
 		console.log(`\n🌊 ==== Wave | ${title} `+
-			this.space.dumpThatWave(this.wave) +
+			this.space.dumpThat(this.wave) +
 			`\n🌊 ==== end of Wave ====\n\n`);
 	}
 
@@ -157,7 +157,7 @@ class qeWave {
 			wave[ix + 1] = Math.sin(angle);
 		}
 
-		//this.dumpWave('qeWave.setCircularWave() done');
+		//this.dump('qeWave.setCircularWave() done');
 		//this.rainbowDump('🌊  qeWave.setCircularWave() done');
 	}
 
@@ -183,7 +183,7 @@ class qeWave {
 			wave[ix + 1] = 0;
 		}
 
-		//this.dumpWave('qeWave.setStandingWave() done');
+		//this.dump('qeWave.setStandingWave() done');
 		//this.rainbowDump('🌊  qeWave.setStandingWave() done');
 	}
 
@@ -210,7 +210,7 @@ class qeWave {
 			wave[ix + 1] *= stretch;
 		}
 
-		//this.dumpWave('qeWave.setPulseWave() done');
+		//this.dump('qeWave.setPulseWave() done');
 		//this.rainbowDump('qeWave.setPulseWave() done');
 	}
 
@@ -258,7 +258,7 @@ class qeWave {
 			}
 		}
 
-		//		//this.dumpWave('qeWave.setPulseWave() done');
+		//		//this.dump('qeWave.setPulseWave() done');
 		//this.rainbowDump('qeWave.setChordWave() done');
 	}
 
