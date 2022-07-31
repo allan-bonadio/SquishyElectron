@@ -25,6 +25,10 @@ function SetIterationTab(props) {
 	if (!props)
 		debugger;
 
+	// so when N=16, user can set lowPass to 0...6
+	// i'll be hacking on this.  0 = only filter out nyquist, 6=only let thru DC and freq=1
+	let lowPassMax = p.N/2 - 3;
+
 	//Unlike other tabs, all these are instant-update.
 
 	return (<div className='SetIterationTab'>
@@ -65,21 +69,17 @@ function SetIterationTab(props) {
 					props.setStepsPerIteration(power);
 				}}
 			/>
-			<LogSlider
-				unique='lowPassFilterSlider'
+
+			<input type='range'
 				className='lowPassFilterSlider cpSlider'
-				label='Frequencies to Suppress'
-				minLabel='1'
-				maxLabel={p.N/4}
+				value={props.lowPassFilter}
+				min={1}
+				max={lowPassMax}
 
-				current={props.lowPassFilter}
-				sliderMin={.125}
-				sliderMax={.5}
-				stepsPerDecade={16}
-
-				handleChange={(power, ix) => {
-					console.info(`handleChange Low Pass Filter::  ix=${ix}  `, power);
-					props.setLowPassFilter(power);
+				onChange={ev => {
+					const newValue = ev.currentTarget.value;
+					console.info(`handleChange Low Pass Filter:: ${newValue}  `);
+					props.setLowPassFilter(newValue);
 				}}
 			/>
 
