@@ -21,9 +21,10 @@ static bool traceIterSteps = false;
 
 static bool traceJustWave = false;
 static bool traceJustInnerProduct = false;
-static bool traceFourierFilter = false;
 
-static bool traceInfrequentFFTs = true;
+static bool traceFourierFilter = true;
+static bool traceInfrequentFFTs = false;
+static bool traceAfterFourierFilter = true;
 
 //const double sNAN99999 = std::numeric_limits<double>::signaling_NaN();
 
@@ -51,7 +52,7 @@ qWave *Avatar::getScratchWave(void) {
 	return scratchQWave;
 };
 
-qSpectrum *Avatar::getSpect(void) {
+qSpectrum *Avatar::getSpectrum(void) {
 	if (!spect)
 		spect = new qSpectrum(space);
 	return spect;
@@ -103,14 +104,15 @@ double getTimeDouble()
 }
 
 
-// does several visscher steps (eg 100 or 500)
-// actually does stepsPerIteration+1 steps; half steps at start and finish
+// Does several visscher steps (eg 100 or 500). Actually does
+// stepsPerIteration+1 steps; half steps at start and finish to adapt and
+// deadapt to Visscher timing
 void Avatar::oneIteration() {
 	int tt;
 
 	//printf("the ttime: %lf\n", getTimeDouble());
 
-	// some uses never need this so wait till we do
+	// now we need it
 	getScratchWave();
 
 	// update this all the time cuz user might have changed it.  Well, actually,
@@ -130,11 +132,6 @@ void Avatar::oneIteration() {
 	stepReal(scratchQWave->wave, mainQWave->wave, 0);
 	stepImaginary(scratchQWave->wave, mainQWave->wave, dt/2);
 
-
-//	mainQWave = new qWave(theSpace);
-//	scratchQWave = new qWave(theSpace);
-//
-
 	int doubleSteps = stepsPerIteration / 2;
 	if (traceIteration)
 		printf("      doubleSteps=%d   stepsPerIteration=%d\n",
@@ -151,13 +148,10 @@ void Avatar::oneIteration() {
 			printf("       step every hundred, step %d; elapsed time: %lf\n", tt * 2, getTimeDouble());
 		}
 
-		//auto end = std::chrono::steady_clock::now();////
-		//std::chrono::duration<double> elapsed_seconds = end-start;////
 		if (traceIterSteps) {
 			printf("step done %d; elapsed time: %lf \n", tt*2, getTimeDouble());////
 		}
 	}
-
 
 	// half step at completion to move Re forward dt/2
 	// and copy back to Main
@@ -173,8 +167,13 @@ void Avatar::oneIteration() {
 	//mainQWave = mainQWave;
 
 	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
-	fourierFilter(lowPassFilter);
 
+	if (traceAfterFourierFilter && iterateSerial >= 4000 && ((int) iterateSerial % 250) == 0) {
+		printf("post-FouFilter spectrum at iteration %8.0lf:\n", iterateSerial);
+		analyzeWaveFFT(mainQWave);
+		fourierFilter(lowPassFilter);
+		analyzeWaveFFT(mainQWave);
+	}
 
 	// need it; somehow? not done in JS.  YES IT IS!  remove this when you have the oppty
 	//theQViewBuffer->loadViewBuffer();
@@ -185,7 +184,7 @@ void Avatar::oneIteration() {
 	}
 
 	if (traceJustWave) {
-		mainQWave->dumpWave("      at end of iteration", true);
+		mainQWave->dump("      at end of iteration", true);
 	}
 	if (traceJustInnerProduct) {
 		printf("      finished one integration iteration (%d steps, N=%d), inner product: %lf\n",
@@ -199,53 +198,66 @@ void Avatar::oneIteration() {
 }
 
 
+static bool dumpFFSpectums = false;
 
 // FFT the wave, cut down the high frequencies, then iFFT it back.
-// lowPassFilter is #frequencies we zero out - max N/4
-// default is N/8.  Can't we eventually find a simple convolution to do this instead of FFT/iFFT?
+// lowPassFilter is .. kinda changes but maybe #frequencies we zero out
+// Can't we eventually find a simple convolution to do this instead of FFT/iFFT?
+// maye after i get more of this working and fine toon it
 void Avatar::fourierFilter(int lowPassFilter) {
-	spect = getSpect();
+	spect = getSpectrum();
 	spect->generateSpectrum(mainQWave);
+	if (dumpFFSpectums) spect->dumpSpectrum("spect right at start of fourierFilter()");
 
-	// the high frequencies are in the middle; the nyquist freq is at N/2
+	// the high frequencies are in the middle
 	int nyquist = spect->nPoints/2;
 	qCx *s = spect->wave;
+
+	// the nyquist freq is at N/2, ALWAYS block that!!
 	s[nyquist] = 0;
 
 	if (traceFourierFilter)
 		printf("🌈  fourierFilter: nPoints=%d  nyquist=%d    lowPassFilter=%d\n",
 			spect->nPoints, nyquist, lowPassFilter);
-	if (lowPassFilter > nyquist/2)  // sorry can't do that
-		lowPassFilter = nyquist/2;
+	//if (lowPassFilter > nyquist/2)  // sorry can't do that
+	//	lowPassFilter = nyquist/2;
 
-	for (int k = 1; k < lowPassFilter; k++) {
+	for (int k = 0; k < lowPassFilter; k++) {
 		double factor = 0;
-		if (traceFourierFilter) {
-			printf("🌈  fourierFilter: smashing lowPassFilter=%d   freqs %d which was %lf, "
-				"and %d which was %lf, by factor %lf\n",
+		if (traceAfterFourierFilter && iterateSerial >= 4000 && ((int) iterateSerial % 250) == 0) {
+			printf("🌈  fourierFilter: smashing lowPassFilter=%d   [freq: %d which was %lf], "
+				"and [freq: %d which was %lf], by factor %8.4lf\n",
 				lowPassFilter, nyquist - k, s[nyquist - k].norm(), nyquist + k, s[nyquist + k].norm(), factor);
 		}
 		s[nyquist + k] = 0;
 		s[nyquist - k] = 0;
 		//s[nyquist + k] *= factor;
 		//s[nyquist - k] *= factor;
-		if (traceFourierFilter) printf("resulting poimts: (%lf %lf)  (%lf %lf)\n",
-				s[nyquist - k].re, s[nyquist - k].im, s[nyquist + k].re, s[nyquist + k].im);
+		if (traceFourierFilter) printf("resulting poimts: (%lf %lf)  (%lf %lf) at k=%d\n",
+				s[nyquist - k].re, s[nyquist - k].im, s[nyquist + k].re, s[nyquist + k].im, k);
 	}
 
-	if (traceInfrequentFFTs && (((int) iterateSerial & 0x3FF) == 0) && iterateSerial > 15000) {
-		printf("fourierFilter iteration %8.0lf", iterateSerial);
-		for (int ix = nyquist - 10; ix < nyquist+10; ix++)
-			printf("[%d] (%8.4lf,%8.4lf)\n", ix, s[ix] .re, s[ix] .im);
+//	if (traceInfrequentFFTs && (((int) iterateSerial & 0x3FF) == 0) && iterateSerial > 15000) {
+//		printf("fourierFilter iteration %8.0lf", iterateSerial);
+//		for (int ix = nyquist - 10; ix < nyquist+10; ix++)
+//			printf("[%d] (%8.4lf,%8.4lf)\n", ix, s[ix] .re, s[ix] .im);
+//
+//		//spect->dumpSpectrum("periodic spectrum check after fourierFilter iteration");
+//		traceFourierFilter = true;
+//	}
+//	else
+//		traceFourierFilter = false;
 
-		//spect->dumpSpectrum("periodic spectrum check after fourierFilter iteration");
-		traceFourierFilter = true;
+	if (traceAfterFourierFilter && iterateSerial >= 4000 && ((int) iterateSerial % 250) == 0) {
+			spect->dumpSpectrum("🐠  inside fourierFilter: spectrum");
 	}
-	else
-		traceFourierFilter = false;
 
+
+	if (dumpFFSpectums) spect->dumpSpectrum("spect right at END of fourierFilter()");
 	spect->generateWave(mainQWave);
+//	if (dumpFFSpectums) mainQWave->dumpHiRes("wave END fourierFilter() b4 normalize");
 	mainQWave->normalize();
+//	if (dumpFFSpectums) mainQWave->dumpHiRes("wave END fourierFilter() after normalize");
 }
 
 

@@ -3,6 +3,7 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
+// formerly called: Manifestation, Incarnation, Timeline, ... formerly part of qSpace
 
 struct Avatar {
 	Avatar(qSpace *);
@@ -51,9 +52,9 @@ struct Avatar {
 
 	// for the fourier filter.  Call the function first time you need it.
 	struct qSpectrum *spect;
-	qSpectrum *getSpect(void);
+	qSpectrum *getSpectrum(void);
 
-	// the qViewBuffer to be passed to webgl
+	// the qViewBuffer to be passed to webgl.  This is a visual thing after all.
 	struct qViewBuffer *qvBuffer;
 
 	// set the elapsedTime and iterateSerial to zero
