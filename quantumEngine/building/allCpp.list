@@ -9,5 +9,4 @@ spaceWave/qCx.cpp
 spaceWave/qSpace.cpp
 spaceWave/qBuffer.cpp
 spaceWave/qWave.cpp
-spaceWave/qFlick.cpp
 spaceWave/qViewBuffer.cpp
