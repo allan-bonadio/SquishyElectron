@@ -9,7 +9,6 @@
 #include "qSpectrum.h"
 #include "fftMain.h"
 
-static bool trace = false;
 
 
 /* ****************************************************** small utilities */
@@ -26,25 +25,31 @@ void qDimension::chooseSpectrumLength(void) {
 
 /* ********************************************************* qWave interface */
 
+static bool traceGenerate = false;
 
 // Calculate the FFT of this qWave and deposit it in the spectrum.
 // must make/free your own qSpectrum *spect = new qSpectrum(origSpace);
 void qSpectrum::generateSpectrum(qWave *inputQWave) {
-	if (trace) printf("🌈 about to generateSpectrum\n");
+	int start = inputQWave->start;
+	int N = inputQWave->end - start;
+	if (traceGenerate) printf("🌈 about to generateSpectrum... start=%d  end-start=%d\n",
+		start, N);
 
-	cooleyTukeyFFT(wave, inputQWave->wave + start, end - start);
+	cooleyTukeyFFT(wave, inputQWave->wave + start, N);
 
 	//printf("    generateSpectrum completed\n");
 }
 
 // do an inverse FFT to reconstruct the wave from generateSpectrum()
-void qSpectrum::generateWave(qWave *outputWave) {
-	if (trace) printf("🌈 about to generateWave\n");
+void qSpectrum::generateWave(qWave *outputQWave) {
+	int start = outputQWave->start;
+	int N = outputQWave->end - start;
+	if (traceGenerate) printf("🌈 about to generateWavestart=%d  e-s=%d\n", start, N);
 
-	cooleyTukeyIFFT(outputWave->wave + start, wave, end - start);
-	outputWave->fixBoundaries();
+	cooleyTukeyIFFT(outputQWave->wave + start, wave, N);
+	outputQWave->fixBoundaries();
 
-	if (trace) printf("    generateWave completed\n");
+	if (traceGenerate) outputQWave->dump("🌈 generateWave completed\n");
 }
 
 
