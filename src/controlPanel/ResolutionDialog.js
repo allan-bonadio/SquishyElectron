@@ -14,53 +14,8 @@ import LogSlider from '../widgets/LogSlider';
 import listOfViewClasses from '../view/SquishView';
 
 
-// had this been a real webiste, I would not have to copy/paste these here
-//export const listOfViewClasses = {
-//	abstractViewDef, manualViewDef, viewVariableViewDef,
-//	flatViewDef,
-//};
-
-// these numbers represent approx 10**(n/10), but
-// rounded off to convenient increments, so eg 60=>1M, 50=>100k,
-// 30=1000, 27=500, 23=>200, 20=>100, 13=>20, 10=>10 /*!!!*/, 7=>5
-// note 11=>12.5=>13 so start at 12 => 16, although it'll round up and always be an integer
-// const MIN_SLIDER_RES = process.env.NODE_ENV == 'development' ? 0 : 12;
-// const MAX_SLIDER_RES = 30;
-
 const MIN_2SLIDER_RES = process.env.NODE_ENV == 'development' ? 4 : 16;
 const MAX_2SLIDER_RES = 1024;
-
-// list of settings that are more better - not that simple!
-// function createGoodPowersOf10() {
-// 	let po10 = [];
-// 	for (let p = MIN_SLIDER_RES; p <= MAX_SLIDER_RES; p += 10) {
-// 		po10.push(<option key={p}>{p}</option>);
-// //		po10.push(<option>{p + 3}</option>);
-// //		po10.push(<option>{p + 7}</option>);
-// 	}
-// 	return po10;
-// }
-//
-// const GoodPowersOf10 = createGoodPowersOf10();
-//
-// // convert eg 20, 21, 25, 30 into 100, 125, 300, 1000
-// // indices under 12 will result in rounded results,
-// // 1 2 2 2 3 3 4 5 6 8 10 13 15...
-// // so not recommended for human consumption
-// function indexToPower(ix) {
-// 	let po10 = 10 ** Math.floor(ix/10);
-// 	let factor = [
-// 		1.0, 1.25, 1.5,
-// 		2.0, 2.50, 3.0,
-// 		4.0, 5.00, 6.0,
-// 		8.0][ix % 10];
-// 	return Math.ceil(factor * po10);
-// }
-//
-// // convert eg 100, 125, 300, 1000 into 20, 21, 25, 30
-// function powerToIndex(p) {
-// 	return Math.round(Math.log10(p) * 10);
-// }
 
 export default class ResolutionDialog extends React.Component {
 	static propTypes = {
@@ -126,7 +81,7 @@ export default class ResolutionDialog extends React.Component {
 
 	/* ******************************************************************* rendering */
 
-	renderSlider() {
+	renderNSlider() {
 		const s = this.state;
 		return <>
 			<LogSlider
@@ -163,7 +118,7 @@ export default class ResolutionDialog extends React.Component {
 		const onChange = ev => this.setState({continuum: +ev.target.value});
 		return <>
 			what kind of space:
-			<label><input type='radio' name='continuum'  value={qeBasicSpace.contENDLESS}
+			<label  key='contENDLESS'><input type='radio' name='continuum'  value={qeBasicSpace.contENDLESS}
 					checked={s.continuum == qeBasicSpace.contENDLESS}
 					onChange={onChange}
 					style={{fontWeight:
@@ -171,7 +126,7 @@ export default class ResolutionDialog extends React.Component {
 						? 'bold'
 						: 'normal'}}/>
 				Endless, repeating left-right</label>
-			<label><input type='radio' name='continuum'  value={qeBasicSpace.contWELL}
+			<label  key='contWELL'><input type='radio' name='continuum'  value={qeBasicSpace.contWELL}
 					checked={s.continuum == qeBasicSpace.contWELL}
 					onChange={onChange}
 					style={{fontWeight:
@@ -179,7 +134,7 @@ export default class ResolutionDialog extends React.Component {
 						? 'bold'
 						: 'normal'}}/>
 				Well with Walls</label>
-			<label><input type='radio' name='continuum'  value={qeBasicSpace.contDISCRETE}
+			<label  key='contDISCRETE'><input type='radio' name='continuum'  value={qeBasicSpace.contDISCRETE}
 					checked={s.continuum == qeBasicSpace.contDISCRETE}
 					onChange={onChange}
 					style={{fontWeight:
@@ -223,21 +178,21 @@ export default class ResolutionDialog extends React.Component {
 
 				<h3>Reconfigure the Space</h3>
 
-				<section className='dialogSection'>
-					{this.renderSlider()}
+				<section className='dialogSection' key='NSlider'>
+					{this.renderNSlider()}
 				</section>
 
-				<section className='dialogSection'
+				<section className='dialogSection'  key='continuumRadios'
 					style={{float: 'left', width: '45%', paddingRight: '2em'}} >
 					{this.renderContinuum()}
 				</section>
 
-				<section className='dialogSection'
+				<section className='dialogSection' key='viewRadios'
 					style={{float: 'left', width: '45%'}}>
 					{this.renderViewRadios()}
 				</section>
 
-				<section className='dialogSection'
+				<section className='dialogSection' key='setButton'
 					style={{padding: '1em', margin: '1em', textAlign: 'right'}}>
 					<button className='cancelButton' onClick={this.cancel}>
 							Cancel
