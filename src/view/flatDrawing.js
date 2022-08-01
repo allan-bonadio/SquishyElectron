@@ -116,6 +116,10 @@ export class flatDrawing extends abstractDrawing {
 		this.rowAttr.attachArray(qe.space.vBuffer, this.rowFloats);
 	}
 
+	// call this when you reset the wave otherwise the smoothing is surprised
+	resetAvgHighest() {
+		this.avgHighest = 0;
+	}
 
 	draw() {
 		const gl = this.gl;

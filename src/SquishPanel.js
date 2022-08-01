@@ -67,6 +67,9 @@ export class SquishPanel extends React.Component {
 // 		const rat = storeSettings.retrieveRatify;
 
 		this.state = {
+			// Many of these things should be in a lower component;
+			// don't need to rerender the whole panel just cuz some params changed.
+
 			// THE N and continuum for THE space we're currently doing
 			// kept between sessions in localStore
 			N: storeSettings.spaceParams.N,
@@ -289,6 +292,7 @@ export class SquishPanel extends React.Component {
 		if (needsRepaint) {
 			// this is kinda cheating, but the effectiveView in the state takes some time to
 			// get set; but we need it immediately.  So we also set it as a variable on this.
+			// see similar code below; keep in sync
 			const curView = this.effectiveView || this.state.effectiveView;
 
 			curView.reloadAllVariables();
@@ -490,7 +494,7 @@ export class SquishPanel extends React.Component {
 		console.info(`js setLowPassFilter(${lowPassFilter})`)
 		this.setState({lowPassFilter});
 		qe.Avatar_setLowPassFilter(lowPassFilter);
-		if (typeof storeSettings != 'undefined')  //  goddamned bug in importing works in constructor
+		if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  //  goddamned bug in importing works in constructor
 			storeSettings.iterationSettings.lowPassFilter = lowPassFilter;
 	}
 	//setLowPassFilter = this.setLowPassFilter.bind(this);
@@ -505,6 +509,11 @@ export class SquishPanel extends React.Component {
 		//this.iterateOneIteration(false, true);
 		//qe.qViewBuffer_getViewBuffer();
 		//qe.createQEWaveFromCBuf();
+		qe.Avatar_resetCounters();
+
+		// see similar code above; keep in sync
+		const curView = this.effectiveView || this.state.effectiveView;
+		curView.drawings.forEach(dr =>  dr.resetAvgHighest && dr.resetAvgHighest());
 	}
 	//setWave = this.setWave.bind(this);
 
