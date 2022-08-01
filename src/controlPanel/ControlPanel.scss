@@ -266,12 +266,12 @@
 	/* **************************************** Set Iteration tab/dialog */
 
 	.SetIterationTab {
-		.sliders, .iStats {
+		.sliderBlock, .iStats {
 			float: left;
 			margin-left: 3em;
 		}
 
-		.sliders .middle {
+		.sliderBlock .middle {
 			width: 10em;
 		}
 

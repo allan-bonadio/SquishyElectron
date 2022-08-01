@@ -32,7 +32,7 @@ function SetIterationTab(props) {
 	//Unlike other tabs, all these are instant-update.
 
 	return (<div className='SetIterationTab'>
-		<div className='sliders'>
+		<div className='sliderBlock'>
 			<h3>Iteration Controls</h3>
 
 			<LogSlider
@@ -70,18 +70,23 @@ function SetIterationTab(props) {
 				}}
 			/>
 
-			<input type='range'
-				className='lowPassFilterSlider cpSlider'
-				value={props.lowPassFilter}
-				min={1}
-				max={lowPassMax}
+			<div className='lowPassFilterSlider cpSlider' >
+				<div >
+					frequencies to filter off: {props.lowPassFilter}
+				</div>
+				<input type='range'
+					value={props.lowPassFilter}
+					min={1}
+					max={lowPassMax}
 
-				onChange={ev => {
-					const newValue = ev.currentTarget.value;
-					console.info(`handleChange Low Pass Filter:: ${newValue}  `);
-					props.setLowPassFilter(newValue);
-				}}
-			/>
+					onChange={ev => {
+						const newValue = ev.currentTarget.value;
+						console.info(`handleChange Low Pass Filter:: ${newValue}  `);
+						props.setLowPassFilter(+newValue);
+					}}
+					style={{height: '65px', width: '300px',}}
+				/>
+			</div>
 
 		</div>
 		<div className='iStats'>
