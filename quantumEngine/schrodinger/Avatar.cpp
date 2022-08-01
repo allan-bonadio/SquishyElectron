@@ -15,18 +15,30 @@
 #include "../fourier/fftMain.h"
 
 
-static bool traceIterSummary = false;
 static bool traceIteration = false;
 static bool traceIterSteps = false;
 
 static bool traceJustWave = false;
 static bool traceJustInnerProduct = false;
 
-static bool traceFourierFilter = true;
-static bool traceInfrequentFFTs = false;
-static bool traceAfterFourierFilter = true;
+static bool traceFourierFilter = false;
 
-//const double sNAN99999 = std::numeric_limits<double>::signaling_NaN();
+static bool useFourierFilter = true;
+
+// only do some traces if we're past where it's a problem
+//static bool dangerousSerial = 4000;  // for the chord pulse
+//static bool dangerousRate = 250;
+
+static bool dangerousSerial = 50;  // for the gaussian pulse
+static bool dangerousRate = 25;
+
+
+static bool traceEachFFSquelch = false;
+static bool traceEndingFFSpectrum = true;
+static bool traceB4nAfterFFSpectrum = true;
+
+static bool dumpFFHiResSpectums = false;
+
 
 // make sure these values are doable by the sliders' steps
 Avatar::Avatar(qSpace *sp)
@@ -109,8 +121,8 @@ double getTimeDouble()
 // deadapt to Visscher timing
 void Avatar::oneIteration() {
 	int tt;
-
-	//printf("the ttime: %lf\n", getTimeDouble());
+	bool dangerousTimes = (iterateSerial >= dangerousSerial)
+		&& ((int) iterateSerial % dangerousRate) == 0;
 
 	// now we need it
 	getScratchWave();
@@ -120,9 +132,9 @@ void Avatar::oneIteration() {
 	potential = space->potential;
 	potentialFactor = space->potentialFactor;
 
-	if (traceIteration)
-		printf("🚀 🚀 Avatar::oneIteration() - dt=%lf   stepsPerIteration=%d\n",
-			dt, stepsPerIteration);
+	//if (traceIteration)
+		printf("🚀 🚀 Avatar::oneIteration() - dt=%lf   stepsPerIteration=%d  %s\n",
+			dt, stepsPerIteration, dangerousTimes ? "dangerous times" : "");
 	isIterating = true;
 
 	// half step in beginning to move Im forward dt/2
@@ -168,46 +180,42 @@ void Avatar::oneIteration() {
 
 	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
 
-	if (traceAfterFourierFilter && iterateSerial >= 4000 && ((int) iterateSerial % 250) == 0) {
-		printf("post-FouFilter spectrum at iteration %8.0lf:\n", iterateSerial);
-		analyzeWaveFFT(mainQWave);
+	if (useFourierFilter) {
+		if (traceB4nAfterFFSpectrum && dangerousTimes) analyzeWaveFFT(mainQWave, "before FF");
 		fourierFilter(lowPassFilter);
-		analyzeWaveFFT(mainQWave);
+		if (traceB4nAfterFFSpectrum && dangerousTimes) analyzeWaveFFT(mainQWave, "after FF");
 	}
 
 	// need it; somehow? not done in JS.  YES IT IS!  remove this when you have the oppty
 	//theQViewBuffer->loadViewBuffer();
 
-	if (traceIterSummary) {
-		printf("🚀 🚀 finished one iteration (%d steps, N=%d), inner product: %lf",
-			stepsPerIteration, space->nStates, mainQWave->innerProduct());
-	}
-
 	if (traceJustWave) {
-		mainQWave->dump("      at end of iteration", true);
+		mainQWave->dump("      traceJustWave at end of iteration", true);
 	}
 	if (traceJustInnerProduct) {
-		printf("      finished one integration iteration (%d steps, N=%d), inner product: %lf\n",
+		printf("      traceJustInnerProduct: finished one iteration (%d steps, N=%d), iProduct: %lf\n",
 			stepsPerIteration, space->nStates, mainQWave->innerProduct());
 	}
 
 	if (this->pleaseFFT) {
-		analyzeWaveFFT(mainQWave);
+		analyzeWaveFFT(mainQWave, "pleaseFFT at end of iteration");
 		this->pleaseFFT = false;
 	}
 }
 
 
-static bool dumpFFSpectums = false;
 
 // FFT the wave, cut down the high frequencies, then iFFT it back.
 // lowPassFilter is .. kinda changes but maybe #frequencies we zero out
 // Can't we eventually find a simple convolution to do this instead of FFT/iFFT?
 // maye after i get more of this working and fine toon it
 void Avatar::fourierFilter(int lowPassFilter) {
+	// this is when the wave tends to come apart with high frequencies
+	bool dangerousTimes = (iterateSerial >= dangerousSerial) && ((int) iterateSerial % dangerousRate) == 0;
+
 	spect = getSpectrum();
 	spect->generateSpectrum(mainQWave);
-	if (dumpFFSpectums) spect->dumpSpectrum("spect right at start of fourierFilter()");
+	if (dumpFFHiResSpectums) spect->dumpSpectrum("spect right at start of fourierFilter()");
 
 	// the high frequencies are in the middle
 	int nyquist = spect->nPoints/2;
@@ -219,45 +227,27 @@ void Avatar::fourierFilter(int lowPassFilter) {
 	if (traceFourierFilter)
 		printf("🌈  fourierFilter: nPoints=%d  nyquist=%d    lowPassFilter=%d\n",
 			spect->nPoints, nyquist, lowPassFilter);
-	//if (lowPassFilter > nyquist/2)  // sorry can't do that
-	//	lowPassFilter = nyquist/2;
 
 	for (int k = 0; k < lowPassFilter; k++) {
-		double factor = 0;
-		if (traceAfterFourierFilter && iterateSerial >= 4000 && ((int) iterateSerial % 250) == 0) {
-			printf("🌈  fourierFilter: smashing lowPassFilter=%d   [freq: %d which was %lf], "
-				"and [freq: %d which was %lf], by factor %8.4lf\n",
-				lowPassFilter, nyquist - k, s[nyquist - k].norm(), nyquist + k, s[nyquist + k].norm(), factor);
-		}
 		s[nyquist + k] = 0;
 		s[nyquist - k] = 0;
-		//s[nyquist + k] *= factor;
-		//s[nyquist - k] *= factor;
-		if (traceFourierFilter) printf("resulting poimts: (%lf %lf)  (%lf %lf) at k=%d\n",
-				s[nyquist - k].re, s[nyquist - k].im, s[nyquist + k].re, s[nyquist + k].im, k);
+		if (traceEachFFSquelch && dangerousTimes) {
+			printf("🌈  fourierFilter: smashed in lowPassFilter=%d   [freq: %d which was %lf], "
+				"and [freq: %d which was %lf]\n",
+				lowPassFilter, nyquist - k, s[nyquist - k].norm(), nyquist + k, s[nyquist + k].norm());
+		}
 	}
 
-//	if (traceInfrequentFFTs && (((int) iterateSerial & 0x3FF) == 0) && iterateSerial > 15000) {
-//		printf("fourierFilter iteration %8.0lf", iterateSerial);
-//		for (int ix = nyquist - 10; ix < nyquist+10; ix++)
-//			printf("[%d] (%8.4lf,%8.4lf)\n", ix, s[ix] .re, s[ix] .im);
-//
-//		//spect->dumpSpectrum("periodic spectrum check after fourierFilter iteration");
-//		traceFourierFilter = true;
-//	}
-//	else
-//		traceFourierFilter = false;
-
-	if (traceAfterFourierFilter && iterateSerial >= 4000 && ((int) iterateSerial % 250) == 0) {
-			spect->dumpSpectrum("🐠  inside fourierFilter: spectrum");
+	if (traceEndingFFSpectrum && dangerousTimes) {
+			spect->dumpSpectrum("🐠  finished fourierFilter: spectrum");
 	}
 
 
-	if (dumpFFSpectums) spect->dumpSpectrum("spect right at END of fourierFilter()");
+	if (dumpFFHiResSpectums) spect->dumpSpectrum("spect right at END of fourierFilter()");
 	spect->generateWave(mainQWave);
-//	if (dumpFFSpectums) mainQWave->dumpHiRes("wave END fourierFilter() b4 normalize");
+	if (dumpFFHiResSpectums) mainQWave->dumpHiRes("wave END fourierFilter() b4 normalize");
 	mainQWave->normalize();
-//	if (dumpFFSpectums) mainQWave->dumpHiRes("wave END fourierFilter() after normalize");
+	if (dumpFFHiResSpectums) mainQWave->dumpHiRes("wave END fourierFilter() after normalize");
 }
 
 
@@ -267,7 +257,7 @@ void Avatar::askForFFT(void) {
 	if (isIterating)
 		this->pleaseFFT = true;
 	else
-		analyzeWaveFFT(mainQWave);
+		analyzeWaveFFT(mainQWave, "askForFFT while idle");
 }
 
 /* **********************************************************  */
