@@ -8,11 +8,7 @@ import PropTypes from 'prop-types';
 //import {scaleLinear} from 'd3-scale';
 //import {path as d3path} from 'd3-path';
 
-//import cxToRgb from '../view/cxToRgb';
-// import qCx from '../engine/qCx';
 import {qeSpace, qeBasicSpace} from '../engine/qeSpace';
-// import qeWave from '../engine/qeWave';
-// import {setFamiliarPotential} from '../widgets/utils';
 
 //const π = Math.PI;
 //const radsPerDeg = π / 180;

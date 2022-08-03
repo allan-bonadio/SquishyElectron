@@ -4,9 +4,6 @@
 */
 
 import {qe, defineQEngineFuncs} from './qe';
-// import qCx from './qCx';
-//import qeWave from './qeWave';
-//import qeSpace from './qeSpace';
 
 // all of these must be attached to window to  get called by c++
 
@@ -44,52 +41,4 @@ export const qeStartPromise = new Promise((succeed, fail) => {
 	qeStartPromiseSucceed = succeed;
 	console.info(`qeStartPromise created:`, succeed, fail);
 });
-
-
-/* ***************************************** obsolete data access */
-
-// these can't be defined until emscripten is alive
-
-// obsolete
-//function qeDefineAccess() {
-//	debugger;
-////	qe.createQEWaveFromCBuf = function createQEWaveFromCBuf() {
-////		// make this thing which is the wave buffer, as a nice TypedArray of doubles (pairs making up cx numbers)
-////		const wave = new Float64Array(window.Module.HEAPF64.buffer, qe.Avatar_getWaveBuffer(), 2 * qe.space.nPoints);
-////		qe.space.waveBuffer = qe.waveBuffer = wave;
-////	}
-//
-//	// get the complex wave value at this point in the wave
-//	// not used very much now
-//	// qe.get1DWave = function get1DWave(ixPoint) {
-//	// 	const ix = 2*ixPoint;
-//	// 	return qCx(
-//	// 		qe.waveBuffer[ix],
-//	// 		qe.waveBuffer[ix+1]
-//	// 	);
-//	// }
-//}
-
-
-// function qeDefineAccess() {
-// // 	qe.createQEWaveFromCBuf = function createQEWaveFromCBuf() {
-// // 		// make this thing which is the wave buffer, as a nice TypedArray of doubles (pairs making up cx numbers)
-// // 		const wave = qe.space.wave;
-// // 		//const wave = new Float64Array(window.Module.HEAPF64.buffer, salientPointers.mainWaveBuffer, 2 * qe.space.nPoints);
-// // 		//qe.space.waveBuffer =
-// // 		//qe.waveBuffer = wave;
-// // 	}
-//
-// 	// get the complex wave value at this point in the wave
-// 	// not used very much now
-// 	// qe.get1DWave = function get1DWave(ixPoint) {
-// 	// 	const ix = 2*ixPoint;
-// 	// 	return qCx(
-// 	// 		qe.waveBuffer[ix],
-// 	// 		qe.waveBuffer[ix+1]
-// 	// 	);
-// 	// }
-// }
-
-
 
