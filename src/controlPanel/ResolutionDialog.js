@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import {qeBasicSpace} from '../engine/qeSpace';
 //import SquishPanel from '../SquishPanel';
 import CommonDialog from '../widgets/CommonDialog';
-import {powerToIndex} from '../widgets/utils';
+import {powerToIndex} from '../utils/powers';
 import LogSlider from '../widgets/LogSlider';
 import listOfViewClasses from '../view/SquishView';
 
@@ -152,16 +152,16 @@ export default class ResolutionDialog extends React.Component {
 		const radioz = [];
 		for (let vuClassName in listOfViewClasses) {
 			const vuClass = listOfViewClasses[vuClassName];
-			//console.log(`doin this vuClass:`, vuClass.name);
+			//console.log(`doin this vuClass:`, vuClass.displayName);
 			//console.dir(vuClass);
 			//console.log(`   typeof:`, typeof vuClassName, typeof vuClass);
-			//console.log(`   names:`, vuClass.name, vuClass.name, vuClass.name);
-			radioz.push(<label key={vuClass.name}>
-				<input type='radio' key={vuClass.name} name='mainViewClassName'
-					value={vuClass.name}
-					checked={vuClass.name == this.state.mainViewClassName}
+			//console.log(`   names:`, vuClass.displayName, vuClass.displayName, vuClass.displayName);
+			radioz.push(<label key={vuClass.displayName}>
+				<input type='radio' key={vuClass.displayName} name='mainViewClassName'
+					value={vuClass.displayName}
+					checked={vuClass.displayName == this.state.mainViewClassName}
 					onChange={onChange}/>
-				{vuClass.name}</label>);
+				{vuClass.displayName}</label>);
 		}
 
 		return radioz;

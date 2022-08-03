@@ -8,6 +8,7 @@ import {flatDrawing} from './flatDrawing';
 import {potentialDrawing} from './potentialDrawing';
 
 class flatDrawingViewDef extends abstractViewDef {
+	static displayName = 'Flat View';
 
 	constructor(viewName, canvas, space, options = {flat: true, potential: false}) {
 		super(viewName, canvas, space);
@@ -19,6 +20,8 @@ class flatDrawingViewDef extends abstractViewDef {
 			new flatDrawing(this, space);
 		if (options.potential)
 			new potentialDrawing(this, space);
+
+		// maybe this is not needed on the instance?  this.name = 'Flat View';
 	}
 }
 

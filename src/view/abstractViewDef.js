@@ -14,10 +14,11 @@
 // viewName is not the viewClassName, which is one of flatViewDef, garlandView, ...
 // there should be ONE of these per canvas, so each squishView should have 1.
 export class abstractViewDef {
+	static displayName = 'Abstract View';
 
 	/* ************************************************** construction */
 	// viewName: personal name for the viewDef instance, for error msgs
-	// canvas: real <canvas DOM element, after it's been created by React
+	// canvas: real <canvas> DOM element, after it's been created by React
 	// class name from instance: vu.constructor.name   from class: vuClass.name
 	constructor(viewName, canvas, space) {
 		this.viewVariables = [];
@@ -39,6 +40,8 @@ export class abstractViewDef {
 		this.bufferDataDrawMode = this.gl.DYNAMIC_DRAW;
 		//bufferDataDrawMode = this.gl.STATIC_DRAW;
 
+		// subclasses: override this!
+		// naw i don't think this is needed  this.name = 'Abstract View';
 	}
 
 	// preliminary construction, called in constructor
