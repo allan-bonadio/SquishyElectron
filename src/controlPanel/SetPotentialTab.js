@@ -9,7 +9,8 @@ import PropTypes from 'prop-types';
 import {scaleLinear} from 'd3-scale';
 import {path as d3path} from 'd3-path';
 
-import {setFamiliarPotential, dumpPotential} from '../widgets/utils';
+// eslint-disable-next-line no-unused-vars
+import {setFamiliarPotential, dumpPotential} from '../utils/potentialUtils';
 import MiniGraph from './MiniGraph';
 import qeSpace from '../engine/qeSpace';
 import TextNSlider from '../widgets/TextNSlider';

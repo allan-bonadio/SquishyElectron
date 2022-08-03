@@ -4,7 +4,7 @@
 */
 import qe from './qe';
 //import qeWave from './qeWave';
-import {setFamiliarPotential} from '../widgets/utils';
+import {setFamiliarPotential} from '../utils/potentialUtils';
 import storeSettings from '../utils/storeSettings';
 import salientBuffersFactory from './salientBuffersFactory';
 
@@ -33,8 +33,8 @@ function dumpRow(ix, re, im, prev, isBorder) {
 
 /* **************************************************************** Basic Space */
 // the dimensions part of the space
-// this is enough to contruct a qeWave with, so MiniGraph can use it
-// pat of qeSpace but also want to use independently
+// this is enough to contruct a qeWave with, so MiniGraph can use it (obsolete,tobe removed)
+// pat of qeSpace but also want to use independently (NO!  reunify with qeSpace!)
 // maybe not - nmight get rid of this given changes that are coming
 export class qeBasicSpace {
 	// note in c++ these are on qSpace; there is no qBasicSpace
@@ -181,6 +181,8 @@ export class qeSpace extends qeBasicSpace {
 			//new Float64Array(window.Module.HEAPF64.buffer,
 			//salientPointers.potentialBuffer, this.nPoints);
 		setFamiliarPotential(this, this.potentialBuffer, storeSettings.potentialParams);
+
+		this.theAvatar = salientBuffers.theAvatar;
 
 		//let emscriptenMemory = window.Module.HEAPF32.buffer;
 		//let address = qe.qViewBuffer_getViewBuffer();

@@ -5,35 +5,43 @@
 
 //import {qeBasicSpace} from '../engine/qeSpace';
 
-// base = which component of storeSettings this is
+// group, groupName = which component of storeSettings this is
 // criterion: validator, see constructor
 //     The criterion are fixed and more broad than some other parts of the code,
 //     eg if 1/N is one of the limits, some other part of the code will enforce that, not here.
+//		um... except for lowPassFilter
 // The general interaction between component states and storeSettings is this:
 // component states are initially set from storeSettings.
-// When changed, both the state and storeSettings, and sending to C++ if applicable, are changed in parallel in same code.
-// With a function that's general over the particular params group, in the component that holds the state.
+// When changed, both the state and storeSettings, and sending
+// to C++ if applicable, are changed in parallel in same code.
+// With a function that's general over the particular params group,
+// in the component that holds the state.
 // (maybe I should integrate these better...)
+// upon load of this file, it'll retrieve all this stuff from localStore.
+// Upon setting each var, group will be stored in localStorage.
 
 /* ************************************************** All Settings */
 //debugger;
 
-// these'll be filled in below
-export const storeSettings =  {
-	spaceParams: {},
-	waveParams: {},
-	potentialParams: {},
-	iterationParams: {},
-	miscParams: {},
-}
-if (typeof storeSettings == 'undefined') debugger;
+// these'll be filled in below, dynamically created
+export const storeSettings =  {};
+
+if (typeof storeSettings == 'undefined') debugger;  // webpack fuckups
 
 
-let alwaysSave = false;
+
+// somehow webpack fumbles this if it's extern, in SquishPanel
+// no doesn't seem to make a diff
+window.storeSettings = storeSettings;
+
+export const surrogateCuzWebPackAlwaysFucksUp = {};
+
+
+let alwaysSave = false;  // maybe don't need this anymore?
 
 // save in the localSettings
-function saveGroup(base) {
-	localStorage.setItem(base, JSON.stringify(storeSettings[base]));
+function saveGroup(groupName) {
+	localStorage.setItem(groupName, JSON.stringify(storeSettings[groupName]));
 }
 
 // figure out a function that can validate this param quickly
@@ -67,15 +75,28 @@ function makeCriterionFunction(criterion) {
 	}
 }
 
-// make a parameter obj.name, part of storeSettings[base]
-// one value that knows what's valid for it, and that's stored in localStore
-function makeParam(obj, name, base, defaultValue, criterion) {
+// make a parameter storeSettings.base.name, part of storeSettings[base]
+// one value that knows what's valid for it, and that's stored in localStore.
+// Undefined is an illegal value; also the default default value if never set.
+function makeParam(varName, groupName, defaultValue, criterion) {
 	// this is where it's really stored, in the closure
 	let value;
 
+	// retrieve from localStorage and set this var, or set to default if not there yet.
+	storeSettings[groupName] = storeSettings[groupName] || {};
+	let group = storeSettings[groupName];
+	let savedGroup = localStorage.getItem(groupName) || '{}';
+	savedGroup = JSON.parse(savedGroup);
+	value = (savedGroup[varName] === undefined) ? defaultValue : savedGroup[varName];
+
+	surrogateCuzWebPackAlwaysFucksUp[groupName] = surrogateCuzWebPackAlwaysFucksUp[groupName] || {};
+	surrogateCuzWebPackAlwaysFucksUp[groupName][varName] = value;
+
+
+
 	const criterionFunction = makeCriterionFunction(criterion);
 
-	Object.defineProperty(obj, name, {
+	Object.defineProperty(group, varName, {
 		get: function() {
 			return value
 		},
@@ -87,10 +108,11 @@ function makeParam(obj, name, base, defaultValue, criterion) {
 				value = newVal;
 
 			if (alwaysSave)
-				saveGroup(base);
+				saveGroup(group);
 		},
 
-		configurable: false,
+		configurable: true,
+		//configurable: false,
 		enumerable: true,
 	});
 }
@@ -108,11 +130,11 @@ function isPowerOf2(n) {
 	return true;
 }
 
-makeParam(storeSettings.spaceParams, 'N', 'spaceParams', 64,  N => isPowerOf2(N) );
+makeParam('N', 'spaceParams', 64,  N => isPowerOf2(N) );
 
 // how to do this correctly with the defined constants???
-makeParam(storeSettings.spaceParams, 'continuum', 'spaceParams', 2, [0, 1, 2]);
-// makeParam(storeSettings.spaceParams, 'continuum', 'spaceParams', qeBasicSpace.contENDLESS,
+makeParam('continuum', 'spaceParams', 2, [0, 1, 2]);
+// makeParam('continuum', 'spaceParams', qeBasicSpace.contENDLESS,
 // 	[qeBasicSpace.contDISCRETE, qeBasicSpace.contWELL, qeBasicSpace.contENDLESS]);
 
 /* ************************************ waveParams */
@@ -121,47 +143,35 @@ makeParam(storeSettings.spaceParams, 'continuum', 'spaceParams', 2, [0, 1, 2]);
 // So 'Set Wave' button actually sets the wave, but meanwhile the setting sliders
 // need to be remembered; this does it.  Potential and space too; not active until user does something.
 
-makeParam(storeSettings.waveParams, 'waveBreed', 'waveParams', 'chord', ['circular', 'standing', 'gaussian', 'chord']);
-makeParam(storeSettings.waveParams, 'waveFrequency', 'waveParams', 16, freq =>
+makeParam('waveBreed', 'waveParams', 'chord', ['circular', 'standing', 'gaussian', 'chord']);
+makeParam('waveFrequency', 'waveParams', 16, freq =>
 	freq >= 1 && freq <= 1000 && 0 === freq % .5 );
-makeParam(storeSettings.waveParams, 'pulseWidth', 'waveParams', 1/16, width => width >= .001 && width <= 1);
-makeParam(storeSettings.waveParams, 'pulseOffset', 'waveParams', 30, offset => offset >= 0 && offset <= 100);
+makeParam('pulseWidth', 'waveParams', 1/16, width => width >= .001 && width <= 1);
+makeParam('pulseOffset', 'waveParams', 30, offset => offset >= 0 && offset <= 100);
 
 /* ************************************ potentialParams */
-makeParam(storeSettings.potentialParams, 'potentialBreed', 'potentialParams', 'flat', ['flat', 'valley']);
-makeParam(storeSettings.potentialParams, 'valleyPower', 'potentialParams', 1, power => power >= -20 && power <= 20);
-makeParam(storeSettings.potentialParams, 'valleyScale', 'potentialParams', 1, scale => scale >= -1e4 && scale <= 1e4);
-makeParam(storeSettings.potentialParams, 'valleyOffset', 'potentialParams', 50, offset => offset >= 0 && offset <= 100);
+makeParam('potentialBreed', 'potentialParams', 'flat', ['flat', 'valley']);
+makeParam('valleyPower', 'potentialParams', 1, power => power >= -20 && power <= 20);
+makeParam('valleyScale', 'potentialParams', 1, scale => scale >= -1e4 && scale <= 1e4);
+makeParam('valleyOffset', 'potentialParams', 50, offset => offset >= 0 && offset <= 100);
 
 /* ************************************ iterationParams */
-makeParam(storeSettings.iterationParams, 'isTimeAdvancing', 'iterationParams', false,  [false, true]);
-makeParam(storeSettings.iterationParams, 'iteratePeriod', 'iterationParams', 50,  per => per >= 16 && per <= 100);
-makeParam(storeSettings.iterationParams, 'dt', 'iterationParams', 0.002,  dt => dt > 0 && dt < 1);
-makeParam(storeSettings.iterationParams, 'stepsPerIteration', 'iterationParams', 200,  spi => spi > 100 && spi < 1e6);
-makeParam(storeSettings.iterationParams, 'lowPassFilter', 'iterationParams', 1/8,  lpf => lpf > 0 && lpf < 1);
+makeParam('isTimeAdvancing', 'iterationParams', false,  [false, true]);
+makeParam('iteratePeriod', 'iterationParams', 50,  per => per >= 16 && per <= 100);
+makeParam('dt', 'iterationParams', 0.002,  dt => dt > 0 && dt < 1);
+makeParam('stepsPerIteration', 'iterationParams', 200,  spi => spi > 100 && spi < 1e6);
+makeParam('lowPassFilter', 'iterationParams', 50, lpf => lpf > 0 && lpf < 75);
 
 /* ************************************miscParams */
-makeParam(storeSettings.miscParams, 'showingTab', 'miscParams', 'wave', ['wave', 'potential', 'space', 'iteration']);
-makeParam(storeSettings.miscParams, 'viewHeight', 'miscParams', 400,  viewHeight => viewHeight >= 50 && viewHeight <= 1e4);
+makeParam('showingTab', 'miscParams', 'wave', ['wave', 'potential', 'space', 'iteration']);
+makeParam('viewHeight', 'miscParams', 400,  viewHeight => viewHeight >= 50 && viewHeight <= 1e4);
 
 
 // no point in saving them when we're reading them already
 // even if it's all defaults, that's fine
-alwaysSave = false;
+// alwaysSave = false;
+// alwaysSave = true;
 
-// upon now load them in from localStore, according to the params we've defined above
-for (let groupName in storeSettings) {
-	let group = storeSettings[groupName];
-	let fromSaved = localStorage.getItem(groupName) || '{}';
-	fromSaved = JSON.parse(fromSaved) || {};
-	for (let paramName in group) {
-		group[paramName] = fromSaved[paramName];
-	}
-}
-
-alwaysSave = true;
-
-// upon load of this file, it'll retrieve all this stuff from localStore
 //
 // ************************************************** old */
 //
