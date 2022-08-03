@@ -20,12 +20,13 @@ import qe from './engine/qe';
 
 import SquishView from './view/SquishView';
 import ResolutionDialog from './controlPanel/ResolutionDialog';
+import {setFamiliarPotential} from './utils/potentialUtils';
 
 // why doesn't this work?!?!!?
 //import {storeSettings} from './utils/storeSettings';
-import storeSettings from './utils/storeSettings';
-
-import {setFamiliarPotential} from './widgets/utils';
+//import storeSettings from './utils/storeSettings';
+import {surrogateCuzWebPackAlwaysFucksUp as storeSettings} from './utils/storeSettings';
+//const storeSettings = window.storeSettings;
 
 // runtime debugging flags - you can change in the debugger or here
 let areBenchmarking = false;
@@ -37,6 +38,9 @@ const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
 
 // const DEFAULT_RESOLUTION = 64;
 // const DEFAULT_CONTINUUM = qeBasicSpace.contENDLESS;
+
+
+let SquishPanelCreated = 0;
 
 
 export class SquishPanel extends React.Component {
@@ -51,20 +55,21 @@ export class SquishPanel extends React.Component {
 	// }
 
 	/* ************************************************ construction & reconstruction */
-	static created = 0;
 
 	constructor(props) {
-
 		super(props);
 
 		// why is this called so many times!?!?!?!?!
-		SquishPanel.created += 1;
-		// console.info(`*** SquishPanel.created:`, SquishPanel.created);////
+		SquishPanelCreated += 1;
+		console.info(`*** SquishPanel.created:`, SquishPanelCreated);////
 		// console.info((new Error()).stack);
 		// debugger;
 
 // 		const space0 = storeSettings.retrieveSettings('space0');
 // 		const rat = storeSettings.retrieveRatify;
+
+		// webpack is always fucking up
+		//let ss = {iterationParams};
 
 		this.state = {
 			// Many of these things should be in a lower component;
@@ -95,13 +100,17 @@ export class SquishPanel extends React.Component {
 			// defaults for sliders for dt & spi
 			dt: storeSettings.iterationParams.dt,
 			stepsPerIteration: storeSettings.iterationParams.stepsPerIteration,
-			lowPassFilter: storeSettings.iterationParams.lowPassFilter,
+			//lowPassFilter: lpf,
+			lowPassFilter: storeSettings.iterationParams.stepsPerIteration,
 
 			// advance forward with each iter
 			runningCycleElapsedTime: 0,
 			runningCycleIterateSerial: 0,
 
-			//canvasSize: {width: 800, height: 400}
+
+
+
+
 		};
 
 		// will be resolved when the space has been created; result will be qeSpace
@@ -475,8 +484,10 @@ export class SquishPanel extends React.Component {
 	setDt = dt => {
 		this.setState({dt});
 		qe.Avatar_setDt(dt);
-		if (typeof storeSettings != 'undefined')  // goddamned bug in importing works in constructor
+		if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  // goddamned bug in importing works in constructor
 			storeSettings.iterationSettings.dt = dt;
+		else
+			this.setState({dt});
 	}
 	//setDt = this.setDt.bind(this);
 
@@ -484,18 +495,22 @@ export class SquishPanel extends React.Component {
 		console.info(`js setStepsPerIteration(${stepsPerIteration})`)
 		this.setState({stepsPerIteration});
 		qe.Avatar_setStepsPerIteration(stepsPerIteration);
-		if (typeof storeSettings != 'undefined')  // goddamned bug in importing works in constructor
+		if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  // goddamned bug in importing works in constructor
 			storeSettings.iterationSettings.stepsPerIteration = stepsPerIteration;
+		else
+			this.setState({stepsPerIteration});
 	}
 	//setStepsPerIteration = this.setStepsPerIteration.bind(this);
 
 	// sets the LPF in both SPanel state AND in the C++ area
-	setLowPassFilter = lowPassFilter => {
+	setLowPassFilter =
+	lowPassFilter => {
 		console.info(`js setLowPassFilter(${lowPassFilter})`)
 		this.setState({lowPassFilter});
 		qe.Avatar_setLowPassFilter(lowPassFilter);
 		if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  //  goddamned bug in importing works in constructor
-			storeSettings.iterationSettings.lowPassFilter = lowPassFilter;
+			storeSettings.iterationSettings.lowPassFilter = (lowPassFilter - 1) / this.state.N;
+		this.setState({lowPassFilter: (lowPassFilter - 1) / this.state.N})
 	}
 	//setLowPassFilter = this.setLowPassFilter.bind(this);
 
