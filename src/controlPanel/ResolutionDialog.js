@@ -11,7 +11,7 @@ import {qeBasicSpace} from '../engine/qeSpace';
 import CommonDialog from '../widgets/CommonDialog';
 import {powerToIndex} from '../utils/powers';
 import LogSlider from '../widgets/LogSlider';
-import listOfViewClasses from '../view/SquishView';
+import listOfViewClasses from '../view/listOfViewClasses';
 
 
 const MIN_2SLIDER_RES = process.env.NODE_ENV == 'development' ? 4 : 16;

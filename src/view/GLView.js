@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-// SquishView has a 1:1 relationship with a C++ Avatar.
+// GLView has a 1:1 relationship with a C++ Avatar.
 // Each wraps a canvas for display.  Via webgl.
 // You can have many in a squishPanel, each subscribing to the same space.
 // One is the main view, displaying current simulation.  Others are used in the
@@ -24,7 +24,7 @@ import {listOfViewClasses} from './listOfViewClasses';
 
 /* **************************************** actual canvas wrapper */
 
-export class SquishView extends React.Component {
+export class GLView extends React.Component {
 	static propTypes = {
 		// the class itself.  Not the instance! the class, the type of view, with drawings baked in.
 		// not the class!  just the class name.
@@ -42,7 +42,7 @@ export class SquishView extends React.Component {
 	constructor(props) {
 		super(props);
 
-		// why is this called so many times!?!?!?!?!  console.log(`SquishView(...`, props, (new Error()).stack);
+		// why is this called so many times!?!?!?!?!  console.log(`GLView(...`, props, (new Error()).stack);
 		this.state = {
 			height: storeSettings.miscParams.viewHeight,
 			space: null,  // set when promise comes in
@@ -64,12 +64,12 @@ export class SquishView extends React.Component {
 		const p = this.props;
 		if (this.state.space && this.canvas)
 			return;  // already done
-		console.log(`SquishView.setGLCanvas(...`, canvas);
+		console.log(`GLView.setGLCanvas(...`, canvas);
 
 		// why do i have to do this?  Old version of CHrome??!?!?!  preposterous
 		if (canvas) {
 			this.canvas = canvas;
-			canvas.squishView = this;
+			canvas.GLView = this;
 		}
 
 		// we need the space AND the canvas to make the views
@@ -90,13 +90,13 @@ export class SquishView extends React.Component {
 			// Make sure you call the new view's domSetup method.
 			this.effectiveView.domSetupForAllDrawings(this.canvas);
 
-			// thsi will kick the SquishView to render.  Is this too intricate?
+			// thsi will kick the GLView to render.  Is this too intricate?
 			p.setEffectiveView(this.effectiveView);
 
-			console.info(`SquishView.compDidMount promise done`);
+			console.info(`GLView.compDidMount promise done`);
 
 		}).catch(ex => {
-			console.error(`error in SquishView createdSpacePromise.then():`, ex.stack || ex.message || ex);
+			console.error(`error in GLView createdSpacePromise.then():`, ex.stack || ex.message || ex);
 			debugger;
 		});
 
@@ -183,7 +183,7 @@ export class SquishView extends React.Component {
 			: <img className='spinner' alt='spinner' src='eclipseOnTransparent.gif' />;
 
 		// voNorthWest/East are populated during drawing
-		return (<div className='SquishView' >
+		return (<div className='GLView' >
 			<canvas className='squishCanvas'
 				width={p.width} height={s.height}
 				ref={canvas => this.setGLCanvas(canvas)}
@@ -211,5 +211,5 @@ export class SquishView extends React.Component {
 	}
 }
 
-export default SquishView;
+export default GLView;
 

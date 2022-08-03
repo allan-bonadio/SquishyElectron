@@ -26,7 +26,7 @@ export class ControlPanel extends React.Component {
 		singleIteration: PropTypes.func.isRequired,
 		resetCounters: PropTypes.func.isRequired,
 
-		// these are the actual functions that change the SquishView on the screen
+		// these are the actual functions that change the GLView on the screen
 		// when user chooses 'set wave'
 		setWave: PropTypes.func.isRequired,
 		setPotential: PropTypes.func.isRequired,

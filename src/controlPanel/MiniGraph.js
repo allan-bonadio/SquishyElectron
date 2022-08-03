@@ -94,7 +94,7 @@ function setPT() {
 
 
 // the component.  We need a class component cuz we weant to save stuff on this?
-//  I want this done by webgl, just like SquishView.  and change to a func component at the same time.
+//  I want this done by webgl, just like GLView.  and change to a func component at the same time.
 export class MiniGraph extends React.Component {
 	constructor(props) {
 		super(props);

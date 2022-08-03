@@ -1,18 +1,18 @@
 /*
-** abstract View Def -- superclass for all the views, which live inside the SquishView
+** abstract View Def -- superclass for all the views, which live inside the GLView
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 
 // Each abstractViewDef subclass is a definition of a kind of view; one per each kind of view.
-// (A SquishView owns an instance of the def and is a React component enclosing the canvas.)
+// (A GLView owns an instance of the def and is a React component enclosing the canvas.)
 
 /* ****************************************  */
 
 
 // This is the superclass of all view defs; with common webgl and space plumbing.
 // viewName is not the viewClassName, which is one of flatViewDef, garlandView, ...
-// there should be ONE of these per canvas, so each squishView should have 1.
+// there should be ONE of these per canvas, so each GLView should have 1.
 export class abstractViewDef {
 	static displayName = 'Abstract View';
 

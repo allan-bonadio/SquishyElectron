@@ -18,7 +18,7 @@ import {qeBasicSpace, qeSpace} from './engine/qeSpace';
 import {qeStartPromise} from './engine/qEngine';
 import qe from './engine/qe';
 
-import SquishView from './view/SquishView';
+import GLView from './view/GLView';
 import ResolutionDialog from './controlPanel/ResolutionDialog';
 import {setFamiliarPotential} from './utils/potentialUtils';
 
@@ -579,7 +579,7 @@ export class SquishPanel extends React.Component {
 		return (
 			<div id={this.props.id} className="SquishPanel">
 				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
-				<SquishView
+				<GLView
 					viewClassName={s.mainViewClassName}
 					viewName='main view'
 					setEffectiveView={this.setEffectiveView}

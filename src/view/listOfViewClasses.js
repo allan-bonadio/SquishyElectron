@@ -12,3 +12,5 @@ export const listOfViewClasses = {
 };
 
 console.log(`list of view classes:`, listOfViewClasses);
+
+export default listOfViewClasses;
