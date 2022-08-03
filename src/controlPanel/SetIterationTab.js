@@ -5,7 +5,9 @@
 
 import PropTypes from 'prop-types';
 import LogSlider from '../widgets/LogSlider';
+import TextNSlider from '../widgets/TextNSlider';
 
+// set prop types
 function setPT() {
 	SetIterationTab.propTypes = {
 		dt: PropTypes.number.isRequired,
@@ -25,9 +27,26 @@ function SetIterationTab(props) {
 	if (!props)
 		debugger;
 
-	// so when N=16, user can set lowPass to 0...6
-	// i'll be hacking on this.  0 = only filter out nyquist, 6=only let thru DC and freq=1
-	let lowPassMax = p.N/2 - 3;
+	// lowPassFilter, the number setting.  On the JS side, it's a percentage of N/2:
+	// and can range from 200/N (nyquist only) to 75
+	// so when N=16, user can set lowPass to 12.5 ... 75 percents = 1 to 6 freqs
+	// when N=64, ranges from 3.1% to 75%
+
+	// step between valid settings, and also the minimum setting, where you just
+	// filter off Nyquist.  Think of this like 100 * ( 1 / (N/2))
+	const aStep = 200 / p.N;
+
+	// should be 0 if N <= 150, 1 if N = 256...512, 2 above that
+	const nDigits = Math.max(0, 1 -Math.ceil(Math.log10(aStep)));
+
+	// display percent numbers rounded off only to the minimum n digits
+	// THese are stored in the storeSettings this way, but they're converted  &
+	// rounded to int before sending to c++
+	let lpfValues = [];
+	for (let perc = aStep; perc <= 75; perc += aStep) {
+		let display = perc.toFixed(nDigits)
+		lpfValues.push(<option key={display} value={display}>{display}</option>);
+	}
 
 	//Unlike other tabs, all these are instant-update.
 
@@ -62,7 +81,7 @@ function SetIterationTab(props) {
 				current={props.stepsPerIteration}
 				sliderMin={50}
 				sliderMax={10000}
-				stepsPerDecade={3}
+				stepsPerDecade={6}
 
 				handleChange={(power, ix) => {
 					console.info(`handleChange stepsPerIteration::  ix=${ix}  power=${power}`);
@@ -70,27 +89,25 @@ function SetIterationTab(props) {
 				}}
 			/>
 
-			<div className='lowPassFilterSlider cpSlider' >
-				<div >
-					frequencies to filter off: {props.lowPassFilter}
-				</div>
-				<input type='range'
-					value={props.lowPassFilter}
-					min={1}
-					max={lowPassMax}
-
-					onChange={ev => {
-						const newValue = ev.currentTarget.value;
+			<TextNSlider className='lowPassFilterSlider '
+				label='Percent of High Frequencies to Filter Out'
+				value={props.lowPassFilter.toFixed(nDigits)}
+				min={aStep} max={75}
+				style={{width: '80%'}}
+				handleChange={newValue => {
 						console.info(`handleChange Low Pass Filter:: ${newValue}  `);
 						props.setLowPassFilter(+newValue);
 					}}
-					style={{height: '65px', width: '300px',}}
-				/>
-			</div>
+				list='lowPassFilterValues'
+			/>
+
+			<datalist id='lowPassFilterValues'>
+				{lpfValues}
+			</datalist>
 
 		</div>
 		<div className='iStats'>
-			<h3 style={{textAlign: 'right'}}>Iteration Statistics</h3>
+			<h3 style={{textAlign: 'left'}}>Iteration Statistics</h3>
 			<table><tbody>
 				<tr><td>iteration calc time:     </td><td><span  className='iterationCalcTime'>-</span> ms</td></tr>
 				<tr><td>reload view buffers:     </td><td><span  className='reloadViewBuffers'>-</span> ms</td></tr>

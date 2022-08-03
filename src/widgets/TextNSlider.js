@@ -5,18 +5,22 @@
 
 import PropTypes from 'prop-types';
 
+
 function setPT() {
 	TextNSlider.propTypes = {
 		className: PropTypes.string,
 		label: PropTypes.string,
 		style: PropTypes.object,
 
-		value: PropTypes.number.isRequired,
-		min: PropTypes.number.isRequired,
-		max: PropTypes.number.isRequired,
-		step: PropTypes.number,
+		value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+		min: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+		max: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+		step: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 
 		handleChange: PropTypes.func,
+
+		// dom ID of <datalist> element
+		list: PropTypes.string,
 	};
 
 	TextNSlider.defaultProps = {

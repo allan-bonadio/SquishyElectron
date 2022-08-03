@@ -171,6 +171,7 @@
 
 
 	.tabFrame {
+		width: 90%;
 		border: inset #abc 2px;
 		padding: .2em .5em;
 		color: #222;
@@ -267,6 +268,7 @@
 
 	.SetIterationTab {
 		.sliderBlock, .iStats {
+			width: 40%;
 			float: left;
 			margin-left: 3em;
 		}
