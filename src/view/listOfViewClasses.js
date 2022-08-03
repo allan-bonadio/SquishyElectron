@@ -11,3 +11,4 @@ export const listOfViewClasses = {
 	flatDrawingViewDef,
 };
 
+console.log(`list of view classes:`, listOfViewClasses);

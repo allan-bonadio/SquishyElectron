@@ -11,15 +11,16 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {thousands} from '../widgets/utils';
+import {thousands} from '../utils/numberFormat.js';
 import qe from '../engine/qe';
 import './view.scss';
 // import {abstractViewDef} from './abstractViewDef';
 // import flatDrawingViewDef from './flatDrawingViewDef';
-import {listOfViewClasses} from './listOfViewClasses';
 import storeSettings from '../utils/storeSettings';
 import PotentialArea from './PotentialArea';
 
+//const listOfViewClasses = import('./listOfViewClasses');
+import {listOfViewClasses} from './listOfViewClasses';
 
 /* **************************************** actual canvas wrapper */
 
@@ -89,10 +90,10 @@ export class SquishView extends React.Component {
 			// Make sure you call the new view's domSetup method.
 			this.effectiveView.domSetupForAllDrawings(this.canvas);
 
-			// thsi will kick the SquishPanel to render.  Is this too intricate?
+			// thsi will kick the SquishView to render.  Is this too intricate?
 			p.setEffectiveView(this.effectiveView);
 
-			console.info(`SquishPanel.compDidMount promise done`);
+			console.info(`SquishView.compDidMount promise done`);
 
 		}).catch(ex => {
 			console.error(`error in SquishView createdSpacePromise.then():`, ex.stack || ex.message || ex);
@@ -124,7 +125,7 @@ export class SquishView extends React.Component {
 			const viewHeight = ev.pageY + this.yOffset;
 			this.setState({height: viewHeight});
 			storeSettings.miscParams.viewHeight = viewHeight;
-			console.info(`mouse drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
+			// console.info(`mouse drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
 
 			ev.preventDefault();
 			ev.stopPropagation();
