@@ -125,6 +125,7 @@ button.round {
 /* **************************************** CommonDialog */
 
 .backdrop {
+	z-index: 10;
 	display: flex;
 	background-color: #8888;
 	position: fixed;
