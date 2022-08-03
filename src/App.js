@@ -9,11 +9,16 @@ import './App.scss';
 import SquishPanel from './SquishPanel';
 import CommonDialog from './widgets/CommonDialog';
 
+let SquishyElectronCreated = 0;
+let SquishyElectronRendered = 0;
+
+
 class App extends React.Component {
 	constructor(props) {
 		super(props);
 
-		console.log(`App(...`, props);
+		SquishyElectronCreated++;
+		console.log(`SquishyElectronCreated: ${SquishyElectronCreated} times ...  App(...`, props);
 		this.state = {
 			innerWindowWidth: window.innerWidth,
 
@@ -22,7 +27,7 @@ class App extends React.Component {
 
 		App.me = this;
 
-		console.log(`App constructor`);
+		console.log(`App constructor done`);
 	}
 
 
@@ -51,6 +56,10 @@ class App extends React.Component {
 
 	render() {
 		const s = this.state;
+		SquishyElectronRendered++;
+		console.log(`SquishyElectron app Rendered: ${SquishyElectronRendered} times`);
+		console.log(`about to render App therefore SquishPanel`);
+
 		//const stateParams = sParams || s.stateParams;
 		const sqDialog = s.isDialogShowing ? <CommonDialog  /> : null;
 			//stateParams={stateParams}
