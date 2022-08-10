@@ -36,22 +36,21 @@ function setPT() {
 function TextNSlider(props) {
 	const p = props;
 
-	// return latest value, but also set slider
+	const limit =
+	val => Math.max(p.min, Math.min(p.max, val));
+
 	function handleText(ev) {
 		const el = ev.currentTarget;
-		const val = +el.value;
-		el.parentNode.querySelector('input[type=range]').value = val;
-		p.handleChange(val);
-
+		p.handleChange(limit(+el.value));
 	}
 
-	// return latest value, but also set text box
-	function handleSlider(ev) {
-		const el = ev.currentTarget;
-		const val = +el.value;
-		el.parentNode.querySelector('input[type=number]').value = val;
-		p.handleChange(val)
-	}
+	const handleSlider = handleText;
+// 	function handleSlider(ev) {
+// 		const el = ev.currentTarget;
+// 		p.handleChange(limit(+el.value))
+// 	}
+
+	let value = limit(p.value);
 
 	let controls;
 	if (p.list) {
@@ -74,12 +73,12 @@ function TextNSlider(props) {
 		// to tweak the display in the text box, do it in the render.  Then when retrieving the number, convert it back.
 		controls = <>
 			<input type='number' placeholder={p.label || ''}
-					value={p.value} min={p.min} max={p.max}
+					value={value} min={p.min} max={p.max}
 					step={p.step}
 					size='7'
 					onChange={handleText} />
 			<input type='range'
-					value={p.value} min={p.min} max={p.max}
+					value={value} min={p.min} max={p.max}
 					step={p.step}
 					onChange={handleSlider} />
 		</>;
