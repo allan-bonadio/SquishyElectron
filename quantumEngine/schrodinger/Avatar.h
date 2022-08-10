@@ -27,15 +27,17 @@ struct Avatar {
 	double iterateSerial;
 
 
-	// params that the user can set
-	double dt;
-	int lowPassFilter;
-	int stepsPerIteration;
-
 	bool isIterating;
 
 	// please do an FFT after the current iteration ends
 	bool pleaseFFT;
+	// make sure the subsequent things are aligned!  or iteration is painfully slow.
+
+
+	// params that the user can set
+	double dt;
+	int lowPassFilter;
+	int stepsPerIteration;
 
 	/* *********************************************** iteration */
 

@@ -19,41 +19,34 @@ class jsAvatar {
 
 	/* ************************************************************************* Accessors */
 
-	/* hopefully I don't have to mess with this all the time.  Must also divide by sizeof type.
-	△ magic=0
-	△ space=4
-	△ elapsedTime=8
-	△ iterateSerial=16
-	△ dt=24
-	△ lowPassFilter=32
-	△ stepsPerIteration=40
-	△ isIterating=44
-	△ pleaseFFT=45
-
-	what to do with these...
-	△ mainQWave=48
-	△ scratchQWave=52
-	△ spect=56
-	△ qvBuffer=60
-	*/
-
-	// getters
+	get space() { return this.ints[1]; }
+	set space(a) { this.ints[1] = a; }
 	get elapsedTime() { return this.doubles[1]; }
-	get iterateSerial() { return this.doubles[2]; }
-	get dt() { return this.doubles[3]; }
-	get lowPassFilter() { return this.doubles[4]; }
-	get stepsPerIteration() { return this.ints[10]; }
-	get isIterating() { return this.bools[44]; }
-	get pleaseFFT() { return this.bools[45]; }
-
-	// setters
 	set elapsedTime(a) { this.doubles[1] = a; }
+	get iterateSerial() { return this.doubles[2]; }
 	set iterateSerial(a) { this.doubles[2] = a; }
-	set dt(a) { this.doubles[3] = a; }
-	set lowPassFilter(a) { this.doubles[4] = a; }
-	set stepsPerIteration(a) { this.ints[10] = a; }
-	set isIterating(a) { this.bools[44] = a; }
-	set pleaseFFT(a) { this.bools[45] = a; }
+	get isIterating() { return this.bools[24]; }
+	set isIterating(a) { this.bools[24] = a; }
+	get pleaseFFT() { return this.bools[25]; }
+	set pleaseFFT(a) { this.bools[25] = a; }
+	get dt() { return this.doubles[4]; }
+	set dt(a) { this.doubles[4] = a; }
+	get lowPassFilter() { return this.ints[10]; }
+	set lowPassFilter(a) { this.ints[10] = a; }
+	get stepsPerIteration() { return this.ints[11]; }
+	set stepsPerIteration(a) { this.ints[11] = a; }
+	get mainQWave() { return this.ints[12]; }
+	set mainQWave(a) { this.ints[12] = a; }
+	get potential() { return this.ints[13]; }
+	set potential(a) { this.ints[13] = a; }
+	get potentialFactor() { return this.doubles[7]; }
+	set potentialFactor(a) { this.doubles[7] = a; }
+	get scratchQWave() { return this.ints[16]; }
+	set scratchQWave(a) { this.ints[16] = a; }
+	get spect() { return this.ints[17]; }
+	set spect(a) { this.ints[17] = a; }
+	get qvBuffer() { return this.ints[18]; }
+	set qvBuffer(a) { this.ints[18] = a; }
 }
 
 

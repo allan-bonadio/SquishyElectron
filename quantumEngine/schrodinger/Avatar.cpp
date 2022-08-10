@@ -54,7 +54,7 @@ Avatar::Avatar(qSpace *sp)
 	// we always need a view buffer; that's the whole idea behind an avatar
 	qvBuffer = new qViewBuffer(space, this);
 
-	//dumpOffsets();
+	dumpOffsets();
 };
 
 // some uses never need these so wait till they do
@@ -81,23 +81,72 @@ Avatar::~Avatar(void) {
 		delete spect;
 };
 
+// use for int field, or anything 1 byte
+#define makeBoolOffset(field)  (int) ((bool *) &this->field - (bool *) this)
+#define makeBoolGetter(field)  printf("get " #field  "() { return this.bools[%d]; }\n", makeBoolOffset(field));
+#define makeBoolSetter(field)  printf("set " #field  "(a) { this.bools[%d] = a; }\n", makeBoolOffset(field));
+
+// use for int field, or anything 32 bits, like a pointer
+#define makeIntOffset(field)  (int) ((int *) &this->field - (int *) this)
+#define makeIntGetter(field)  printf("get " #field  "() { return this.ints[%d]; }\n", makeIntOffset(field));
+#define makeIntSetter(field)  printf("set " #field  "(a) { this.ints[%d] = a; }\n", makeIntOffset(field));
+
+// use for int field, or anything 64 bits
+#define makeDoubleOffset(field)  (int) ((double *) &this->field - (double *) this)
+#define makeDoubleGetter(field)  printf("get " #field  "() { return this.doubles[%d]; }\n", makeDoubleOffset(field));
+#define makeDoubleSetter(field)  printf("set " #field  "(a) { this.doubles[%d] = a; }\n", makeDoubleOffset(field));
+
+
 // need these numbers for the js interface to this object, to figure out the offsets.
-// see jsAvatar.js  usually disabled.
+// see jsAvatar.js ;  usually disabled.
+// Paste the output into class jsAvatar, the class itself, to replace the existing ones
 void Avatar::dumpOffsets(void) {
-	printf("△ magic=%d\n", (int) ((byte *) &this->magic - (byte *) this));
-	printf("△ space=%d\n", (int) ((byte *) &this->space - (byte *) this));
-	printf("△ elapsedTime=%d\n", (int) ((byte *) &this->elapsedTime - (byte *) this));
-	printf("△ iterateSerial=%d\n", (int) ((byte *) &this->iterateSerial - (byte *) this));
-	printf("△ dt=%d\n", (int) ((byte *) &this->dt - (byte *) this));
-	printf("△ lowPassFilter=%d\n", (int) ((byte *) &this->lowPassFilter - (byte *) this));
-	printf("△ stepsPerIteration=%d\n", (int) ((byte *) &this->stepsPerIteration - (byte *) this));
-	printf("△ isIterating=%d\n", (int) ((byte *) &this->isIterating - (byte *) this));
-	printf("△ pleaseFFT=%d\n", (int) ((byte *) &this->pleaseFFT - (byte *) this));
-	printf("\n");
-	printf("△ mainQWave=%d\n", (int) ((byte *) &this->mainQWave - (byte *) this));
-	printf("△ scratchQWave=%d\n", (int) ((byte *) &this->scratchQWave - (byte *) this));
-	printf("△ spect=%d\n", (int) ((byte *) &this->spect - (byte *) this));
-	printf("△ qvBuffer=%d\n", (int) ((byte *) &this->qvBuffer - (byte *) this));
+	// don't need magic
+
+	makeIntGetter(space);
+	makeIntSetter(space);
+
+	/* *********************************************** JS accessible */
+
+	makeDoubleGetter(elapsedTime);
+	makeDoubleSetter(elapsedTime);
+	makeDoubleGetter(iterateSerial);
+	makeDoubleSetter(iterateSerial);
+
+	makeBoolGetter(isIterating);
+	makeBoolSetter(isIterating);
+	makeBoolGetter(pleaseFFT);
+	makeBoolSetter(pleaseFFT);
+
+	makeDoubleGetter(dt);
+	makeDoubleSetter(dt);
+	makeIntGetter(lowPassFilter);
+	makeIntSetter(lowPassFilter);
+	makeIntGetter(stepsPerIteration);
+	makeIntSetter(stepsPerIteration);
+
+	/* *********************************************** iteration */
+
+	makeIntGetter(mainQWave);
+	makeIntSetter(mainQWave);
+
+	makeIntGetter(potential);
+	makeIntSetter(potential);
+	makeDoubleGetter(potentialFactor);
+	makeDoubleSetter(potentialFactor);
+
+	makeIntGetter(scratchQWave);
+	makeIntSetter(scratchQWave);
+
+	// for the fourier filter.  Call the function first time you need it.
+	makeIntGetter(spect);
+	makeIntSetter(spect);
+
+	// the qViewBuffer to be passed to webgl.  This is a visual thing after all.
+	makeIntGetter(qvBuffer);
+	makeIntSetter(qvBuffer);
+
+	printf("--------------- done with Avatar --------------");
 }
 
 void Avatar::resetCounters(void) {
@@ -107,7 +156,8 @@ void Avatar::resetCounters(void) {
 
 /* ********************************************************** integration */
 
-
+// return elapsed time siince last page reload, in seconds,
+// seems like it's down to miliseconds
 double getTimeDouble()
 {
     struct timespec ts;
@@ -132,9 +182,10 @@ void Avatar::oneIteration() {
 	potential = space->potential;
 	potentialFactor = space->potentialFactor;
 
-	//if (traceIteration)
-		printf("🚀 🚀 Avatar::oneIteration() - dt=%lf   stepsPerIteration=%d  %s\n",
-			dt, stepsPerIteration, dangerousTimes ? "dangerous times" : "");
+	if (traceIteration)
+		printf("🚀 🚀 Avatar::oneIteration() - dt=%lf   stepsPerIteration=%d  %s; elapsed time: %lf\n",
+			dt, stepsPerIteration, dangerousTimes ? "dangerous times" : "",
+			getTimeDouble());
 	isIterating = true;
 
 	// half step in beginning to move Im forward dt/2
@@ -146,24 +197,24 @@ void Avatar::oneIteration() {
 
 	int doubleSteps = stepsPerIteration / 2;
 	if (traceIteration)
-		printf("      doubleSteps=%d   stepsPerIteration=%d\n",
+		printf("      Avatar: doubleSteps=%d   stepsPerIteration=%d\n",
 			doubleSteps, stepsPerIteration);
 
 	for (tt = 0; tt < doubleSteps; tt++) {
-		// this seems to have a resolution of 100µs on Panama
-		//auto start = std::chrono::steady_clock::now();////
-
 		oneVisscherStep(mainQWave, scratchQWave);
 		oneVisscherStep(scratchQWave, mainQWave);
 
-		if (traceIteration && 0 == tt % 100) {
-			printf("       step every hundred, step %d; elapsed time: %lf\n", tt * 2, getTimeDouble());
+		if (traceIteration && 0 == tt % 32) {
+			printf("       Avatar: step every 64, step %d; elapsed time: %lf\n", tt * 2, getTimeDouble());
 		}
 
 		if (traceIterSteps) {
 			printf("step done %d; elapsed time: %lf \n", tt*2, getTimeDouble());////
 		}
 	}
+
+	if (traceIteration)
+		printf("      Avatar: %d steps done; elapsed time: %lf \n", stepsPerIteration, getTimeDouble());
 
 	// half step at completion to move Re forward dt/2
 	// and copy back to Main
@@ -174,12 +225,7 @@ void Avatar::oneIteration() {
 
 	iterateSerial++;
 
-	// printf("Avatar::oneIteration(): qvBuffer %ld and latestWave=%ld\n",
-	// 	(long) qvBuffer, (long) latestWave);
-	//mainQWave = mainQWave;
-
 	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
-
 	if (useFourierFilter) {
 		if (traceB4nAfterFFSpectrum && dangerousTimes) analyzeWaveFFT(mainQWave, "before FF");
 		fourierFilter(lowPassFilter);
@@ -201,6 +247,9 @@ void Avatar::oneIteration() {
 		analyzeWaveFFT(mainQWave, "pleaseFFT at end of iteration");
 		this->pleaseFFT = false;
 	}
+
+	if (traceIteration)
+		printf("      iteration done; elapsed time: %lf \n", getTimeDouble());
 }
 
 
