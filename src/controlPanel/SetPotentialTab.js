@@ -14,7 +14,8 @@ import {setFamiliarPotential, dumpPotential} from '../utils/potentialUtils';
 import MiniGraph from './MiniGraph';
 import qeSpace from '../engine/qeSpace';
 import TextNSlider from '../widgets/TextNSlider';
-import storeSettings from '../utils/storeSettings';
+import {storeASetting} from '../utils/storeSettings';
+//import {getASetting} from '../utils/storeSettings';
 
 // some typical potential value, so we can get an idea of how to scale in the graph
 let SOME_POTENTIAL = 0.01;
@@ -93,26 +94,26 @@ class SetPotentialTab extends React.Component {
 
 	setFlat = () => {
 		this.props.setCPState({potentialBreed: 'flat'});
-		storeSettings.potentialParams.potentialBreed = 'flat';
+		storeASetting('potentialParams', 'potentialBreed', 'flat');
 	}
 	setValley = () => {
 		this.props.setCPState({potentialBreed: 'valley'});
-		storeSettings.potentialParams.potentialBreed = 'valley';
+		storeASetting('potentialParams', 'potentialBreed', 'valley');
 	}
 	setValleyPower = valleyPower => {
 		this.props.setCPState({potentialBreed: 'valley', valleyPower});
-		storeSettings.potentialParams.valleyPower = valleyPower;
-		storeSettings.potentialParams.potentialBreed = 'valley';
+		storeASetting('potentialParams', 'valleyPower', valleyPower);
+		storeASetting('potentialParams', 'potentialBreed', 'valley');
 	}
 	setValleyScale = valleyScale => {
 		this.props.setCPState({potentialBreed: 'valley', valleyScale});
-		storeSettings.potentialParams.valleyScale = valleyScale;
-		storeSettings.potentialParams.potentialBreed = 'valley';
+		storeASetting('potentialParams', 'valleyScale', valleyScale);
+		storeASetting('potentialParams', 'potentialBreed', 'valley');
 	}
 	setValleyOffset = valleyOffset => {
 		this.props.setCPState({potentialBreed: 'valley', valleyOffset});
-		storeSettings.potentialParams.valleyOffset = valleyOffset;
-		storeSettings.potentialParams.potentialBreed = 'valley';
+		storeASetting('potentialParams', 'valleyOffset', valleyOffset);
+		storeASetting('potentialParams', 'potentialBreed', 'valley');
 	}
 
 	// rendering for the Tab

@@ -16,7 +16,7 @@ import qeSpace from '../engine/qeSpace';
 // import {qeStartPromise} from '../engine/qEngine';
 // import qe from '../engine/qe';
 
-import storeSettings from '../utils/storeSettings';
+import {getASetting} from '../utils/storeSettings';
 
 
 export class ControlPanel extends React.Component {
@@ -77,18 +77,24 @@ export class ControlPanel extends React.Component {
 			// state for the wave resets - these are control-panel only.
 			// waveParams - Only goes into effect if we call setWave()
 
-			waveBreed: storeSettings.waveParams.waveBreed,
-			waveFrequency: storeSettings.waveParams.waveFrequency,
-			pulseWidth: storeSettings.waveParams.pulseWidth,
-			pulseOffset: storeSettings.waveParams.pulseOffset,
+			waveBreed: getASetting('waveParams', 'waveBreed'),
+
+			// an integer (but a well can have halfs?)
+			waveFrequency: getASetting('waveParams', 'waveFrequency'),
+
+			// a percentage
+			pulseWidth: getASetting('waveParams', 'pulseWidth'),
+
+			// also a percentage
+			pulseOffset: getASetting('waveParams', 'pulseOffset'),
 
 			// state for potential resets - control panel only, setPotential()
-			potentialBreed: storeSettings.potentialParams.potentialBreed,
-			valleyPower: storeSettings.potentialParams.valleyPower,
-			valleyScale: storeSettings.potentialParams.valleyScale,
-			valleyOffset: storeSettings.potentialParams.valleyOffset,
+			potentialBreed: getASetting('potentialParams', 'potentialBreed'),
+			valleyPower: getASetting('potentialParams', 'valleyPower'),
+			valleyScale: getASetting('potentialParams', 'valleyScale'),
+			valleyOffset: getASetting('potentialParams', 'valleyOffset'),
 
-			showingTab: storeSettings.miscParams.showingTab,
+			showingTab: getASetting('miscParams', 'showingTab'),
 		}
 	}
 

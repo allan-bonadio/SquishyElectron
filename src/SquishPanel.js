@@ -25,8 +25,7 @@ import {setFamiliarPotential} from './utils/potentialUtils';
 // why doesn't this work?!?!!?
 //import {storeSettings} from './utils/storeSettings';
 //import storeSettings from './utils/storeSettings';
-import {surrogateCuzWebPackAlwaysFucksUp as storeSettings} from './utils/storeSettings';
-//const storeSettings = window.storeSettings;
+import {getASetting, storeASetting} from './utils/storeSettings';
 
 // runtime debugging flags - you can change in the debugger or here
 let areBenchmarking = false;
@@ -50,10 +49,6 @@ export class SquishPanel extends React.Component {
 		width: PropTypes.number,
 	};
 
-	// static getListOfViews() {
-	// 	return listOfViewClasses;
-	// }
-
 	/* ************************************************ construction & reconstruction */
 
 	constructor(props) {
@@ -65,21 +60,15 @@ export class SquishPanel extends React.Component {
 		// console.info((new Error()).stack);
 		// debugger;
 
-// 		const space0 = storeSettings.retrieveSettings('space0');
-// 		const rat = storeSettings.retrieveRatify;
-
-		// webpack is always fucking up
-		//let ss = {iterationParams};
-
 		this.state = {
 			// Many of these things should be in a lower component;
 			// don't need to rerender the whole panel just cuz some params changed.
 
 			// THE N and continuum for THE space we're currently doing
 			// kept between sessions in localStore
-			N: storeSettings.spaceParams.N,
+			N: getASetting('spaceParams', 'N'),
 
-			continuum: storeSettings.spaceParams.continuum,
+			continuum: getASetting('spaceParams', 'continuum'),
 
 			mainViewClassName: DEFAULT_VIEW_CLASS_NAME,
 
@@ -91,26 +80,21 @@ export class SquishPanel extends React.Component {
 
 			// this is controlled by the user (start/stop/step buttons)
 			// does not really influence the rendering of the canvas... (other than running)
-			isTimeAdvancing: storeSettings.iterationParams.isTimeAdvancing,
+			isTimeAdvancing: getASetting('iterationParams', 'isTimeAdvancing'),
 
 			// this is the actual 'frequency' in actual milliseconds, convert between like 1000/n
 			// eg the menu on the CPToolbar says 10/sec, so this becomes 100
-			iteratePeriod: storeSettings.iterationParams.iteratePeriod,
+			iteratePeriod: getASetting('iterationParams', 'iteratePeriod'),
 
 			// defaults for sliders for dt & spi
-			dt: storeSettings.iterationParams.dt,
-			stepsPerIteration: storeSettings.iterationParams.stepsPerIteration,
+			dt: getASetting('iterationParams', 'dt'),
+			stepsPerIteration: getASetting('iterationParams', 'stepsPerIteration'),
 			//lowPassFilter: lpf,
-			lowPassFilter: storeSettings.iterationParams.stepsPerIteration,
+			lowPassFilter: getASetting('iterationParams', 'lowPassFilter'),
 
 			// advance forward with each iter
 			runningCycleElapsedTime: 0,
 			runningCycleIterateSerial: 0,
-
-
-
-
-
 		};
 
 		// will be resolved when the space has been created; result will be qeSpace
@@ -193,8 +177,8 @@ export class SquishPanel extends React.Component {
 
 			// OK callback
 			finalParams => {
-				let prevLowPassFilter = s.lowPassFilter;
-				let prevN = s.N;
+				// let prevLowPassFilter = s.lowPassFilter;
+				// let prevN = s.N;
 
 				qe.deleteTheSpace();
 
@@ -202,15 +186,18 @@ export class SquishPanel extends React.Component {
 					finalParams.N, finalParams.continuum, finalParams.mainViewClassName);
 				this.setState({isTimeAdvancing: timeWasAdvancing, });
 
-				storeSettings.spaceParams.N = finalParams.N;
-				storeSettings.spaceParams.continuum = finalParams.continuum;
+				//storeASetting('spaceParams', 'N', finalParams.N);
+				storeASetting('spaceParams', 'N', finalParams.N);
+				//storeASetting('spaceParams', 'continuum', finalParams.continuum);
+				storeASetting('spaceParams', 'continuum', finalParams.continuum);
 				//localStorage.space0 = JSON.stringify({N: finalParams.N, continuum: finalParams.continuum});
 				// should also work storeSettings.setSetting('space0.N, finalParams.N);
 				// and storeSettings.setSetting('space0.continuum, finalParams.continuum);
 
-				// move the LPF proportionately
-				let newLPF = Math.max(prevLowPassFilter * finalParams.N / prevN, 1);
-				this.setLowPassFilter(newLPF);
+				// no longer needed with redefinition of LPF as 0 < lpf <= 75
+				// 	// move the LPF proportionately
+				// 	let newLPF = Math.max(prevLowPassFilter * finalParams.N / prevN, 1);
+				// 	this.setLowPassFilter(newLPF);
 			},
 
 			// cancel callback
@@ -448,7 +435,6 @@ export class SquishPanel extends React.Component {
 		if (this.state.isTimeAdvancing)
 			return;
 
-		//this.onceMore = false;
 		this.setState({isTimeAdvancing: true});
 	}
 
@@ -456,7 +442,6 @@ export class SquishPanel extends React.Component {
 		if (!this.state.isTimeAdvancing)
 			return;
 
-		//this.onceMore = false;
 		this.setState({isTimeAdvancing: false});
 	}
 
@@ -484,10 +469,10 @@ export class SquishPanel extends React.Component {
 	setDt = dt => {
 		this.setState({dt});
 		qe.Avatar_setDt(dt);
-		if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  // goddamned bug in importing works in constructor
-			storeSettings.iterationSettings.dt = dt;
-		else
-			this.setState({dt});
+		//if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  // goddamned bug in importing works in constructor
+		storeASetting('iterationSettings', 'dt', dt);
+
+		this.setState({dt});
 	}
 	//setDt = this.setDt.bind(this);
 
@@ -495,10 +480,10 @@ export class SquishPanel extends React.Component {
 		console.info(`js setStepsPerIteration(${stepsPerIteration})`)
 		this.setState({stepsPerIteration});
 		qe.Avatar_setStepsPerIteration(stepsPerIteration);
-		if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  // goddamned bug in importing works in constructor
-			storeSettings.iterationSettings.stepsPerIteration = stepsPerIteration;
-		else
-			this.setState({stepsPerIteration});
+		//if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  // goddamned bug in importing works in constructor
+		storeASetting('iterationSettings', 'stepsPerIteration', stepsPerIteration);
+
+		this.setState({stepsPerIteration});
 	}
 	//setStepsPerIteration = this.setStepsPerIteration.bind(this);
 
@@ -508,11 +493,15 @@ export class SquishPanel extends React.Component {
 		console.info(`js setLowPassFilter(${lowPassFilter})`)
 		this.setState({lowPassFilter});
 		qe.Avatar_setLowPassFilter(lowPassFilter);
-		if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  //  goddamned bug in importing works in constructor
-			storeSettings.iterationSettings.lowPassFilter = (lowPassFilter - 1) / this.state.N;
-		this.setState({lowPassFilter: (lowPassFilter - 1) / this.state.N})
+// 		if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  //  goddamned bug in importing works in constructor
+// 			storeASetting('iterationSettings', 'lowPassFilter', (lowPassFilter - 1) / this.state.N);
+
+		storeASetting('iterationSettings', 'lowPassFilter', lowPassFilter);
+		this.setState({lowPassFilter});
+
+		// here's where it converts to the C++ style integer number of freqs
+		qe.Avatar_setLowPassFilter(Math.round(lowPassFilter / 200 * this.state.N));
 	}
-	//setLowPassFilter = this.setLowPassFilter.bind(this);
 
 	// completely wipe out the 𝜓 wavefunction and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon setWave in wave tab

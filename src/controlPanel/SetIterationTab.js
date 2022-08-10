@@ -39,16 +39,7 @@ function SetIterationTab(props) {
 	// should be 0 if N <= 150, 1 if N = 256...512, 2 above that
 	const nDigits = Math.max(0, 1 -Math.ceil(Math.log10(aStep)));
 
-	// display percent numbers rounded off only to the minimum n digits
-	// THese are stored in the storeSettings this way, but they're converted  &
-	// rounded to int before sending to c++
-	let lpfValues = [];
-	for (let perc = aStep; perc <= 75; perc += aStep) {
-		let display = perc.toFixed(nDigits)
-		lpfValues.push(<option key={display} value={display}>{display}</option>);
-	}
-
-	//Unlike other tabs, all these are instant-update.
+	// Unlike other tabs, all these are instant-update.
 
 	return (<div className='SetIterationTab'>
 		<div className='sliderBlock'>
@@ -92,18 +83,13 @@ function SetIterationTab(props) {
 			<TextNSlider className='lowPassFilterSlider '
 				label='Percent of High Frequencies to Filter Out'
 				value={props.lowPassFilter.toFixed(nDigits)}
-				min={aStep} max={75}
+				min={aStep} max={75} step={aStep}
 				style={{width: '80%'}}
 				handleChange={newValue => {
 						console.info(`handleChange Low Pass Filter:: ${newValue}  `);
 						props.setLowPassFilter(+newValue);
 					}}
-				list='lowPassFilterValues'
 			/>
-
-			<datalist id='lowPassFilterValues'>
-				{lpfValues}
-			</datalist>
 
 		</div>
 		<div className='iStats'>

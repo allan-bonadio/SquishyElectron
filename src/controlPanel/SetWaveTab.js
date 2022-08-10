@@ -15,7 +15,7 @@ import qeWave from '../engine/qeWave';
 import qCx from '../engine/qCx';
 import cxToRgb from '../view/cxToRgb';
 import TextNSlider from '../widgets/TextNSlider';
-import storeSettings from '../utils/storeSettings';
+import {storeASetting} from '../utils/storeSettings';
 
 let debugWaveTab = false;
 
@@ -106,19 +106,21 @@ class SetWaveTab extends React.Component {
 
 	setBreed = breed => {
 		this.props.setCPState({waveBreed: breed});
-		storeSettings.waveParams.waveBreed = breed;
+		storeASetting('waveParams', 'waveBreed', breed);
 	}
 	setWaveFrequency = waveFrequency => {
 		this.props.setCPState({waveFrequency});
-		storeSettings.waveParams.waveFrequency = waveFrequency;
+		storeASetting('waveParams', 'waveFrequency', waveFrequency);
 	}
 	setPulseWidth = pulseWidth => {
+		if (pulseWidth < 1) pulseWidth = 1;////
+
 		this.props.setCPState({pulseWidth});
-		storeSettings.waveParams.pulseWidth = pulseWidth;
+		storeASetting('waveParams', 'pulseWidth', pulseWidth);
 	}
 	setPulseOffset = pulseOffset => {
 		this.props.setCPState({pulseOffset});
-		storeSettings.waveParams.pulseOffset = pulseOffset;
+		storeASetting('waveParams', 'pulseOffset', pulseOffset);
 	}
 
 
@@ -131,14 +133,14 @@ class SetWaveTab extends React.Component {
 		const sliders = <>
 			<TextNSlider className='frequency' label='frequency'
 				value={+p.waveParams.waveFrequency}
-				min={-20} max={20} step={'standing' == breed ? .5 : 1}
+				min={-30} max={30} step={'standing' == breed ? .5 : 1}
 				handleChange={this.setWaveFrequency}
 			/>
 
 			<TextNSlider className='pulseWidth' label='pulse width, %'
 				style={{display: needPulseWidth ? 'block' :  'none'}}
 				value={+p.waveParams.pulseWidth}
-				min={1} max={10} step={.1}
+				min={1} max={50} step={.1}
 				handleChange={this.setPulseWidth}
 			/>
 

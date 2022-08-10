@@ -16,7 +16,7 @@ import qe from '../engine/qe';
 import './view.scss';
 // import {abstractViewDef} from './abstractViewDef';
 // import flatDrawingViewDef from './flatDrawingViewDef';
-import storeSettings from '../utils/storeSettings';
+import {getASetting, storeASetting} from '../utils/storeSettings';
 import PotentialArea from './PotentialArea';
 
 //const listOfViewClasses = import('./listOfViewClasses');
@@ -44,7 +44,7 @@ export class GLView extends React.Component {
 
 		// why is this called so many times!?!?!?!?!  console.log(`GLView(...`, props, (new Error()).stack);
 		this.state = {
-			height: storeSettings.miscParams.viewHeight,
+			height: getASetting('miscParams', 'viewHeight'),
 			space: null,  // set when promise comes in
 		}
 
@@ -124,7 +124,7 @@ export class GLView extends React.Component {
 
 			const viewHeight = ev.pageY + this.yOffset;
 			this.setState({height: viewHeight});
-			storeSettings.miscParams.viewHeight = viewHeight;
+			storeASetting('miscParams', 'viewHeight', viewHeight);
 			// console.info(`mouse drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
 
 			ev.preventDefault();
