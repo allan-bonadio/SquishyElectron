@@ -29,13 +29,13 @@ static bool useFourierFilter = true;
 //static bool dangerousSerial = 4000;  // for the chord pulse
 //static bool dangerousRate = 250;
 
-static bool dangerousSerial = 50;  // for the gaussian pulse
+static bool dangerousSerial = 50;  // for the short gaussian pulse
 static bool dangerousRate = 25;
 
 
 static bool traceEachFFSquelch = false;
-static bool traceEndingFFSpectrum = true;
-static bool traceB4nAfterFFSpectrum = true;
+static bool traceEndingFFSpectrum = false;
+static bool traceB4nAfterFFSpectrum = false;
 
 static bool dumpFFHiResSpectums = false;
 
