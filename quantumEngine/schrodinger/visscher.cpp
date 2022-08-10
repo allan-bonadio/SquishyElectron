@@ -34,7 +34,7 @@ so that in our buffers of complex numbers, the Im part is dt/2 ahead of the Re p
 initial wave:   ψr(t)              ψi(t + dt/2)
 1st iter wave:  ψr(t + dt)         ψi(t + 3dt/2)
 
-The natural discretization of Eqs. (6) is therefore
+The natural discretization of Eqs. 6 (visscher paper) is therefore
 	ψr(t + dt) = ψr(t) + dt H ψi(t + dt/2)
 
 Half a tick later, at a half odd integer multiple of dt,
@@ -44,7 +44,7 @@ or
 
 where H is hamiltonian, typically ( potential + ∂2/∂x2 )
 We do the hamiltonian custom here instead of using the function in hamiltonian.cpp
-and for now omit the potential
+and sometimes omit the potential
  */
 
 // this is our second derivative wrt x:

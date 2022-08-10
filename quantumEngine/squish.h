@@ -17,12 +17,13 @@
 
 #include "spaceWave/qCx.h"
 
-// continuum values - same as in qeBasicSpace in qeSpace.js; pls synchronize them!
+// continuum values - same as in qeSpace.js; pls synchronize them!
 // also used in qBuffers and subclasses
 const int contDISCRETE = 0;
 const int contWELL = 1;
 const int contENDLESS = 2;
 
+// return elapsed time since last page reload, in seconds
 extern double getTimeDouble();
 
 #endif

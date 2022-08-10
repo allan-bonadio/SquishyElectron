@@ -179,11 +179,9 @@ makeParam('lowPassFilter', 'iterationParams', 50, lpf => lpf > 0 && lpf < 75);
 makeParam('showingTab', 'miscParams', 'wave', ['wave', 'potential', 'space', 'iteration']);
 makeParam('viewHeight', 'miscParams', 400,  viewHeight => viewHeight >= 50 && viewHeight <= 1e4);
 
-debugger;
 
 // cuz of some magical bad ju-ju, this shit just doesn't owrk and i have to do it by hand.
 export function storeASetting(groupName, varName, newValue) {
-debugger;////
 	// if bad value, just set to default
 	if (newValue === undefined || !alternateStoreVerifiers[groupName][varName](newValue))
 		newValue = alternateStoreDefaults[groupName][varName];

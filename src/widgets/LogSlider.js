@@ -133,7 +133,6 @@ class LogSlider extends React.Component {
 
 		// right on the edge of transition, it can vibrate!  average this out. so it slides gently
 		let val = powerToIndex(spd, p.current);
-		console.info()
 		//val = (val + this.avgValue * 15) / 16
 
 		if (traceThisSlider.test(p.unique)) console.info(

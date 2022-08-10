@@ -5,8 +5,8 @@
 
 cd `dirname $0`
 
-. /dvl/emscripten/emsdk-main/emsdk_env.sh
-# also try emsdk without the -main or make a symlink
+. /dvl/emscripten/emsdk/emsdk_env.sh
+# was formerly /emsdk-main/ but should be fixed now
 
 # this has all c++ & h files, except main.cpp and the testing files.
 # omit those, so testing can also use this and compile & run itself (see testing/cppu*).
