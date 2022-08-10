@@ -202,6 +202,7 @@ class qeWave {
 		this.setCircularWave(freq);
 
 		// modulate with a gaussian, centered at the offset, with pulseWidth
+		// that's a percentage, 0...100.  tweak numbers to suit the ui
 		const s2 = 1 / (pulseWidth * 2);
 		for (let ix = start; ix < end; ix += 2) {
 			const 𝜟 = ix - offset;
@@ -214,9 +215,6 @@ class qeWave {
 		//this.rainbowDump('qeWave.setPulseWave() done');
 	}
 
-
-
-	// freq is just like circular, although as a fraction of the pulseWidth instead of N
 	// 2stdDev is width of the packet, as percentage of N (0%...100%).
 	// offset is how far along is the peak, as an integer X value (0...N).
 	setChordWave(freqUi, pulseWidth, offsetUi) {
@@ -225,7 +223,7 @@ class qeWave {
 		const {start, end, N} = this.space.startEnd2;
 		let offset = offsetUi * N / 100;  // now in units of X
 		const freq = Math.round(freqUi);
-		const nSideFreqs = Math.round(pulseWidth * N)
+		const nSideFreqs = Math.round(pulseWidth / 100 * N)
 		console.log(`🌊  setPulseWave freq=${freqUi} => ${freq}  nSideFreqs=${nSideFreqs}`+
 			`  offset=${offsetUi}% => ${offset}`)
 
@@ -264,6 +262,8 @@ class qeWave {
 
 	// set one of the above canned waveforms, according to the waveParams object's values
 	setFamiliarWave(waveParams) {
+		waveParams.pulseWidth = Math.max(1, waveParams.pulseWidth);  // emergency!!  this gets really slow
+
 		// should the boundaries, normalize and dump be moved to the end of here?
 		switch (waveParams.waveBreed) {
 		case 'circular':
