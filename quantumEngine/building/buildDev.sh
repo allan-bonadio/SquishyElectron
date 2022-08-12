@@ -2,6 +2,8 @@
 # build for development -- script to compile emscripten/C++ sources into WebAssembly
 # Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 
+# turn this on for profiling help
+#PROFILING=--profiling
 
 cd `dirname $0`
 
@@ -25,6 +27,7 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \
 	-sEXPORTED_FUNCTIONS=@building/exports.json \
 	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","getValue","setValue"]' \
+	$PROFILING \
 	-DLABEL_LEN=$LABEL_LEN \
 	-I/dvl/emscripten/emsdk/upstream/emscripten/cache/sysroot/include \
 	-include emscripten.h \
