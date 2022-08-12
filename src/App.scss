@@ -125,7 +125,7 @@ button.round {
 /* **************************************** CommonDialog */
 
 .backdrop {
-	z-index: 10;
+	z-index: 20;
 	display: flex;
 	background-color: #8888;
 	position: fixed;
@@ -195,4 +195,7 @@ button.round {
 
 
 
-
+.SquishPanel {
+	position: relative;
+	z-index: 10;
+}
