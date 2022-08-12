@@ -15,6 +15,8 @@
 #include "../fourier/fftMain.h"
 
 
+static bool useFourierFilter = true;
+
 static bool traceIteration = false;
 static bool traceIterSteps = false;
 
@@ -23,23 +25,24 @@ static bool traceJustInnerProduct = false;
 
 static bool traceFourierFilter = false;
 
-static bool useFourierFilter = true;
-
-// only do some traces if we're past where it's a problem
-//static bool dangerousSerial = 4000;  // for the chord pulse
-//static bool dangerousRate = 250;
-
-static bool dangerousSerial = 50;  // for the short gaussian pulse
-static bool dangerousRate = 25;
-
-
-static bool traceEachFFSquelch = false;
-static bool traceEndingFFSpectrum = false;
-static bool traceB4nAfterFFSpectrum = false;
-
 static bool dumpFFHiResSpectums = false;
 
 
+
+// only do some traces if we're past where it's a problem
+static int dangerousSerial = 4000;  // for the chord pulse
+static int dangerousRate = 250;
+
+//static int dangerousSerial = 50;  // for the short gaussian pulse
+//static int dangerousRate = 25;
+
+// those apply to these tracing flags
+static bool traceEachFFSquelch = false;
+static bool traceEndingFFSpectrum = false;
+static bool traceB4nAfterFFSpectrum = true;
+
+
+/* *********************************************************************************** Avatar */
 // make sure these values are doable by the sliders' steps
 Avatar::Avatar(qSpace *sp)
 	: dt(1e-3), stepsPerIteration(100), lowPassFilter(1),
@@ -54,7 +57,7 @@ Avatar::Avatar(qSpace *sp)
 	// we always need a view buffer; that's the whole idea behind an avatar
 	qvBuffer = new qViewBuffer(space, this);
 
-	dumpOffsets();
+	//dumpOffsets();
 };
 
 // some uses never need these so wait till they do
@@ -172,7 +175,7 @@ double getTimeDouble()
 void Avatar::oneIteration() {
 	int tt;
 	bool dangerousTimes = (iterateSerial >= dangerousSerial)
-		&& ((int) iterateSerial % dangerousRate) == 0;
+		&& (((int) iterateSerial % dangerousRate) == 0);
 
 	// now we need it
 	getScratchWave();
@@ -260,7 +263,8 @@ void Avatar::oneIteration() {
 // maye after i get more of this working and fine toon it
 void Avatar::fourierFilter(int lowPassFilter) {
 	// this is when the wave tends to come apart with high frequencies
-	bool dangerousTimes = (iterateSerial >= dangerousSerial) && ((int) iterateSerial % dangerousRate) == 0;
+	bool dangerousTimes = (iterateSerial >= dangerousSerial)
+		&& (((int) iterateSerial % dangerousRate) == 0);
 
 	spect = getSpectrum();
 	spect->generateSpectrum(mainQWave);
@@ -289,6 +293,8 @@ void Avatar::fourierFilter(int lowPassFilter) {
 
 	if (traceEndingFFSpectrum && dangerousTimes) {
 			spect->dumpSpectrum("🐠  finished fourierFilter: spectrum");
+			//printf("frame iterateSerial=%lf, dangerousSerial=%d,  dangerousRate=%d\n",
+			//	iterateSerial, dangerousSerial, dangerousRate);
 	}
 
 
