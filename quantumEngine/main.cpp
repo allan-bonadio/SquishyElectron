@@ -34,6 +34,8 @@ int main() {
 	qeStarted(180, 18);
 
 
+	printf("alignof(double) = %ld, alignof(int) = %ld, alignof(int *) = %ld, alignof(bool) = %ld\n",
+		alignof(double), alignof(int), alignof(int *), alignof(bool));
 	return 0;
 }
 
