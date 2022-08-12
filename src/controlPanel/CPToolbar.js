@@ -44,7 +44,7 @@ function CPToolbar(props) {
 		<option key='.2' value='0.200'>every 5 sec</option>
 		<option key='.1' value='0.100'>every 10 sec</option>
 		<option key='.05' value='0.050'>every 20 sec</option>
-		<option key='.01667' value='0.017'>every minute</option>
+		<option key='.0166666666' value='0.0166666666'>every minute</option>
 	</>;
 
 	// nail this down so roundoff error doesn't spoil everything.
