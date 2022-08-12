@@ -27,13 +27,6 @@ struct Avatar {
 	double iterateSerial;
 
 
-	bool isIterating;
-
-	// please do an FFT after the current iteration ends
-	bool pleaseFFT;
-	// make sure the subsequent things are aligned!  or iteration is painfully slow.
-
-
 	// params that the user can set
 	double dt;
 	int lowPassFilter;
@@ -46,7 +39,7 @@ struct Avatar {
 
 	// grabbed from the space upon each iteration start
 	double *potential;
-	double potentialFactor;
+	double potentialFactor;  // aligned by 8
 
 	//  and a scratch wave for stepping. Call the function first time you need it.
 	struct qWave *scratchQWave;
@@ -58,6 +51,7 @@ struct Avatar {
 
 	// the qViewBuffer to be passed to webgl.  This is a visual thing after all.
 	struct qViewBuffer *qvBuffer;
+	// aligned by 4, not 8
 
 	// set the elapsedTime and iterateSerial to zero
 	void resetCounters(void);
@@ -81,6 +75,12 @@ struct Avatar {
 	// set pleaseFFt from JS (only if in the middle of an iteration)
 	void askForFFT(void);
 
+	// for alignment, but these last
+	bool isIterating;
+
+	// please do an FFT after the current iteration ends
+	bool pleaseFFT;
+	// make sure the subsequent things are aligned!  or iteration is painfully slow.
 };
 
 extern Avatar *theAvatar;
