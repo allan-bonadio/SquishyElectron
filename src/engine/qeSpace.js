@@ -76,7 +76,7 @@ export class qeBasicSpace {
 	}
 
 	// this will return the DOUBLE of start and end so you can just loop thru += 2
-	// but NOT N, it passes thru
+	// but NOT N, that's honest
 	get startEnd2() {
 		const dim = this.dimensions[0];
 		return {start: dim.start*2, end: dim.end*2, N: dim.N, nPoints: this.nPoints * 2,

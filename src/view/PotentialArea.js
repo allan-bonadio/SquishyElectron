@@ -86,31 +86,13 @@ export class PotentialArea extends React.Component {
 	}
 
 	mouseDown(ev) {
-		//const p = this.props;
-
-		// which x?
-		//this.mouseReveal('down', ev, ix);
-
-			// a hit! otherwise we wouldn't be calling the event handler.
+		// a hit! otherwise we wouldn't be calling the event handler.
 
 		this.changePotential(ev, 'M down');
 		this.dragging = true;
 		//debugger;
 
 	}
-//		const x = Math.floor(ev.clientX / p.barWidth);
-//		this.mouseReveal('down', ev, x);
-////		console.log(`mouseDown on point (%f,%f) %f`,
-////			ev.clientX, ev.clientY,
-////			potentialBuffer[x), ev];
-//		if (Math.abs(qe.space.potentialBuffer[x] - ev.clientY) < 10) {
-//			// a hit!
-//			console.log(`    a hit! on point ${x}:`, ev);
-//			qe.space.potentialBuffer[x] = ev.clientY;
-//			this.dragging = true;
-//			debugger;
-//		}
-// 	}
 
 	mouseMove(ev) {
 		//const p = this.props;

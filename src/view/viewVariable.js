@@ -33,7 +33,7 @@ export class viewVariable {
 }
 
 
-/* ************************************************** uniforms */
+/* ************************************************** uniforms for variables */
 
 // uniforms don't vary from one vertex to another
 // create this as many times as you have uniforms as input to either or both shaders

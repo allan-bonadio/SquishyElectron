@@ -14,6 +14,7 @@
 // and each dimension should have a function that does the honors.
 // or, per-view or per-space.
 // btw, this is really Hψ not just H.  Isn't H supposed to be real?
+// real eigenvalues.
 qCx hamiltonian(qCx *wave, int x) {
 	// so at location x, if dx = 1,
 	// the derivative would be (𝜓[x+1] - 𝜓[x])
