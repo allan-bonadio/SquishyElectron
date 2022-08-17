@@ -61,15 +61,12 @@ void Avatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
 	//printf("⚛️ start of stepReal");
 	//dumpThat(oldW, true);
-	//printf("⚛︎ stepReal start N States=(%d), dt=%lf\n",
-	//	dims->nStates, avatar->dt);
 
-	//printf("⚛︎ the hamiltonian 𝜓.re at ...\n");
 	for (int ix = dims->start; ix < dims->end; ix++) {
+		// second deriv wrt x of psi
 		double d2ψi = oldW[ix-1].im + oldW[ix+1].im - oldW[ix].im * 2;
 
-		//printf("⚛︎ x=%d  Hψ = %lf,%lf \n", ix, d2.re, d2.im);
-
+		// total hamiltonian including potential
 		double Hψ = d2ψi + potential[ix] * potentialFactor * oldW[ix].re;
 		//double Hψ = d2ψi;   // without potential
 
@@ -77,7 +74,8 @@ void Avatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 		newW[ix].re = oldW[ix].re - dt * Hψ;
 		qCheck("vischer stepReal", newW[ix]);
 	}
-	if (traceVischerBench) printf("      stepReal, on to fix boundaries: time=%lf\n", getTimeDouble());
+	if (traceVischerBench) printf("      stepReal, on to fix boundaries: time=%lf\n",
+		getTimeDouble());
 	mainQWave->fixThoseBoundaries(newW);
 	//printf("⚛️ end of stepReal:");
 }
@@ -90,19 +88,20 @@ void Avatar::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 	//dumpThat(oldW, true);
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
+		// second deriv d2ψr / dx**2
 		double d2ψr = oldW[ix-1].re + oldW[ix+1].re - oldW[ix].re * 2;
 
+		// total hamiltonian
 		double Hψ = d2ψr + potential[ix] * potentialFactor * oldW[ix].im;
 		//double Hψ = d2ψr;  // without potential
 
 		// note addition
 		newW[ix].im = oldW[ix].im + dt * Hψ;
 
-		//newW[ix].im = oldW1.im - dt * d2.im;
-		//newW[ix].im = oldW1.im - dt * H.im * newW[ix].re;
 		qCheck("vischer stepImaginary", newW[ix]);
 	}
-	if (traceVischerBench) printf("      stepImaginary, on to fix boundaries: time=%lf\n", getTimeDouble());
+	if (traceVischerBench) printf("      stepImaginary, on to fix boundaries: time=%lf\n",
+		getTimeDouble());
 
 	mainQWave->fixThoseBoundaries(newW);
 	//printf("⚛️ end of stepImaginary - result wave:");
@@ -115,19 +114,22 @@ void Avatar::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
 	qWave *newQW = newQWave;
 	qCx *newW = newQWave->wave;
 
-	if (traceVischerBench) printf("❇️ oneVisscherStep, start: time=%lf\n", getTimeDouble());
-	if (traceVischerBench) printf("❇️ oneVisscherStep, consecutive: time=%lf\n", getTimeDouble());
+	if (traceVischerBench) printf("❇️ oneVisscherStep, new=%p, old=%p, start: time=%lf\n",
+		newQWave, oldQWave, getTimeDouble());
+	if (traceVischerBench) printf("                   consecutive: time=%lf\n", getTimeDouble());
 
 	qDimension *dims = space->dimensions;
 	oldQW->fixBoundaries();
 	if (debugVisscher) oldQW->dump("starting oneVisscherStep", true);
 
-	if (traceVischerBench) printf("         oneVisscherStep, about to stepReal: time=%lf\n", getTimeDouble());
+	if (traceVischerBench) printf("         oneVisscherStep, about to stepReal: time=%lf\n",
+		getTimeDouble());
 	stepReal(oldW, newW, dt);
 	if (debugHalfway) newQWave->dump("Visscher wave after the Re step", true);
 	// now at an half-odd fraction of dt
 
-	if (traceVischerBench) printf("         oneVisscherStep, about to stepImaginary: time=%lf\n", getTimeDouble());
+	if (traceVischerBench) printf("         oneVisscherStep, about to stepImaginary: time=%lf\n",
+		getTimeDouble());
 	stepImaginary(oldW, newW, dt);
 	// now at an integer fraction of dt
 

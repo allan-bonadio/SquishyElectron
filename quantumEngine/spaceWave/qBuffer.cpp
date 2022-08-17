@@ -30,7 +30,7 @@ static bool traceAllocate = false;
 qCx *allocateWave(int nPoints) {
 	qCx *buf = (qCx *) calloc(nPoints, sizeof(qCx));
 	if (traceAllocate) {
-		printf("🍕 allocateWave()  wave=%p  nPoints: %d bytelength=x%lx\n",
+		printf("🍕 allocateWave()  buf=%p  nPoints: %d bytelength=x%lx\n",
 			buf, nPoints, nPoints * sizeof(qCx));
 	}
 	return buf;
@@ -46,7 +46,6 @@ void freeWave(qCx *wave) {
 
 // make one, the right size for this buffer's space, or nPoints long if no space
 qCx *qBuffer::allocateWave(int nPoints) {
-	if (((long) space) & 0xFFFFFFFe00000000) nPoints = space->nPoints;  // crash me
 	if (nPoints <= 0) {
 		if (space)
 			nPoints = space->freeBufferLength;
@@ -55,10 +54,10 @@ qCx *qBuffer::allocateWave(int nPoints) {
 	}
 
 	// ?? this is weird  this->nPoints = nPoints;
-	if (traceAllocate)
-		printf("🍕 qBuffer::allocateWave this=%p  wave=%p  nPoints: %d\n",
-			this, wave, nPoints);
 	qCx *buf =  (qCx *) malloc(nPoints * sizeof(qCx));
+	if (traceAllocate)
+		printf("🍕 qBuffer::allocateWave this=%p  nPoints: %d  buf: %p\n",
+			this, nPoints, buf);
 	return buf;
 }
 
