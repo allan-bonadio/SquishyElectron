@@ -28,9 +28,9 @@ let alsoDrawPoints = false, alsoDrawLines = false;
 
 let ps = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
 
-// make the line number for the start a multiple of 10 (?)
+// make the line number for the start correspond to this JS file line number
 const vertexSrc = `${cxToColorGlsl}
-#line 154
+#line 33
 varying highp vec4 vColor;
 attribute vec4 row;
 uniform float barWidth;
@@ -65,6 +65,7 @@ void main() {
 `;
 
 const fragmentSrc = `
+#line 68
 precision highp float;
 varying highp vec4 vColor;
 
@@ -73,7 +74,7 @@ void main() {
 }
 `;
 
-// the original display that's worth watching
+// the original display that's worth watching: flat upside down hump graph
 export class flatDrawing extends abstractDrawing {
 
 	static drawingClassName: 'flatDrawing';
