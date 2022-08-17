@@ -7,18 +7,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {scaleLinear} from 'd3-scale';
-import {path as d3path} from 'd3-path';
+//import {path as d3path} from 'd3-path';
 
 // eslint-disable-next-line no-unused-vars
 import {setFamiliarPotential, dumpPotential} from '../utils/potentialUtils';
 import MiniGraph from './MiniGraph';
 import qeSpace from '../engine/qeSpace';
 import TextNSlider from '../widgets/TextNSlider';
-import {storeASetting} from '../utils/storeSettings';
+import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
 //import {getASetting} from '../utils/storeSettings';
 
 // some typical potential value, so we can get an idea of how to scale in the graph
-let SOME_POTENTIAL = 0.01;
+//let SOME_POTENTIAL = 0.01;
 
 // set prop types
 function setPT() {
@@ -48,72 +48,78 @@ class SetPotentialTab extends React.Component {
 	// rendering for the elements of the minitab
 	// Returns a <g element enclosing the juicy stuff
 	// NOT the main display space, but the minigraph space
-	recipe(miniSpace, potentialParams) {
+	recipe =
+	(miniSpace, potentialParams) => {
 		//const p = this.props;
-		const {start, end, N, nPoints} = miniSpace.startEnd;
+		//const {start, end, N, nPoints} = miniSpace.startEnd;
+
+		// temporarily disabled
+		return '';
 
 		// keep these buffers around for reuse - a bit faster
-		if (! this.potentialArray || this.potentialArray.length != nPoints)
-			this.potentialArray = new Float64Array(nPoints);
-		let potentialArray = this.potentialArray;
-
-		// generate the values
-		setFamiliarPotential(miniSpace, potentialArray, potentialParams);
-
-		// calc domain
-		let maxY = 0;
-		let minY = 0;  // in case all the other values are zero, which is the default
-		for (let ix = start; ix < end; ix++) {
-			minY = Math.min(minY, potentialArray[ix]);
-			maxY = Math.max(maxY, potentialArray[ix]);
-		}
-
-		// make some room in case it's small or zero
-		minY -= SOME_POTENTIAL;
-		maxY += SOME_POTENTIAL;
-
-		this.xScale.domain([1, N]);
-		this.yScale.domain([maxY, minY]);
-
-		// generate the points for the <path
-		let pathObj = d3path();
-		//console.info(`point 1 = (${this.xScale(start)}, ${ this.yScale(potentialArray[start])})`)
-		pathObj.moveTo(this.xScale(start),  this.yScale(potentialArray[start]).toFixed(2));
-		for (let ix = start+1; ix < end; ix++) {
-			pathObj.lineTo(this.xScale(ix), this.yScale(potentialArray[ix]).toFixed(2));
-		}
-		const d = pathObj.toString();
-		//console.info(`d = ${d}`)
-		//dumpPotential(miniSpace, potentialArray);
-
-		return <g className='linePaths' >
-			<path d={d} stroke='#fff' fill='none'  key='only' strokeWidth={3} />
-		</g>;
+		// if (! this.potentialArray || this.potentialArray.length != nPoints)
+		// 	this.potentialArray = new Float64Array(nPoints);
+		// let potentialArray = this.potentialArray;
+		//
+		// // generate the values
+		// setFamiliarPotential(miniSpace, potentialArray, potentialParams);
+		//
+		// // calc domain
+		// let maxY = 0;
+		// let minY = 0;  // in case all the other values are zero, which is the default
+		// for (let ix = start; ix < end; ix++) {
+		// 	minY = Math.min(minY, potentialArray[ix]);
+		// 	maxY = Math.max(maxY, potentialArray[ix]);
+		// }
+		//
+		// // make some room in case it's small or zero
+		// minY -= SOME_POTENTIAL;
+		// maxY += SOME_POTENTIAL;
+		//
+		// this.xScale.domain([1, N]);
+		// this.yScale.domain([maxY, minY]);
+		//
+		// // generate the points for the <path
+		// let pathObj = d3path();
+		// //console.info(`point 1 = (${this.xScale(start)}, ${ this.yScale(potentialArray[start])})`)
+		// pathObj.moveTo(this.xScale(start),  this.yScale(potentialArray[start]).toFixed(2));
+		// for (let ix = start+1; ix < end; ix++) {
+		// 	pathObj.lineTo(this.xScale(ix), this.yScale(potentialArray[ix]).toFixed(2));
+		// }
+		// const d = pathObj.toString();
+		// //console.info(`d = ${d}`)
+		// //dumpPotential(miniSpace, potentialArray);
+		//
+		// return <g className='linePaths' >
+		// 	<path d={d} stroke='#fff' fill='none'  key='only' strokeWidth={3} />
+		// </g>;
 	}
-	recipe = this.recipe.bind(this);
 
 	setFlat = () => {
-		this.props.setCPState({potentialBreed: 'flat'});
-		storeASetting('potentialParams', 'potentialBreed', 'flat');
+		this.props.setCPState({potentialBreed:
+			storeASetting('potentialParams', 'potentialBreed', 'flat')});
 	}
 	setValley = () => {
-		this.props.setCPState({potentialBreed: 'valley'});
-		storeASetting('potentialParams', 'potentialBreed', 'valley');
+		this.props.setCPState({potentialBreed:
+			storeASetting('potentialParams', 'potentialBreed', 'valley')});
 	}
 	setValleyPower = valleyPower => {
-		this.props.setCPState({potentialBreed: 'valley', valleyPower});
-		storeASetting('potentialParams', 'valleyPower', valleyPower);
-		storeASetting('potentialParams', 'potentialBreed', 'valley');
+		this.props.setCPState({
+			potentialBreed: storeASetting('potentialParams', 'potentialBreed', 'valley'),
+			valleyPower: storeASetting('potentialParams', 'valleyPower', valleyPower),
+			});
 	}
 	setValleyScale = valleyScale => {
-		this.props.setCPState({potentialBreed: 'valley', valleyScale});
-		storeASetting('potentialParams', 'valleyScale', valleyScale);
-		storeASetting('potentialParams', 'potentialBreed', 'valley');
+		this.props.setCPState({
+			potentialBreed: storeASetting('potentialParams', 'potentialBreed', 'valley'),
+			valleyScale: storeASetting('potentialParams', 'valleyScale', valleyScale),
+		});
 	}
 	setValleyOffset = valleyOffset => {
-		this.props.setCPState({potentialBreed: 'valley', valleyOffset});
-		storeASetting('potentialParams', 'valleyOffset', valleyOffset);
-		storeASetting('potentialParams', 'potentialBreed', 'valley');
+		this.props.setCPState({
+			potentialBreed: storeASetting('potentialParams', 'potentialBreed', 'valley'),
+			valleyOffset: storeASetting('potentialParams', 'valleyOffset', valleyOffset),
+		});
 	}
 
 	// rendering for the Tab
@@ -124,7 +130,9 @@ class SetPotentialTab extends React.Component {
 		const sliders = 	<>
 				<TextNSlider className='powerSlider'  label='Power'
 					value={+pp.valleyPower}
-					min={-2} max={2} step={.01}
+					min={alternateMinMaxs.potentialParams.valleyPower.min}
+					max={alternateMinMaxs.potentialParams.valleyPower.max}
+					step={.01}
 					style={{width: '8em'}}
 					handleChange={this.setValleyPower}
 				/>
@@ -132,7 +140,9 @@ class SetPotentialTab extends React.Component {
 				<br/>
 				<TextNSlider className='scaleSlider'  label='Scale'
 					value={+pp.valleyScale}
-					min={-5} max={5} step={.01}
+					min={alternateMinMaxs.potentialParams.valleyScale.min}
+					max={alternateMinMaxs.potentialParams.valleyScale.max}
+					step={.01}
 					style={{width: '8em'}}
 					handleChange={this.setValleyScale}
 				/>
@@ -140,7 +150,9 @@ class SetPotentialTab extends React.Component {
 				<br/>
 				<TextNSlider className='offsetSlider'  label='Offset %'
 					value={+pp.valleyOffset}
-					min={0} max={100} step={.1}
+					min={alternateMinMaxs.potentialParams.valleyOffset.min}
+					max={alternateMinMaxs.potentialParams.valleyOffset.max}
+					step={.1}
 					style={{width: '8em'}}
 					handleChange={this.setValleyOffset}
 				/>

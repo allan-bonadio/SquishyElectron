@@ -35,15 +35,11 @@ if (typeof storeSettings == 'undefined') debugger;  // webpack fuckups
 // this is such a pile of shit
 let alternateStoreDefaults = {};
 let alternateStoreVerifiers = {};
+export let alternateMinMaxs = {};
 
 // somehow webpack fumbles this if it's extern, in SquishPanel
 // no doesn't seem to make a diff
 window.storeSettings = storeSettings;
-
-export const surrogateCuzWebPackAlwaysFucksUp = {};
-
-
-let alwaysSave = false;  // maybe don't need this anymore?
 
 // save in the localSettings
 function saveGroup(groupName) {
@@ -72,6 +68,14 @@ function makeCriterionFunction(criterion) {
 		case 'Array':
 			return value => criterion.includes(value);
 
+		// must be like {min=-100, max=100}; optional step
+		case 'Object':
+			if (criterion.step)
+				return value => (value >= criterion.min && value <= criterion.max
+					&& 0 === value % criterion.step);
+			else
+				return value => (value >= criterion.min && value <= criterion.max);
+
 		default:
 			throw new Error(`bad criterion class ${criterion.constructor.name}`);
 		}
@@ -84,29 +88,33 @@ function makeCriterionFunction(criterion) {
 // make a parameter storeSettings.base.name, part of storeSettings[base]
 // one value that knows what's valid for it, and that's stored in localStore.
 // Undefined is an illegal value; also the default default value if never set.
-function makeParam(varName, groupName, defaultValue, criterion) {
-	// this is where it's really stored, in the closure
-	// not
-	let value;
+function makeParam(groupName, varName, defaultValue, criterion) {
+	const criterionFunction = makeCriterionFunction(criterion);
+
 
 	// retrieve from localStorage and set this var, or set to default if not there yet.
 	storeSettings[groupName] = storeSettings[groupName] || {};
 	let group = storeSettings[groupName];
 	let savedGroup = localStorage.getItem(groupName) || '{}';
 	savedGroup = JSON.parse(savedGroup);
-	value = (savedGroup[varName] === undefined) ? defaultValue : savedGroup[varName];
-
-	surrogateCuzWebPackAlwaysFucksUp[groupName] = surrogateCuzWebPackAlwaysFucksUp[groupName] || {};
-	surrogateCuzWebPackAlwaysFucksUp[groupName][varName] = value;
-
-
-
-	const criterionFunction = makeCriterionFunction(criterion);
+	let value = savedGroup[varName];
+	if (value === undefined || !criterionFunction(value)) {
+		savedGroup[varName] = value = defaultValue;
+		localStorage.setItem(groupName,  JSON.stringify(savedGroup));
+	}
+	else {
+		value = savedGroup[varName];
+	}
 
 	alternateStoreDefaults[groupName] = alternateStoreDefaults[groupName] || {};
 	alternateStoreDefaults[groupName][varName] = defaultValue;
 	alternateStoreVerifiers[groupName] = alternateStoreVerifiers[groupName] || {};
 	alternateStoreVerifiers[groupName][varName] = criterionFunction;
+	alternateMinMaxs[groupName] = alternateMinMaxs[groupName] || {};
+	if (typeof criterion == 'object' && criterion.max !== undefined)
+		alternateMinMaxs[groupName][varName] = criterion;
+
+
 
 	// now for the shit that doesn't work
 	Object.defineProperty(group, varName, {
@@ -120,8 +128,7 @@ function makeParam(varName, groupName, defaultValue, criterion) {
 			else
 				value = newVal;
 
-			if (alwaysSave)
-				saveGroup(group);
+			saveGroup(group);
 		},
 
 		configurable: true,
@@ -143,11 +150,14 @@ function isPowerOf2(n) {
 	return true;
 }
 
-makeParam('N', 'spaceParams', 64,  N => isPowerOf2(N) );
+// these also define the controls mins and maxes
+
+// see also resolution dialog for the slider
+makeParam('spaceParams', 'N', 64,  N => isPowerOf2(N) );
 
 // how to do this correctly with the defined constants???
-makeParam('continuum', 'spaceParams', 2, [0, 1, 2]);
-// makeParam('continuum', 'spaceParams', qeBasicSpace.contENDLESS,
+makeParam('spaceParams', 'continuum', 2, [0, 1, 2]);
+// makeParam('spaceParams', 'continuum', qeBasicSpace.contENDLESS,
 // 	[qeBasicSpace.contDISCRETE, qeBasicSpace.contWELL, qeBasicSpace.contENDLESS]);
 
 /* ************************************ waveParams */
@@ -155,55 +165,87 @@ makeParam('continuum', 'spaceParams', 2, [0, 1, 2]);
 // this keeps many settings that don't immediately affect running iteration.
 // So 'Set Wave' button actually sets the wave, but meanwhile the setting sliders
 // need to be remembered; this does it.  Potential and space too; not active until user does something.
+// THis also defines slider mins and maxes!  One source of truth.
 
-makeParam('waveBreed', 'waveParams', 'chord', ['circular', 'standing', 'gaussian', 'chord']);
-makeParam('waveFrequency', 'waveParams', 16, freq =>
-	freq >= 1 && freq <= 1000 && 0 === freq % .5 );
-makeParam('pulseWidth', 'waveParams', 1/16, width => width >= .001 && width <= 1);
-makeParam('pulseOffset', 'waveParams', 30, offset => offset >= 0 && offset <= 100);
+makeParam('waveParams', 'waveBreed', 'chord', ['circular', 'standing', 'gaussian', 'chord']);
+makeParam('waveParams', 'waveFrequency', 16, {min: -50, max: 50, step: 0.5});
+makeParam('waveParams', 'pulseWidth', 20, {min: 1, max: 100});
+makeParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
 
 /* ************************************ potentialParams */
-makeParam('potentialBreed', 'potentialParams', 'flat', ['flat', 'valley']);
-makeParam('valleyPower', 'potentialParams', 1, power => power >= -20 && power <= 20);
-makeParam('valleyScale', 'potentialParams', 1, scale => scale >= -1e4 && scale <= 1e4);
-makeParam('valleyOffset', 'potentialParams', 50, offset => offset >= 0 && offset <= 100);
+makeParam('potentialParams', 'potentialBreed', 'flat', ['flat', 'valley']);
+makeParam('potentialParams', 'valleyPower', 1, {min: -20, max: 20});
+makeParam('potentialParams', 'valleyScale', 1, {min: -1e4, max: 1e4});
+makeParam('potentialParams', 'valleyOffset', 50, {min: 0, max: 100});
 
 /* ************************************ iterationParams */
-makeParam('isTimeAdvancing', 'iterationParams', false,  [false, true]);
-makeParam('iteratePeriod', 'iterationParams', 50,  per => per >= 16 && per <= 100);
-makeParam('dt', 'iterationParams', 0.002,  dt => dt > 0 && dt < 1);
-makeParam('stepsPerIteration', 'iterationParams', 200,  spi => spi > 100 && spi < 1e6);
-makeParam('lowPassFilter', 'iterationParams', 50, lpf => lpf > 0 && lpf < 75);
+makeParam('iterationParams', 'isTimeAdvancing', false,  [false, true]);
+makeParam('iterationParams', 'iteratePeriod', 50, {min: 16, max: 60_001});
+makeParam('iterationParams', 'dt', 0.002, {min: 1e-6, max: 1.0, });
+makeParam('iterationParams', 'stepsPerIteration', 100, {min: 10, max: 1e5});
+makeParam('iterationParams', 'lowPassFilter', 50, {min: 0, max: 75});
 
 /* ************************************miscParams */
-makeParam('showingTab', 'miscParams', 'wave', ['wave', 'potential', 'space', 'iteration']);
-makeParam('viewHeight', 'miscParams', 400,  viewHeight => viewHeight >= 50 && viewHeight <= 1e4);
+makeParam('miscParams', 'showingTab', 'wave', ['wave', 'potential', 'space', 'iteration']);
+makeParam('miscParams', 'viewHeight', 400, {min: 50, max: 1e4});
 
+// they should ALL be there
+function checkAllSettingData() {
+	console.log(`stored group spaceParams: ${localStorage.spaceParams}`);
+	console.log(`stored group waveParams: ${localStorage.waveParams}`);
+	console.log(`stored group potentialParams: ${localStorage.potentialParams}`);
+	console.log(`stored group iterationParams: ${localStorage.iterationParams}`);
+	console.log(`stored group miscParams: ${localStorage.miscParams}`);
 
-// cuz of some magical bad ju-ju, this shit just doesn't owrk and i have to do it by hand.
-export function storeASetting(groupName, varName, newValue) {
-	// if bad value, just set to default
-	if (newValue === undefined || !alternateStoreVerifiers[groupName][varName](newValue))
-		newValue = alternateStoreDefaults[groupName][varName];
-
-	let savedGroup = localStorage.getItem(groupName) || '{}';
-	savedGroup = JSON.parse(savedGroup);
-
-	savedGroup[varName] = newValue;
-	localStorage.setItem(groupName,  JSON.stringify(savedGroup));
+	console.log(`alternateStoreDefaults`, alternateStoreDefaults);
+	console.log(`alternateStoreVerifiers`, alternateStoreVerifiers);
+	console.log(`alternateMinMaxs`, alternateMinMaxs);
 }
 
-// might as well do this by hand, too
+checkAllSettingData();
 
 export function getAGroup(groupName) {
+	if (!alternateStoreVerifiers
+	|| !alternateStoreVerifiers[groupName]) debugger;
+
 	let savedGroup = localStorage.getItem(groupName) || '{}';
 	return JSON.parse(savedGroup);
 }
 
+// cuz of some magical bad ju-ju, this shit just doesn't owrk and i have to do it by hand.
+export function storeASetting(groupName, varName, newValue) {
+	if (!alternateStoreVerifiers
+	|| !alternateStoreVerifiers[groupName]
+	|| !alternateStoreVerifiers[groupName][varName]) debugger;
+
+	// if bad value, just set to default
+	if (newValue === undefined || !alternateStoreVerifiers[groupName][varName](newValue))
+		newValue = alternateStoreDefaults[groupName][varName];
+
+	let savedGroup = getAGroup(groupName);
+
+	savedGroup[varName] = newValue;
+	localStorage.setItem(groupName,  JSON.stringify(savedGroup));
+
+	// also return the new, validated value; input could be weird!
+	return newValue;
+}
+
+// might as well do this by hand, too
+
 export function getASetting(groupName, varName) {
 	let setting = getAGroup(groupName)[varName];
-	if (setting === undefined || !alternateStoreVerifiers[groupName][varName](setting))
+	console.info(`get some stuff please `, groupName, varName, alternateStoreVerifiers, setting);
+	console.info(alternateStoreVerifiers[groupName]);////
+	console.info(alternateStoreVerifiers[groupName][varName]);
+	if (!alternateStoreVerifiers
+	|| !alternateStoreVerifiers[groupName]
+	|| !alternateStoreVerifiers[groupName][varName]) debugger;
+
+	if (setting === undefined
+	|| !alternateStoreVerifiers[groupName][varName](setting)) {
 		return alternateStoreDefaults[groupName][varName];
+	}
 	return setting;
 }
 

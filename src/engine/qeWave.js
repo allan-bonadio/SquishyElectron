@@ -190,22 +190,24 @@ class qeWave {
 	// freq is just like circular, although as a fraction of the pulseWidth instead of N
 	// 2stdDev is width of the packet, as percentage of N (0%...100%).
 	// offset is how far along is the peak, as an integer X value (0...N).
-	setPulseWave(freqUi, pulseWidth, offsetUi) {
+	setPulseWave(freqUi, pulseWidthUi, offsetUi) {
 		const wave = this.wave;
 		const {start, end, N} = this.space.startEnd2;
 		let offset = offsetUi * N / 100;  // now in units of X
+		let pulseWidth = pulseWidthUi * N / 100;  // now in units of X
 		const freq = Math.round(freqUi);
 		if (traceSetWave) console.log(`🌊  setPulseWave freq=${freqUi} => ${freq} `+
-			`  offset=${offsetUi}% => ${offset}`)
+			`  offset=${offsetUi}% => ${offset}   pulseWidth=${pulseWidthUi}% => ${pulseWidth}`)
 
-		// start with a circular wave, freq WITHIN the pulse width
+		// start with a circular wave
 		this.setCircularWave(freq);
 
 		// modulate with a gaussian, centered at the offset, with pulseWidth
-		// that's a percentage, 0...100.  tweak numbers to suit the ui
-		const s2 = 1 / (pulseWidth * 2);
-		for (let ix = start; ix < end; ix += 2) {
-			const 𝜟 = ix - offset;
+		// tweak numbers to suit the ui
+		const s2 = pulseWidth ** -2;  // 1/stddev**2 sortof
+		for (let twoix = start; twoix < end; twoix += 2) {
+			let ix = twoix / 2;
+			const 𝜟 = (ix - offset) % N;
 			const stretch = Math.exp(-𝜟 * 𝜟 * s2);
 			wave[ix] *= stretch;
 			wave[ix + 1] *= stretch;
@@ -217,13 +219,13 @@ class qeWave {
 
 	// 2stdDev is width of the packet, as percentage of N (0%...100%).
 	// offset is how far along is the peak, as an integer X value (0...N).
-	setChordWave(freqUi, pulseWidth, offsetUi) {
-		console.log(`setChordWave(${freqUi}, ${pulseWidth}, ${offsetUi})`);
+	setChordWave(freqUi, pulseWidthUi, offsetUi) {
+		console.log(`setChordWave(${freqUi}, ${pulseWidthUi}, ${offsetUi})`);
 		const wave = this.wave;
 		const {start, end, N} = this.space.startEnd2;
 		let offset = offsetUi * N / 100;  // now in units of X
+		const nSideFreqs = Math.round(pulseWidthUi / 100 * N)
 		const freq = Math.round(freqUi);
-		const nSideFreqs = Math.round(pulseWidth / 100 * N)
 		console.log(`🌊  setPulseWave freq=${freqUi} => ${freq}  nSideFreqs=${nSideFreqs}`+
 			`  offset=${offsetUi}% => ${offset}`)
 
@@ -234,16 +236,7 @@ class qeWave {
 // 		let freqHigh = freq + 1.;
 // 		let freqHighHigh = freqHigh + 1.;
 
-		// FIve neighboring frequencies, weighting, where the middle freq has weight 1.0
-// 		let nearWeight = 2/3;
-// 		let farWeight = 1/3;
-// 		let nearWeight = .5;
-// 		let farWeight = .25;
-// 		let nearWeight = 1;
-// 		let farWeight = 1
-		// let nearWeight = 0.9;
-		// let farWeight = 0.8
-		const startFreq = freqUi - Math.floor(nSideFreqs);
+		const startFreq = freqUi - nSideFreqs;
 		const lastFreq = startFreq + nSideFreqs
 
 		for (let ix = start; ix < end; ix += 2) {

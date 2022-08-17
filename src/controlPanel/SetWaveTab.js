@@ -15,7 +15,7 @@ import qeWave from '../engine/qeWave';
 import qCx from '../engine/qCx';
 import cxToRgb from '../view/cxToRgb';
 import TextNSlider from '../widgets/TextNSlider';
-import {storeASetting} from '../utils/storeSettings';
+import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
 
 let debugWaveTab = false;
 
@@ -48,7 +48,8 @@ class SetWaveTab extends React.Component {
 
 	// use this in the minigraph.  sets waveRecipe.maxY and waveRecipe.elements as return values
 	// Returns a <g element enclosing the juicy stuff
-	recipe(miniSpace, waveParams) {
+	recipe =
+	(miniSpace, waveParams) => {
 		//const p = this.props;
 		const {start, end, N, nPoints} = miniSpace.startEnd2;
 
@@ -102,25 +103,19 @@ class SetWaveTab extends React.Component {
 				{this.elements}
 			</g>;
 	}
-	recipe = this.recipe.bind(this);
 
 	setBreed = breed => {
-		this.props.setCPState({waveBreed: breed});
-		storeASetting('waveParams', 'waveBreed', breed);
+		this.props.setCPState({waveBreed: storeASetting('waveParams', 'waveBreed', breed)});
 	}
 	setWaveFrequency = waveFrequency => {
-		this.props.setCPState({waveFrequency});
-		storeASetting('waveParams', 'waveFrequency', waveFrequency);
+		// set it first so it's limited
+		this.props.setCPState({waveFrequency: storeASetting('waveParams', 'waveFrequency', waveFrequency)});
 	}
 	setPulseWidth = pulseWidth => {
-		if (pulseWidth < 1) pulseWidth = 1;////
-
-		this.props.setCPState({pulseWidth});
-		storeASetting('waveParams', 'pulseWidth', pulseWidth);
+		this.props.setCPState({pulseWidth: storeASetting('waveParams', 'pulseWidth', pulseWidth)});
 	}
 	setPulseOffset = pulseOffset => {
-		this.props.setCPState({pulseOffset});
-		storeASetting('waveParams', 'pulseOffset', pulseOffset);
+		this.props.setCPState({pulseOffset: storeASetting('waveParams', 'pulseOffset', pulseOffset)});
 	}
 
 
@@ -133,21 +128,27 @@ class SetWaveTab extends React.Component {
 		const sliders = <>
 			<TextNSlider className='frequency' label='frequency'
 				value={+p.waveParams.waveFrequency}
-				min={-30} max={30} step={'standing' == breed ? .5 : 1}
+				min={alternateMinMaxs.waveParams.waveFrequency.min}
+				max={alternateMinMaxs.waveParams.waveFrequency.max}
+				step={'standing' == breed ? .5 : 1}
 				handleChange={this.setWaveFrequency}
 			/>
 
 			<TextNSlider className='pulseWidth' label='pulse width, %'
 				style={{display: needPulseWidth ? 'block' :  'none'}}
 				value={+p.waveParams.pulseWidth}
-				min={1} max={50} step={.1}
+				min={alternateMinMaxs.waveParams.pulseWidth.min}
+				max={alternateMinMaxs.waveParams.pulseWidth.max}
+				step={.1}
 				handleChange={this.setPulseWidth}
 			/>
 
 			<TextNSlider className='offset' label='offset, %'
 				style={{display: needOffset ? 'block' :  'none'}}
 				value={+p.waveParams.pulseOffset}
-				min={0} max={100} step={2}
+				min={alternateMinMaxs.waveParams.pulseOffset.min}
+				max={alternateMinMaxs.waveParams.pulseOffset.max}
+				step={2}
 				handleChange={this.setPulseOffset}
 			/>
 

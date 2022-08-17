@@ -6,7 +6,7 @@
 import PropTypes from 'prop-types';
 import LogSlider from '../widgets/LogSlider';
 import TextNSlider from '../widgets/TextNSlider';
-
+import {alternateMinMaxs} from '../utils/storeSettings';
 // set prop types
 function setPT() {
 	SetIterationTab.propTypes = {
@@ -53,8 +53,8 @@ function SetIterationTab(props) {
 				maxLabel='1.0'
 
 				current={props.dt}
-				sliderMin={.0001}
-				sliderMax={1}
+				sliderMin={alternateMinMaxs.iterationParams.dt.min}
+				sliderMax={alternateMinMaxs.iterationParams.dt.max}
 				stepsPerDecade={6}
 
 				handleChange={(power, ix) => {
@@ -70,8 +70,8 @@ function SetIterationTab(props) {
 				maxLabel='smoother'
 
 				current={props.stepsPerIteration}
-				sliderMin={50}
-				sliderMax={10000}
+				sliderMin={alternateMinMaxs.iterationParams.stepsPerIteration.min}
+				sliderMax={alternateMinMaxs.iterationParams.stepsPerIteration.max}
 				stepsPerDecade={6}
 
 				handleChange={(power, ix) => {
@@ -83,7 +83,9 @@ function SetIterationTab(props) {
 			<TextNSlider className='lowPassFilterSlider '
 				label='Percent of High Frequencies to Filter Out'
 				value={props.lowPassFilter.toFixed(nDigits)}
-				min={aStep} max={75} step={aStep}
+				min={alternateMinMaxs.iterationParams.lowPassFilter.min}
+				max={alternateMinMaxs.iterationParams.lowPassFilter.max}
+				step={aStep}
 				style={{width: '80%'}}
 				handleChange={newValue => {
 						console.info(`handleChange Low Pass Filter:: ${newValue}  `);
