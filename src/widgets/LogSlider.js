@@ -102,14 +102,15 @@ class LogSlider extends React.Component {
 		this.maxIndex = powerToIndex(p.stepsPerDecade, p.sliderMax);
 	}
 
-	mouseDown(ev) {
+	mouseDown =
+	ev => {
 		const p = this.props;
 		if (traceThisSlider.test(p.unique)) console.info(`mouseDown avgValue=`, this.avgValue);
 		this.avgValue = +ev.currentTarget.value;
 	}
-	mouseDown = this.mouseDown.bind(this);
 
-	handleSlide(ev) {
+	handleSlide =
+	ev => {
 		const p = this.props;
 		const spd = p.stepsPerDecade;
 		const stepFactors = stepsPerDecadeStepFactors[spd];
@@ -120,7 +121,6 @@ class LogSlider extends React.Component {
 		if (traceThisSlider.test(p.unique)) console.info(`handleChange  ix=${ix}  power=${power}`);
 		p.handleChange(power, ix);
 	}
-	handleSlide = this.handleSlide.bind(this);
 
 	render () {
 		const p = this.props;

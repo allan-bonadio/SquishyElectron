@@ -82,7 +82,8 @@ export class SquishPanel extends React.Component {
 			// does not really influence the rendering of the canvas... (other than running)
 			isTimeAdvancing: getASetting('iterationParams', 'isTimeAdvancing'),
 
-			// this is the actual 'frequency' in actual milliseconds, convert between like 1000/n
+			// this is the actual 'frequency' in actual milliseconds, as set by that menu.
+			// convert between like 1000/n
 			// eg the menu on the CPToolbar says 10/sec, so this becomes 100
 			iteratePeriod: getASetting('iterationParams', 'iteratePeriod'),
 
@@ -93,6 +94,7 @@ export class SquishPanel extends React.Component {
 			lowPassFilter: getASetting('iterationParams', 'lowPassFilter'),
 
 			// advance forward with each iter
+			// NOT SAME as shown on GLView!
 			runningCycleElapsedTime: 0,
 			runningCycleIterateSerial: 0,
 		};
@@ -149,11 +151,11 @@ export class SquishPanel extends React.Component {
 	}
 
 
-	setEffectiveView(view) {
+	setEffectiveView =
+	view => {
 		this.effectiveView = view;
 		this.setState({effectiveView: view})
 	}
-	setEffectiveView = this.setEffectiveView.bind(this);
 
 	// init or re-init the space and the panel
 	setNew1DResolution(N, continuum) {
@@ -328,7 +330,8 @@ export class SquishPanel extends React.Component {
 	// This gets called once each animation period according to requestAnimationFrame(), usually 60/sec
 	// and maintaining that as long as the website is running.  Even if there's no apparent motion.
 	// it will advance one heartbeat in animation time, which every so often calls iterateOneIteration()
-	animateHeartbeat(now) {
+	animateHeartbeat =
+	now => {
 		const s = this.state;
 
 		// no matter how often animateHeartbeat() is called, it'll only iterate once in the iteratePeriod
@@ -356,7 +359,6 @@ export class SquishPanel extends React.Component {
 
 		requestAnimationFrame(this.animateHeartbeat);
 	}
-	animateHeartbeat = this.animateHeartbeat.bind(this);  // so we can pass it as a callback
 
 	/* ******************************************************* runningOneCycle */
 
@@ -364,14 +366,14 @@ export class SquishPanel extends React.Component {
 	// the leftmost state is at its peak.  Then display stats.
 
 	// button handler
-	startRunningOneCycle() {
+	startRunningOneCycle =
+	() => {
 		if (!this.allowRunningOneCycle) return;
 		this.runningOneCycle = true;
 		this.runningCycleStartingTime = qe.Avatar_getElapsedTime();
 		this.runningCycleStartingSerial = qe.Avatar_getIterateSerial();
 		this.startIterating();
 	}
-	startRunningOneCycle = this.startRunningOneCycle.bind(this);
 
 	// manage runningOneCycle - called each iteration
 	continueRunningOneCycle() {
@@ -428,13 +430,24 @@ export class SquishPanel extends React.Component {
 
 	// set the frequency of iteration frames.  Does not control whether iterating or not.
 	setIterateFrequency(newFreq) {
-		this.setState({iteratePeriod: 1000. / +newFreq});
+
+
+		this.setState({iteratePeriod:
+
+
+			storeASetting('iterationParams', 'iteratePeriod', 1000. / +newFreq)
+
+
+		});
+
+
 	}
 
 	startIterating() {
 		if (this.state.isTimeAdvancing)
 			return;
 
+		storeASetting('iterationParams', 'isTimeAdvancing', true);
 		this.setState({isTimeAdvancing: true});
 	}
 
@@ -442,74 +455,72 @@ export class SquishPanel extends React.Component {
 		if (!this.state.isTimeAdvancing)
 			return;
 
+		storeASetting('iterationParams', 'isTimeAdvancing', false);
 		this.setState({isTimeAdvancing: false});
 	}
 
-	startStop() {
+	startStop =
+	() => {
 		if (this.state.isTimeAdvancing)
 			this.stopIterating();
 		else
 			this.startIterating();
 	}
-	startStop = this.startStop.bind(this);
 
-	singleIteration() {
+	singleIteration =
+	() => {
 		this.iterateOneIteration(true);
 	}
-	singleIteration = this.singleIteration.bind(this);
 
-	resetCounters(ev) {
+	resetCounters =
+	(ev) => {
 		qe.Avatar_resetCounters();
 		this.showTimeNIteration();
 	}
-	resetCounters = this.resetCounters.bind(this);
 
 	/* ******************************************************* user settings */
 
 	setDt = dt => {
 		this.setState({dt});
 		qe.Avatar_setDt(dt);
-		//if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  // goddamned bug in importing works in constructor
-		storeASetting('iterationSettings', 'dt', dt);
-
-		this.setState({dt});
+		//if (typeof storeSettings != 'undefined' && storeSettings.iterationParams)  // goddamned bug in importing works in constructor
+		let ddtt = storeASetting('iterationParams', 'dt', dt);
+		this.setState({dt: ddtt});
 	}
-	//setDt = this.setDt.bind(this);
 
-	setStepsPerIteration = stepsPerIteration => {
+	setStepsPerIteration =
+	stepsPerIteration => {
 		console.info(`js setStepsPerIteration(${stepsPerIteration})`)
-		this.setState({stepsPerIteration});
-		qe.Avatar_setStepsPerIteration(stepsPerIteration);
-		//if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  // goddamned bug in importing works in constructor
-		storeASetting('iterationSettings', 'stepsPerIteration', stepsPerIteration);
-
-		this.setState({stepsPerIteration});
+		//if (typeof storeSettings != 'undefined' && storeSettings.iterationParams)  // goddamned bug in importing works in constructor
+		let spi = storeASetting('iterationParams', 'stepsPerIteration', stepsPerIteration);
+		this.setState({stepsPerIteration: spi});
+		qe.Avatar_setStepsPerIteration({stepsPerIteration: spi});
 	}
-	//setStepsPerIteration = this.setStepsPerIteration.bind(this);
 
 	// sets the LPF in both SPanel state AND in the C++ area
 	setLowPassFilter =
 	lowPassFilter => {
 		console.info(`js setLowPassFilter(${lowPassFilter})`)
-		this.setState({lowPassFilter});
-		qe.Avatar_setLowPassFilter(lowPassFilter);
-// 		if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  //  goddamned bug in importing works in constructor
-// 			storeASetting('iterationSettings', 'lowPassFilter', (lowPassFilter - 1) / this.state.N);
+		//this.setState({lowPassFilter});
+		//qe.Avatar_setLowPassFilter(lowPassFilter);
+// 		if (typeof storeSettings != 'undefined' && storeSettings.iterationParams)  //  goddamned bug in importing works in constructor
+// 			storeASetting('iterationParams', 'lowPassFilter', (lowPassFilter - 1) / this.state.N);
 
-		storeASetting('iterationSettings', 'lowPassFilter', lowPassFilter);
-		this.setState({lowPassFilter});
+		let lpf = storeASetting('iterationParams', 'lowPassFilter', lowPassFilter);
+		this.setState({lowPassFilter: lpf});
 
-		// here's where it converts to the C++ style integer number of freqs
-		qe.Avatar_setLowPassFilter(Math.round(lowPassFilter / 200 * this.state.N));
+		// here's where it converts from percent to the C++ style integer number of freqs
+		qe.Avatar_setLowPassFilter(Math.round(lpf / 200 * this.state.N));
 	}
 
 	// completely wipe out the 𝜓 wavefunction and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon setWave in wave tab
-	setWave = waveParams => {
+	setWave =
+	waveParams => {
 // 		const wave = qe.Avatar_getWaveBuffer();
 		const qewave = this.state.space.qewave;
 		qewave.setFamiliarWave(waveParams);  // wait - qeSpace does this too
-		this.iterateOneIteration(true, true);  // ?? take  this out
+		//this.iterateOneIteration(true, true);  // ?? take  this out this was to kick to display it....
 		//this.iterateOneIteration(false, true);
 		//qe.qViewBuffer_getViewBuffer();
 		//qe.createQEWaveFromCBuf();
@@ -518,8 +529,9 @@ export class SquishPanel extends React.Component {
 		// see similar code above; keep in sync
 		const curView = this.effectiveView || this.state.effectiveView;
 		curView.drawings.forEach(dr =>  dr.resetAvgHighest && dr.resetAvgHighest());
+
+		// don't have to set storeSettings cuz already done in CP
 	}
-	//setWave = this.setWave.bind(this);
 
 	// completely wipe out the quantum potential and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon set potential in potential tab
@@ -542,7 +554,6 @@ export class SquishPanel extends React.Component {
 // 			throw `setPotential: no voltage breed '${breed}'`
 // 		}
 	}
-	//setPotential = this.setPotential.bind(this);
 
 	// dump the view buffer, from the JS side.  Why not use the C++ version?
 	dumpViewBuffer(title = '') {

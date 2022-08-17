@@ -35,13 +35,6 @@ export default class ResolutionDialog extends React.Component {
 	};
 
 
-// 	handleChangePowersOf10(ev) {
-// 		const target = ev.target;
-// 		const index = target.value;
-// 		this.setState({power, index, });
-// 	}
-// 	handleChangePowersOf10 = this.handleChangePowersOf10.bind(this);
-
 	/* ******************************************************************* open/close */
 
 	static initialParams;
@@ -65,18 +58,18 @@ export default class ResolutionDialog extends React.Component {
 	}
 
 	// called when user clicks OK, before dialog is hidden in App
-	OK(ev) {
+	OK =
+	ev => {
 		ResolutionDialog.okCallback(this.state);
 		CommonDialog.startClosingDialog();
 	}
-	OK = this.OK.bind(this);
 
 	// called when user clicks Cancel, before dialog is hidden in App
-	cancel(ev) {
+	cancel =
+	ev => {
 		ResolutionDialog.cancelCallback();
 		CommonDialog.startClosingDialog();
 	}
-	cancel = this.cancel.bind(this);
 
 
 	/* ******************************************************************* rendering */
@@ -104,14 +97,14 @@ export default class ResolutionDialog extends React.Component {
 		</>;
 	}
 
-	handleResChange(N, ix) {
+	handleResChange =
+	(N, ix) => {
 		this.setState({
 			ix: +ix,
 			N: +N,
 		});
 		console.info(`handleResChange(N=${N}, ix=$ix) `)
 	}
-	handleResChange = this.handleResChange.bind(this);
 
 	renderContinuum() {
 		const s = this.state;
@@ -174,7 +167,7 @@ export default class ResolutionDialog extends React.Component {
 		//const s = this.state;
 
 		return (
-			<article className='dialog ResolutionDialog' style={{fontSize: '80%'}}>
+			<article className='dialog ResolutionDialog'>
 
 				<h3>Reconfigure the Space</h3>
 

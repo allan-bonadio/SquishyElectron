@@ -13,6 +13,7 @@ import SetPotentialTab from './SetPotentialTab';
 import SetResolutionTab from './SetResolutionTab';
 import SetIterationTab from './SetIterationTab';
 import qeSpace from '../engine/qeSpace';
+import {storeASetting} from '../utils/storeSettings';
 // import {qeStartPromise} from '../engine/qEngine';
 // import qe from '../engine/qe';
 
@@ -26,7 +27,8 @@ export class ControlPanel extends React.Component {
 		singleIteration: PropTypes.func.isRequired,
 		resetCounters: PropTypes.func.isRequired,
 
-		// these are the actual functions that change the GLView on the screen
+		// these are the actual functions that change the main qWave and ultimately
+		// the GLView on the screen
 		// when user chooses 'set wave'
 		setWave: PropTypes.func.isRequired,
 		setPotential: PropTypes.func.isRequired,
@@ -102,41 +104,51 @@ export class ControlPanel extends React.Component {
 
 	// set rate, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
 	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
-	setIterateFrequency(freq) {
-		this.props.setIterateFrequency(freq);
-	}
-	setIterateFrequency = this.setIterateFrequency.bind(this);
+	setIterateFrequency =
+	freq => this.props.setIterateFrequency(freq);
 
 
 	/* ********************************************** wave & pot */
 
 	// used to set any familiarParam value, pass eg {pulseWidth: 40}
-	setCPState(obj) {
+	// Sets state in control panel only, eg setWave panel settings
+	setCPState =
+	(obj) => {
 		this.setState(obj);
 	}
-	setCPState = this.setCPState.bind(this);
 
+	// SetWave button
 	// this one is an event handler in the wave tab for the SetWave button
 	// but squishpanel hands us a more refined function.
-	setWaveHandler(ev) {
+	// do not confuse with setCPState or the storeSettings settings
+	setWaveHandler =
+	ev => {
 		const {waveBreed, waveFrequency, pulseWidth, pulseOffset} = this.state;
 		this.props.setWave({waveBreed, waveFrequency, pulseWidth, pulseOffset});
 	}
-	setWaveHandler = this.setWaveHandler.bind(this);
 
-	setFlatPotentialHandler(ev) {
-		const {valleyPower, valleyScale, valleyOffset} = this.state;
-		this.props.setPotential({potentialBreed: 'flat', valleyPower, valleyScale, valleyOffset});
+	// Set Potential buttons
+	setFlatPotentialHandler =
+	ev => {
+		this.setCPState({
+			potentialBreed: storeASetting('potentialParams', 'potentialBreed', 'flat')
+		});
+		this.props.setPotential({potentialBreed: 'flat'});
 	}
-	setFlatPotentialHandler = this.setFlatPotentialHandler.bind(this);
 
-	setValleyPotentialHandler(ev) {
+	setValleyPotentialHandler =
+	ev => {
 		const {valleyPower, valleyScale, valleyOffset} = this.state;
+		this.setCPState({
+			potentialBreed: storeASetting('potentialParams', 'potentialBreed', 'valley')
+		});
 		this.props.setPotential({potentialBreed: 'valley', valleyPower, valleyScale, valleyOffset});
 	}
-	setValleyPotentialHandler = this.setValleyPotentialHandler.bind(this);
 
-
+	setShowingTab =
+	tabCode => {
+		this.setState({showingTab: storeASetting('miscParams', 'showingTab', tabCode)});
+	}
 
 
 	/* ********************************************** render  pieces */
@@ -145,6 +157,8 @@ export class ControlPanel extends React.Component {
 	createShowingTab() {
 		const p = this.props;
 		const s = this.state;
+		const {waveBreed, waveFrequency, pulseWidth, pulseOffset} = s;
+		const {potentialBreed, valleyPower, valleyScale, valleyOffset} = s;
 
 		switch (s.showingTab) {
 		case 'wave':
@@ -152,9 +166,7 @@ export class ControlPanel extends React.Component {
 			// function with no args that'll call theother one
 			return <SetWaveTab
 				setWaveHandler={this.setWaveHandler}
-				waveParams={{waveBreed: s.waveBreed, waveFrequency: s.waveFrequency,
-					pulseWidth: s.pulseWidth, pulseOffset: s.pulseOffset,}}
-
+				waveParams={{waveBreed, waveFrequency, pulseWidth, pulseOffset,}}
 				setCPState={this.setCPState}
 				origSpace={p.space}
 			/>;
@@ -163,18 +175,12 @@ export class ControlPanel extends React.Component {
 			return <SetPotentialTab
 				setFlatPotentialHandler={this.setFlatPotentialHandler}
 				setValleyPotentialHandler={this.setValleyPotentialHandler}
-				potentialParams={{
-					potentialBreed: s.potentialBreed,
-					valleyPower: +s.valleyPower,
-					valleyScale: +s.valleyScale,
-					valleyOffset: +s.valleyOffset,
-				}}
-
+				potentialParams={{potentialBreed, valleyPower, valleyScale, valleyOffset,}}
 				setCPState={this.setCPState}
 				origSpace={p.space}
 			/>;
 
-		case 'resolution':
+		case 'space':
 			return <SetResolutionTab openResolutionDialog={p.openResolutionDialog} />;
 
 		case 'iteration':
@@ -221,13 +227,13 @@ export class ControlPanel extends React.Component {
 			<div className='cpSecondRow'>
 				<ul className='TabBar' >
 					<li className={s.showingTab == 'wave' ? 'selected' : ''} key='wave'
-						onClick={ev => this.setState({showingTab: 'wave'})}>Wave</li>
+						onClick={ev => this.setShowingTab('wave')}>Wave</li>
 					<li  className={s.showingTab == 'potential' ? 'selected' : ''} key='potential'
-						onClick={ev => this.setState({showingTab: 'potential'})}>Potential</li>
-					<li  className={s.showingTab == 'resolution' ? 'selected' : ''} key='resolution'
-						onClick={ev => this.setState({showingTab: 'resolution'})}>Space</li>
+						onClick={ev => this.setShowingTab('potential')}>Potential</li>
+					<li  className={s.showingTab == 'space' ? 'selected' : ''} key='space'
+						onClick={ev => this.setShowingTab('space')}>Space</li>
 					<li  className={s.showingTab == 'iteration' ? 'selected' : ''} key='iteration'
-						onClick={ev => this.setState({showingTab: 'iteration'})}>Iteration</li>
+						onClick={ev => this.setShowingTab('iteration')}>Iteration</li>
 				</ul>
 				<div className='tabFrame'>
 					{showingTabHtml}

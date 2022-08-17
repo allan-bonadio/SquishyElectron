@@ -101,11 +101,11 @@ export class GLView extends React.Component {
 		});
 
 	}
-	//setGLCanvas = this.setGLCanvas.bind(this);
 
 	/* ************************************************************************ resizing */
 
-	mouseDown(ev) {
+	mouseDown =
+	ev => {
 		this.resizing = true;
 		this.yOffset = this.state.height - ev.pageY;
 		console.info(`mouse down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
@@ -117,9 +117,9 @@ export class GLView extends React.Component {
 		ev.preventDefault();
 		ev.stopPropagation();
 	}
-	mouseDown = this.mouseDown.bind(this);
 
-	mouseMove(ev) {
+	mouseMove =
+	ev => {
 		//if (this.resizing) {
 
 			const viewHeight = ev.pageY + this.yOffset;
@@ -131,9 +131,9 @@ export class GLView extends React.Component {
 			ev.stopPropagation();
 		//}
 	}
-	mouseMove = this.mouseMove.bind(this);
 
-	mouseUp(ev) {
+	mouseUp =
+	ev => {
 		//if (this.resizing) {
 			console.info(`mouse up ${ev.pageX} ${ev.pageY}`);
 			this.resizing = false;
@@ -148,7 +148,6 @@ export class GLView extends React.Component {
 			ev.stopPropagation();
 		//}
 	}
-	mouseUp = this.mouseUp.bind(this);
 
 	/* ************************************************************************ render */
 
