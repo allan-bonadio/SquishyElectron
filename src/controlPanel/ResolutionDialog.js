@@ -6,8 +6,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {qeBasicSpace} from '../engine/eSpace';
-//import SquishPanel from '../SquishPanel';
+// import {qeBasicSpace} from '../engine/eSpace';
+import qe from '../engine/qe';
 import CommonDialog from '../widgets/CommonDialog';
 import {powerToIndex} from '../utils/powers';
 import LogSlider from '../widgets/LogSlider';
@@ -111,27 +111,27 @@ export default class ResolutionDialog extends React.Component {
 		const onChange = ev => this.setState({continuum: +ev.target.value});
 		return <>
 			what kind of space:
-			<label  key='contENDLESS'><input type='radio' name='continuum'  value={qeBasicSpace.contENDLESS}
-					checked={s.continuum == qeBasicSpace.contENDLESS}
+			<label  key='contENDLESS'><input type='radio' name='continuum'  value={qe.contENDLESS}
+					checked={s.continuum == qe.contENDLESS}
 					onChange={onChange}
 					style={{fontWeight:
-						(this.props.continuum == qeBasicSpace.contENDLESS)
+						(this.props.continuum == qe.contENDLESS)
 						? 'bold'
 						: 'normal'}}/>
 				Endless, repeating left-right</label>
-			<label  key='contWELL'><input type='radio' name='continuum'  value={qeBasicSpace.contWELL}
-					checked={s.continuum == qeBasicSpace.contWELL}
+			<label  key='contWELL'><input type='radio' name='continuum'  value={qe.contWELL}
+					checked={s.continuum == qe.contWELL}
 					onChange={onChange}
 					style={{fontWeight:
-						(this.props.continuum == qeBasicSpace.contWELL)
+						(this.props.continuum == qe.contWELL)
 						? 'bold'
 						: 'normal'}}/>
 				Well with Walls</label>
-			<label  key='contDISCRETE'><input type='radio' name='continuum'  value={qeBasicSpace.contDISCRETE}
-					checked={s.continuum == qeBasicSpace.contDISCRETE}
+			<label  key='contDISCRETE'><input type='radio' name='continuum'  value={qe.contDISCRETE}
+					checked={s.continuum == qe.contDISCRETE}
 					onChange={onChange}
 					style={{fontWeight:
-						(this.props.continuum == qeBasicSpace.contDISCRETE)
+						(this.props.continuum == qe.contDISCRETE)
 						? 'bold'
 						: 'normal'}}/>
 				Discreet Quanta (not recommended)</label>

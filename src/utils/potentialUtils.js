@@ -3,7 +3,8 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-import {qeBasicSpace} from '../engine/eSpace';
+//import {qeBasicSpace} from '../engine/eSpace';
+import qe from '../engine/qe';
 
 
 // raw numbers ~ 1 are way too big and throw it all into chaos
@@ -20,16 +21,16 @@ export function fixPotentialBoundaries(space, potential) {
 	const {end, continuum} = space.startEnd;
 
 	switch (continuum) {
-	case qeBasicSpace.contDISCRETE:
+	case qe.contDISCRETE:
 		break;
 
-	case qeBasicSpace.contWELL:
+	case qe.contWELL:
 		// the points on the end are ∞ potential, but the arithmetic goes bonkers
 		// if I actually set the voltage to ∞
 		potential[0] = potential[1] = potential[end] = potential[end+1] = 0; // ?? gonna have to think thru contWELL
 		break;
 
-	case qeBasicSpace.contENDLESS:
+	case qe.contENDLESS:
 		// the points on the end get set to the opposite side
 		potential[0] = potential[end-1];
 		potential[end] = potential[1];

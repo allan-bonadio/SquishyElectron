@@ -1,7 +1,12 @@
-// this file generated Wed Aug 03 2022 17:50:50 GMT-0700 (Pacific Daylight Time)
-// by the file SquishyElectron/quantumEngine/building/genExports.js
+/*
+** qe - quantum engine interface
+** this file generated Fri Aug 19 2022 21:59:58 GMT-0700 (Pacific Daylight Time)
+** by the file SquishyElectron/quantumEngine/building/genExports.js
+*/
+
 let cwrap;
 export const qe = {};
+
 export function defineQEngineFuncs() {
 	cwrap = window.Module.cwrap;
 
@@ -25,6 +30,11 @@ export function defineQEngineFuncs() {
 	qe.qViewBuffer_dumpViewBuffer = cwrap('qViewBuffer_dumpViewBuffer', null, ['string']);
 	qe.Avatar_askForFFT = cwrap('Avatar_askForFFT', null, []);
 	qe.Avatar_normalize = cwrap('Avatar_normalize', null, []);
+
+	// constants shared with C++
+	qe.contDISCRETE = 0;
+	qe.contWELL = 1;
+	qe.contENDLESS = 2;
 }
 
 window.defineQEngineFuncs = defineQEngineFuncs;  // just in case

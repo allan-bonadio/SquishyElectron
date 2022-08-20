@@ -36,7 +36,7 @@ if (typeof storeSettings == 'undefined') debugger;
 const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
 
 // const DEFAULT_RESOLUTION = 64;
-// const DEFAULT_CONTINUUM = qeBasicSpace.contENDLESS;
+// const DEFAULT_CONTINUUM = qe.contENDLESS;
 
 
 let SquishPanelCreated = 0;

@@ -9,6 +9,8 @@ if (! process.env.SQUISH_ROOT) throw "SQUISH_ROOT not defined!";
 console.log(`Run this whenever the list of C++ functions to call from JS changes.`)
 const fs = require('fs');
 
+/* ************************************************************************** Tables of Inputs */
+
 // the exports list.
 // in C++: each function must be declared 'export "C" ...'
 // in JS: import qe from 'engine/qe', then use qe.funcname()
@@ -61,28 +63,71 @@ exportsSrc  = [
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():
 // https://emscripten.org/docs/api_reference/preamble.js.html#calling-compiled-c-functions-from-javascript
 
-// the exports.json file, needed by emcc
+// hey, how about common constants between C++ and JS?
+// no strings.  Probably all ints.
+let commonConstants = [
+	{name: 'contDISCRETE', cppType: 'int', value: 0},
+	{name: 'contWELL', cppType: 'int', value: 1},
+	{name: 'contENDLESS', cppType: 'int', value: 2},
+];
+
+
+/* ************************************************************************** Generate Files */
+
+// ****************************** the exports.json file, needed by emcc */
 let exportsFile = exportsSrc.map(funcDesc => '_' + funcDesc.name);
 fs.writeFile(`${process.env.SQUISH_ROOT}/quantumEngine/building/exports.json`,
 	JSON.stringify(exportsFile) + '\n',
 	ex => ex && console.error('error building exports:', ex));
 
-// the JS file.  convert json's double " to single '
+
+// ****************************** commonConstants.h , needed by C++ */
+
+const hConsts = commonConstants.map(co => `const ${co.cppType} ${co.name} = ${co.value};`);
+
+const commonH = `/*
+** commonConstants.h - shared constants between JS and C++
+** this file generated ${new Date()}
+** by the file SquishyElectron/quantumEngine/building/genExports.js
+*/
+
+${hConsts.join('\n')}
+`;
+
+fs.writeFile(`${process.env.SQUISH_ROOT}/quantumEngine/commonConstants.h`,
+	commonH,
+	ex => ex && console.error('error building exports:', ex)
+);
+
+
+
+/* ****************************** qe.js file, for the js side */
+
+// the JS file with the stub JS funcs that call the c++ funcs.  convert json's double " to single '
 let defineFuncBody = exportsSrc.map(funcDesc => {
 	return `\tqe.${funcDesc.name} = cwrap('${funcDesc.name}', `+
 		`${JSON.stringify(funcDesc.retType).replace(/\x22/g, '\x27')}, `+
 		`${JSON.stringify(funcDesc.args).replace(/\x22/g, '\x27')});`;
 });
 
+const JsConsts = commonConstants.map(co => `\tqe.${co.name} = ${co.value};`);
 
-const code = `// this file generated ${new Date()}
-// by the file SquishyElectron/quantumEngine/building/genExports.js
+const code = `/*
+** qe - quantum engine interface
+** this file generated ${new Date()}
+** by the file SquishyElectron/quantumEngine/building/genExports.js
+*/
+
 let cwrap;
 export const qe = {};
+
 export function defineQEngineFuncs() {
 	cwrap = window.Module.cwrap;
 
 ${defineFuncBody.join('\n')}
+
+	// constants shared with C++
+${JsConsts.join('\n')}
 }
 
 window.defineQEngineFuncs = defineQEngineFuncs;  // just in case

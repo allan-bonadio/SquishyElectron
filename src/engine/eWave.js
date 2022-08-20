@@ -172,7 +172,7 @@ class eWave {
 		const wave = this.wave;
 
 		// good idea or bad?
-// 		if (this.space.continuum == qeBasicSpace.contWELL) {
+// 		if (this.space.continuum == qe.contWELL) {
 // 			start--;
 // 			end++;
 // 		}

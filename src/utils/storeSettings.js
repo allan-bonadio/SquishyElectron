@@ -157,8 +157,8 @@ makeParam('spaceParams', 'N', 64,  N => isPowerOf2(N) );
 
 // how to do this correctly with the defined constants???
 makeParam('spaceParams', 'continuum', 2, [0, 1, 2]);
-// makeParam('spaceParams', 'continuum', qeBasicSpace.contENDLESS,
-// 	[qeBasicSpace.contDISCRETE, qeBasicSpace.contWELL, qeBasicSpace.contENDLESS]);
+// makeParam('spaceParams', 'continuum', qe.contENDLESS,
+// 	[qe.contDISCRETE, qe.contWELL, qe.contENDLESS]);
 
 /* ************************************ waveParams */
 

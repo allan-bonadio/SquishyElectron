@@ -32,16 +32,12 @@ function dumpRow(ix, re, im, prev, isBorder) {
 }
 
 /* **************************************************************** Basic Space */
+// stop using qeBasicSpace!!!  Must rewrite minigraph
 // the dimensions part of the space
 // this is enough to contruct a eWave with, so MiniGraph can use it (obsolete,tobe removed)
 // pat of eSpace but also want to use independently (NO!  reunify with eSpace!)
 // maybe not - nmight get rid of this given changes that are coming
 export class qeBasicSpace {
-	// note in c++ these are on qSpace; there is no qBasicSpace
-	static contDISCRETE = 0;
-	static contWELL = 1;
-	static contENDLESS = 2;
-
 	// dims is the raw minimal definition of the dimensions for the space to be contructed.
 	// here we fill in the details.
 	constructor(dims) {
@@ -114,16 +110,16 @@ export class qeBasicSpace {
 		const {end, continuum} = this.startEnd2;
 
 		switch (continuum) {
-		case qeBasicSpace.contDISCRETE:
+		case qe.contDISCRETE:
 			break;
 
-		case qeBasicSpace.contWELL:
+		case qe.contWELL:
 			// the points on the end are ∞ potential, but the arithmetic goes bonkers
 			// if I actually set the voltage to ∞.  Remember complex values 2 doubles
 			wave[0] = wave[1] = wave[end] = wave[end+1] = 0;
 			break;
 
-		case qeBasicSpace.contENDLESS:
+		case qe.contENDLESS:
 			// the points on the end get set to the opposite side.  Remember this is for complex, 2x
 			wave[0] = wave[end-2];
 			wave[1]  = wave[end-1];
@@ -140,7 +136,7 @@ export class qeBasicSpace {
 /* **************************************************************** Space */
 // this is how you create a qSpace - start from JS and call this.
 // call like this:
-// new eSpace([{N: 128, continuum: qeBasicSpace.contENDLESS, label: 'x', coord: 'x'}])
+// new eSpace([{N: 128, continuum: qe.contENDLESS, label: 'x', coord: 'x'}])
 // labels must be unique.  Modeled after qSpace in C++,
 // does all dimensions in constructor, at least.
 // Coords are the same if two dims are parallel, eg two particles with x coords.
