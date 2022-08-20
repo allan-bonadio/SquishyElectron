@@ -11,7 +11,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {thousands} from '../utils/numberFormat.js';
+import {thousands} from '../utils/formatNumber';
 import qe from '../engine/qe';
 import './view.scss';
 // import {abstractViewDef} from './abstractViewDef';

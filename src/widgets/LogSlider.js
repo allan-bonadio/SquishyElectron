@@ -9,7 +9,7 @@ import React from 'react';
 //import {path as d3path} from 'd3-path';
 
 import {stepsPerDecadeStepFactors, indexToPower, powerToIndex} from '../utils/powers';
-import {thousands} from '../utils/numberFormat';
+import {thousands} from '../utils/formatNumber';
 
 // set a particular unique in this regex to trace its renders and stuff or use the second one to turn off
 //let traceThisSlider = /stepsPerIterationSlider/;

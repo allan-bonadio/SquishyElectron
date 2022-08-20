@@ -24,6 +24,15 @@ export const stepsPerDecadeStepFactors = {
 
 	// 16 = base 2 only, all the way up.  Special case in the code.  a "decade" is really x16 with 4 gradations
 	16: [1, 2, 4, 8],
+
+	// more binary step factors, subtract 20 to get steps per binade, times 16
+	//21: [16, ],  // 1 step per binade
+	//22: [16, 24, ],  // 2 steps per binade
+	// 23: [16, 20, 24, ]  // 3 steps per binade
+	// 24: [16, 20, 24,  28,]  // 4 steps per binade
+	// //25: [16, 18, 20, 24,  28,]  // 5 steps per binade
+	// 26: [16, 18, 20, 22, 24,  28,]  // 6 steps per binade
+	// 28: [16, 18, 20, 22, 24, 26, 28, 30, ]  // 8 steps per binade
 };
 //const Base2 = 16;
 
@@ -70,7 +79,7 @@ export function powerToIndex(spd, power) {
 	return Math.round(logOf);
 }
 
-// keep this!!
+// keep this!!  or even better, move to a spec file!
 //😇 function testPowers() {
 //😇 	for (let spdStr in stepsPerDecadeStepFactors) {
 //😇 		const spd = +spdStr;
