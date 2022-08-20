@@ -228,7 +228,7 @@ void qBuffer::dumpHiRes(const char *title) {
 	printf("🍕 🍕  HIRES innerProduct: %8.4lf\n", iProd);
 }
 
-// calls the JS dumpRainbow method of qeWave.  Note we can't compile this for
+// calls the JS dumpRainbow method of eWave.  Note we can't compile this for
 // straight C++ specs cuz there's no emscripten or JS.  So the app,
 // or node with emscripten
 void qBuffer::rainbowDump(const char *title) {

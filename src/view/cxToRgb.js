@@ -14,7 +14,7 @@ const vec3 = (r, b, g) => `rgb(${(r*256).toFixed(0)},${(g*256).toFixed(0)},${(b*
 console.info(`vec3: `, vec3(.5, .5, .5), vec3(1, 1, 1), vec3(0, 0, 0), vec3(.6, .7, .8));
 
 // convert a complex number into a color, whose hue is based on the
-// complex phase of the number.  Input is a qCx object.
+// complex phase of the number.  Input is a eCx object.
 
 // Piecewise linear.  Visualize a hexagon
 // 1+0i is on the far right, 0°, and is Red.  x is real part, y is imaginary part

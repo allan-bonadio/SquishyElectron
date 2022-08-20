@@ -8,9 +8,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import qe from '../engine/qe';
-import qeSpace from '../engine/qeSpace';
+import eSpace from '../engine/eSpace';
 
-// import qeSpace from '../engine/qeSpace';
+// import eSpace from '../engine/eSpace';
 
 /* This draws the white potential line, and handles interaction
 
@@ -26,7 +26,7 @@ export class PotentialArea extends React.Component {
 		width: PropTypes.number.isRequired,
 		height: PropTypes.number.isRequired,
 		x: PropTypes.number.isRequired,
-		space: PropTypes.instanceOf(qeSpace),
+		space: PropTypes.instanceOf(eSpace),
 	};
 
 	constructor(props) {

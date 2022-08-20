@@ -10,7 +10,7 @@ import {qe, defineQEngineFuncs} from './qe';
 /* ****************************************************** app startup */
 
 // c++ main() calls us to tell us that it's up, and to pass the sizes of different data structures.
-// (qspace can change; double and therefore qCx can change length)
+// (qspace can change; double and therefore eCx can change length)
 export let maxDimensions, maxLabel;
 
 let qeStartPromiseSucceed;

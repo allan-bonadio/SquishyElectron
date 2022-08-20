@@ -6,7 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {qeBasicSpace} from '../engine/qeSpace';
+import {qeBasicSpace} from '../engine/eSpace';
 //import SquishPanel from '../SquishPanel';
 import CommonDialog from '../widgets/CommonDialog';
 import {powerToIndex} from '../utils/powers';

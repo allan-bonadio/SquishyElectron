@@ -2,7 +2,7 @@
 ** salientBuffers - the JS mapping to c++ buffers
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
-import qeWave from './qeWave';
+import eWave from './eWave';
 import jsAvatar from './jsAvatar';
 
 // I guess you could have one of these for each space?  No, per avatar?
@@ -25,8 +25,8 @@ class salientBuffersFactory {
 		// now make the JS-usable versions.  Someday: pass in the length of each?
 		//np = this.nPoints * 8;  // 8 = four floats for first row, four for second row
 
-		// qeWave figures out the right buffer length
-		this.mainQeWave = new qeWave(space, struct[1]);
+		// eWave figures out the right buffer length
+		this.mainQeWave = new eWave(space, struct[1]);
 
 		// one double per point
 		this.potentialBuffer = new Float64Array(window.Module.HEAPF64.buffer, struct[2],

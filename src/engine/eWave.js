@@ -1,9 +1,9 @@
 /*
-** qeWave -- JS equivalent to a qWave (roughly)
+** eWave -- JS equivalent to a qWave (roughly)
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-// import {qeBasicSpace} from './qeSpace';
+// import {qeBasicSpace} from './eSpace';
 import {qe} from './qe';
 import cxToRgb from '../view/cxToRgb';
 
@@ -14,9 +14,9 @@ let traceSetWave = true;
 
 // Dump a wave buffer as a colored bargraph in the JS console
 // this is also called by C++ so it's easier as a standalone function
-// see also qeWave method by same name (but different args)
+// see also eWave method by same name (but different args)
 function rainbowDump(wave, start, end, nPoints) {
-	let title = "temporary title qeWave.js:17";
+	let title = "temporary title eWave.js:17";
 	start *= 2;
 	end *= 2;
 	if (isNaN(start) || isNaN(end))
@@ -55,7 +55,7 @@ window.rainbowDump = rainbowDump;
 /* **************************************************************** qewave */
 
 // this is just a 1D wave.  someday...
-class qeWave {
+class eWave {
 	// waveArg is one of these:
 	// • a C++ wave/spectrum buffer ptr, ask any qBuffer to pass back its wave and it comes out as an integer
 	// • a Float64Array[2*nPoints], with pairs being the real and im parts of psi.
@@ -89,7 +89,7 @@ class qeWave {
 				wave[j] = -99.;
 		}
 		else
-			throw `call to construct qeWave failed cuz bad waveArg=${waveArg}`;
+			throw `call to construct eWave failed cuz bad waveArg=${waveArg}`;
 	}
 
 	/* **************************************************************** dumping */
@@ -157,8 +157,8 @@ class qeWave {
 			wave[ix + 1] = Math.sin(angle);
 		}
 
-		//this.dump('qeWave.setCircularWave() done');
-		//this.rainbowDump('🌊  qeWave.setCircularWave() done');
+		//this.dump('eWave.setCircularWave() done');
+		//this.rainbowDump('🌊  eWave.setCircularWave() done');
 	}
 
 
@@ -183,8 +183,8 @@ class qeWave {
 			wave[ix + 1] = 0;
 		}
 
-		//this.dump('qeWave.setStandingWave() done');
-		//this.rainbowDump('🌊  qeWave.setStandingWave() done');
+		//this.dump('eWave.setStandingWave() done');
+		//this.rainbowDump('🌊  eWave.setStandingWave() done');
 	}
 
 	// freq is just like circular, although as a fraction of the pulseWidth instead of N
@@ -213,8 +213,8 @@ class qeWave {
 			wave[ix + 1] *= stretch;
 		}
 
-		//this.dump('qeWave.setPulseWave() done');
-		//this.rainbowDump('qeWave.setPulseWave() done');
+		//this.dump('eWave.setPulseWave() done');
+		//this.rainbowDump('eWave.setPulseWave() done');
 	}
 
 	// 2stdDev is width of the packet, as percentage of N (0%...100%).
@@ -249,8 +249,8 @@ class qeWave {
 			}
 		}
 
-		//		//this.dump('qeWave.setPulseWave() done');
-		//this.rainbowDump('qeWave.setChordWave() done');
+		//		//this.dump('eWave.setPulseWave() done');
+		//this.rainbowDump('eWave.setChordWave() done');
 	}
 
 	// set one of the above canned waveforms, according to the waveParams object's values
@@ -282,5 +282,5 @@ class qeWave {
 	}
 }
 
-export default qeWave;
+export default eWave;
 

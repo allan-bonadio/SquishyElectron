@@ -7,7 +7,7 @@ import {abstractDrawing} from './abstractDrawing';
 import qe from '../engine/qe';
 import {viewUniform, viewAttribute} from './viewVariable';
 //import SquishPanel from '../SquishPanel';
-//import {qeStartPromise} from '../engine/qEngine';
+//import {qeStartPromise} from '../engine/eEngine';
 
 /* ******************************************************* unit height management */
 

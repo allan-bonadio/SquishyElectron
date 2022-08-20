@@ -10,9 +10,9 @@ import {scaleLinear} from 'd3-scale';
 
 
 import MiniGraph from './MiniGraph';
-import qeSpace from '../engine/qeSpace';
-import qeWave from '../engine/qeWave';
-import qCx from '../engine/qCx';
+import eSpace from '../engine/eSpace';
+import eWave from '../engine/eWave';
+import eCx from '../engine/eCx';
 import cxToRgb from '../view/cxToRgb';
 import TextNSlider from '../widgets/TextNSlider';
 import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
@@ -22,7 +22,7 @@ let debugWaveTab = false;
 function setPT() {
 	// variables from on high, and the funcs needed to change them
 	SetWaveTab.propTypes = {
-		origSpace: PropTypes.instanceOf(qeSpace),
+		origSpace: PropTypes.instanceOf(eSpace),
 
 		// actually sets the one in use by the algorithm
 		setWaveHandler: PropTypes.func.isRequired,
@@ -55,7 +55,7 @@ class SetWaveTab extends React.Component {
 
 		// keep these buffers around for reuse - a bit faster
 		if (! this.qewave || this.elements.length != nPoints) {
-			this.qewave = new qeWave(miniSpace);
+			this.qewave = new eWave(miniSpace);
 			this.elements = new Array(N);
 			this.magns = new Float64Array(nPoints/2);
 		}
@@ -88,7 +88,7 @@ class SetWaveTab extends React.Component {
 		for (let ix = start; ix < end; ix += 2) {
 			let ix1 = ix/2;
 			let x = xScale(ix1);
-			let color = cxToRgb(qCx(wave[ix], wave[ix+1]));
+			let color = cxToRgb(eCx(wave[ix], wave[ix+1]));
 			magn = this.magns[ix1];
 			magn = this.yScale(magn);
 

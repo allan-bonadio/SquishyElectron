@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-import {qeBasicSpace} from '../engine/qeSpace';
+import {qeBasicSpace} from '../engine/eSpace';
 
 
 // raw numbers ~ 1 are way too big and throw it all into chaos

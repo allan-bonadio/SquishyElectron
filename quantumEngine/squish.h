@@ -17,7 +17,7 @@
 
 #include "spaceWave/qCx.h"
 
-// continuum values - same as in qeSpace.js; pls synchronize them!
+// continuum values - same as in eSpace.js; pls synchronize them!
 // also used in qBuffers and subclasses
 const int contDISCRETE = 0;
 const int contWELL = 1;

@@ -12,7 +12,7 @@ import {scaleLinear} from 'd3-scale';
 // eslint-disable-next-line no-unused-vars
 import {setFamiliarPotential, dumpPotential} from '../utils/potentialUtils';
 import MiniGraph from './MiniGraph';
-import qeSpace from '../engine/qeSpace';
+import eSpace from '../engine/eSpace';
 import TextNSlider from '../widgets/TextNSlider';
 import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
 //import {getASetting} from '../utils/storeSettings';
@@ -23,7 +23,7 @@ import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
 // set prop types
 function setPT() {
 	SetPotentialTab.propTypes = {
-		origSpace: PropTypes.instanceOf(qeSpace),
+		origSpace: PropTypes.instanceOf(eSpace),
 
 		// actually sets the one in use by the algorithm
 		setFlatPotentialHandler: PropTypes.func.isRequired,

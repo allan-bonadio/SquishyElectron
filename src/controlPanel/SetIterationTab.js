@@ -98,7 +98,7 @@ function SetIterationTab(props) {
 			<h3 style={{textAlign: 'left'}}>Iteration Statistics</h3>
 			<table><tbody>
 				<tr><td>iteration calc time:     </td><td><span  className='iterationCalcTime'>-</span> ms</td></tr>
-				<tr><td>reload view buffers:     </td><td><span  className='reloadViewBuffers'>-</span> ms</td></tr>
+				<tr><td>reload view variables:     </td><td><span  className='reloadVarsNBuffer'>-</span> ms</td></tr>
 				<tr><td>reload GL variables:     </td><td><span  className='reloadGlInputs'>-</span> ms</td></tr>
 				<tr><td>draw:                      </td><td><span  className='drawTime'>-</span> ms</td></tr>
 				<tr><td>total for iteration:  </td><td><span  className='totalForIteration'>-</span> ms</td></tr>

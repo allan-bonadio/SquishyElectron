@@ -8,10 +8,10 @@ import cxToRgb from '../view/cxToRgb';
 
 // do this old school class so  i can use the constructor without new
 // very handy - either arg can be a complex obj, or a real, and the im arg can be absent
-function qCx(re, im) {
+function eCx(re, im) {
 	// if called as a function instead of with new, convert
 	if (!this || this === window)
-		return new qCx(re, im);
+		return new eCx(re, im);
 
 	if (typeof re == 'object') {
 		if (typeof im == 'object') {
@@ -35,16 +35,16 @@ function qCx(re, im) {
 }
 
 // aint workin
-qCx.prototype.color = function color() {
+eCx.prototype.color = function color() {
 	return cxToRgb(this);
 };
 
 // aint workin?
-qCx.prototype.norm = function norm() {
+eCx.prototype.norm = function norm() {
 	return this.re ** 2 + this.im ** 2;
 }
 
-// const qCx = (re, im) => {
+// const eCx = (re, im) => {
 // 	if (typeof re == 'object') {
 // 		if (typeof im == 'object') {
 // 			return {re: re.re - im.im, re.im + im.re);
@@ -67,5 +67,5 @@ qCx.prototype.norm = function norm() {
 
 
 
-export default qCx;
+export default eCx;
 

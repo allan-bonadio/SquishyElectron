@@ -13,9 +13,9 @@ import PropTypes from 'prop-types';
 import ControlPanel from './controlPanel/ControlPanel';
 
 // eslint-disable-next-line no-unused-vars
-import {qeBasicSpace, qeSpace} from './engine/qeSpace';
-// import qeWave from './engine/qeWave';
-import {qeStartPromise} from './engine/qEngine';
+import {qeBasicSpace, eSpace} from './engine/eSpace';
+// import eWave from './engine/eWave';
+import {qeStartPromise} from './engine/eEngine';
 import qe from './engine/qe';
 
 import GLView from './view/GLView';
@@ -72,7 +72,7 @@ export class SquishPanel extends React.Component {
 
 			mainViewClassName: DEFAULT_VIEW_CLASS_NAME,
 
-			// the qeSpace
+			// the eSpace
 			space: null,  // set in setNew1DResolution()
 
 			// see the view dir, this is for the viewDef instance
@@ -99,7 +99,7 @@ export class SquishPanel extends React.Component {
 			runningCycleIterateSerial: 0,
 		};
 
-		// will be resolved when the space has been created; result will be qeSpace
+		// will be resolved when the space has been created; result will be eSpace
 		this.createdSpacePromise = new Promise((succeed, fail) => {
 			this.createdSpace = succeed;
 			console.info(`qeStartPromise created:`, succeed, fail);
@@ -123,8 +123,6 @@ export class SquishPanel extends React.Component {
 	componentDidMount() {
 		// upon startup, after C++ says it's ready, but remember constructor runs twice
 		qeStartPromise.then((arg) => {
-			// done in qEngine qeDefineAccess();
-
 			const s = this.state;
 
 			// space will end up ini the state but meanwhile we need it now
@@ -159,7 +157,7 @@ export class SquishPanel extends React.Component {
 
 	// init or re-init the space and the panel
 	setNew1DResolution(N, continuum) {
-		qe.space = new qeSpace([{N, continuum, label: 'x'}]);
+		qe.space = new eSpace([{N, continuum, label: 'x'}]);
 		this.setState({space: qe.space});
 		return qe.space;
 	}
@@ -223,7 +221,7 @@ export class SquishPanel extends React.Component {
 		this.iStats = {
 			startIteration: now,
 			endCalc: now,
-			endReloadViewBuffer: now,
+			endReloadVarsNBuffer: now,
 			endReloadInputs: now,
 			endDraw: now,
 			prevStart: now,
@@ -249,8 +247,8 @@ export class SquishPanel extends React.Component {
 
 		const st = this.iStats;
 		show('iterationCalcTime', st.endCalc - st.startIteration);
-		show('reloadViewBuffers', st.endReloadViewBuffer - st.endCalc);
-		show('reloadGlInputs', st.endReloadInputs - st.endReloadViewBuffer);
+		show('reloadVarsNBuffer', st.endReloadVarsNBuffer - st.endCalc);
+		show('reloadGlInputs', st.endReloadInputs - st.endReloadVarsNBuffer);
 		show('drawTime', st.endDraw - st.endReloadInputs);
 		show('totalForIteration', st.endDraw - st.startIteration);
 		const period = st.startIteration - st.prevStart;
@@ -274,7 +272,7 @@ export class SquishPanel extends React.Component {
 	// so if needsRepaint false or absent, it'll only repaint if an iteration has been done.
 	iterateOneIteration(isTimeAdvancing, needsRepaint) {
 		//console.log(`time since last tic: ${now - startIteration}ms`)
-// 		this.endCalc = this.startReloadViewBuffer = this.endReloadViewBuffer =
+// 		this.endCalc = this.startReloadViewBuffer = this.endReloadVarsNBuffer =
 // 			this.endIteration = 0;
 		this.iStats.startIteration = performance.now();  // absolute beginning of integrate iteration
 		// could be slow.
@@ -286,36 +284,36 @@ export class SquishPanel extends React.Component {
 
 		// if we need to repaint... if we're iterating, if the view says we have to,
 		// or if this is a one shot step
-		this.iStats.endReloadViewBuffer = this.iStats.endReloadInputs = this.iStats.endDraw = performance.now();
+		this.iStats.endReloadVarsNBuffer = this.iStats.endReloadInputs = this.iStats.endDraw = performance.now();
 		if (needsRepaint) {
 			// this is kinda cheating, but the effectiveView in the state takes some time to
 			// get set; but we need it immediately.  So we also set it as a variable on this.
-			// see similar code below; keep in sync
+			// see similar code below; keep in sync.  Also, early on, it might not be done at all yet.
 			const curView = this.effectiveView || this.state.effectiveView;
+			if (curView) {
+				curView.reloadAllVariables();
 
-			curView.reloadAllVariables();
+				// copy from latest wave to view buffer (c++)
+				qe.qViewBuffer_getViewBuffer();
+				this.iStats.endReloadVarsNBuffer = performance.now();
 
-			// copy from latest wave to view buffer (c++)
-			qe.qViewBuffer_getViewBuffer();
-			this.iStats.endReloadViewBuffer = performance.now();
+				// draw
+				curView.setInputsOnDrawings();
+				this.iStats.endReloadInputs = performance.now();
 
-			// draw
-			curView.setInputsOnDrawings();
-			this.iStats.endReloadInputs = performance.now();
-
-			curView.drawAllDrawings();
-			// populate the frame number and elapsed pseudo-time
-			this.showTimeNIteration();
-			this.iStats.endDraw = performance.now();
-
+				curView.drawAllDrawings();
+				// populate the frame number and elapsed pseudo-time
+				this.showTimeNIteration();
+				this.iStats.endDraw = performance.now();
+			}
 		}
 
 		// print out per-iteration benchmarks
 		if (areBenchmarking) {
 			console.log(`times:\n`+
 				`iteration calc time:     ${(this.iStats.endCalc - this.iStats.startIteration).toFixed(2)}ms\n`+
-				`reloadViewBuffers:     ${(this.iStats.endReloadViewBuffer - this.iStats.endCalc).toFixed(2)}ms\n`+
-				`reload GL variables:     ${(this.iStats.endReloadInputs - this.iStats.endReloadViewBuffer).toFixed(2)}ms\n`+
+				`reloadVarsNBuffer:     ${(this.iStats.endReloadVarsNBuffer - this.iStats.endCalc).toFixed(2)}ms\n`+
+				`reload GL variables:     ${(this.iStats.endReloadInputs - this.iStats.endReloadVarsNBuffer).toFixed(2)}ms\n`+
 				`draw:   ${(this.iStats.endDraw - this.iStats.endReloadInputs).toFixed(2)}ms\n`+
 				`total for iteration:  ${(this.iStats.endDraw - this.iStats.startIteration).toFixed(2)}ms\n` +
 				`period since last:  ${(this.iStats.startIteration - this.iStats.prevStart).toFixed(2)}ms\n`);
@@ -519,7 +517,7 @@ export class SquishPanel extends React.Component {
 	waveParams => {
 // 		const wave = qe.Avatar_getWaveBuffer();
 		const qewave = this.state.space.qewave;
-		qewave.setFamiliarWave(waveParams);  // wait - qeSpace does this too
+		qewave.setFamiliarWave(waveParams);  // wait - eSpace does this too
 		//this.iterateOneIteration(true, true);  // ?? take  this out this was to kick to display it....
 		//this.iterateOneIteration(false, true);
 		//qe.qViewBuffer_getViewBuffer();
@@ -527,6 +525,7 @@ export class SquishPanel extends React.Component {
 		qe.Avatar_resetCounters();
 
 		// see similar code above; keep in sync
+		console.info(`see similar code above; keep in this.ev${this.effectiveView} this.state.ev${this.state.effectiveView}`);
 		const curView = this.effectiveView || this.state.effectiveView;
 		curView.drawings.forEach(dr =>  dr.resetAvgHighest && dr.resetAvgHighest());
 

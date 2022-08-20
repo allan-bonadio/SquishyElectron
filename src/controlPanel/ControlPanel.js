@@ -12,9 +12,9 @@ import SetWaveTab from './SetWaveTab';
 import SetPotentialTab from './SetPotentialTab';
 import SetResolutionTab from './SetResolutionTab';
 import SetIterationTab from './SetIterationTab';
-import qeSpace from '../engine/qeSpace';
+import eSpace from '../engine/eSpace';
 import {storeASetting} from '../utils/storeSettings';
-// import {qeStartPromise} from '../engine/qEngine';
+// import {qeStartPromise} from '../engine/eEngine';
 // import qe from '../engine/qe';
 
 import {getASetting} from '../utils/storeSettings';
@@ -39,7 +39,7 @@ export class ControlPanel extends React.Component {
 		setIterateFrequency: PropTypes.func.isRequired,
 
 		// early on, there's no space.  Must have SquishPanel mounted first.
-		space: PropTypes.instanceOf(qeSpace),
+		space: PropTypes.instanceOf(eSpace),
 		N: PropTypes.number.isRequired,
 
 		// waveParams: PropTypes.shape({

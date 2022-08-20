@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 //import {scaleLinear} from 'd3-scale';
 //import {path as d3path} from 'd3-path';
 
-import {qeSpace, qeBasicSpace} from '../engine/qeSpace';
+import {eSpace, qeBasicSpace} from '../engine/eSpace';
 
 //const π = Math.PI;
 //const radsPerDeg = π / 180;
@@ -19,7 +19,7 @@ function setPT() {
 	MiniGraph.propTypes = {
 		className: PropTypes.string.isRequired,
 
-		// function that accepts x, and returns y, a real or qCx if isWave
+		// function that accepts x, and returns y, a real or eCx if isWave
 		//yFunction: PropTypes.func,
 
 		// pass the function that will return the svg elements to display, recipe(miniSpace, potentialParams)
@@ -39,7 +39,7 @@ function setPT() {
 		familiarParams: PropTypes.object.isRequired,
 
 		// the space that the mainstream is using - MiniGraph uses an adaptation of this one
-		origSpace: PropTypes.instanceOf(qeSpace).isRequired,
+		origSpace: PropTypes.instanceOf(eSpace).isRequired,
 	};
 	MiniGraph.defaultProps = {};
 }

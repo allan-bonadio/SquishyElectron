@@ -1,9 +1,9 @@
 /*
-** qeSpace - the JS representations of the c++ qSpace object
+** eSpace - the JS representations of the c++ qSpace object
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 import qe from './qe';
-//import qeWave from './qeWave';
+//import eWave from './eWave';
 import {setFamiliarPotential} from '../utils/potentialUtils';
 import storeSettings from '../utils/storeSettings';
 import salientBuffersFactory from './salientBuffersFactory';
@@ -33,8 +33,8 @@ function dumpRow(ix, re, im, prev, isBorder) {
 
 /* **************************************************************** Basic Space */
 // the dimensions part of the space
-// this is enough to contruct a qeWave with, so MiniGraph can use it (obsolete,tobe removed)
-// pat of qeSpace but also want to use independently (NO!  reunify with qeSpace!)
+// this is enough to contruct a eWave with, so MiniGraph can use it (obsolete,tobe removed)
+// pat of eSpace but also want to use independently (NO!  reunify with eSpace!)
 // maybe not - nmight get rid of this given changes that are coming
 export class qeBasicSpace {
 	// note in c++ these are on qSpace; there is no qBasicSpace
@@ -83,7 +83,7 @@ export class qeBasicSpace {
 			continuum: dim.continuum};
 	}
 
-	// a qeSpace method to dump any wave buffer according to that space.
+	// a eSpace method to dump any wave buffer according to that space.
 	// RETURNS A STRING of the wave.
 	dumpThat(wave) {
 		if (this.nPoints <= 0) throw "🚀  qeBasicSpace::dumpThat	() with zero points";
@@ -131,7 +131,7 @@ export class qeBasicSpace {
 			wave[end+1] = wave[3];
 			break;
 
-		default: throw `🚀  bad continuum '${continuum}' in  qeSpace.fixThoseBoundaries()`;
+		default: throw `🚀  bad continuum '${continuum}' in  eSpace.fixThoseBoundaries()`;
 		}
 	}
 }
@@ -140,19 +140,19 @@ export class qeBasicSpace {
 /* **************************************************************** Space */
 // this is how you create a qSpace - start from JS and call this.
 // call like this:
-// new qeSpace([{N: 128, continuum: qeBasicSpace.contENDLESS, label: 'x', coord: 'x'}])
+// new eSpace([{N: 128, continuum: qeBasicSpace.contENDLESS, label: 'x', coord: 'x'}])
 // labels must be unique.  Modeled after qSpace in C++,
 // does all dimensions in constructor, at least.
 // Coords are the same if two dims are parallel, eg two particles with x coords.
 // Not the same if one particle with x and y coords; eg you could have an endless canal.
-export class qeSpace extends qeBasicSpace {
+export class eSpace extends qeBasicSpace {
 	static contCodeToText = code => ['Discrete', 'Well', 'Endless'][code];
 
 	constructor(dims) {
 		super(dims);
 
 		// this actually does it over on the C++ side
-		qe.startNewSpace("a qeSpace");
+		qe.startNewSpace("a eSpace");
 		dims.forEach(dim => {
 			qe.addSpaceDimension(dim.N, dim.continuum, dim.label);
 
@@ -170,7 +170,7 @@ export class qeSpace extends qeBasicSpace {
 
 		// this reaches into C++ space and accesses the main wave buffer of this space
 		// hmmm space shouldn't point to this - just avatar?
-		this.qewave = salientBuffers.mainQeWave;  // new qeWave(this, salientPointers.mainWaveBuffer);
+		this.qewave = salientBuffers.mainQeWave;  // new eWave(this, salientPointers.mainWaveBuffer);
 		this.wave = this.qewave.wave;
 
 		// by default it's set to 1s, or zeroes?  but we want something good.
@@ -191,10 +191,10 @@ export class qeSpace extends qeBasicSpace {
 		this.vBuffer = salientBuffers.vBuffer;
 			// new Float32Array(emscriptenMemory, address, np);
 
-		if (debugSpace) console.log(`🚀  done with the resulting qeSpace:`, this);
+		if (debugSpace) console.log(`🚀  done with the resulting eSpace:`, this);
 	}
 
 }
 
 
-export default qeSpace;
+export default eSpace;
