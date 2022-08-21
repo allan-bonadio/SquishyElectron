@@ -54,7 +54,11 @@ class App extends React.Component {
 	}
 
 
+	static rendered = 0;
 	render() {
+		App.rendered++;
+		console.info(`App rendered ${App.rendered} times`);
+
 		const s = this.state;
 		SquishyElectronRendered++;
 		console.log(`SquishyElectron app Rendered: ${SquishyElectronRendered} times`);

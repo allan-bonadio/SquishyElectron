@@ -568,12 +568,13 @@ export class SquishPanel extends React.Component {
 
 	/* ******************************************************* rendering */
 
+	static rendered = 0;
 	render() {
+		SquishPanel.rendered++;
+		console.info(`SquishPanel rendered ${SquishPanel.rendered} times`);
+
 		const p = this.props;
 		const s = this.state;
-
-			// potentialParams={defaultPotentialParams}
-			// waveParams={defaultWaveParams}
 
 		return (
 			<div id={this.props.id} className="SquishPanel">
