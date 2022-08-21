@@ -30,11 +30,11 @@ class salientBuffersFactory {
 
 		// one double per point
 		this.potentialBuffer = new Float64Array(window.Module.HEAPF64.buffer, struct[2],
-			space.nPoints * Float64Array.BYTES_PER_ELEMENT);
+			space.nPoints * 2);
 
 		// display also the boundary points?  if not, use nStates instead
 		this.vBuffer = new Float32Array(window.Module.HEAPF64.buffer, struct[3],
-			space.nPoints * Float32Array.BYTES_PER_ELEMENT *  8); // two vec4 s per point
+			space.nPoints * 8); // two vec4 s per point
 
 		this.theAvatar = new jsAvatar(struct[4], this.mainQeWave);
 		this.miniGraphAvatar = new jsAvatar(struct[5]);  // not yet implemented or used...
