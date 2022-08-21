@@ -5,6 +5,7 @@
 
 // line numbers should correspond!  Be careful how many lines this is!
 const cxToColorGlsl = `
+#line 8
 float sqrtOneThird = sqrt(1. / 3.);  // 0.57735..
 float sqrtThreeOver2 = sqrt(3.) / 2.;  // .8660...
 
