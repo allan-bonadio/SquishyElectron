@@ -31,16 +31,16 @@ We will define
 so that in our buffers of complex numbers, the Im part is dt/2 ahead of the Re part:
 
               real components    imag components
-initial wave:   ψr(t)              ψi(t + dt/2)
-1st iter wave:  ψr(t + dt)         ψi(t + 3dt/2)
+initial wave:   𝜓r(t)              𝜓i(t + dt/2)
+1st iter wave:  𝜓r(t + dt)         𝜓i(t + 3dt/2)
 
 The natural discretization of Eqs. 6 (visscher paper) is therefore
-	ψr(t + dt) = ψr(t) + dt H ψi(t + dt/2)
+	𝜓r(t + dt) = 𝜓r(t) + dt H 𝜓i(t + dt/2)
 
 Half a tick later, at a half odd integer multiple of dt,
-	ψi(t + dt/2) = ψi(t - dt/2) - dt H ψr(t)
+	𝜓i(t + dt/2) = 𝜓i(t - dt/2) - dt H 𝜓r(t)
 or
-	ψi(t + 3dt/2) = ψi(t + dt/2) - dt H ψr(t + dt)
+	𝜓i(t + 3dt/2) = 𝜓i(t + dt/2) - dt H 𝜓r(t + dt)
 
 where H is hamiltonian, typically ( potential + ∂2/∂x2 )
 We do the hamiltonian custom here instead of using the function in hamiltonian.cpp
@@ -52,11 +52,11 @@ and sometimes omit the potential
 
 
 
-// first step: advance the ψr a dt, from t to t + dt
-// oldW points to buffer with real = ψr(t)    imag = ψi(t + dt/2)
-// newW points to buffer with real = ψr(t + dt)   imag unchanged = ψi(t + dt/2)
-// here we will calculate the ψr(t + dt) values in a new buffer only, and fill them in.
-// the ψi values in buffer 0 are still uncalculated
+// first step: advance the 𝜓r a dt, from t to t + dt
+// oldW points to buffer with real = 𝜓r(t)    imag = 𝜓i(t + dt/2)
+// newW points to buffer with real = 𝜓r(t + dt)   imag unchanged = 𝜓i(t + dt/2)
+// here we will calculate the 𝜓r(t + dt) values in a new buffer only, and fill them in.
+// the 𝜓i values in buffer 0 are still uncalculated
 void Avatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
 	//printf("⚛️ start of stepReal");
@@ -64,14 +64,14 @@ void Avatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		// second deriv wrt x of psi
-		double d2ψi = oldW[ix-1].im + oldW[ix+1].im - oldW[ix].im * 2;
+		double d2𝜓i = oldW[ix-1].im + oldW[ix+1].im - oldW[ix].im * 2;
 
 		// total hamiltonian including potential
-		double Hψ = d2ψi + potential[ix] * potentialFactor * oldW[ix].re;
-		//double Hψ = d2ψi;   // without potential
+		double H𝜓 = d2𝜓i + potential[ix] * potentialFactor * oldW[ix].re;
+		//double H𝜓 = d2𝜓i;   // without potential
 
 		// note subtraction
-		newW[ix].re = oldW[ix].re - dt * Hψ;
+		newW[ix].re = oldW[ix].re - dt * H𝜓;
 		qCheck("vischer stepReal", newW[ix]);
 	}
 	if (traceVischerBench) printf("      stepReal, on to fix boundaries: time=%lf\n",
@@ -88,15 +88,15 @@ void Avatar::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 	//dumpThat(oldW, true);
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
-		// second deriv d2ψr / dx**2
-		double d2ψr = oldW[ix-1].re + oldW[ix+1].re - oldW[ix].re * 2;
+		// second deriv d2𝜓r / dx**2
+		double d2𝜓r = oldW[ix-1].re + oldW[ix+1].re - oldW[ix].re * 2;
 
 		// total hamiltonian
-		double Hψ = d2ψr + potential[ix] * potentialFactor * oldW[ix].im;
-		//double Hψ = d2ψr;  // without potential
+		double H𝜓 = d2𝜓r + potential[ix] * potentialFactor * oldW[ix].im;
+		//double H𝜓 = d2𝜓r;  // without potential
 
 		// note addition
-		newW[ix].im = oldW[ix].im + dt * Hψ;
+		newW[ix].im = oldW[ix].im + dt * H𝜓;
 
 		qCheck("vischer stepImaginary", newW[ix]);
 	}
