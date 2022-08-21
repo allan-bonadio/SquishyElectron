@@ -45,7 +45,7 @@ export class qeBasicSpace {
 		let nPoints = 1, nStates = 1;
 		this.dimensions = dims.map(dim => {
 			let d = {...dim};
-			if (d.continuum != 'discrete') {
+			if (d.continuum != qe.contDISCRETE) {
 				d.start = 1;
 				d.end = d.N + 1;
 			}
@@ -120,7 +120,7 @@ export class qeBasicSpace {
 			break;
 
 		case qe.contENDLESS:
-			// the points on the end get set to the opposite side.  Remember this is for complex, 2x
+			// the points on the end get set to the opposite side.  Remember this is for complex, 2x floats
 			wave[0] = wave[end-2];
 			wave[1]  = wave[end-1];
 			wave[end] = wave[2];
