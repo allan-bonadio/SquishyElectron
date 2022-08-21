@@ -11,11 +11,7 @@ import qe from '../engine/qe';
 const VALLEY_FACTOR = .001;
 
 // Potential is simple array.  No wrapper object needed (not yet)  Just make a typed array from what C++ created
-
-// now done in salientBuffersFactory
-//export function getWrappedPotential(space) {
-//	return new Float64Array(window.Module.HEAPF64.buffer, qe.qSpace_getPotentialBuffer(), space.nPoints);
-//}
+// um... soon though, call it ePotential.  maybe also on the c++ side
 
 export function fixPotentialBoundaries(space, potential) {
 	const {end, continuum} = space.startEnd;
@@ -25,13 +21,13 @@ export function fixPotentialBoundaries(space, potential) {
 		break;
 
 	case qe.contWELL:
-		// the points on the end are ∞ potential, but the arithmetic goes bonkers
-		// if I actually set the voltage to ∞
-		potential[0] = potential[1] = potential[end] = potential[end+1] = 0; // ?? gonna have to think thru contWELL
+		// the points on the end are ∞ potential, but the arithmetic goes bonkers?  no, potential on ends is not really used.
+		// if I actually set the voltage to ∞, really ought to work?  real, not complex
+		potential[0] = potential[end] = Infinity;
 		break;
 
 	case qe.contENDLESS:
-		// the points on the end get set to the opposite side
+		// the points on the end get set to the opposite side.    real, not complex.
 		potential[0] = potential[end-1];
 		potential[end] = potential[1];
 		break;
