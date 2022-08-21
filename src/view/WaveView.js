@@ -1,9 +1,9 @@
 /*
-** GLView -- a webgl image of the quantum wave (or whatever)
+** WaveView -- a webgl image of the quantum wave (or whatever)
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-// GLView has a 1:1 relationship with a C++ Avatar.
+// WaveView has a 1:1 relationship with a C++ Avatar.
 // Each wraps a canvas for display.  Via webgl.
 // You can have many in a squishPanel, each subscribing to the same space.
 // One is the main view, displaying current simulation.  Others are used in the
@@ -26,7 +26,7 @@ import {listOfViewClasses} from './listOfViewClasses';
 
 
 
-export class GLView extends React.Component {
+export class WaveView extends React.Component {
 	static propTypes = {
 		// the class itself.  Not the instance! the class, the type of view, with drawings baked in.
 		// not the class!  just the class name.
@@ -45,10 +45,10 @@ export class GLView extends React.Component {
 	constructor(props) {
 		super(props);
 
-		GLView.created++;
-		console.info(`GLView created ${GLView.created} times`);
+		WaveView.created++;
+		console.info(`WaveView created ${WaveView.created} times`);
 
-		// why is this called so many times!?!?!?!?!  console.log(`GLView(...`, props, (new Error()).stack);
+		// why is this called so many times!?!?!?!?!  console.log(`WaveView(...`, props, (new Error()).stack);
 		this.state = {
 			height: getASetting('miscParams', 'viewHeight'),
 			space: null,  // set when promise comes in
@@ -70,12 +70,12 @@ export class GLView extends React.Component {
 		const p = this.props;
 		if (this.state.space && this.canvas)
 			return;  // already done
-		console.log(`GLView.setGLCanvas(...`, canvas);
+		console.log(`WaveView.setGLCanvas(...`, canvas);
 
 		// why do i have to do this?  Old version of CHrome??!?!?!  preposterous
 		if (canvas) {
 			this.canvas = canvas;
-			canvas.GLView = this;
+			canvas.WaveView = this;
 		}
 
 		// we need the space AND the canvas to make the views
@@ -96,13 +96,13 @@ export class GLView extends React.Component {
 			// Make sure you call the new view's domSetup method.
 			this.effectiveView.domSetupForAllDrawings(this.canvas);
 
-			// thsi will kick the GLView to render.  Is this too intricate?
+			// thsi will kick the WaveView to render.  Is this too intricate?
 			p.setEffectiveView(this.effectiveView);
 
-			console.info(`GLView.compDidMount promise done`);
+			console.info(`WaveView.compDidMount promise done`);
 
 		}).catch(ex => {
-			console.error(`error in GLView createdSpacePromise.then():`, ex.stack || ex.message || ex);
+			console.error(`error in WaveView createdSpacePromise.then():`, ex.stack || ex.message || ex);
 			debugger;
 		});
 
@@ -110,7 +110,7 @@ export class GLView extends React.Component {
 
 	/* ************************************************************************ resizing */
 
-	// these are for resizing the GLView ONLY.
+	// these are for resizing the WaveView ONLY.
 	mouseDown =
 	ev => {
 		this.resizing = true;
@@ -175,8 +175,8 @@ export class GLView extends React.Component {
 		const p = this.props;
 		const s = this.state;
 
-		GLView.rendered++;
-		console.info(`GLView rendered ${GLView.rendered} times`);
+		WaveView.rendered++;
+		console.info(`WaveView rendered ${WaveView.rendered} times`);
 
 		let wholeRect = null;  // if null, not ready (first render, etc)
 		if (this.element) {
@@ -198,7 +198,7 @@ export class GLView extends React.Component {
 			: <img className='spinner' alt='spinner' src='eclipseOnTransparent.gif' />;
 
 		// voNorthWest/East are populated during drawing
-		return (<div className='GLView'  ref={el => this.element = el}>
+		return (<div className='WaveView'  ref={el => this.element = el}>
 			<canvas className='squishCanvas'
 				width={p.width} height={s.height}
 				ref={canvas => this.setGLCanvas(canvas)}
@@ -226,5 +226,5 @@ export class GLView extends React.Component {
 	}
 }
 
-export default GLView;
+export default WaveView;
 

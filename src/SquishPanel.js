@@ -18,7 +18,7 @@ import {qeBasicSpace, eSpace} from './engine/eSpace';
 import {qeStartPromise} from './engine/eEngine';
 import qe from './engine/qe';
 
-import GLView from './view/GLView';
+import WaveView from './view/WaveView';
 import ResolutionDialog from './controlPanel/ResolutionDialog';
 import {setFamiliarPotential} from './utils/potentialUtils';
 
@@ -94,7 +94,7 @@ export class SquishPanel extends React.Component {
 			lowPassFilter: getASetting('iterationParams', 'lowPassFilter'),
 
 			// advance forward with each iter
-			// NOT SAME as shown on GLView!
+			// NOT SAME as shown on WaveView!
 			runningCycleElapsedTime: 0,
 			runningCycleIterateSerial: 0,
 		};
@@ -579,7 +579,7 @@ export class SquishPanel extends React.Component {
 		return (
 			<div id={this.props.id} className="SquishPanel">
 				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
-				<GLView
+				<WaveView
 					viewClassName={s.mainViewClassName}
 					viewName='main view'
 					setEffectiveView={this.setEffectiveView}

@@ -28,7 +28,7 @@ export class ControlPanel extends React.Component {
 		resetCounters: PropTypes.func.isRequired,
 
 		// these are the actual functions that change the main qWave and ultimately
-		// the GLView on the screen
+		// the WaveView on the screen
 		// when user chooses 'set wave'
 		setWave: PropTypes.func.isRequired,
 		setPotential: PropTypes.func.isRequired,
