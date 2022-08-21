@@ -45,23 +45,23 @@ void qSpectrum::dumpThatSpectrum(qCx *wave, bool withExtras) {
 	// zeroth entry is freq 0, same both sides
 	double norm = wave[0].norm() / N;
 	double totalNorm = norm;
-	printf("[%3d] (%8.4lf,%8.4lf)     %8.4lf\n",
-		0, wave[0].re, wave[0].im, norm);
+	printf("[%3d] (%8.4lf,%8.4lf)     %8.4lf m𝜓\n",
+		0, wave[0].re, wave[0].im, norm * 1000);
 
 	// in-between rows shows ix frequency, complementary both sides, except:
 	for (int ix = 1; ix < halfN; ix++) {
 		int cix = (N - ix);
 		norm = (wave[ix].norm() + wave[cix].norm()) / N;
 		totalNorm += norm;
-		printf("[%3d] (%8.4lf,%8.4lf)  (%8.4lf,%8.4lf)    %12.8lf\n",
-			ix, wave[ix].re, wave[ix].im, wave[cix].re, wave[cix].im, norm);
+		printf("[%3d] (%8.4lf,%8.4lf)  (%8.4lf,%8.4lf)    %12.8lf m𝜓\n",
+			ix, wave[ix].re, wave[ix].im, wave[cix].re, wave[cix].im, norm * 1000);
 	}
 
 	// N/2-th entry is nyquist freq, same both sides
 	norm = wave[halfN].norm() / N;
 	totalNorm += norm;
-	printf("[%3d]                      (%8.4lf,%8.4lf)     %8.4lf   total: %8.4lf\n",
-		halfN, wave[halfN].re, wave[halfN].im, norm, totalNorm);
+	printf("[%3d]                      (%8.4lf,%8.4lf)     %8.4lf m𝜓  total: %8.4lf 𝜓\n",
+		halfN, wave[halfN].re, wave[halfN].im, norm * 1000, totalNorm);
 }
 
 // this is the member function that dumps its own Spectrum and space
