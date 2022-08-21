@@ -1,5 +1,5 @@
 /*
-** squish View -- a webgl image of the quantum wave (or whatever)
+** GLView -- a webgl image of the quantum wave (or whatever)
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
@@ -24,6 +24,8 @@ import {listOfViewClasses} from './listOfViewClasses';
 
 /* **************************************** actual canvas wrapper */
 
+
+
 export class GLView extends React.Component {
 	static propTypes = {
 		// the class itself.  Not the instance! the class, the type of view, with drawings baked in.
@@ -39,8 +41,12 @@ export class GLView extends React.Component {
 		createdSpacePromise: PropTypes.instanceOf(Promise),
 	};
 
+	static created = 0;
 	constructor(props) {
 		super(props);
+
+		GLView.created++;
+		console.info(`GLView created ${GLView.created} times`);
 
 		// why is this called so many times!?!?!?!?!  console.log(`GLView(...`, props, (new Error()).stack);
 		this.state = {
@@ -104,6 +110,7 @@ export class GLView extends React.Component {
 
 	/* ************************************************************************ resizing */
 
+	// these are for resizing the GLView ONLY.
 	mouseDown =
 	ev => {
 		this.resizing = true;
@@ -163,9 +170,18 @@ export class GLView extends React.Component {
 		}
 	}
 
+	static rendered = 0;
 	render() {
 		const p = this.props;
 		const s = this.state;
+
+		GLView.rendered++;
+		console.info(`GLView rendered ${GLView.rendered} times`);
+
+		let wholeRect = null;  // if null, not ready (first render, etc)
+		if (this.element) {
+			wholeRect = this.element.getBoundingClientRect();
+		}
 
 		// if c++ isn't initialized yet, we can assume the time and frame serial
 		let et = '0';
@@ -182,7 +198,7 @@ export class GLView extends React.Component {
 			: <img className='spinner' alt='spinner' src='eclipseOnTransparent.gif' />;
 
 		// voNorthWest/East are populated during drawing
-		return (<div className='GLView' >
+		return (<div className='GLView'  ref={el => this.element = el}>
 			<canvas className='squishCanvas'
 				width={p.width} height={s.height}
 				ref={canvas => this.setGLCanvas(canvas)}
@@ -205,7 +221,7 @@ export class GLView extends React.Component {
 
 
 			<PotentialArea width={p.width} height={s.height}
-				x={0} space={s.space} />
+				space={s.space} wholeRect={wholeRect} />
 		</div>);
 	}
 }
