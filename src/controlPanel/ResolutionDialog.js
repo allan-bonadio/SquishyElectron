@@ -133,7 +133,8 @@ export default class ResolutionDialog extends React.Component {
 					style={{fontWeight:
 						(this.props.continuum == qe.contDISCRETE)
 						? 'bold'
-						: 'normal'}}/>
+						: 'normal'}}
+						disabled />
 				Discreet Quanta (not recommended)</label>
 		</>;
 	}
