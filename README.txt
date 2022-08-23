@@ -172,8 +172,18 @@ needs more research
 Great discussion of how to integrate Schrodinger.
 https://physics.stackexchange.com/questions/259134/schrodinger-equation-for-a-hamiltonian-with-explicit-time-dependence
 
---------------------------------------------------
---------------------------------------------------
+-------------------------------------------------- react management after eject
+and other tips and tricks
+
+https://github.com/sanjsanj/create-react-app-ejected
+
+CRA docs
+https://create-react-app.dev/docs/documentation-intro
+-------------------------------------------------- optimization
+
+Use PureComponent to speed up rendering if you follow the rules:
+https://reactjs.org/docs/react-api.html#reactpurecomponent
+
 --------------------------------------------------
 --------------------------------------------------
 --------------------------------------------------
