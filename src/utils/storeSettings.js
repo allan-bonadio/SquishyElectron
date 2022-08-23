@@ -141,7 +141,7 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 // somewhere you have to record the defaults and criterion for each setting, so here they are
 
 function isPowerOf2(n) {
-	console.info(`isPowerOf2(${n}) `);
+	//console.info(`isPowerOf2(${n}) `);
 	while (n > 1 ){
 		// if it's got more than 1 bit on
 		if (n & 1) return false;
@@ -190,19 +190,19 @@ makeParam('miscParams', 'showingTab', 'wave', ['wave', 'potential', 'space', 'it
 makeParam('miscParams', 'viewHeight', 400, {min: 50, max: 1e4});
 
 // they should ALL be there
-function checkAllSettingData() {
-	console.log(`stored group spaceParams: ${localStorage.spaceParams}`);
-	console.log(`stored group waveParams: ${localStorage.waveParams}`);
-	console.log(`stored group potentialParams: ${localStorage.potentialParams}`);
-	console.log(`stored group iterationParams: ${localStorage.iterationParams}`);
-	console.log(`stored group miscParams: ${localStorage.miscParams}`);
-
-	console.log(`alternateStoreDefaults`, alternateStoreDefaults);
-	console.log(`alternateStoreVerifiers`, alternateStoreVerifiers);
-	console.log(`alternateMinMaxs`, alternateMinMaxs);
-}
-
-checkAllSettingData();
+// function checkAllSettingData() {
+// 	console.log(`stored group spaceParams: ${localStorage.spaceParams}`);
+// 	console.log(`stored group waveParams: ${localStorage.waveParams}`);
+// 	console.log(`stored group potentialParams: ${localStorage.potentialParams}`);
+// 	console.log(`stored group iterationParams: ${localStorage.iterationParams}`);
+// 	console.log(`stored group miscParams: ${localStorage.miscParams}`);
+//
+// 	console.log(`alternateStoreDefaults`, alternateStoreDefaults);
+// 	console.log(`alternateStoreVerifiers`, alternateStoreVerifiers);
+// 	console.log(`alternateMinMaxs`, alternateMinMaxs);
+// }
+//
+//checkAllSettingData();
 
 export function getAGroup(groupName) {
 	if (!alternateStoreVerifiers
@@ -235,9 +235,9 @@ export function storeASetting(groupName, varName, newValue) {
 
 export function getASetting(groupName, varName) {
 	let setting = getAGroup(groupName)[varName];
-	console.info(`get some stuff please `, groupName, varName, alternateStoreVerifiers, setting);
-	console.info(alternateStoreVerifiers[groupName]);////
-	console.info(alternateStoreVerifiers[groupName][varName]);
+// 	console.info(`get some stuff please `, groupName, varName, alternateStoreVerifiers, setting);
+// 	console.info(alternateStoreVerifiers[groupName]);////
+// 	console.info(alternateStoreVerifiers[groupName][varName]);
 	if (!alternateStoreVerifiers
 	|| !alternateStoreVerifiers[groupName]
 	|| !alternateStoreVerifiers[groupName][varName]) debugger;
