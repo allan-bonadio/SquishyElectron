@@ -47,9 +47,39 @@ We do the hamiltonian custom here instead of using the function in hamiltonian.c
 and sometimes omit the potential
  */
 
-// this is our second derivative wrt x:
-// 	qCx d2 = wave[x-1] + wave[x+1] - wave[x] * 2;
+/*
+this is our second derivative wrt x:
+	qCxd2 = wave[x-1] + wave[x+1] - wave[x] * 2;
+because dx  is always chosen to be 1.
 
+real units:
+ℏ = 1.054571817e-34 kg m^2 / s = 1 cuz of the lhs of schrodinger's we use
+m_e = 9.1093837015e-31 kg
+ℏ / 2m_e = 5.78838180e-5  m^2/s = 1 cuz of the rhs of schrodinger's we use
+therefore, 1s = 5.7...e-5 m^2   ???
+and 1ps = 1e-12s = 5.78838180e-17 m^2 - yeah i think so.
+or 1ns corresponds to 5.78838180e-14 m^2
+or  2.4059056091210226e-7 m or about 241 µm ??
+
+no do it this way
+ℏ^2 / 2m_e = 6.10426431e-39  kg m^4 / s^2  = 1 cuz of the rhs of schrodinger's we use
+
+wait try this, ℏ = 1, right, so 1 / 2m_e = 1  and m_e = 1/2 = 9.1093837015e-31 kg
+and 1 kg = 5.4888455287888166e+29
+
+... ok i'm confused again... the whole eq is units of energy, kg m^2 / s^2
+Definitely, dx is always 1 in our units.
+
+so schrodinger's eq, just units, is kindof like d/dt = d^2/dx^2 or dt = dx^2
+every step, dx=1 is used to calculate a rate of change over dt.
+
+therefore, 1s = 5.78838180e-5 m^2   ???
+and 1ps = 1e-12s = 5.78838180e-17 m^2 - yeah i think so.
+or 1ns corresponds to 5.78838180e-14 m^2
+or  2.4059056091210226e-7 m or about 241 µm ??
+
+other way: 1nm = 1e-9m   square = 1e-18 m^2 times that number = 1.7275985492180218e-14 seconds.  thisi isn't right.
+*/
 
 
 // first step: advance the 𝜓r a dt, from t to t + dt
