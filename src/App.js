@@ -54,6 +54,7 @@ class App extends React.Component {
 	}
 
 
+	static whyDidYouRender = true;
 	static rendered = 0;
 	render() {
 		App.rendered++;

@@ -1,3 +1,6 @@
+// uncomment this only for debugging re-render bugs
+import './wdyr'; // <--- wdyr must be first import
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 //import ErrorBoundary from './widgets/ErrorBoundary';

@@ -540,15 +540,15 @@ export class SquishPanel extends React.Component {
 		setFamiliarPotential(this.state.space, this.state.space.potentialBuffer, potentialParams);
 		//this.iterateOneIteration(true, true);  // ???  take this out - jus ttrigger a PotentialArea render
 
-		this.invalidatePotentialArea();
+		this.updatePotentialArea();
 
 		// no this doesn't affect the vBuffer
 	}
 
 	// potential area needs to be told when the data changes.  can't put the whole potential buffer in the state!
-	setInvalidatePotentialArea =
-	(invalidatePotentialArea) => {
-		this.invalidatePotentialArea = invalidatePotentialArea;
+	setUpdatePotentialArea =
+	(updatePotentialArea) => {
+		this.updatePotentialArea = updatePotentialArea;
 	};
 
 	// dump the view buffer, from the JS side.  Why not use the C++ version?
@@ -565,6 +565,7 @@ export class SquishPanel extends React.Component {
 
 	/* ******************************************************* rendering */
 
+	static whyDidYouRender = true;
 	static rendered = 0;
 	render() {
 		SquishPanel.rendered++;
@@ -582,7 +583,7 @@ export class SquishPanel extends React.Component {
 					setEffectiveView={this.setEffectiveView}
 					createdSpacePromise={this.createdSpacePromise}
 					width={p.width}
-					setInvalidatePotentialArea={this.setInvalidatePotentialArea}
+					setUpdatePotentialArea={this.setUpdatePotentialArea}
 				/>
 				<ControlPanel
 					openResolutionDialog={() => this.openResolutionDialog()}

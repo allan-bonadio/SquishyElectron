@@ -24,7 +24,7 @@ export class PotentialArea extends React.Component {
 		space: PropTypes.instanceOf(eSpace),
 		wholeRect: PropTypes.object,
 
-		setInvalidatePotentialArea: PropTypes.func,
+		setUpdatePotentialArea: PropTypes.func,
 	};
 
 	constructor(props) {
@@ -32,11 +32,12 @@ export class PotentialArea extends React.Component {
 		// why is this called so many times!?!?!?!?!  console.log(`PotentialArea(...`, props, (new Error()).stack);
 
 		this.state = {
-			// we increment this in lieu of storing the whole potential in the state
+			// should just use forceUpdate on our comp obj instead!
 			changeSerial: 0,
 		};
 
-		props.setInvalidatePotentialArea(this.invalidatePotentialArea);
+		// should just use forceUpdate on our comp obj instead!
+		props.setUpdatePotentialArea(this.updatePotentialArea);
 	}
 
 	/* ***************************************************  click & drag */
@@ -65,7 +66,7 @@ export class PotentialArea extends React.Component {
 		this.potentialBuffer[ix] = newPotential;
 
 		//qe.set1DPotential(ix, p.height + p.y - newPotential);
-		this.invalidatePotentialArea();
+		this.updatePotentialArea();
 	}
 
 	mouseDown(ev) {
@@ -100,10 +101,9 @@ export class PotentialArea extends React.Component {
 
 	/* *************************************************** drawing */
 
-	invalidatePotentialArea =
+	updatePotentialArea =
 	() => {
-		debugger;
-		this.setState({changeSerial: this.state.changeSerial + 1});
+		this.forceUpdate();
 	}
 
 	// make the sequence of coordinates the white line needs to draw
@@ -182,6 +182,7 @@ export class PotentialArea extends React.Component {
 		return paths
 	}
 
+	static whyDidYouRender = true;
 	static rendered = 0;
 	render() {
 		PotentialArea.rendered++;

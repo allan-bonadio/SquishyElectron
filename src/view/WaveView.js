@@ -40,7 +40,7 @@ export class WaveView extends React.Component {
 		// tells us when the space exists.  From the SquishPanel, or just pass something resolved.
 		createdSpacePromise: PropTypes.instanceOf(Promise),
 
-		setInvalidatePotentialArea: PropTypes.func,
+		setUpdatePotentialArea: PropTypes.func,
 	};
 
 	static created = 0;
@@ -68,11 +68,13 @@ export class WaveView extends React.Component {
 
 	// the canvas per panel, one panel per canvas.
 	// Only called when canvas is created (or recreated, someday)
+	static setGLCanvasAgain = 0;
 	setGLCanvas(canvas) {
 		const p = this.props;
 		if (this.state.space && this.canvas)
 			return;  // already done
-		console.log(`WaveView.setGLCanvas(...`, canvas);
+		this.setGLCanvasAgain++;
+		console.log(`for the ${this.setGLCanvasAgain}th time, WaveView.setGLCanvas(...`, canvas);
 
 		// why do i have to do this?  Old version of CHrome??!?!?!  preposterous
 		if (canvas) {
@@ -172,6 +174,7 @@ export class WaveView extends React.Component {
 		}
 	}
 
+	static whyDidYouRender = true;
 	static rendered = 0;
 	render() {
 		const p = this.props;
@@ -225,7 +228,7 @@ export class WaveView extends React.Component {
 
 			<PotentialArea width={p.width} height={s.height}
 				space={s.space} wholeRect={wholeRect}
-				setInvalidatePotentialArea={p.setInvalidatePotentialArea}/>
+				setUpdatePotentialArea={p.setUpdatePotentialArea}/>
 		</div>);
 	}
 }
