@@ -17,7 +17,7 @@
 
 static bool useFourierFilter = true;
 
-static bool traceIteration = false;
+static bool traceIteration = true;
 static bool traceIterSteps = false;
 
 static bool traceJustWave = false;
@@ -101,7 +101,7 @@ Avatar::~Avatar(void) {
 
 
 // need these numbers for the js interface to this object, to figure out the offsets.
-// see jsAvatar.js ;  usually disabled.
+// see jsAvatar.js ;  usually this function isn't called.
 // Paste the output into class jsAvatar, the class itself, to replace the existing ones
 void Avatar::dumpOffsets(void) {
 	// don't need magic
@@ -109,18 +109,18 @@ void Avatar::dumpOffsets(void) {
 	makeIntGetter(space);
 	makeIntSetter(space);
 
-	/* *********************************************** JS accessible */
+	/* *********************************************** scalars */
 
 	makeDoubleGetter(elapsedTime);
 	makeDoubleSetter(elapsedTime);
 	makeDoubleGetter(iterateSerial);
 	makeDoubleSetter(iterateSerial);
-
+	printf("\n");
 	makeBoolGetter(isIterating);
 	makeBoolSetter(isIterating);
 	makeBoolGetter(pleaseFFT);
 	makeBoolSetter(pleaseFFT);
-
+	printf("\n");
 	makeDoubleGetter(dt);
 	makeDoubleSetter(dt);
 	makeIntGetter(lowPassFilter);
@@ -128,24 +128,29 @@ void Avatar::dumpOffsets(void) {
 	makeIntGetter(stepsPerIteration);
 	makeIntSetter(stepsPerIteration);
 
-	/* *********************************************** iteration */
+	/* *********************************************** waves & buffers */
 
+	printf("\n");
 	makeIntGetter(mainQWave);
 	makeIntSetter(mainQWave);
 
+	printf("\n");
 	makeIntGetter(potential);
 	makeIntSetter(potential);
 	makeDoubleGetter(potentialFactor);
 	makeDoubleSetter(potentialFactor);
 
+	printf("\n");
 	makeIntGetter(scratchQWave);
 	makeIntSetter(scratchQWave);
 
 	// for the fourier filter.  Call the function first time you need it.
+	printf("\n");
 	makeIntGetter(spect);
 	makeIntSetter(spect);
 
 	// the qViewBuffer to be passed to webgl.  This is a visual thing after all.
+	printf("\n");
 	makeIntGetter(qvBuffer);
 	makeIntSetter(qvBuffer);
 
@@ -186,8 +191,9 @@ void Avatar::oneIteration() {
 	potentialFactor = space->potentialFactor;
 
 	if (traceIteration)
-		printf("🚀 🚀 Avatar::oneIteration() - dt=%lf   stepsPerIteration=%d  %s; elapsed time: %lf\n",
+		printf("🚀 🚀 Avatar::oneIteration() - dt=%lf   stepsPerIteration=%d  %s; potentialFactor=%lf  elapsed time: %lf\n",
 			dt, stepsPerIteration, dangerousTimes ? "dangerous times" : "",
+			potentialFactor,
 			getTimeDouble());
 	isIterating = true;
 
