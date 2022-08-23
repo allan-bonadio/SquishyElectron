@@ -23,6 +23,8 @@ export class PotentialArea extends React.Component {
 		// for first couple of renders, space and wholeRect are null
 		space: PropTypes.instanceOf(eSpace),
 		wholeRect: PropTypes.object,
+
+		setInvalidatePotentialArea: PropTypes.func,
 	};
 
 	constructor(props) {
@@ -33,6 +35,8 @@ export class PotentialArea extends React.Component {
 			// we increment this in lieu of storing the whole potential in the state
 			changeSerial: 0,
 		};
+
+		props.setInvalidatePotentialArea(this.invalidatePotentialArea);
 	}
 
 	/* ***************************************************  click & drag */
@@ -58,13 +62,10 @@ export class PotentialArea extends React.Component {
 			ix, this.potentialBuffer[ix]);//,
 			this.mouseReveal(title, ev, ix);
 
-		// move the potential in this area
-		//for (let offset = -1; offset <= 1; offset++) {
-			this.potentialBuffer[ix] = newPotential;
-		//}
+		this.potentialBuffer[ix] = newPotential;
 
 		//qe.set1DPotential(ix, p.height + p.y - newPotential);
-		this.setState({changeSerial: this.state.changeSerial + 1});
+		this.invalidatePotentialArea();
 	}
 
 	mouseDown(ev) {
@@ -99,6 +100,11 @@ export class PotentialArea extends React.Component {
 
 	/* *************************************************** drawing */
 
+	invalidatePotentialArea =
+	() => {
+		debugger;
+		this.setState({changeSerial: this.state.changeSerial + 1});
+	}
 
 	// make the sequence of coordinates the white line needs to draw
 	// as compressed as possible

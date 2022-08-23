@@ -67,10 +67,10 @@ double Avatar_getIterateSerial(void) {
 }
 
 void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
-void qSpace_setZeroPotential(void) { theSpace->setZeroPotential(); }
-void qSpace_setValleyPotential(double power, double scale, double offset) {
-	theSpace->setValleyPotential(power, scale, offset);
-}
+//void qSpace_setZeroPotential(void) { theSpace->setZeroPotential(); }
+//void qSpace_setValleyPotential(double power, double scale, double offset) {
+//	theSpace->setValleyPotential(power, scale, offset);
+//}
 
 void Avatar_setDt(double dt) {
 	theAvatar->dt = dt;

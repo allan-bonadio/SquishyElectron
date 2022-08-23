@@ -91,7 +91,7 @@ export class ControlPanel extends React.Component {
 			pulseOffset: getASetting('waveParams', 'pulseOffset'),
 
 			// state for potential resets - control panel only, setPotential()
-			potentialBreed: getASetting('potentialParams', 'potentialBreed'),
+			//potentialBreed: getASetting('potentialParams', 'potentialBreed'),
 			valleyPower: getASetting('potentialParams', 'valleyPower'),
 			valleyScale: getASetting('potentialParams', 'valleyScale'),
 			valleyOffset: getASetting('potentialParams', 'valleyOffset'),
@@ -127,22 +127,22 @@ export class ControlPanel extends React.Component {
 		this.props.setWave({waveBreed, waveFrequency, pulseWidth, pulseOffset});
 	}
 
-	// Set Potential buttons
-	setFlatPotentialHandler =
-	ev => {
-		this.setCPState({
-			potentialBreed: storeASetting('potentialParams', 'potentialBreed', 'flat')
-		});
-		this.props.setPotential({potentialBreed: 'flat'});
-	}
-
-	setValleyPotentialHandler =
-	ev => {
+	// fills in the potential buffer with values according to the potentialParams
+	// called when user clicks Valley potential or Flat potential
+	setPotentialHandler =
+	() => {
 		const {valleyPower, valleyScale, valleyOffset} = this.state;
-		this.setCPState({
-			potentialBreed: storeASetting('potentialParams', 'potentialBreed', 'valley')
-		});
-		this.props.setPotential({potentialBreed: 'valley', valleyPower, valleyScale, valleyOffset});
+// 		this.setCPState({
+// 			potentialBreed: storeASetting('potentialParams', 'potentialBreed', 'valley')
+// 		});
+
+		// actually sets buffer
+		this.props.setPotential({valleyPower, valleyScale, valleyOffset});
+
+		// only NOW do we set it in the localStorage
+		storeASetting('potentialParams', 'valleyPower', valleyPower);
+		storeASetting('potentialParams', 'valleyScale', valleyScale);
+		storeASetting('potentialParams', 'valleyOffset', valleyOffset);
 	}
 
 	setShowingTab =
@@ -158,7 +158,7 @@ export class ControlPanel extends React.Component {
 		const p = this.props;
 		const s = this.state;
 		const {waveBreed, waveFrequency, pulseWidth, pulseOffset} = s;
-		const {potentialBreed, valleyPower, valleyScale, valleyOffset} = s;
+		const {valleyPower, valleyScale, valleyOffset} = s;
 
 		switch (s.showingTab) {
 		case 'wave':
@@ -173,9 +173,8 @@ export class ControlPanel extends React.Component {
 
 		case 'potential':
 			return <SetPotentialTab
-				setFlatPotentialHandler={this.setFlatPotentialHandler}
-				setValleyPotentialHandler={this.setValleyPotentialHandler}
-				potentialParams={{potentialBreed, valleyPower, valleyScale, valleyOffset,}}
+				setPotentialHandler={this.setPotentialHandler}
+				potentialParams={{ valleyPower, valleyScale, valleyOffset,}}
 				setCPState={this.setCPState}
 				origSpace={p.space}
 			/>;

@@ -1,6 +1,6 @@
 /*
 ** qe - quantum engine interface
-** this file generated Fri Aug 19 2022 22:33:26 GMT-0700 (Pacific Daylight Time)
+** this file generated Mon Aug 22 2022 02:59:40 GMT-0700 (Pacific Daylight Time)
 ** by the file SquishyElectron/quantumEngine/building/genExports.js
 */
 
@@ -18,8 +18,6 @@ export function defineQEngineFuncs() {
 	qe.Avatar_getElapsedTime = cwrap('Avatar_getElapsedTime', 'number', []);
 	qe.Avatar_getIterateSerial = cwrap('Avatar_getIterateSerial', 'number', []);
 	qe.qSpace_dumpPotential = cwrap('qSpace_dumpPotential', 'number', ['string']);
-	qe.qSpace_setZeroPotential = cwrap('qSpace_setZeroPotential', 'number', []);
-	qe.qSpace_setValleyPotential = cwrap('qSpace_setValleyPotential', 'number', ['number','number','number']);
 	qe.Avatar_setDt = cwrap('Avatar_setDt', null, ['number']);
 	qe.Avatar_setStepsPerIteration = cwrap('Avatar_setStepsPerIteration', null, ['number']);
 	qe.Avatar_setLowPassFilter = cwrap('Avatar_setLowPassFilter', null, ['number']);

@@ -173,9 +173,9 @@ makeParam('waveParams', 'pulseWidth', 20, {min: 1, max: 100});
 makeParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
 
 /* ************************************ potentialParams */
-makeParam('potentialParams', 'potentialBreed', 'flat', ['flat', 'valley']);
+//makeParam('potentialParams', 'potentialBreed', 'flat', ['flat', 'valley']);
 makeParam('potentialParams', 'valleyPower', 1, {min: -20, max: 20});
-makeParam('potentialParams', 'valleyScale', 1, {min: -1e4, max: 1e4});
+makeParam('potentialParams', 'valleyScale', 1, {min: -1e4, max: 1e44});
 makeParam('potentialParams', 'valleyOffset', 50, {min: 0, max: 100});
 
 /* ************************************ iterationParams */

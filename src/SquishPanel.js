@@ -534,25 +534,22 @@ export class SquishPanel extends React.Component {
 
 	// completely wipe out the quantum potential and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon set potential in potential tab
-	setPotential = potentialParams => {
+	setPotential =
+	(potentialParams) => {
+		// sets the numbers
 		setFamiliarPotential(this.state.space, this.state.space.potentialBuffer, potentialParams);
-		this.iterateOneIteration(true, true);  // ???  take this out
-		if (dumpingTheViewBuffer)
-			qe.qViewBuffer_getViewBuffer();
+		//this.iterateOneIteration(true, true);  // ???  take this out - jus ttrigger a PotentialArea render
 
-// 		switch (breed) {
-// 		case 'zero':
-// 			qe.qSpace_setZeroPotential()
-// 			break;
-//
-// 		case 'valley':
-// 			qe.qSpace_setValleyPotential(+arg1, +arg2, +arg3);
-// 			break;
-//
-// 		default:
-// 			throw `setPotential: no voltage breed '${breed}'`
-// 		}
+		this.invalidatePotentialArea();
+
+		// no this doesn't affect the vBuffer
 	}
+
+	// potential area needs to be told when the data changes.  can't put the whole potential buffer in the state!
+	setInvalidatePotentialArea =
+	(invalidatePotentialArea) => {
+		this.invalidatePotentialArea = invalidatePotentialArea;
+	};
 
 	// dump the view buffer, from the JS side.  Why not use the C++ version?
 	dumpViewBuffer(title = '') {
@@ -585,6 +582,7 @@ export class SquishPanel extends React.Component {
 					setEffectiveView={this.setEffectiveView}
 					createdSpacePromise={this.createdSpacePromise}
 					width={p.width}
+					setInvalidatePotentialArea={this.setInvalidatePotentialArea}
 				/>
 				<ControlPanel
 					openResolutionDialog={() => this.openResolutionDialog()}

@@ -38,8 +38,8 @@ exportsSrc  = [
 
 	// the potential
 	{name: 'qSpace_dumpPotential', retType: 'number', args: ['string']},
-	{name: 'qSpace_setZeroPotential', retType: 'number', args: []},
-	{name: 'qSpace_setValleyPotential', retType: 'number', args: ['number', 'number', 'number']},
+	// now done in js {name: 'qSpace_setZeroPotential', retType: 'number', args: []},
+	// now done in js {name: 'qSpace_setValleyPotential', retType: 'number', args: ['number', 'number', 'number']},
 
 	// params
 	{name: 'Avatar_setDt', retType: null, args: ['number']},

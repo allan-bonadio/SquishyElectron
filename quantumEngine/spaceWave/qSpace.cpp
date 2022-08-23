@@ -25,7 +25,7 @@ static bool traceFreeBuffer = false;
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
 qSpace::qSpace(const char *lab)
-	: magic('qSpa'), nDimensions(0), potential(NULL), nPoints(0), nStates(0), freeBufferList(NULL) {
+	: magic('qSpa'), nDimensions(0), potential(NULL), nPoints(0), nStates(0), freeBufferList(NULL), potentialFactor(1.) {
 
 	//printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n", lab, (this));
 
@@ -138,41 +138,46 @@ qSpace::~qSpace(void) {
 
 /* ********************************************************** potential */
 
+// is this obsolete?  no, need it for C++ testing
 void qSpace::dumpPotential(const char *title) {
 	int ix;
 	qDimension *dims = dimensions;
 
-	//printf("🚀 🚀 == Potential %s, %d...%d", title, dims->start, dims->end);
-	if (dims->continuum) printf("  start [O]=%lf", thePotential[0]);
-	//printf("\n");
+	printf("🚀 🚀 == Potential %s, %d...%d\n", title, dims->start, dims->end);
 
-	//for (ix = dims->start; ix < dims->end; ix++) {
-	//	if (0 == ix % 10) printf("\n[%3d] ", ix);
-	//	printf("%lf ", thePotential[ix]);
-	//}
-	//if (dims->continuum) printf("\n🚀 🚀 end [%3d]=%lf", ix, thePotential[ix]);
-	//printf("\n");
-}
+	int half = dims->N / 2;
+	int quarter = dims->N / 4;
+	int quarterEnd = dims->start + quarter;
+	for (ix = dims->start; ix < quarterEnd; ix++) {
 
-void qSpace::setZeroPotential(void) {
-	qDimension *dims = dimensions;
-	printf("setZeroPotential\n");
-	for (int ix = 0; ix < dims->nPoints; ix++)
-		thePotential[ix] = 0.;
-
-	potentialFactor = 1.;
-}
-
-void qSpace::setValleyPotential(double power = 1, double scale = 1, double offset = 0) {
-	printf("setValleyPotential power=%10.3lf  scale=%10.3lf  offset=%10.3lf\n", power, scale, offset);
-	qDimension *dims = dimensions;
-	double mid = floor(dims->nPoints / 2);
-	for (int ix = 0; ix < dims->nPoints; ix++) {
-		thePotential[ix] = pow(abs(ix - mid), power) * scale + offset;
+		printf("[%3d] %8.4lg   [%3d] %8.4lg   [%3d] %8.4lg   [%3d] %8.4lg\n",
+			ix, potential[ix], ix+quarter, potential[ix+quarter],
+			ix+half, potential[ix+half], ix+half+quarter, potential[ix+half+quarter]);
 	}
-
-	potentialFactor = 1.;
+	printf("🚀 🚀 == Potential %s, %d...%d\n", title, dims->start, dims->end);
 }
+
+// now done in JS and szero is not a special case anymore
+//void qSpace::setZeroPotential(void) {
+//	qDimension *dims = dimensions;
+//	printf("setZeroPotential\n");
+//	for (int ix = 0; ix < dims->nPoints; ix++)
+//		thePotential[ix] = 0.;
+//
+//	potentialFactor = 1.;
+//}
+
+// obsolete; now done in JS.
+//void qSpace::setValleyPotential(double power = 1, double scale = 1, double offset = 0) {
+//	printf("setValleyPotential power=%10.3lf  scale=%10.3lf  offset=%10.3lf\n", power, scale, offset);
+//	qDimension *dims = dimensions;
+//	double mid = round(dims->nStates * offset / 100) + dims->start;
+//	for (int ix = dims->start; ix < dims->end; ix++) {
+//		thePotential[ix] = pow(abs(ix - mid), power) * scale + offset;
+//	}
+//
+//	potentialFactor = 1.;
+//}
 
 
 

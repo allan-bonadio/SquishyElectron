@@ -39,6 +39,8 @@ export class WaveView extends React.Component {
 
 		// tells us when the space exists.  From the SquishPanel, or just pass something resolved.
 		createdSpacePromise: PropTypes.instanceOf(Promise),
+
+		setInvalidatePotentialArea: PropTypes.func,
 	};
 
 	static created = 0;
@@ -193,6 +195,7 @@ export class WaveView extends React.Component {
 		}
 
 		//let nPoints = s.space && s.space.nPoints;
+		//debugger;
 
 		const spinner = qe.cppLoaded ? ''
 			: <img className='spinner' alt='spinner' src='eclipseOnTransparent.gif' />;
@@ -221,7 +224,8 @@ export class WaveView extends React.Component {
 
 
 			<PotentialArea width={p.width} height={s.height}
-				space={s.space} wholeRect={wholeRect} />
+				space={s.space} wholeRect={wholeRect}
+				setInvalidatePotentialArea={p.setInvalidatePotentialArea}/>
 		</div>);
 	}
 }

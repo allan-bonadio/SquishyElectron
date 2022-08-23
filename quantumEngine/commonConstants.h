@@ -1,6 +1,6 @@
 /*
 ** commonConstants.h - shared constants between JS and C++
-** this file generated Fri Aug 19 2022 22:33:26 GMT-0700 (Pacific Daylight Time)
+** this file generated Mon Aug 22 2022 02:59:40 GMT-0700 (Pacific Daylight Time)
 ** by the file SquishyElectron/quantumEngine/building/genExports.js
 */
 

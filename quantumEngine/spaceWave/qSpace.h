@@ -129,8 +129,8 @@ public:
 
 	/* *********************************************** potential */
 	void dumpPotential(const char *title);
-	void setZeroPotential(void);
-	void setValleyPotential(double power, double scale, double offset);
+//	void setZeroPotential(void);
+//	void setValleyPotential(double power, double scale, double offset);
 
 };
 

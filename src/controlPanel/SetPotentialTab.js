@@ -14,8 +14,7 @@ import {setFamiliarPotential, dumpPotential} from '../utils/potentialUtils';
 import MiniGraph from './MiniGraph';
 import eSpace from '../engine/eSpace';
 import TextNSlider from '../widgets/TextNSlider';
-import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
-//import {getASetting} from '../utils/storeSettings';
+import {alternateMinMaxs} from '../utils/storeSettings';
 
 // some typical potential value, so we can get an idea of how to scale in the graph
 //let SOME_POTENTIAL = 0.01;
@@ -26,13 +25,13 @@ function setPT() {
 		origSpace: PropTypes.instanceOf(eSpace),
 
 		// actually sets the one in use by the algorithm
-		setFlatPotentialHandler: PropTypes.func.isRequired,
-		setValleyPotentialHandler: PropTypes.func.isRequired,
+		//setFlatPotentialHandler: PropTypes.func.isRequired,
+		setPotentialHandler: PropTypes.func.isRequired,
 
 		potentialParams: PropTypes.shape({
-			potentialBreed: PropTypes.oneOf(['flat', 'valley',]),
+			//potentialBreed: PropTypes.oneOf(['flat', 'valley',]),
 			valleyPower: PropTypes.number.isRequired,
-			valleyScale: PropTypes.number.isRequired,
+			valleyScale: PropTypes.number.isRequired,  // NOT the same as potentialFactor; this is JS only
 			valleyOffset: PropTypes.number.isRequired,
 		}).isRequired,
 	};
@@ -95,76 +94,87 @@ class SetPotentialTab extends React.Component {
 		// </g>;
 	}
 
-	setFlat = () => {
-		this.props.setCPState({potentialBreed:
-			storeASetting('potentialParams', 'potentialBreed', 'flat')});
+	/* *************************************************************** short term setters */
+	// they keep the settings before user clicks 'flat' or 'valley'
+// 	setFlat =
+// 	() => {
+// // 		this.props.setCPState({potentialBreed:
+// // 			storeASetting('potentialParams', 'potentialBreed', 'flat')});
+// 	}
+// 	setValley =
+// 	() => {
+// // 		this.props.setCPState({potentialBreed:
+// // 			storeASetting('potentialParams', 'potentialBreed', 'valley')});
+// 	}
+	setValleyPower =
+	valleyPower => {
+		this.props.setCPState({valleyPower});
 	}
-	setValley = () => {
-		this.props.setCPState({potentialBreed:
-			storeASetting('potentialParams', 'potentialBreed', 'valley')});
+	setValleyScale =
+	valleyScale => {
+		this.props.setCPState({valleyScale});
 	}
-	setValleyPower = valleyPower => {
-		this.props.setCPState({
-			potentialBreed: storeASetting('potentialParams', 'potentialBreed', 'valley'),
-			valleyPower: storeASetting('potentialParams', 'valleyPower', valleyPower),
-			});
-	}
-	setValleyScale = valleyScale => {
-		this.props.setCPState({
-			potentialBreed: storeASetting('potentialParams', 'potentialBreed', 'valley'),
-			valleyScale: storeASetting('potentialParams', 'valleyScale', valleyScale),
-		});
-	}
-	setValleyOffset = valleyOffset => {
-		this.props.setCPState({
-			potentialBreed: storeASetting('potentialParams', 'potentialBreed', 'valley'),
-			valleyOffset: storeASetting('potentialParams', 'valleyOffset', valleyOffset),
-		});
+	setValleyOffset =
+	valleyOffset => {
+		this.props.setCPState({valleyOffset});
 	}
 
-	// rendering for the Tab
+	setFlatPotentialHandler =
+	(ev) => {
+		this.setValleyPower(0);
+		this.setValleyScale(1);
+		this.setValleyOffset(50);
+		this.props.setPotentialHandler();
+	};
+
+	/* *************************************************************** rendering for the Tab */
+
+	renderSliders() {
+		const pp = this.props.potentialParams;
+		return <>
+			<TextNSlider className='powerSlider'  label='Power'
+				value={+pp.valleyPower}
+				min={alternateMinMaxs.potentialParams.valleyPower.min}
+				max={alternateMinMaxs.potentialParams.valleyPower.max}
+				step={.01}
+				style={{width: '8em'}}
+				handleChange={this.setValleyPower}
+			/>
+
+			<br/>
+			<TextNSlider className='scaleSlider'  label='Scale'
+				value={+pp.valleyScale}
+				min={alternateMinMaxs.potentialParams.valleyScale.min}
+				max={alternateMinMaxs.potentialParams.valleyScale.max}
+				step={.01}
+				style={{width: '8em'}}
+				handleChange={this.setValleyScale}
+			/>
+
+			<br/>
+			<TextNSlider className='offsetSlider'  label='Offset %'
+				value={+pp.valleyOffset}
+				min={alternateMinMaxs.potentialParams.valleyOffset.min}
+				max={alternateMinMaxs.potentialParams.valleyOffset.max}
+				step={.1}
+				style={{width: '8em'}}
+				handleChange={this.setValleyOffset}
+			/>
+			<br/>
+		</>;
+	}
+
+
 	render() {
 		const p = this.props;
 		const pp = p.potentialParams;
-
-		const sliders = 	<>
-				<TextNSlider className='powerSlider'  label='Power'
-					value={+pp.valleyPower}
-					min={alternateMinMaxs.potentialParams.valleyPower.min}
-					max={alternateMinMaxs.potentialParams.valleyPower.max}
-					step={.01}
-					style={{width: '8em'}}
-					handleChange={this.setValleyPower}
-				/>
-
-				<br/>
-				<TextNSlider className='scaleSlider'  label='Scale'
-					value={+pp.valleyScale}
-					min={alternateMinMaxs.potentialParams.valleyScale.min}
-					max={alternateMinMaxs.potentialParams.valleyScale.max}
-					step={.01}
-					style={{width: '8em'}}
-					handleChange={this.setValleyScale}
-				/>
-
-				<br/>
-				<TextNSlider className='offsetSlider'  label='Offset %'
-					value={+pp.valleyOffset}
-					min={alternateMinMaxs.potentialParams.valleyOffset.min}
-					max={alternateMinMaxs.potentialParams.valleyOffset.max}
-					step={.1}
-					style={{width: '8em'}}
-					handleChange={this.setValleyOffset}
-				/>
-				<br/>
-			</>;
 
 		// remember that set*PotentialHandler is an event handler that gets the params from ControlPanel state
 		return <div className='setPotentialTab'>
 			<div className='potentialTitlePanel'>
 				<h3>Set Potential</h3>
 				<button className='zeroVoltageButton round'
-					onClick={p.setFlatPotentialHandler}>
+					onClick={this.setFlatPotentialHandler}>
 						Set to Flat Potential
 				</button>
 
@@ -172,10 +182,10 @@ class SetPotentialTab extends React.Component {
 			<div className='divider' ></div>
 
 			<div className='potentialValleyPanel'>
-				{sliders}
+				{this.renderSliders()}
 
 				<button className='valleyVoltageButton round'
-					onClick={p.setValleyPotentialHandler} >
+					onClick={p.setPotentialHandler} >
 						Set to Valley Potential
 				</button>
 			</div>

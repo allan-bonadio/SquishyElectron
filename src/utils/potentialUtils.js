@@ -38,15 +38,9 @@ export function fixPotentialBoundaries(space, potential) {
 
 export function setFamiliarPotential(space, potentialArray, potentialParams) {
 	const {start, end, N} = space.startEnd;
-	let {potentialBreed, valleyPower, valleyScale, valleyOffset} = potentialParams;
+	let {valleyPower, valleyScale, valleyOffset} = potentialParams;
 	let pot;
 	for (let ix = start; ix < end; ix++) {
-		switch (potentialBreed) {
-		case 'flat':
-			pot = 0;
-			break;
-
-		case 'valley':
 			pot = Math.pow(Math.abs(ix - valleyOffset * N / 100), +valleyPower) * +valleyScale * VALLEY_FACTOR;
 			if (! isFinite(pot)) {
 				console.warn(`potential ${pot} screwed up at x=${ix}`, JSON.stringify(potentialParams));
@@ -54,11 +48,6 @@ export function setFamiliarPotential(space, potentialArray, potentialParams) {
 				console.warn(`   Math.pow(ix - valleyOffset * N / 100, +valleyPower)=${Math.pow(ix - valleyOffset * N / 100, +valleyPower)}`);
 				console.warn(`  Math.pow(ix - valleyOffset * N / 100, +valleyPower) * +valleyScale=${Math.pow(ix - valleyOffset * N / 100, +valleyPower) * +valleyScale}`);
 			}
-			break;
-
-		default:
-			throw `bad potentialBreed: ${potentialBreed}`;
-		}
 		potentialArray[ix] = pot;
 	}
 
