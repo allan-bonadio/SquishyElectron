@@ -1,3 +1,6 @@
+This is obsolete.  See squishy_electron_4
+
+
 This project is like, pre-alpha quality.  sorry.
 It has hardwired file paths that I've created identically on my machines.
 
